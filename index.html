@@ -124,6 +124,12 @@
             transform: translateY(-2px);
         }
 
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Table Styles */
         .table-container {
             overflow-x: auto;
@@ -206,6 +212,12 @@
         .notification.show {
             transform: translateX(0);
         }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -277,13 +289,13 @@
                     </select>
                 </div>
 
-                <button type="submit">Save Data (සුරකින්න)</button>
+                <button type="submit" id="submitBtn">Save Data (සුරකින්න)</button>
             </form>
         </div>
 
         <!-- Data View Section -->
         <div class="glass-panel" style="display: flex; flex-direction: column;">
-            <h2>Daily Records <br><span class="lang-si" style="font-size: 1.2rem; color: var(--text-muted); font-weight: 400;">දෛනික වාර්තා</span></h2>
+            <h2>Daily Records <br><span class="lang-si" style="font-size: 1.2rem; color: var(--text-muted); font-weight: 400;">දෛනික වාර්තා (Cloud)</span></h2>
             
             <div class="table-container">
                 <table id="dataTable">
@@ -299,143 +311,145 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <!-- Data will be populated here -->
+                        <tr><td colspan="7" class="loading">Loading data from cloud...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <script>
-        // IndexedDB Configuration
-        const dbName = 'PhoneSalesDB';
-        const dbVersion = 1;
-        const storeName = 'sales';
-        let db;
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Initialize Database
-        const request = indexedDB.open(dbName, dbVersion);
-
-        request.onerror = (event) => {
-            console.error("Database error: " + event.target.error);
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
+            authDomain: "methmi-work-hub.firebaseapp.com",
+            projectId: "methmi-work-hub",
+            storageBucket: "methmi-work-hub.firebasestorage.app",
+            messagingSenderId: "786539502768",
+            appId: "1:786539502768:web:171f0b674108a8555bef75"
         };
 
-        request.onupgradeneeded = (event) => {
-            db = event.target.result;
-            const objectStore = db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
-            objectStore.createIndex('date', 'date', { unique: false });
-        };
-
-        request.onsuccess = (event) => {
-            db = event.target.result;
-            loadData();
-        };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         // Set default date to today
         document.getElementById('date').valueAsDate = new Date();
 
+        const salesForm = document.getElementById('salesForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const tableBody = document.getElementById('tableBody');
+
         // Handle Form Submission
-        document.getElementById('salesForm').addEventListener('submit', (e) => {
+        salesForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Saving... (සුරකිමින්...)';
 
-            const entry = {
-                date: document.getElementById('date').value,
-                spNumber: document.getElementById('spNumber').value,
-                nic: document.getElementById('nic').value,
-                name: document.getElementById('name').value,
-                model: document.getElementById('model').value,
-                mrp: document.getElementById('mrp').value,
-                loanAmount: document.getElementById('loanAmount').value,
-                settlement: document.getElementById('settlement').value,
-                downPayment: document.getElementById('downPayment').value,
-                fintrexPayment: document.getElementById('fintrexPayment').value,
-                stage: document.getElementById('stage').value,
-                timestamp: new Date().getTime()
-            };
+            try {
+                await addDoc(collection(db, "sales"), {
+                    date: document.getElementById('date').value,
+                    spNumber: document.getElementById('spNumber').value,
+                    nic: document.getElementById('nic').value,
+                    name: document.getElementById('name').value,
+                    model: document.getElementById('model').value,
+                    mrp: document.getElementById('mrp').value,
+                    loanAmount: document.getElementById('loanAmount').value,
+                    settlement: document.getElementById('settlement').value,
+                    downPayment: document.getElementById('downPayment').value,
+                    fintrexPayment: document.getElementById('fintrexPayment').value,
+                    stage: document.getElementById('stage').value,
+                    timestamp: serverTimestamp()
+                });
 
-            const transaction = db.transaction([storeName], 'readwrite');
-            const objectStore = transaction.objectStore(storeName);
-            const request = objectStore.add(entry);
-
-            request.onsuccess = () => {
                 // Show notification
                 const notif = document.getElementById('notification');
                 notif.classList.add('show');
                 setTimeout(() => notif.classList.remove('show'), 3000);
                 
                 // Clear optional fields but keep date
-                document.getElementById('salesForm').reset();
+                salesForm.reset();
                 document.getElementById('date').valueAsDate = new Date();
                 
-                loadData();
-            };
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error saving data. Please check connection and permissions.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Save Data (සුරකින්න)';
+            }
         });
 
-        // Load Data to Table
-        function loadData() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            const objectStore = db.transaction(storeName).objectStore(storeName);
-            const records = [];
+        // Real-time Data Loading
+        const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            tableBody.innerHTML = '';
             
-            objectStore.openCursor().onsuccess = (event) => {
-                const cursor = event.target.result;
-                if (cursor) {
-                    records.push(cursor.value);
-                    cursor.continue();
-                } else {
-                    // Sort records by timestamp descending (newest first)
-                    records.sort((a, b) => b.timestamp - a.timestamp);
-                    
-                    records.forEach(data => {
-                        const tr = document.createElement('tr');
-                        
-                        let stageBadge = '';
-                        if(data.stage === 'COMPLET') stageBadge = '<span class="badge badge-completed">Completed</span>';
-                        else if(data.stage === 'PENDING') stageBadge = '<span class="badge badge-pending">Pending</span>';
-                        else stageBadge = '<span class="badge badge-doc">Doc Pending</span>';
-
-                        tr.innerHTML = `
-                            <td>${data.date}</td>
-                            <td>
-                                <strong>SP:</strong> ${data.spNumber}<br>
-                                <strong>NIC:</strong> ${data.nic}
-                            </td>
-                            <td>
-                                <strong>${data.name}</strong><br>
-                                <span style="color: var(--text-muted)">${data.model}</span>
-                            </td>
-                            <td>
-                                MRP: ${data.mrp || '-'}<br>
-                                Loan: ${data.loanAmount || '-'}<br>
-                                Setl: ${data.settlement || '-'}
-                            </td>
-                            <td>
-                                DP: ${data.downPayment || '-'}<br>
-                                Fin: ${data.fintrexPayment || '-'}
-                            </td>
-                            <td>${stageBadge}</td>
-                            <td><button class="delete-btn" onclick="deleteEntry(${data.id})">Del</button></td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                }
-            };
-        }
-
-        // Delete Entry
-        window.deleteEntry = function(id) {
-            if(confirm("Are you sure you want to delete this record? (මෙම වාර්තාව මැකීමට ඔබට විශ්වාසද?)")) {
-                const request = db.transaction([storeName], 'readwrite')
-                                  .objectStore(storeName)
-                                  .delete(id);
-                
-                request.onsuccess = () => {
-                    loadData();
-                };
+            if (snapshot.empty) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="loading">No records found.</td></tr>';
+                return;
             }
-        };
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                
+                const tr = document.createElement('tr');
+                
+                let stageBadge = '';
+                if(data.stage === 'COMPLET') stageBadge = '<span class="badge badge-completed">Completed</span>';
+                else if(data.stage === 'PENDING') stageBadge = '<span class="badge badge-pending">Pending</span>';
+                else stageBadge = '<span class="badge badge-doc">Doc Pending</span>';
+
+                tr.innerHTML = `
+                    <td>${data.date}</td>
+                    <td>
+                        <strong>SP:</strong> ${data.spNumber}<br>
+                        <strong>NIC:</strong> ${data.nic}
+                    </td>
+                    <td>
+                        <strong>${data.name}</strong><br>
+                        <span style="color: var(--text-muted)">${data.model}</span>
+                    </td>
+                    <td>
+                        MRP: ${data.mrp || '-'}<br>
+                        Loan: ${data.loanAmount || '-'}<br>
+                        Setl: ${data.settlement || '-'}
+                    </td>
+                    <td>
+                        DP: ${data.downPayment || '-'}<br>
+                        Fin: ${data.fintrexPayment || '-'}
+                    </td>
+                    <td>${stageBadge}</td>
+                    <td><button class="delete-btn" data-id="${id}">Del</button></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Add delete event listeners
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if(confirm("Are you sure you want to delete this record? (මෙම වාර්තාව මැකීමට ඔබට විශ්වාසද?)")) {
+                        const docId = e.target.getAttribute('data-id');
+                        try {
+                            await deleteDoc(doc(db, "sales", docId));
+                        } catch (error) {
+                            console.error("Error deleting document: ", error);
+                        }
+                    }
+                });
+            });
+            
+        }, (error) => {
+            console.error("Error fetching data: ", error);
+            tableBody.innerHTML = '<tr><td colspan="7" class="loading" style="color: #ef4444;">Error loading data from database. Did you create the Firestore Database in Test Mode? (Database එක Test Mode එකෙන් හැදුවාදැයි පරීක්ෂා කරන්න)</td></tr>';
+        });
     </script>
 </body>
 </html>
