@@ -364,7 +364,7 @@
             const loan = parseFloat(loanAmountInput.value) || 0;
 
             const discountedMrp = mrp - (mrp * 0.04);
-            const settlement = discountedMrp - dp - doc - loan;
+            const settlement = discountedMrp - dp - doc; // Loan amount is kept separate as per request
 
             if (mrp > 0 || dp > 0 || doc > 0 || loan > 0) {
                 settlementInput.value = settlement.toFixed(2);
