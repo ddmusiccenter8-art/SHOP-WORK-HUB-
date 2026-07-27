@@ -202,6 +202,10 @@
                         <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Storage</label>
                         <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
                         
+                        <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Transfer To (Shop / Branch)</label>
+                        <input type="text" id="invShop" list="shopDatalist" autocomplete="off" required placeholder="Select or type new branch..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <datalist id="shopDatalist"></datalist>
+                        
                         <button type="submit" id="invSubmitBtn" style="width: 100%; background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Add to Inventory</button>
                     </form>
                 </div>
@@ -215,11 +219,12 @@
                                 <tr>
                                     <th>IMEI</th>
                                     <th>Model & Storage</th>
+                                    <th>Location</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody">
-                                <tr><td colspan="3" style="text-align: center;">Loading...</td></tr>
+                                <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -496,23 +501,44 @@
             const q = query(collection(db, "inventory"), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('inventoryTableBody');
+                const datalist = document.getElementById('shopDatalist');
                 tbody.innerHTML = '';
+                
                 if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No stock items added yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No stock items added yet.</td></tr>';
+                    datalist.innerHTML = '';
                     return;
                 }
+                
+                const uniqueLocations = new Set();
                 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const tr = document.createElement('tr');
                     let badge = data.status === 'Available' ? '<span class="badge badge-confirmed">Available</span>' : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Sold</span>';
+                    let location = data.shop || '-';
+                    
+                    if (data.shop) {
+                        uniqueLocations.add(data.shop.trim());
+                    }
                     
                     tr.innerHTML = `
                         <td><strong>${data.imei}</strong></td>
                         <td>${data.model} - ${data.storage}</td>
+                        <td><span style="color: #c084fc;">${location}</span></td>
                         <td>${badge}</td>
                     `;
                     tbody.appendChild(tr);
+                });
+
+                // Update Dropdown List
+                datalist.innerHTML = '';
+                uniqueLocations.forEach(loc => {
+                    if (loc) {
+                        const option = document.createElement('option');
+                        option.value = loc;
+                        datalist.appendChild(option);
+                    }
                 });
             });
         }
@@ -528,17 +554,29 @@
                     imei: document.getElementById('invImei').value.trim(),
                     model: document.getElementById('invModel').value.trim(),
                     storage: document.getElementById('invStorage').value.trim(),
+                    shop: document.getElementById('invShop').value.trim(),
                     status: 'Available',
                     timestamp: serverTimestamp()
                 });
                 document.getElementById('inventoryForm').reset();
+                
+                // Show success briefly
+                btn.innerText = 'Added! ✅';
+                btn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    btn.innerText = 'Add to Inventory';
+                    btn.style.background = 'var(--primary)';
+                    btn.disabled = false;
+                    document.getElementById('invImei').focus(); // Auto-focus for next entry
+                }, 1000);
+                
             } catch(err) {
                 alert("Error adding inventory item.");
                 console.error(err);
+                btn.innerText = 'Add to Inventory';
+                btn.disabled = false;
             }
-            
-            btn.innerText = 'Add to Inventory';
-            btn.disabled = false;
         });
     </script>
 </body>
