@@ -554,7 +554,7 @@
                 storage: document.getElementById('invStorage').value.trim(),
                 shop: document.getElementById('invShop').value.trim(),
                 status: 'Available',
-                timestamp: serverTimestamp()
+                timestamp: Date.now() // Used instead of serverTimestamp for instant local ordering
             }).catch(err => {
                 console.error("Error adding inventory item:", err);
                 alert("Error adding item: " + err.message);
