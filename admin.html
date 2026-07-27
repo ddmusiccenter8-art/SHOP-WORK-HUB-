@@ -183,16 +183,27 @@
             <div id="modalContent" class="detail-grid"></div>
             
             <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+            <h3 style="font-size: 1rem; color: var(--warning);">Admin Actions</h3>
             
-            <h3 style="font-size: 1rem; color: var(--warning);">Send Reply / Note to Shop</h3>
-            <textarea id="replyText" placeholder="Write your message here..."></textarea>
-            
-            <h3 style="font-size: 1rem; color: var(--primary); margin-top: 1rem;">Payment Details / Status</h3>
-            <input type="text" id="paymentStatusText" placeholder="e.g. Paid via Bank Transfer" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;">
-            
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button class="btn-reply" id="sendReplyBtn">Send Reply</button>
-                <button class="btn-pay" id="markPayBtn">Mark Payment Sent</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.9rem;">Send Reply / Note to Shop</label>
+                    <textarea id="replyText" placeholder="Write your message here..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; min-height: 80px; margin-top: 0.5rem;"></textarea>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.9rem;">Fintrex Payment Update</label>
+                    <input type="text" id="fintrexPaymentText" placeholder="e.g. Approved 25,000" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; margin-top: 0.5rem;">
+                    
+                    <label style="color: var(--text-muted); font-size: 0.9rem;">Payment Status (Shop Settlement)</label>
+                    <select id="paymentStatusSelect" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;">
+                        <option value="Pending">Pending (ගෙවීමට ඇත)</option>
+                        <option value="Paid">Paid (ගෙව්වා)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn-pay" id="saveUpdatesBtn" style="width: 100%;">Save All Updates</button>
             </div>
         </div>
     </div>
@@ -372,12 +383,12 @@
                 <div class="detail-item"><strong>Document Charge:</strong> <br>${data.document}</div>
                 <div class="detail-item" style="color:var(--success);"><strong>Loan Amount:</strong> <br>${data.loanAmount}</div>
                 <div class="detail-item" style="color:var(--warning);"><strong>Settlement:</strong> <br>${data.settlement}</div>
-                <div class="detail-item"><strong>Fintrex Payment:</strong> <br>${data.fintrexPayment || '-'}</div>
                 <div class="detail-item"><strong>Current Status:</strong> <br>${getStatusBadge(data.status)}</div>
             `;
             
             document.getElementById('replyText').value = data.adminReply || '';
-            document.getElementById('paymentStatusText').value = data.paymentStatus || '';
+            document.getElementById('fintrexPaymentText').value = data.fintrexPayment || '';
+            document.getElementById('paymentStatusSelect').value = data.paymentStatus === 'Paid' ? 'Paid' : 'Pending';
             document.getElementById('detailModal').style.display = 'flex';
         };
 
@@ -387,28 +398,34 @@
         };
 
         // Actions
-        document.getElementById('sendReplyBtn').addEventListener('click', async () => {
+        document.getElementById('saveUpdatesBtn').addEventListener('click', async () => {
             if (!currentModalDocId) return;
-            const text = document.getElementById('replyText').value;
-            const btn = document.getElementById('sendReplyBtn');
-            btn.innerText = 'Sending...';
+            
+            const reply = document.getElementById('replyText').value;
+            const fintrex = document.getElementById('fintrexPaymentText').value;
+            const pStatus = document.getElementById('paymentStatusSelect').value;
+            
+            const btn = document.getElementById('saveUpdatesBtn');
+            btn.innerText = 'Saving...';
+            
             try {
-                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Admin Replied', adminReply: text });
-                closeModal();
-            } catch (e) { alert("Error sending reply"); }
-            btn.innerText = 'Send Reply';
-        });
+                let newMainStatus = 'New';
+                if (pStatus === 'Paid') {
+                    newMainStatus = 'Payment Sent';
+                } else if (reply.trim() !== '') {
+                    newMainStatus = 'Admin Replied';
+                }
 
-        document.getElementById('markPayBtn').addEventListener('click', async () => {
-            if (!currentModalDocId) return;
-            const payText = document.getElementById('paymentStatusText').value;
-            const btn = document.getElementById('markPayBtn');
-            btn.innerText = 'Marking...';
-            try {
-                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Payment Sent', paymentStatus: payText });
+                await updateDoc(doc(db, "sales", currentModalDocId), { 
+                    status: newMainStatus, 
+                    adminReply: reply,
+                    fintrexPayment: fintrex,
+                    paymentStatus: pStatus
+                });
                 closeModal();
-            } catch (e) { alert("Error marking payment"); }
-            btn.innerText = 'Mark Payment Sent';
+            } catch (e) { alert("Error saving updates"); }
+            
+            btn.innerText = 'Save All Updates';
         });
     </script>
 </body>
