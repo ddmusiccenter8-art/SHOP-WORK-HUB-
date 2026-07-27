@@ -142,7 +142,10 @@
             
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <div style="position: relative;">
+                    <input type="password" id="password" required placeholder="••••••••">
+                    <span id="togglePassword" style="position: absolute; right: 15px; top: 12px; cursor: pointer; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">Show</span>
+                </div>
             </div>
             
             <button type="submit" id="loginBtn">Login to Work Hub</button>
@@ -177,6 +180,14 @@
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMessage');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.innerText = type === 'password' ? 'Hide' : 'Show';
+        });
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -200,7 +211,10 @@
         });
 
         function redirectUser(email) {
-            if (email.toLowerCase().includes('admin')) {
+            const adminEmails = ['admin@methmi.com', 'methmimobilepvtltd@gmail.com', 'ddmusiccenter8@gmail.com'];
+            const isAdmin = email.toLowerCase().includes('admin') || adminEmails.includes(email.toLowerCase());
+            
+            if (isAdmin) {
                 window.location.href = 'admin.html';
             } else {
                 window.location.href = 'shop.html';

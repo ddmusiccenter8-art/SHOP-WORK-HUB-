@@ -302,6 +302,7 @@
 
             <div id="paymentSection" style="display: none; margin-top: 20px; text-align: center;">
                 <p style="color: var(--text-muted); margin-bottom: 10px;">Admin has marked the payment as sent.</p>
+                <p id="paymentNoteDisplay" style="color: white; font-weight: bold; margin-bottom: 15px;"></p>
                 <button class="confirm-btn" id="confirmPaymentBtn">Confirm Payment Received</button>
             </div>
         </div>
@@ -446,7 +447,7 @@
                     let statusHtml = '';
                     if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                     else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
-                    else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '')">Payment Sent - Click to Confirm</span>`;
+                    else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.paymentStatus || '')}')">Payment Sent - Click to Confirm</span>`;
                     else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed</span>';
 
                     tr.innerHTML = `
@@ -515,6 +516,7 @@
                 document.getElementById('replySection').style.display = 'block';
             } else if (type === 'payment') {
                 document.getElementById('modalTitle').innerText = 'Confirm Payment';
+                document.getElementById('paymentNoteDisplay').innerText = decodeURIComponent(replyEncoded) || 'No additional payment details provided.';
                 document.getElementById('paymentSection').style.display = 'block';
             }
             modal.style.display = 'flex';

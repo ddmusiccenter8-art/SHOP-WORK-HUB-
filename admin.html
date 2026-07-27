@@ -186,7 +186,11 @@
             
             <h3 style="font-size: 1rem; color: var(--warning);">Send Reply / Note to Shop</h3>
             <textarea id="replyText" placeholder="Write your message here..."></textarea>
-            <div style="display: flex; gap: 1rem;">
+            
+            <h3 style="font-size: 1rem; color: var(--primary); margin-top: 1rem;">Payment Details / Status</h3>
+            <input type="text" id="paymentStatusText" placeholder="e.g. Paid via Bank Transfer" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;">
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                 <button class="btn-reply" id="sendReplyBtn">Send Reply</button>
                 <button class="btn-pay" id="markPayBtn">Mark Payment Sent</button>
             </div>
@@ -219,7 +223,9 @@
         // Auth Check
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (!user.email.toLowerCase().includes('admin')) {
+                const adminEmails = ['admin@methmi.com', 'methmimobilepvtltd@gmail.com', 'ddmusiccenter8@gmail.com'];
+                const isAdmin = user.email.toLowerCase().includes('admin') || adminEmails.includes(user.email.toLowerCase());
+                if (!isAdmin) {
                     window.location.href = 'shop.html';
                 } else {
                     loadAllData();
@@ -371,6 +377,7 @@
             `;
             
             document.getElementById('replyText').value = data.adminReply || '';
+            document.getElementById('paymentStatusText').value = data.paymentStatus || '';
             document.getElementById('detailModal').style.display = 'flex';
         };
 
@@ -394,10 +401,11 @@
 
         document.getElementById('markPayBtn').addEventListener('click', async () => {
             if (!currentModalDocId) return;
+            const payText = document.getElementById('paymentStatusText').value;
             const btn = document.getElementById('markPayBtn');
             btn.innerText = 'Marking...';
             try {
-                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Payment Sent' });
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Payment Sent', paymentStatus: payText });
                 closeModal();
             } catch (e) { alert("Error marking payment"); }
             btn.innerText = 'Mark Payment Sent';
