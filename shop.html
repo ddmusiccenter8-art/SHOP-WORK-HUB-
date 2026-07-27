@@ -228,8 +228,17 @@
                     <input type="text" id="name" required>
                 </div>
                 <div class="form-group">
+                    <label>IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
+                    <input type="text" id="imei" required placeholder="Type IMEI to check stock...">
+                    <div id="imeiStatus" style="font-size: 0.85rem; margin-top: 5px; font-weight: bold;"></div>
+                </div>
+                <div class="form-group">
                     <label>Model <span class="lang-si">(දුරකථන මාදිලිය)</span></label>
                     <input type="text" id="model" required>
+                </div>
+                <div class="form-group">
+                    <label>Storage <span class="lang-si">(ධාරිතාවය)</span></label>
+                    <input type="text" id="storage" placeholder="e.g. 128GB">
                 </div>
                 <div class="form-group">
                     <label>MRP <span class="lang-si">(උපරිම සිල්ලර මිල)</span></label>
@@ -308,7 +317,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, doc, updateDoc, serverTimestamp } 
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, doc, updateDoc, serverTimestamp, getDocs } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -350,22 +359,64 @@
         // Set default date
         document.getElementById('date').valueAsDate = new Date();
 
-        // Auto Calculation Logic
+        // Auto Calculation & Inventory Check Logic
+        let currentStockSource = 'Shop';
+        let currentDiscount = 0.04;
+        let matchedInventoryDocId = null;
+
+        const imeiInput = document.getElementById('imei');
+        const imeiStatus = document.getElementById('imeiStatus');
+        const modelInput = document.getElementById('model');
+        const storageInput = document.getElementById('storage');
         const mrpInput = document.getElementById('mrp');
         const downPaymentInput = document.getElementById('downPayment');
         const documentInput = document.getElementById('document');
         const loanAmountInput = document.getElementById('loanAmount');
         const settlementInput = document.getElementById('settlement');
 
+        imeiInput.addEventListener('input', async (e) => {
+            const val = e.target.value.trim();
+            if (val.length < 4) {
+                imeiStatus.innerText = '';
+                currentStockSource = 'Shop';
+                currentDiscount = 0.04;
+                matchedInventoryDocId = null;
+                calculateSettlement();
+                return;
+            }
+            
+            const q = query(collection(db, "inventory"), where("imei", "==", val), where("status", "==", "Available"));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                const invDoc = snapshot.docs[0];
+                const data = invDoc.data();
+                
+                imeiStatus.innerHTML = '<span style="color: var(--success);">✅ Head Office Stock (6% Discount Applied)</span>';
+                modelInput.value = data.model;
+                storageInput.value = data.storage || '';
+                
+                currentStockSource = 'HO';
+                currentDiscount = 0.06;
+                matchedInventoryDocId = invDoc.id;
+            } else {
+                imeiStatus.innerHTML = '<span style="color: var(--text-muted);">Shop Stock (4% Discount Applied)</span>';
+                currentStockSource = 'Shop';
+                currentDiscount = 0.04;
+                matchedInventoryDocId = null;
+            }
+            calculateSettlement();
+        });
+
         function calculateSettlement() {
             const mrp = parseFloat(mrpInput.value) || 0;
             const dp = parseFloat(downPaymentInput.value) || 0;
-            const doc = parseFloat(documentInput.value) || 0;
+            const docCharge = parseFloat(documentInput.value) || 0;
 
-            const discountedMrp = mrp - (mrp * 0.04);
-            const settlement = discountedMrp - dp - doc;
+            const discountedMrp = mrp - (mrp * currentDiscount);
+            const settlement = discountedMrp - dp - docCharge;
 
-            if (mrp > 0 || dp > 0 || doc > 0) {
+            if (mrp > 0 || dp > 0 || docCharge > 0) {
                 settlementInput.value = settlement.toFixed(2);
             } else {
                 settlementInput.value = '';
@@ -391,19 +442,31 @@
                     spNumber: document.getElementById('spNumber').value,
                     nic: document.getElementById('nic').value,
                     name: document.getElementById('name').value,
-                    model: document.getElementById('model').value,
+                    imei: imeiInput.value,
+                    model: modelInput.value,
+                    storage: storageInput.value,
                     mrp: document.getElementById('mrp').value,
                     loanAmount: loanAmountInput.value,
                     settlement: settlementInput.value,
                     downPayment: downPaymentInput.value,
                     document: documentInput.value,
                     fintrexPayment: '',
-                    status: 'New', // Workflow: New -> Admin Replied -> Payment Sent -> Confirmed
+                    status: 'New', 
                     adminReply: '',
+                    stockSource: currentStockSource,
+                    discountApplied: (currentDiscount * 100) + '%',
                     timestamp: serverTimestamp()
                 });
                 
+                if (matchedInventoryDocId) {
+                    await updateDoc(doc(db, "inventory", matchedInventoryDocId), { status: 'Sold' });
+                }
+                
                 salesForm.reset();
+                imeiStatus.innerText = '';
+                currentStockSource = 'Shop';
+                currentDiscount = 0.04;
+                matchedInventoryDocId = null;
                 document.getElementById('date').valueAsDate = new Date();
             } catch (error) {
                 console.error(error);
