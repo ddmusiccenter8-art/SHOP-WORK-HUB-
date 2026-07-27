@@ -543,40 +543,37 @@
             });
         }
 
-        document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
+        document.getElementById('inventoryForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
-            btn.innerText = 'Adding...';
+            
+            // Fire and forget to prevent UI hanging
+            addDoc(collection(db, "inventory"), {
+                imei: document.getElementById('invImei').value.trim(),
+                model: document.getElementById('invModel').value.trim(),
+                storage: document.getElementById('invStorage').value.trim(),
+                shop: document.getElementById('invShop').value.trim(),
+                status: 'Available',
+                timestamp: serverTimestamp()
+            }).catch(err => {
+                console.error("Error adding inventory item:", err);
+                alert("Error adding item: " + err.message);
+            });
+
+            // Immediately reset form for the next item
+            document.getElementById('inventoryForm').reset();
+            
+            // Show success briefly
+            btn.innerText = 'Added! ✅';
+            btn.style.background = 'var(--success)';
             btn.disabled = true;
             
-            try {
-                await addDoc(collection(db, "inventory"), {
-                    imei: document.getElementById('invImei').value.trim(),
-                    model: document.getElementById('invModel').value.trim(),
-                    storage: document.getElementById('invStorage').value.trim(),
-                    shop: document.getElementById('invShop').value.trim(),
-                    status: 'Available',
-                    timestamp: serverTimestamp()
-                });
-                document.getElementById('inventoryForm').reset();
-                
-                // Show success briefly
-                btn.innerText = 'Added! ✅';
-                btn.style.background = 'var(--success)';
-                
-                setTimeout(() => {
-                    btn.innerText = 'Add to Inventory';
-                    btn.style.background = 'var(--primary)';
-                    btn.disabled = false;
-                    document.getElementById('invImei').focus(); // Auto-focus for next entry
-                }, 1000);
-                
-            } catch(err) {
-                alert("Error adding inventory item.");
-                console.error(err);
+            setTimeout(() => {
                 btn.innerText = 'Add to Inventory';
+                btn.style.background = 'var(--primary)';
                 btn.disabled = false;
-            }
+                document.getElementById('invImei').focus(); // Auto-focus for next entry
+            }, 600);
         });
     </script>
 </body>
