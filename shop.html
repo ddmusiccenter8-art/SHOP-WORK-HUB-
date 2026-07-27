@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Hub | Shop Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            background: -webkit-linear-gradient(45deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .lang-si { font-size: 0.9rem; }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Table Styles */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+        
+        .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+        .badge-new { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+        .badge-replied { background: rgba(245, 158, 11, 0.2); color: var(--warning); cursor: pointer; }
+        .badge-sent { background: rgba(139, 92, 246, 0.2); color: #c084fc; cursor: pointer; }
+        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 2rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-close {
+            float: right;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+        .reply-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+        .confirm-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>METHMI WORK HUB <span style="font-size: 1rem; color: var(--text-muted);">| Shop Dashboard</span></h1>
+        <div>
+            <span id="userEmailDisplay" style="margin-right: 15px; color: var(--text-muted);"></span>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Form Section -->
+        <div class="glass-panel">
+            <h2>New Entry <span class="lang-si">(නව දත්ත)</span></h2>
+            
+            <form id="salesForm">
+                <div class="form-group">
+                    <label>Date <span class="lang-si">(දිනය)</span></label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label>SP Number <span class="lang-si">(SP අංකය)</span></label>
+                    <input type="text" id="spNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>NIC <span class="lang-si">(ජා. හැ. අංකය)</span></label>
+                    <input type="text" id="nic" required>
+                </div>
+                <div class="form-group">
+                    <label>Name <span class="lang-si">(නම)</span></label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Model <span class="lang-si">(දුරකථන මාදිලිය)</span></label>
+                    <input type="text" id="model" required>
+                </div>
+                <div class="form-group">
+                    <label>MRP <span class="lang-si">(උපරිම සිල්ලර මිල)</span></label>
+                    <input type="number" id="mrp" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Down Payment <span class="lang-si">(මූලික ගෙවීම)</span></label>
+                    <input type="number" id="downPayment" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Document <span class="lang-si">(ලේඛන)</span></label>
+                    <input type="number" id="document" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Loan Amount <span class="lang-si">(ණය මුදල)</span></label>
+                    <input type="number" id="loanAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Settlement <span class="lang-si">(පියවීම) - Auto</span></label>
+                    <input type="number" id="settlement" placeholder="0.00" step="0.01" readonly style="background: rgba(0,0,0,0.5);">
+                </div>
+                <div class="form-group">
+                    <label>Fintrex Payment <span class="lang-si">(Fintrex ගෙවීම්)</span></label>
+                    <input type="text" id="fintrexPayment">
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Data</button>
+            </form>
+        </div>
+
+        <!-- Data View & Chart Section -->
+        <div>
+            <div class="glass-panel" style="padding-bottom: 1rem;">
+                <h2>Sales Analytics <span class="lang-si">(විකුණුම් සටහන)</span></h2>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h2>My Submissions <span class="lang-si">(මගේ දත්ත)</span></h2>
+                <div class="table-container">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>SP / Model</th>
+                                <th>Amounts</th>
+                                <th>Status <span class="lang-si">(තත්වය)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="4" style="text-align: center;">Loading data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div id="actionModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Details</h2>
+            
+            <div id="replySection" class="reply-box" style="display: none;">
+                <strong>Admin Reply:</strong>
+                <p id="adminReplyText" style="margin-top: 5px;"></p>
+            </div>
+
+            <div id="paymentSection" style="display: none; margin-top: 20px; text-align: center;">
+                <p style="color: var(--text-muted); margin-bottom: 10px;">Admin has marked the payment as sent.</p>
+                <button class="confirm-btn" id="confirmPaymentBtn">Confirm Payment Received</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, doc, updateDoc, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
+            authDomain: "methmi-work-hub.firebaseapp.com",
+            projectId: "methmi-work-hub",
+            storageBucket: "methmi-work-hub.firebasestorage.app",
+            messagingSenderId: "786539502768",
+            appId: "1:786539502768:web:171f0b674108a8555bef75"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let chartInstance = null;
+        let currentModalDocId = null;
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email.toLowerCase().includes('admin')) {
+                    window.location.href = 'admin.html';
+                } else {
+                    currentUser = user;
+                    document.getElementById('userEmailDisplay').innerText = user.email;
+                    loadShopData(user.email);
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        // Set default date
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Auto Calculation Logic
+        const mrpInput = document.getElementById('mrp');
+        const downPaymentInput = document.getElementById('downPayment');
+        const documentInput = document.getElementById('document');
+        const loanAmountInput = document.getElementById('loanAmount');
+        const settlementInput = document.getElementById('settlement');
+
+        function calculateSettlement() {
+            const mrp = parseFloat(mrpInput.value) || 0;
+            const dp = parseFloat(downPaymentInput.value) || 0;
+            const doc = parseFloat(documentInput.value) || 0;
+
+            const discountedMrp = mrp - (mrp * 0.04);
+            const settlement = discountedMrp - dp - doc;
+
+            if (mrp > 0 || dp > 0 || doc > 0) {
+                settlementInput.value = settlement.toFixed(2);
+            } else {
+                settlementInput.value = '';
+            }
+        }
+        [mrpInput, downPaymentInput, documentInput].forEach(input => input.addEventListener('input', calculateSettlement));
+
+        // Handle Form Submission
+        const salesForm = document.getElementById('salesForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        salesForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Saving...';
+
+            try {
+                await addDoc(collection(db, "sales"), {
+                    shopId: currentUser.email,
+                    date: document.getElementById('date').value,
+                    spNumber: document.getElementById('spNumber').value,
+                    nic: document.getElementById('nic').value,
+                    name: document.getElementById('name').value,
+                    model: document.getElementById('model').value,
+                    mrp: document.getElementById('mrp').value,
+                    loanAmount: loanAmountInput.value,
+                    settlement: settlementInput.value,
+                    downPayment: downPaymentInput.value,
+                    document: documentInput.value,
+                    fintrexPayment: document.getElementById('fintrexPayment').value,
+                    status: 'New', // Workflow: New -> Admin Replied -> Payment Sent -> Confirmed
+                    adminReply: '',
+                    timestamp: serverTimestamp()
+                });
+                
+                salesForm.reset();
+                document.getElementById('date').valueAsDate = new Date();
+            } catch (error) {
+                console.error(error);
+                alert("Error saving data.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Submit Data';
+            }
+        });
+
+        // Load Data & Chart
+        function loadShopData(email) {
+            const q = query(collection(db, "sales"), where("shopId", "==", email), orderBy("timestamp", "desc"));
+            const tableBody = document.getElementById('tableBody');
+            
+            onSnapshot(q, (snapshot) => {
+                tableBody.innerHTML = '';
+                const salesByDate = {}; // For Chart
+
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No records found.</td></tr>';
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    
+                    // Chart Data prep (aggregate loan amounts by date)
+                    if (data.date) {
+                        const amount = parseFloat(data.loanAmount) || 0;
+                        salesByDate[data.date] = (salesByDate[data.date] || 0) + amount;
+                    }
+                    
+                    // Table Rendering
+                    const tr = document.createElement('tr');
+                    
+                    let statusHtml = '';
+                    if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
+                    else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
+                    else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '')">Payment Sent - Click to Confirm</span>`;
+                    else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed</span>';
+
+                    tr.innerHTML = `
+                        <td>${data.date}</td>
+                        <td>
+                            <strong>${data.spNumber}</strong><br>
+                            <span style="color: var(--text-muted)">${data.model}</span>
+                        </td>
+                        <td>
+                            Loan: ${data.loanAmount || '-'}<br>
+                            Setl: ${data.settlement || '-'}
+                        </td>
+                        <td>${statusHtml}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                updateChart(salesByDate);
+            });
+        }
+
+        // Chart Logic
+        function updateChart(salesByDate) {
+            const dates = Object.keys(salesByDate).sort();
+            const amounts = dates.map(d => salesByDate[d]);
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Total Loan Amounts',
+                        data: amounts,
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Modal Logic (Global functions)
+        window.openModal = function(id, type, replyEncoded) {
+            currentModalDocId = id;
+            const modal = document.getElementById('actionModal');
+            document.getElementById('replySection').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'none';
+
+            if (type === 'reply') {
+                document.getElementById('modalTitle').innerText = 'Admin Message';
+                document.getElementById('adminReplyText').innerText = decodeURIComponent(replyEncoded);
+                document.getElementById('replySection').style.display = 'block';
+            } else if (type === 'payment') {
+                document.getElementById('modalTitle').innerText = 'Confirm Payment';
+                document.getElementById('paymentSection').style.display = 'block';
+            }
+            modal.style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('actionModal').style.display = 'none';
+            currentModalDocId = null;
+        };
+
+        // Confirm Payment Action
+        document.getElementById('confirmPaymentBtn').addEventListener('click', async () => {
+            if (!currentModalDocId) return;
+            const btn = document.getElementById('confirmPaymentBtn');
+            btn.innerText = 'Confirming...';
+            try {
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Confirmed' });
+                closeModal();
+            } catch (e) {
+                console.error(e);
+                alert("Error confirming payment");
+            } finally {
+                btn.innerText = 'Confirm Payment Received';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Hub | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            background: -webkit-linear-gradient(45deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tabs { margin-top: 2rem; display: flex; gap: 1rem; width: 100%; max-width: 1300px; padding: 0 2rem; }
+        .tab {
+            padding: 0.8rem 2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            color: var(--text-muted);
+        }
+        .tab.active { background: var(--card-bg); color: white; border-top: 2px solid var(--primary); }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            padding: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0 12px 12px 12px;
+            min-height: 70vh;
+        }
+
+        /* Views */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+        tr:hover { background: rgba(255, 255, 255, 0.02); cursor: pointer; }
+
+        .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+        .badge-new { background: rgba(59, 130, 246, 0.2); color: var(--info); }
+        .badge-replied { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-sent { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
+        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+
+        .shop-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .shop-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-color); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 2rem; width: 90%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-close { float: right; cursor: pointer; font-size: 1.5rem; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .detail-item { background: rgba(255,255,255,0.02); padding: 0.8rem; border-radius: 6px; }
+        
+        textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 1rem; border-radius: 8px; margin-top: 1rem; min-height: 80px; }
+        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 1rem; color: white;}
+        .btn-reply { background: var(--warning); color: black;}
+        .btn-pay { background: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>METHMI WORK HUB <span style="font-size: 1rem; color: var(--text-muted);">| Admin Dashboard</span></h1>
+        <button id="logoutBtn" style="margin: 0; padding: 0.5rem 1rem; background: transparent; border: 1px solid var(--primary); color: var(--primary);">Logout</button>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('submissions')">All Submissions</div>
+        <div class="tab" onclick="switchTab('shops')">Shop Profiles</div>
+    </div>
+
+    <div class="container">
+        <!-- All Submissions View -->
+        <div id="submissionsView" class="view active">
+            <h2>Recent Entries from All Shops</h2>
+            <div style="overflow-x: auto; margin-top: 1.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Shop</th>
+                            <th>Customer / Model</th>
+                            <th>Loan / Settlement</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allSubmissionsBody">
+                        <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Shop Profiles View -->
+        <div id="shopsView" class="view">
+            <div id="shopListSection">
+                <h2>Registered Shops</h2>
+                <div class="shop-grid" id="shopGrid" style="margin-top: 1.5rem;">
+                    <!-- Shop cards will populate here -->
+                </div>
+            </div>
+
+            <div id="singleShopSection" style="display: none;">
+                <button onclick="backToShops()" style="background: rgba(255,255,255,0.1); margin-bottom: 1rem;">&larr; Back to Shops</button>
+                <h2 id="profileTitle">Shop Profile</h2>
+                <div style="width: 100%; height: 300px; margin: 1.5rem 0;">
+                    <canvas id="shopChart"></canvas>
+                </div>
+                <h3>Shop's Entries</h3>
+                <table>
+                    <tbody id="singleShopTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2>Entry Details</h2>
+            <div id="modalContent" class="detail-grid"></div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+            
+            <h3 style="font-size: 1rem; color: var(--warning);">Send Reply / Note to Shop</h3>
+            <textarea id="replyText" placeholder="Write your message here..."></textarea>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-reply" id="sendReplyBtn">Send Reply</button>
+                <button class="btn-pay" id="markPayBtn">Mark Payment Sent</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } 
+        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
+            authDomain: "methmi-work-hub.firebaseapp.com",
+            projectId: "methmi-work-hub",
+            storageBucket: "methmi-work-hub.firebasestorage.app",
+            messagingSenderId: "786539502768",
+            appId: "1:786539502768:web:171f0b674108a8555bef75"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allSales = [];
+        let currentModalDocId = null;
+        let chartInstance = null;
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (!user.email.toLowerCase().includes('admin')) {
+                    window.location.href = 'shop.html';
+                } else {
+                    loadAllData();
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        // Tab Switching
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'View').classList.add('active');
+        };
+
+        // Load All Data
+        function loadAllData() {
+            const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                allSales = [];
+                const tbody = document.getElementById('allSubmissionsBody');
+                tbody.innerHTML = '';
+                
+                const uniqueShops = new Set();
+
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    allSales.push(data);
+                    
+                    if (data.shopId) uniqueShops.add(data.shopId);
+
+                    const tr = document.createElement('tr');
+                    tr.onclick = () => openDetailsModal(data);
+                    
+                    let statusHtml = getStatusBadge(data.status);
+                    tr.innerHTML = `
+                        <td>${data.date}</td>
+                        <td style="color: #c084fc;">${data.shopId.split('@')[0]}</td>
+                        <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span></td>
+                        <td>L: ${data.loanAmount || '-'}<br>S: ${data.settlement || '-'}</td>
+                        <td>${statusHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                renderShopDirectory(Array.from(uniqueShops));
+            });
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'New') return '<span class="badge badge-new">New</span>';
+            if (status === 'Admin Replied') return '<span class="badge badge-replied">Replied</span>';
+            if (status === 'Payment Sent') return '<span class="badge badge-sent">Pay Sent</span>';
+            if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
+            return `<span class="badge">${status}</span>`;
+        }
+
+        // Shop Directory
+        function renderShopDirectory(shops) {
+            const grid = document.getElementById('shopGrid');
+            grid.innerHTML = '';
+            shops.forEach(shop => {
+                const shopSales = allSales.filter(s => s.shopId === shop);
+                const totalLoan = shopSales.reduce((sum, s) => sum + (parseFloat(s.loanAmount)||0), 0);
+                
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.onclick = () => viewShopProfile(shop, shopSales);
+                card.innerHTML = `
+                    <h3 style="color: white; margin-bottom: 0.5rem;">${shop.split('@')[0].toUpperCase()}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${shop}</p>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p style="color: var(--success); font-weight: bold;">Total Loans: Rs. ${totalLoan.toLocaleString()}</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">${shopSales.length} Entries</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.viewShopProfile = function(shopEmail, shopSales) {
+            document.getElementById('shopListSection').style.display = 'none';
+            document.getElementById('singleShopSection').style.display = 'block';
+            document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile';
+
+            // Chart
+            const salesByDate = {};
+            shopSales.forEach(s => {
+                if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + (parseFloat(s.loanAmount)||0);
+            });
+            const dates = Object.keys(salesByDate).sort();
+            const amounts = dates.map(d => salesByDate[d]);
+
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(document.getElementById('shopChart'), {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{ label: 'Daily Loans', data: amounts, backgroundColor: '#8b5cf6', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Table
+            const tbody = document.getElementById('singleShopTable');
+            tbody.innerHTML = '';
+            shopSales.forEach(data => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => openDetailsModal(data);
+                tr.innerHTML = `
+                    <td>${data.date}</td>
+                    <td>${data.name}</td>
+                    <td>Loan: ${data.loanAmount}</td>
+                    <td>${getStatusBadge(data.status)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.backToShops = function() {
+            document.getElementById('singleShopSection').style.display = 'none';
+            document.getElementById('shopListSection').style.display = 'block';
+        };
+
+        // Details Modal
+        window.openDetailsModal = function(data) {
+            currentModalDocId = data.id;
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <div class="detail-item"><strong>Date:</strong> <br>${data.date}</div>
+                <div class="detail-item"><strong>Shop:</strong> <br>${data.shopId}</div>
+                <div class="detail-item"><strong>Customer:</strong> <br>${data.name}</div>
+                <div class="detail-item"><strong>NIC:</strong> <br>${data.nic}</div>
+                <div class="detail-item"><strong>Model:</strong> <br>${data.model}</div>
+                <div class="detail-item"><strong>SP Number:</strong> <br>${data.spNumber}</div>
+                <div class="detail-item"><strong>MRP:</strong> <br>${data.mrp}</div>
+                <div class="detail-item"><strong>Down Payment:</strong> <br>${data.downPayment}</div>
+                <div class="detail-item"><strong>Document Charge:</strong> <br>${data.document}</div>
+                <div class="detail-item" style="color:var(--success);"><strong>Loan Amount:</strong> <br>${data.loanAmount}</div>
+                <div class="detail-item" style="color:var(--warning);"><strong>Settlement:</strong> <br>${data.settlement}</div>
+                <div class="detail-item"><strong>Fintrex Payment:</strong> <br>${data.fintrexPayment || '-'}</div>
+                <div class="detail-item"><strong>Current Status:</strong> <br>${getStatusBadge(data.status)}</div>
+            `;
+            
+            document.getElementById('replyText').value = data.adminReply || '';
+            document.getElementById('detailModal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('detailModal').style.display = 'none';
+            currentModalDocId = null;
+        };
+
+        // Actions
+        document.getElementById('sendReplyBtn').addEventListener('click', async () => {
+            if (!currentModalDocId) return;
+            const text = document.getElementById('replyText').value;
+            const btn = document.getElementById('sendReplyBtn');
+            btn.innerText = 'Sending...';
+            try {
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Admin Replied', adminReply: text });
+                closeModal();
+            } catch (e) { alert("Error sending reply"); }
+            btn.innerText = 'Send Reply';
+        });
+
+        document.getElementById('markPayBtn').addEventListener('click', async () => {
+            if (!currentModalDocId) return;
+            const btn = document.getElementById('markPayBtn');
+            btn.innerText = 'Marking...';
+            try {
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Payment Sent' });
+                closeModal();
+            } catch (e) { alert("Error marking payment"); }
+            btn.innerText = 'Mark Payment Sent';
+        });
+    </script>
+</body>
+</html>
