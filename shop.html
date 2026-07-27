@@ -428,53 +428,55 @@
         const salesForm = document.getElementById('salesForm');
         const submitBtn = document.getElementById('submitBtn');
 
-        salesForm.addEventListener('submit', async (e) => {
+        salesForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!currentUser) return;
 
             submitBtn.disabled = true;
-            submitBtn.innerText = 'Saving...';
+            submitBtn.innerText = 'Submitted! ✅';
+            submitBtn.style.background = 'var(--success)';
 
-            try {
-                await addDoc(collection(db, "sales"), {
-                    shopId: currentUser.email,
-                    date: document.getElementById('date').value,
-                    spNumber: document.getElementById('spNumber').value,
-                    nic: document.getElementById('nic').value,
-                    name: document.getElementById('name').value,
-                    imei: imeiInput.value,
-                    model: modelInput.value,
-                    storage: storageInput.value,
-                    mrp: document.getElementById('mrp').value,
-                    loanAmount: loanAmountInput.value,
-                    settlement: settlementInput.value,
-                    downPayment: downPaymentInput.value,
-                    document: documentInput.value,
-                    fintrexPayment: '',
-                    status: 'New', 
-                    adminReply: '',
-                    stockSource: currentStockSource,
-                    discountApplied: (currentDiscount * 100) + '%',
-                    timestamp: serverTimestamp()
-                });
-                
-                if (matchedInventoryDocId) {
-                    await updateDoc(doc(db, "inventory", matchedInventoryDocId), { status: 'Sold' });
-                }
-                
-                salesForm.reset();
-                imeiStatus.innerText = '';
-                currentStockSource = 'Shop';
-                currentDiscount = 0.04;
-                matchedInventoryDocId = null;
-                document.getElementById('date').valueAsDate = new Date();
-            } catch (error) {
+            addDoc(collection(db, "sales"), {
+                shopId: currentUser.email,
+                date: document.getElementById('date').value,
+                spNumber: document.getElementById('spNumber').value,
+                nic: document.getElementById('nic').value,
+                name: document.getElementById('name').value,
+                imei: imeiInput.value,
+                model: modelInput.value,
+                storage: storageInput.value,
+                mrp: document.getElementById('mrp').value,
+                loanAmount: loanAmountInput.value,
+                settlement: settlementInput.value,
+                downPayment: downPaymentInput.value,
+                document: documentInput.value,
+                fintrexPayment: '',
+                status: 'New', 
+                adminReply: '',
+                stockSource: currentStockSource,
+                discountApplied: (currentDiscount * 100) + '%',
+                timestamp: Date.now() // Use Date.now() for instant local ordering
+            }).catch(error => {
                 console.error(error);
-                alert("Error saving data.");
-            } finally {
+                alert("Error saving data: " + error.message);
+            });
+            
+            if (matchedInventoryDocId) {
+                updateDoc(doc(db, "inventory", matchedInventoryDocId), { status: 'Sold' }).catch(console.error);
+            }
+            
+            salesForm.reset();
+            imeiStatus.innerText = '';
+            currentStockSource = 'Shop';
+            currentDiscount = 0.04;
+            matchedInventoryDocId = null;
+            document.getElementById('date').valueAsDate = new Date();
+
+            setTimeout(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerText = 'Submit Data';
-            }
+                submitBtn.style.background = 'var(--primary)';
+            }, 1000);
         });
 
         // Load Data & Chart
