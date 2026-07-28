@@ -168,10 +168,13 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                <button class="filter-btn active" onclick="filterSubmissions('All')">All</button>
-                <button class="filter-btn" onclick="filterSubmissions('Pending')">Pending Settlements</button>
-                <button class="filter-btn" onclick="filterSubmissions('Paid')">Completed / Paid</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="filter-btn active" onclick="filterSubmissions('All')">All</button>
+                    <button class="filter-btn" onclick="filterSubmissions('Pending')">Pending Settlements</button>
+                    <button class="filter-btn" onclick="filterSubmissions('Paid')">Completed / Paid</button>
+                </div>
+                <input type="text" id="adminSearchInput" placeholder="Search IMEI, SP, NIC, Model..." onkeyup="filterSubmissions(currentFilter)" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.6rem 1rem; border-radius: 8px; width: 100%; max-width: 300px;">
             </div>
 
             <div style="overflow-x: auto; margin-top: 1.5rem;">
@@ -303,7 +306,8 @@
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button class="btn-pay" id="saveUpdatesBtn" style="width: 100%;">Save All Updates</button>
+                <button id="saveUpdatesBtn" style="flex: 1; background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Save All Updates</button>
+                <button id="completeProcessBtn" style="display: none; flex: 1; background: var(--success); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Complete Process ✅</button>
             </div>
         </div>
     </div>
@@ -402,12 +406,20 @@
             let totalLoan = 0;
             let totalPaid = 0;
             let totalPending = 0;
+            
+            const searchTerm = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
 
             const filteredSales = allSales.filter(data => {
                 const s = parseFloat(data.settlement) || 0;
                 totalLoan += (parseFloat(data.loanAmount) || 0);
                 
-                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed');
+                const matchesSearch = (data.imei?.toLowerCase().includes(searchTerm)) || 
+                                      (data.spNumber?.toLowerCase().includes(searchTerm)) || 
+                                      (data.nic?.toLowerCase().includes(searchTerm)) ||
+                                      (data.model?.toLowerCase().includes(searchTerm));
+                if (!matchesSearch) return false;
+
+                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
                 if (isPaid) {
                     totalPaid += s;
                     if (currentFilter === 'Pending') return false;
@@ -450,6 +462,7 @@
             if (status === 'Admin Replied') return '<span class="badge badge-replied">Replied</span>';
             if (status === 'Payment Sent') return '<span class="badge badge-sent">Pay Sent</span>';
             if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
+            if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:var(--success)">Completed</span>';
             return `<span class="badge">${status}</span>`;
         }
 
@@ -549,6 +562,14 @@
             document.getElementById('replyText').value = data.adminReply || '';
             document.getElementById('fintrexPaymentText').value = data.fintrexPayment || '';
             document.getElementById('paymentStatusSelect').value = data.paymentStatus === 'Paid' ? 'Paid' : 'Pending';
+            
+            const completeBtn = document.getElementById('completeProcessBtn');
+            if (data.status === 'Confirmed') {
+                completeBtn.style.display = 'block';
+            } else {
+                completeBtn.style.display = 'none';
+            }
+
             document.getElementById('detailModal').style.display = 'flex';
         };
 
@@ -569,11 +590,16 @@
             btn.innerText = 'Saving...';
             
             try {
-                let newMainStatus = 'New';
-                if (pStatus === 'Paid') {
-                    newMainStatus = 'Payment Sent';
-                } else if (reply.trim() !== '') {
-                    newMainStatus = 'Admin Replied';
+                // Determine new status unless it is already Completed/Confirmed
+                const currentData = allSales.find(s => s.id === currentModalDocId);
+                let newMainStatus = currentData ? currentData.status : 'New';
+                
+                if (newMainStatus !== 'Confirmed' && newMainStatus !== 'Completed') {
+                    if (pStatus === 'Paid') {
+                        newMainStatus = 'Payment Sent';
+                    } else if (reply.trim() !== '') {
+                        newMainStatus = 'Admin Replied';
+                    }
                 }
 
                 await updateDoc(doc(db, "sales", currentModalDocId), { 
@@ -586,6 +612,21 @@
             } catch (e) { alert("Error saving updates"); }
             
             btn.innerText = 'Save All Updates';
+        });
+
+        document.getElementById('completeProcessBtn').addEventListener('click', async () => {
+            if (!currentModalDocId) return;
+            const btn = document.getElementById('completeProcessBtn');
+            btn.innerText = 'Completing...';
+            try {
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Completed' });
+                closeModal();
+            } catch (e) {
+                console.error(e);
+                alert("Error completing process");
+            } finally {
+                btn.innerText = 'Complete Process ✅';
+            }
         });
 
         // Inventory Logic

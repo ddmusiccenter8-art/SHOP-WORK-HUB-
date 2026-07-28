@@ -140,6 +140,10 @@
         .view { display: none; width: 100%; max-width: 1300px; }
         .view.active { display: grid; }
 
+        .filter-btn { padding: 0.5rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.8rem; margin-top: 0; }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .tabs { flex-direction: column; gap: 0.5rem; padding: 0 1rem; margin-top: 1rem; }
@@ -303,7 +307,17 @@
             </div>
 
             <div class="glass-panel">
-                <h2>My Submissions <span class="lang-si">(මගේ දත්ත)</span></h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                    <h2 style="margin: 0;">My Submissions <span class="lang-si">(මගේ දත්ත)</span></h2>
+                    <input type="text" id="shopSearchInput" placeholder="Search IMEI, SP, NIC, Model..." onkeyup="filterShopSales()" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.6rem 1rem; border-radius: 8px; width: 100%; max-width: 250px;">
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <button class="filter-btn active" onclick="filterShopSalesByStatus('All')">All History</button>
+                    <button class="filter-btn" onclick="filterShopSalesByStatus('Pending')">Pending Payments</button>
+                    <button class="filter-btn" onclick="filterShopSalesByStatus('Paid')">Completed Payments</button>
+                </div>
+
                 <div class="table-container">
                     <table id="dataTable">
                         <thead>
@@ -329,10 +343,11 @@
         
         <div style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location</label>
-            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="myBranchName" list="branchDatalist" placeholder="e.g. PULASTHIGAMA POLONNARUWA" style="max-width: 400px; flex: 1; margin: 0;">
-                <datalist id="branchDatalist"></datalist>
-                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0.75rem 1.5rem;" onclick="loadMyStock()">View Stock</button>
+            <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
+                <select id="myBranchName" style="max-width: 400px; flex: 1; margin: 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; appearance: auto;">
+                    <option value="">Loading branches...</option>
+                </select>
+                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.5rem;" onclick="loadMyStock()">View Stock</button>
             </div>
             <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">Select your branch name to see phones sent to you by Head Office.</p>
         </div>
@@ -566,88 +581,139 @@
             }, 1000);
         });
 
+        let allShopSales = [];
+        let currentShopFilter = 'All';
+
+        window.filterShopSalesByStatus = function(status) {
+            currentShopFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderShopSales();
+        };
+
+        window.filterShopSales = function() {
+            renderShopSales();
+        };
+
+        function renderShopSales() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            const searchTerm = (document.getElementById('shopSearchInput')?.value || '').toLowerCase();
+
+            const filtered = allShopSales.filter(data => {
+                const matchesSearch = (data.imei?.toLowerCase().includes(searchTerm)) || 
+                                      (data.spNumber?.toLowerCase().includes(searchTerm)) || 
+                                      (data.nic?.toLowerCase().includes(searchTerm)) ||
+                                      (data.model?.toLowerCase().includes(searchTerm));
+                if (!matchesSearch) return false;
+
+                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
+                
+                if (currentShopFilter === 'Pending' && isPaid) return false;
+                if (currentShopFilter === 'Paid' && !isPaid) return false;
+                
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No records found.</td></tr>';
+                return;
+            }
+
+            filtered.forEach(data => {
+                const tr = document.createElement('tr');
+                const id = data.id;
+                
+                let statusHtml = '';
+                let paymentNote = data.paymentStatus === 'Paid' ? '<br><span style="color:var(--success); font-size:0.8rem; font-weight:bold;">Paid 💰</span>' : '<br><span style="color:var(--warning); font-size:0.8rem; font-weight:bold;">Pending ⏳</span>';
+
+                if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
+                else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
+                else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.paymentStatus || '')}')">Payment Sent - Click to Confirm</span>`;
+                else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.paymentStatus || '')}')">Confirmed by Shop</span>';
+                else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:var(--success)">✅ Completed</span>';
+
+                tr.innerHTML = `
+                    <td>${data.date}</td>
+                    <td>
+                        <strong>${data.spNumber}</strong><br>
+                        <span style="color: var(--text-muted)">${data.model}</span>
+                    </td>
+                    <td>
+                        Loan: ${data.loanAmount || '-'}<br>
+                        Setl: ${data.settlement || '-'}${paymentNote}
+                    </td>
+                    <td>${statusHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         // Load Data & Chart
         function loadShopData(email) {
             const q = query(collection(db, "sales"), where("shopId", "==", email), orderBy("timestamp", "desc"));
-            const tableBody = document.getElementById('tableBody');
             
             onSnapshot(q, (snapshot) => {
-                tableBody.innerHTML = '';
-                const salesByDate = {}; // For Chart
-
-                if (snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No records found.</td></tr>';
-                }
+                allShopSales = [];
+                let salesByDate = {}; // For Chart
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const id = docSnap.id;
+                    data.id = docSnap.id;
+                    allShopSales.push(data);
                     
-                    // Chart Data prep (aggregate loan amounts by date)
                     if (data.date) {
                         const amount = parseFloat(data.loanAmount) || 0;
                         salesByDate[data.date] = (salesByDate[data.date] || 0) + amount;
                     }
-                    
-                    // Table Rendering
-                    const tr = document.createElement('tr');
-                    
-                    let statusHtml = '';
-                    let paymentNote = data.paymentStatus === 'Paid' ? '<br><span style="color:var(--success); font-size:0.8rem; font-weight:bold;">Paid 💰</span>' : '<br><span style="color:var(--warning); font-size:0.8rem; font-weight:bold;">Pending ⏳</span>';
-
-                    if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
-                    else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
-                    else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.paymentStatus || '')}')">Payment Sent - Click to Confirm</span>`;
-                    else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed</span>';
-
-                    tr.innerHTML = `
-                        <td>${data.date}</td>
-                        <td>
-                            <strong>${data.spNumber}</strong><br>
-                            <span style="color: var(--text-muted)">${data.model}</span>
-                        </td>
-                        <td>
-                            Loan: ${data.loanAmount || '-'}<br>
-                            Setl: ${data.settlement || '-'}${paymentNote}
-                        </td>
-                        <td>${statusHtml}</td>
-                    `;
-                    tableBody.appendChild(tr);
                 });
 
-                updateChart(salesByDate);
+                renderShopSales();
+
+                // Sort dates for chart
+                const sortedDates = Object.keys(salesByDate).sort();
+                let labels = [];
+                let revenueData = [];
+                let maxLoan = 0;
+                
+                sortedDates.forEach(d => {
+                    labels.push(d);
+                    revenueData.push(salesByDate[d]);
+                    if (salesByDate[d] > maxLoan) maxLoan = salesByDate[d];
+                });
+
+                updateChart(labels, revenueData, maxLoan);
             });
         }
 
-        // Chart Logic
-        function updateChart(salesByDate) {
-            const dates = Object.keys(salesByDate).sort();
-            const amounts = dates.map(d => salesByDate[d]);
-
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-
-            chartInstance = new Chart(ctx, {
+        // Chart Update Function
+        let myChart = null;
+        function updateChart(labels, revenueData, maxLoan) {
+            const ctx = document.getElementById('salesChart');
+            if(!ctx) return;
+            if (myChart) myChart.destroy();
+            
+            myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Total Loan Amounts',
-                        data: amounts,
-                        borderColor: '#4F46E5',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    labels: labels,
+                    datasets: [
+                        { label: 'Total Loan Amount (Rs.)', data: revenueData, borderColor: '#4F46E5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
+                        y: { 
+                            beginAtZero: true,
+                            max: maxLoan > 0 ? maxLoan * 1.2 : 100000, 
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }, 
+                            ticks: { color: '#9CA3AF' } 
+                        },
+                        x: { grid: { display: false }, ticks: { color: '#9CA3AF' } }
                     }
                 }
             });
@@ -702,15 +768,21 @@
                     const d = docSnap.data();
                     if(d.shop) uniqueLocs.add(d.shop.trim());
                 });
-                const datalist = document.getElementById('branchDatalist');
-                datalist.innerHTML = '';
+                const select = document.getElementById('myBranchName');
+                select.innerHTML = '<option value="">Select your branch...</option>';
                 uniqueLocs.forEach(loc => {
                     if (loc) {
                         const opt = document.createElement('option');
                         opt.value = loc;
-                        datalist.appendChild(opt);
+                        opt.innerText = loc;
+                        select.appendChild(opt);
                     }
                 });
+                
+                const savedBranch = localStorage.getItem('myBranchName');
+                if (savedBranch) {
+                    select.value = savedBranch;
+                }
             }).catch(e => console.error("Error loading branch options:", e));
         }
 
