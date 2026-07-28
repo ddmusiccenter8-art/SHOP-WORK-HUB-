@@ -258,6 +258,19 @@
                     <input type="text" id="name" required>
                 </div>
                 <div class="form-group">
+                    <label>Stock Type <span class="lang-si">(තොග වර්ගය)</span></label>
+                    <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: white;">
+                            <input type="radio" name="stockType" value="HO" onchange="manualStockSelect('HO')">
+                            Main Shop Stock (6%)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: white;">
+                            <input type="radio" name="stockType" value="Shop" onchange="manualStockSelect('Shop')" checked>
+                            Sub Shop Stock (4%)
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label>IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
                     <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1rem;">
                         <input type="text" id="imei" required placeholder="Type IMEI to check stock..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin: 0; min-width: 0;">
@@ -476,13 +489,26 @@
         const loanAmountInput = document.getElementById('loanAmount');
         const settlementInput = document.getElementById('settlement');
 
+        window.manualStockSelect = function(type) {
+            if (type === 'HO') {
+                currentStockSource = 'HO';
+                currentDiscount = 0.06;
+                imeiStatus.innerHTML = '<span style="color: var(--success);">Main Shop Stock (6% Discount Applied)</span>';
+            } else {
+                currentStockSource = 'Shop';
+                currentDiscount = 0.04;
+                imeiStatus.innerHTML = '<span style="color: var(--text-muted);">Sub Shop Stock (4% Discount Applied)</span>';
+                matchedInventoryDocId = null;
+            }
+            calculateSettlement();
+        };
+
         imeiInput.addEventListener('input', async (e) => {
             const val = e.target.value.trim();
             if (val.length < 4) {
                 imeiStatus.innerText = '';
-                currentStockSource = 'Shop';
-                currentDiscount = 0.04;
-                matchedInventoryDocId = null;
+                // Do not auto-revert to Shop Stock if they manually selected HO Stock.
+                // We just rely on currentStockSource and currentDiscount.
                 calculateSettlement();
                 return;
             }
@@ -501,11 +527,13 @@
                 currentStockSource = 'HO';
                 currentDiscount = 0.06;
                 matchedInventoryDocId = invDoc.id;
+                document.querySelector('input[name="stockType"][value="HO"]').checked = true;
             } else {
                 imeiStatus.innerHTML = '<span style="color: var(--text-muted);">Shop Stock (4% Discount Applied)</span>';
                 currentStockSource = 'Shop';
                 currentDiscount = 0.04;
                 matchedInventoryDocId = null;
+                document.querySelector('input[name="stockType"][value="Shop"]').checked = true;
             }
             calculateSettlement();
         });
@@ -572,6 +600,7 @@
             currentStockSource = 'Shop';
             currentDiscount = 0.04;
             matchedInventoryDocId = null;
+            document.querySelector('input[name="stockType"][value="Shop"]').checked = true;
             document.getElementById('date').valueAsDate = new Date();
 
             setTimeout(() => {
