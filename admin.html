@@ -413,10 +413,10 @@
                 const s = parseFloat(data.settlement) || 0;
                 totalLoan += (parseFloat(data.loanAmount) || 0);
                 
-                const matchesSearch = (data.imei?.toLowerCase().includes(searchTerm)) || 
-                                      (data.spNumber?.toLowerCase().includes(searchTerm)) || 
-                                      (data.nic?.toLowerCase().includes(searchTerm)) ||
-                                      (data.model?.toLowerCase().includes(searchTerm));
+                const matchesSearch = (data.imei || '').toString().toLowerCase().includes(searchTerm) || 
+                                      (data.spNumber || '').toString().toLowerCase().includes(searchTerm) || 
+                                      (data.nic || '').toString().toLowerCase().includes(searchTerm) ||
+                                      (data.model || '').toString().toLowerCase().includes(searchTerm);
                 if (!matchesSearch) return false;
 
                 const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');

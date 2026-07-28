@@ -258,19 +258,6 @@
                     <input type="text" id="name" required>
                 </div>
                 <div class="form-group">
-                    <label>Stock Type <span class="lang-si">(තොග වර්ගය)</span></label>
-                    <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: white;">
-                            <input type="radio" name="stockType" value="HO" onchange="manualStockSelect('HO')">
-                            Main Shop Stock (6%)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: white;">
-                            <input type="radio" name="stockType" value="Shop" onchange="manualStockSelect('Shop')" checked>
-                            Sub Shop Stock (4%)
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label>IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
                     <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1rem;">
                         <input type="text" id="imei" required placeholder="Type IMEI to check stock..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin: 0; min-width: 0;">
@@ -357,9 +344,8 @@
         <div style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
             <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location</label>
             <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
-                <select id="myBranchName" style="max-width: 400px; flex: 1; margin: 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; appearance: auto;">
-                    <option value="">Loading branches...</option>
-                </select>
+                <input type="text" id="myBranchName" list="branchDatalist" placeholder="e.g. PULASTHIGAMA POLONNARUWA" style="max-width: 400px; flex: 1; margin: 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                <datalist id="branchDatalist"></datalist>
                 <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.5rem;" onclick="loadMyStock()">View Stock</button>
             </div>
             <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">Select your branch name to see phones sent to you by Head Office.</p>
@@ -489,26 +475,13 @@
         const loanAmountInput = document.getElementById('loanAmount');
         const settlementInput = document.getElementById('settlement');
 
-        window.manualStockSelect = function(type) {
-            if (type === 'HO') {
-                currentStockSource = 'HO';
-                currentDiscount = 0.06;
-                imeiStatus.innerHTML = '<span style="color: var(--success);">Main Shop Stock (6% Discount Applied)</span>';
-            } else {
-                currentStockSource = 'Shop';
-                currentDiscount = 0.04;
-                imeiStatus.innerHTML = '<span style="color: var(--text-muted);">Sub Shop Stock (4% Discount Applied)</span>';
-                matchedInventoryDocId = null;
-            }
-            calculateSettlement();
-        };
-
         imeiInput.addEventListener('input', async (e) => {
             const val = e.target.value.trim();
             if (val.length < 4) {
                 imeiStatus.innerText = '';
-                // Do not auto-revert to Shop Stock if they manually selected HO Stock.
-                // We just rely on currentStockSource and currentDiscount.
+                currentStockSource = 'Shop';
+                currentDiscount = 0.04;
+                matchedInventoryDocId = null;
                 calculateSettlement();
                 return;
             }
@@ -527,13 +500,11 @@
                 currentStockSource = 'HO';
                 currentDiscount = 0.06;
                 matchedInventoryDocId = invDoc.id;
-                document.querySelector('input[name="stockType"][value="HO"]').checked = true;
             } else {
                 imeiStatus.innerHTML = '<span style="color: var(--text-muted);">Shop Stock (4% Discount Applied)</span>';
                 currentStockSource = 'Shop';
                 currentDiscount = 0.04;
                 matchedInventoryDocId = null;
-                document.querySelector('input[name="stockType"][value="Shop"]').checked = true;
             }
             calculateSettlement();
         });
@@ -600,7 +571,6 @@
             currentStockSource = 'Shop';
             currentDiscount = 0.04;
             matchedInventoryDocId = null;
-            document.querySelector('input[name="stockType"][value="Shop"]').checked = true;
             document.getElementById('date').valueAsDate = new Date();
 
             setTimeout(() => {
@@ -631,10 +601,10 @@
             const searchTerm = (document.getElementById('shopSearchInput')?.value || '').toLowerCase();
 
             const filtered = allShopSales.filter(data => {
-                const matchesSearch = (data.imei?.toLowerCase().includes(searchTerm)) || 
-                                      (data.spNumber?.toLowerCase().includes(searchTerm)) || 
-                                      (data.nic?.toLowerCase().includes(searchTerm)) ||
-                                      (data.model?.toLowerCase().includes(searchTerm));
+                const matchesSearch = (data.imei || '').toString().toLowerCase().includes(searchTerm) || 
+                                      (data.spNumber || '').toString().toLowerCase().includes(searchTerm) || 
+                                      (data.nic || '').toString().toLowerCase().includes(searchTerm) ||
+                                      (data.model || '').toString().toLowerCase().includes(searchTerm);
                 if (!matchesSearch) return false;
 
                 const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
@@ -797,20 +767,19 @@
                     const d = docSnap.data();
                     if(d.shop) uniqueLocs.add(d.shop.trim());
                 });
-                const select = document.getElementById('myBranchName');
-                select.innerHTML = '<option value="">Select your branch...</option>';
+                const datalist = document.getElementById('branchDatalist');
+                datalist.innerHTML = '';
                 uniqueLocs.forEach(loc => {
                     if (loc) {
                         const opt = document.createElement('option');
                         opt.value = loc;
-                        opt.innerText = loc;
-                        select.appendChild(opt);
+                        datalist.appendChild(opt);
                     }
                 });
                 
                 const savedBranch = localStorage.getItem('myBranchName');
                 if (savedBranch) {
-                    select.value = savedBranch;
+                    document.getElementById('myBranchName').value = savedBranch;
                 }
             }).catch(e => console.error("Error loading branch options:", e));
         }
