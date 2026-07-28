@@ -6,6 +6,7 @@
     <title>Work Hub | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
             --primary: #4F46E5;
@@ -116,6 +117,24 @@
         button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 1rem; color: white;}
         .btn-reply { background: var(--warning); color: black;}
         .btn-pay { background: var(--primary); }
+
+        .filter-btn { padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; margin-top: 0; }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .tabs { flex-direction: column; gap: 0.5rem; padding: 0 1rem; margin-top: 1rem; }
+            .tab { border-radius: 8px; border-bottom: 1px solid var(--border-color); text-align: center; }
+            .container { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+            .header { flex-direction: column; gap: 1rem; text-align: center; padding: 1rem; }
+            
+            #inventoryView > div { grid-template-columns: 1fr; }
+            #submissionsView > div { grid-template-columns: 1fr; }
+            
+            th, td { padding: 0.8rem 0.5rem; font-size: 0.8rem; }
+            .badge { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+        }
     </style>
 </head>
 <body>
@@ -134,7 +153,27 @@
     <div class="container">
         <!-- All Submissions View -->
         <div id="submissionsView" class="view active">
-            <h2>Recent Entries from All Shops</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Loan Amount</h3>
+                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--success);" id="totalLoanVal">Rs. 0</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Settlement (Completed)</h3>
+                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--primary);" id="totalPaidVal">Rs. 0</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Settlement (Pending)</h3>
+                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--warning);" id="totalPendingVal">Rs. 0</p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <button class="filter-btn active" onclick="filterSubmissions('All')">All</button>
+                <button class="filter-btn" onclick="filterSubmissions('Pending')">Pending Settlements</button>
+                <button class="filter-btn" onclick="filterSubmissions('Paid')">Completed / Paid</button>
+            </div>
+
             <div style="overflow-x: auto; margin-top: 1.5rem;">
                 <table>
                     <thead>
@@ -194,7 +233,10 @@
                     <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Add Head Office Stock</h2>
                     <form id="inventoryForm">
                         <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">IMEI Number</label>
-                        <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1rem;">
+                            <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin: 0; min-width: 0;">
+                            <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; margin: 0; white-space: nowrap;">📷 Scan</button>
+                        </div>
                         
                         <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Model</label>
                         <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
@@ -266,6 +308,16 @@
         </div>
     </div>
 
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 1rem;">
+            <span class="modal-close" onclick="stopScanner()">&times;</span>
+            <h2 style="margin-bottom: 1rem; color: white;">Scan Barcode</h2>
+            <div id="reader" style="width: 100%; min-height: 300px; background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden;"></div>
+            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); width: 100%; margin-top: 1rem;">Cancel</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -315,41 +367,81 @@
             document.getElementById(tabName + 'View').classList.add('active');
         };
 
+        let currentFilter = 'All';
+        window.filterSubmissions = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderAllSubmissions();
+        };
+
         // Load All Data
         function loadAllData() {
             const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
             
             onSnapshot(q, (snapshot) => {
                 allSales = [];
-                const tbody = document.getElementById('allSubmissionsBody');
-                tbody.innerHTML = '';
-                
                 const uniqueShops = new Set();
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     data.id = docSnap.id;
                     allSales.push(data);
-                    
                     if (data.shopId) uniqueShops.add(data.shopId);
-
-                    const tr = document.createElement('tr');
-                    tr.onclick = () => openDetailsModal(data);
-                    
-                    let statusHtml = getStatusBadge(data.status);
-                    let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (6%)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4%)</span>';
-                    
-                    tr.innerHTML = `
-                        <td>${data.date}</td>
-                        <td style="color: #c084fc;">${data.shopId.split('@')[0]}</td>
-                        <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span><br>${sourceHtml}</td>
-                        <td>L: ${data.loanAmount || '-'}<br>S: ${data.settlement || '-'}</td>
-                        <td>${statusHtml}</td>
-                    `;
-                    tbody.appendChild(tr);
                 });
 
+                renderAllSubmissions();
                 renderShopDirectory(Array.from(uniqueShops));
+            });
+        }
+
+        function renderAllSubmissions() {
+            const tbody = document.getElementById('allSubmissionsBody');
+            tbody.innerHTML = '';
+            
+            let totalLoan = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+
+            const filteredSales = allSales.filter(data => {
+                const s = parseFloat(data.settlement) || 0;
+                totalLoan += (parseFloat(data.loanAmount) || 0);
+                
+                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed');
+                if (isPaid) {
+                    totalPaid += s;
+                    if (currentFilter === 'Pending') return false;
+                } else {
+                    totalPending += s;
+                    if (currentFilter === 'Paid') return false;
+                }
+                return true;
+            });
+
+            document.getElementById('totalLoanVal').innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalPaidVal').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalPendingVal').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            if (filteredSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No records found.</td></tr>';
+                return;
+            }
+
+            filteredSales.forEach((data) => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => openDetailsModal(data);
+                
+                let statusHtml = getStatusBadge(data.status);
+                let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (6%)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4%)</span>';
+                
+                tr.innerHTML = `
+                    <td>${data.date}</td>
+                    <td style="color: #c084fc;">${data.shopId.split('@')[0]}</td>
+                    <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span><br>${sourceHtml}</td>
+                    <td>L: ${data.loanAmount || '-'}<br>S: ${data.settlement || '-'}</td>
+                    <td>${statusHtml}</td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
@@ -560,8 +652,9 @@
                 alert("Error adding item: " + err.message);
             });
 
-            // Immediately reset form for the next item
-            document.getElementById('inventoryForm').reset();
+            // Immediately reset ONLY the IMEI field for fast scanning of the next item
+            const imeiInput = document.getElementById('invImei');
+            imeiInput.value = '';
             
             // Show success briefly
             btn.innerText = 'Added! ✅';
@@ -575,6 +668,36 @@
                 document.getElementById('invImei').focus(); // Auto-focus for next entry
             }, 600);
         });
+
+        // Barcode Scanner Logic
+        let html5QrcodeScanner = null;
+        window.startScanner = function(inputId) {
+            document.getElementById('scannerModal').style.display = 'flex';
+            
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                fps: 10, 
+                qrbox: { width: 250, height: 100 },
+                formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A ]
+            }, false);
+                
+            html5QrcodeScanner.render((decodedText) => {
+                document.getElementById(inputId).value = decodedText;
+                stopScanner();
+                
+                // Optionally auto-submit if fields are filled
+                if(document.getElementById('invModel').value && document.getElementById('invShop').value) {
+                    document.getElementById('invSubmitBtn').click();
+                }
+            }, (error) => { /* ignore */ });
+        };
+
+        window.stopScanner = function() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(e => console.error(e));
+                html5QrcodeScanner = null;
+            }
+            document.getElementById('scannerModal').style.display = 'none';
+        };
     </script>
 </body>
 </html>

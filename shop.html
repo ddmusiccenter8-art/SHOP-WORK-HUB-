@@ -6,6 +6,7 @@
     <title>Work Hub | Shop Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
             --primary: #4F46E5;
@@ -132,6 +133,26 @@
             margin-top: 1rem;
         }
 
+        /* Tabs */
+        .tabs { margin-top: -1rem; margin-bottom: 2rem; display: flex; gap: 1rem; width: 100%; max-width: 1300px; }
+        .tab { padding: 0.8rem 2rem; background: rgba(255,255,255,0.05); border-radius: 8px 8px 0 0; cursor: pointer; font-weight: 600; border: 1px solid var(--border-color); border-bottom: none; color: var(--text-muted); }
+        .tab.active { background: var(--card-bg); color: white; border-top: 2px solid var(--primary); }
+        .view { display: none; width: 100%; max-width: 1300px; }
+        .view.active { display: grid; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .tabs { flex-direction: column; gap: 0.5rem; padding: 0 1rem; margin-top: 1rem; }
+            .tab { border-radius: 8px; border-bottom: 1px solid var(--border-color); text-align: center; }
+            .container { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+            .header { flex-direction: column; gap: 1rem; text-align: center; padding: 1rem; }
+            
+            #newEntryView.view.active { display: flex; flex-direction: column; }
+            
+            th, td { padding: 0.8rem 0.5rem; font-size: 0.8rem; }
+            .badge { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+        }
+
         /* Table Styles */
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
@@ -205,8 +226,13 @@
         </div>
     </div>
 
-    <div class="container">
-        <!-- Form Section -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('newEntry')">Submissions</div>
+        <div class="tab" onclick="switchTab('myStock')">My Stock</div>
+    </div>
+
+    <!-- Form Section View -->
+    <div id="newEntryView" class="container view active">
         <div class="glass-panel">
             <h2>New Entry <span class="lang-si">(නව දත්ත)</span></h2>
             
@@ -229,20 +255,23 @@
                 </div>
                 <div class="form-group">
                     <label>IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
-                    <input type="text" id="imei" required placeholder="Type IMEI to check stock...">
-                    <div id="imeiStatus" style="font-size: 0.85rem; margin-top: 5px; font-weight: bold;"></div>
+                    <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1rem;">
+                        <input type="text" id="imei" required placeholder="Type IMEI to check stock..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin: 0; min-width: 0;">
+                        <button type="button" onclick="startScanner('imei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; margin: 0; white-space: nowrap;">📷 Scan</button>
+                    </div>
+                    <div id="imeiStatus" style="font-size: 0.85rem; margin-top: -10px; font-weight: bold; margin-bottom: 15px;"></div>
                 </div>
                 <div class="form-group">
                     <label>Model <span class="lang-si">(දුරකථන මාදිලිය)</span></label>
                     <input type="text" id="model" required>
                 </div>
                 <div class="form-group">
-                    <label>Storage <span class="lang-si">(ධාරිතාවය)</span></label>
-                    <input type="text" id="storage" placeholder="e.g. 128GB">
-                </div>
-                <div class="form-group">
                     <label>MRP <span class="lang-si">(උපරිම සිල්ලර මිල)</span></label>
                     <input type="number" id="mrp" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Storage <span class="lang-si">(ධාරිතාවය)</span></label>
+                    <input type="text" id="storage" placeholder="e.g. 128GB">
                 </div>
                 <div class="form-group">
                     <label>Down Payment <span class="lang-si">(මූලික ගෙවීම)</span></label>
@@ -294,6 +323,36 @@
         </div>
     </div>
 
+    <!-- My Stock View -->
+    <div id="myStockView" class="view" style="grid-template-columns: 1fr; background: var(--card-bg); padding: 2rem; border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color);">
+        <h2>My Stock <span class="lang-si">(මගේ තොගය)</span></h2>
+        
+        <div style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+            <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location</label>
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="myBranchName" list="branchDatalist" placeholder="e.g. PULASTHIGAMA POLONNARUWA" style="max-width: 400px; flex: 1; margin: 0;">
+                <datalist id="branchDatalist"></datalist>
+                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0.75rem 1.5rem;" onclick="loadMyStock()">View Stock</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">Select your branch name to see phones sent to you by Head Office.</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>IMEI</th>
+                        <th>Model & Storage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="myStockBody">
+                    <tr><td colspan="3" style="text-align: center;">Select your branch and click View Stock.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Action Modal -->
     <div id="actionModal" class="modal">
         <div class="modal-content">
@@ -308,8 +367,19 @@
             <div id="paymentSection" style="display: none; margin-top: 20px; text-align: center;">
                 <p style="color: var(--text-muted); margin-bottom: 10px;">Admin has marked the payment as sent.</p>
                 <p id="paymentNoteDisplay" style="color: white; font-weight: bold; margin-bottom: 15px;"></p>
-                <button class="confirm-btn" id="confirmPaymentBtn">Confirm Payment Received</button>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn-pay" id="confirmPaymentBtn" style="width: 100%; margin-top:0;">Confirm Payment Received</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 1rem;">
+            <span class="modal-close" onclick="stopScanner()">&times;</span>
+            <h2 style="margin-bottom: 1rem; color: white;">Scan Barcode</h2>
+            <div id="reader" style="width: 100%; min-height: 300px; background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden;"></div>
+            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); width: 100%; margin-top: 1rem;">Cancel</button>
         </div>
     </div>
 
@@ -346,6 +416,13 @@
                     currentUser = user;
                     document.getElementById('userEmailDisplay').innerText = user.email;
                     loadShopData(user.email);
+                    loadBranchOptions(); // Load datalist
+                    
+                    const savedBranch = localStorage.getItem('myBranchName');
+                    if(savedBranch) {
+                        document.getElementById('myBranchName').value = savedBranch;
+                        loadMyStock();
+                    }
                 }
             } else {
                 window.location.href = 'index.html';
@@ -355,6 +432,16 @@
         document.getElementById('logoutBtn').addEventListener('click', () => {
             signOut(auth);
         });
+
+        // Tab Logic
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'View').classList.add('active');
+        };
 
         // Set default date
         document.getElementById('date').valueAsDate = new Date();
@@ -506,6 +593,8 @@
                     const tr = document.createElement('tr');
                     
                     let statusHtml = '';
+                    let paymentNote = data.paymentStatus === 'Paid' ? '<br><span style="color:var(--success); font-size:0.8rem; font-weight:bold;">Paid 💰</span>' : '<br><span style="color:var(--warning); font-size:0.8rem; font-weight:bold;">Pending ⏳</span>';
+
                     if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                     else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
                     else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.paymentStatus || '')}')">Payment Sent - Click to Confirm</span>`;
@@ -519,7 +608,7 @@
                         </td>
                         <td>
                             Loan: ${data.loanAmount || '-'}<br>
-                            Setl: ${data.settlement || '-'}
+                            Setl: ${data.settlement || '-'}${paymentNote}
                         </td>
                         <td>${statusHtml}</td>
                     `;
@@ -603,6 +692,93 @@
                 btn.innerText = 'Confirm Payment Received';
             }
         });
+
+        // Load Stock logic
+        function loadBranchOptions() {
+            const q = query(collection(db, "inventory"));
+            getDocs(q).then(snapshot => {
+                const uniqueLocs = new Set();
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if(d.shop) uniqueLocs.add(d.shop.trim());
+                });
+                const datalist = document.getElementById('branchDatalist');
+                datalist.innerHTML = '';
+                uniqueLocs.forEach(loc => {
+                    if (loc) {
+                        const opt = document.createElement('option');
+                        opt.value = loc;
+                        datalist.appendChild(opt);
+                    }
+                });
+            }).catch(e => console.error("Error loading branch options:", e));
+        }
+
+        let myStockUnsubscribe = null;
+        window.loadMyStock = function() {
+            const branch = document.getElementById('myBranchName').value.trim();
+            if(!branch) return alert("Please type or select your Branch Name first.");
+            
+            localStorage.setItem('myBranchName', branch);
+            
+            if(myStockUnsubscribe) myStockUnsubscribe();
+            
+            const tbody = document.getElementById('myStockBody');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Loading...</td></tr>';
+
+            const q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
+            myStockUnsubscribe = onSnapshot(q, (snapshot) => {
+                tbody.innerHTML = '';
+                if(snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No available stock for this branch right now.</td></tr>';
+                    return;
+                }
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${data.imei}</strong></td>
+                        <td>${data.model} ${data.storage ? '- ' + data.storage : ''}</td>
+                        <td><span class="badge badge-confirmed">Available</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }, error => {
+                console.error("Stock fetch error:", error);
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--warning);">Error fetching stock.</td></tr>';
+            });
+        };
+
+        // Barcode Scanner Logic
+        let html5QrcodeScanner = null;
+        window.startScanner = function(inputId) {
+            document.getElementById('scannerModal').style.display = 'flex';
+            
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                fps: 10, 
+                qrbox: { width: 250, height: 100 },
+                formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A ]
+            }, false);
+                
+            html5QrcodeScanner.render((decodedText) => {
+                const inputEl = document.getElementById(inputId);
+                inputEl.value = decodedText;
+                stopScanner();
+                
+                // Trigger input event to run IMEI validation immediately
+                const event = new Event('input', { bubbles: true });
+                inputEl.dispatchEvent(event);
+            }, (error) => { /* ignore */ });
+        };
+
+        window.stopScanner = function() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(e => console.error(e));
+                html5QrcodeScanner = null;
+            }
+            document.getElementById('scannerModal').style.display = 'none';
+        };
     </script>
 </body>
 </html>
