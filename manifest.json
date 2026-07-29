@@ -2,20 +2,22 @@
   "name": "Methmi Work Hub",
   "short_name": "Methmi Hub",
   "description": "Methmi Mobile Point of Sales and Inventory System",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0b0f19",
   "theme_color": "#6366f1",
   "icons": [
     {
-      "src": "./icon.jpg",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "./icon.jpg",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
