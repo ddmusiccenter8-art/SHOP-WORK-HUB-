@@ -743,11 +743,14 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const adminEmails = [
+                    'spmsolutions2001@gmail.com',
+                    'spmsolutions@gmail.com',
                     'admin@methmi.com', 
                     'methmimobilepvtltd@gmail.com', 
                     'ddmusiccenter8@gmail.com'
                 ];
                 const isAdmin = user.email.toLowerCase().includes('admin') || 
+                                user.email.toLowerCase().includes('spm') || 
                                 adminEmails.includes(user.email.toLowerCase());
 
                 if (!isAdmin) {
