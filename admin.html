@@ -660,7 +660,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, initializeFirestore, memoryLocalCache, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
+        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -674,13 +674,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        let db;
-        try {
-            db = initializeFirestore(app, { localCache: memoryLocalCache() });
-        } catch(e) {
-            db = getFirestore(app);
-        }
+        const db = getFirestore(app);
 
         // Connection Status Listener
         window.addEventListener('online', () => {
@@ -802,36 +796,47 @@
 
         // Load All Submissions
         function loadAllData() {
-            const q = query(collection(db, "sales"));
-            
-            onSnapshot(q, (snapshot) => {
-                allSales = [];
-                const uniqueShops = new Set();
-
-                if (snapshot.empty) {
-                    const tbody = document.getElementById('allSubmissionsBody');
-                    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submission records found in database.</td></tr>';
-                    renderAllSubmissions();
-                    return;
+            // Immediate HTTP fetch backup
+            getDocs(collection(db, "sales")).then((snapshot) => {
+                if (snapshot && !snapshot.empty) {
+                    processSalesSnapshot(snapshot);
                 }
+            }).catch(e => console.error("getDocs sales error:", e));
 
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    data.id = docSnap.id;
-                    allSales.push(data);
-                    if (data.shopId) uniqueShops.add(data.shopId);
-                });
-
-                allSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                renderAllSubmissions();
-                renderShopDirectory(Array.from(uniqueShops));
+            // Realtime listener
+            onSnapshot(collection(db, "sales"), (snapshot) => {
+                processSalesSnapshot(snapshot);
             }, (err) => {
                 console.error("Firestore snapshot error:", err);
                 const tbody = document.getElementById('allSubmissionsBody');
-                if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 2rem;">Database Sync Error: ' + err.message + '</td></tr>';
-                showToast("Failed to sync sales data: " + err.message, "error");
+                if (tbody && (!allSales || allSales.length === 0)) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 2rem;">Database Sync Error: ' + err.message + '</td></tr>';
+                }
             });
+        }
+
+        function processSalesSnapshot(snapshot) {
+            const tbody = document.getElementById('allSubmissionsBody');
+            allSales = [];
+            const uniqueShops = new Set();
+
+            if (snapshot.empty) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submission records found in database.</td></tr>';
+                renderAllSubmissions();
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                data.id = docSnap.id;
+                allSales.push(data);
+                if (data.shopId) uniqueShops.add(data.shopId);
+            });
+
+            allSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            renderAllSubmissions();
+            renderShopDirectory(Array.from(uniqueShops));
         }
 
         window.renderAllSubmissions = function() {
