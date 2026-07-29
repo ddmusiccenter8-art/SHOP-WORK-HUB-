@@ -106,6 +106,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
         }
 
         .tab.active { 
@@ -115,25 +121,32 @@
             box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.15);
         }
 
-        .view { display: none; width: 100%; max-width: 1350px; }
-        .view.active { display: grid; animation: fadeIn 0.3s ease; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .view { 
+            display: none; 
+            width: 100%; 
+            max-width: 1350px; 
+        }
+        
+        .view.active { 
+            display: block; 
+            animation: fadeIn 0.3s ease; 
         }
 
-        .container {
-            width: 100%;
+        #newEntryView.active {
             display: grid;
             grid-template-columns: 1fr 1.8fr;
             gap: 2rem;
         }
 
         @media (max-width: 992px) {
-            .container {
+            #newEntryView.active {
                 grid-template-columns: 1fr;
             }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .glass-panel {
@@ -350,7 +363,7 @@
     </div>
 
     <!-- Form Section View -->
-    <div id="newEntryView" class="container view active">
+    <div id="newEntryView" class="view active">
         <!-- New Entry Form -->
         <div class="glass-panel">
             <h2>New Entry <span class="lang-si">(නව දත්ත ඇතුළත් කරන්න)</span></h2>
@@ -465,17 +478,20 @@
     </div>
 
     <!-- My Stock View -->
-    <div id="myStockView" class="view" style="grid-template-columns: 1fr; background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color);">
-        <h2>My Head Office Stock <span class="lang-si">(මා වෙත එවූ තොග)</span></h2>
-        
+    <div id="myStockView" class="view" style="background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem;">
+            <h2>My Head Office Stock <span class="lang-si">(මා වෙත එවූ තොග)</span></h2>
+            <span id="stockBadgeCount" style="background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem;">Checking Stock...</span>
+        </div>
+
         <div style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
             <label style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location</label>
             <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
                 <input type="text" id="myBranchName" list="branchDatalist" placeholder="e.g. PULASTHIGAMA POLONNARUWA" style="max-width: 420px; flex: 1; margin: 0; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 10px;">
                 <datalist id="branchDatalist"></datalist>
-                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.8rem;" onclick="loadMyStock()">View Stock</button>
+                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.8rem;" onclick="loadMyStock(true)">View Stock</button>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Select your shop/branch name to view phones transferred from Head Office (6% discount rate applies to these IMEIs).</p>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Phones transferred to your branch from Head Office (6% discount rate applies to these IMEIs when selling).</p>
         </div>
 
         <div class="table-container">
@@ -484,11 +500,12 @@
                     <tr>
                         <th>IMEI</th>
                         <th>Model & Storage</th>
+                        <th>Assigned Branch</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="myStockBody">
-                    <tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">Select your branch name above and click "View Stock".</td></tr>
+                    <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading stock data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -584,9 +601,8 @@
                     loadBranchOptions();
                     
                     const savedBranch = localStorage.getItem('myBranchName');
-                    if(savedBranch) {
+                    if (savedBranch) {
                         document.getElementById('myBranchName').value = savedBranch;
-                        loadMyStock();
                     }
                 }
             } else {
@@ -598,15 +614,22 @@
             signOut(auth);
         });
 
-        // Tab Logic
+        // Tab Switching Logic
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(t => {
                 if (t.dataset.tab === tabName) t.classList.add('active');
                 else t.classList.remove('active');
             });
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+            });
             const targetView = document.getElementById(tabName + 'View');
-            if (targetView) targetView.classList.add('active');
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+            if (tabName === 'myStock') {
+                loadMyStock(false);
+            }
         };
 
         // Set default date to today
@@ -826,7 +849,7 @@
             });
         };
 
-        // Load Data & Chart (using safe client-side sorting to avoid Firebase index error)
+        // Load Data & Chart
         function loadShopData(email) {
             const q = query(collection(db, "sales"), where("shopId", "==", email));
             
@@ -840,7 +863,6 @@
                     allShopSales.push(data);
                 });
 
-                // Client-side sort by timestamp descending
                 allShopSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
                 allShopSales.forEach(data => {
@@ -954,15 +976,16 @@
             }
         });
 
-        // Load Stock logic
+        // Load Stock options & branches
         function loadBranchOptions() {
             const q = query(collection(db, "inventory"));
             getDocs(q).then(snapshot => {
                 const uniqueLocs = new Set();
                 snapshot.forEach(docSnap => {
                     const d = docSnap.data();
-                    if(d.shop) uniqueLocs.add(d.shop.trim());
+                    if (d.shop) uniqueLocs.add(d.shop.trim());
                 });
+
                 const datalist = document.getElementById('branchDatalist');
                 datalist.innerHTML = '';
                 uniqueLocs.forEach(loc => {
@@ -972,42 +995,70 @@
                         datalist.appendChild(opt);
                     }
                 });
+
+                const savedBranch = localStorage.getItem('myBranchName');
+                if (savedBranch) {
+                    document.getElementById('myBranchName').value = savedBranch;
+                } else if (uniqueLocs.size > 0 && currentUser) {
+                    // Try auto matching user email to available branches
+                    const userPrefix = currentUser.email.split('@')[0].toLowerCase();
+                    const matchedBranch = Array.from(uniqueLocs).find(loc => loc.toLowerCase().includes(userPrefix));
+                    if (matchedBranch) {
+                        document.getElementById('myBranchName').value = matchedBranch;
+                    }
+                }
             }).catch(e => console.error("Error loading branch options:", e));
         }
 
         let myStockUnsubscribe = null;
-        window.loadMyStock = function() {
-            const branch = document.getElementById('myBranchName').value.trim();
-            if(!branch) return showToast("Please enter or select your Branch Name first", "warning");
-            
-            localStorage.setItem('myBranchName', branch);
-            
-            if(myStockUnsubscribe) myStockUnsubscribe();
-            
+        window.loadMyStock = function(isExplicitClick = false) {
+            let branch = document.getElementById('myBranchName').value.trim();
             const tbody = document.getElementById('myStockBody');
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available stock...</td></tr>';
+            const stockBadge = document.getElementById('stockBadgeCount');
 
-            const q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
+            if (branch) {
+                localStorage.setItem('myBranchName', branch);
+            }
+
+            if (myStockUnsubscribe) myStockUnsubscribe();
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available stock...</td></tr>';
+
+            let q;
+            if (branch) {
+                q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
+            } else {
+                // If branch is empty, load all available Head Office stock items so shop can see all allocated stock
+                q = query(collection(db, "inventory"), where("status", "==", "Available"));
+            }
+
             myStockUnsubscribe = onSnapshot(q, (snapshot) => {
                 tbody.innerHTML = '';
-                if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now.</td></tr>';
+                if (snapshot.empty) {
+                    stockBadge.innerText = '0 Stock Items';
+                    stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                    stockBadge.style.color = 'var(--danger)';
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now.</td></tr>';
                     return;
                 }
-                
+
+                stockBadge.innerText = `${snapshot.size} Stock Available`;
+                stockBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                stockBadge.style.color = 'var(--success)';
+
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${data.imei}</strong></td>
-                        <td>${data.model} ${data.storage ? '- ' + data.storage : ''}</td>
+                        <td><strong>${data.imei || '-'}</strong></td>
+                        <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}</td>
+                        <td><span style="color: var(--accent-purple); font-weight: 600;">${data.shop || '-'}</span></td>
                         <td><span class="badge badge-confirmed">Available</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             }, error => {
                 console.error("Stock fetch error:", error);
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--warning);">Error fetching branch stock.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--warning);">Error fetching stock: ' + error.message + '</td></tr>';
             });
         };
 
