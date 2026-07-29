@@ -42,7 +42,7 @@
             background: rgba(23, 32, 54, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 1.2rem 2.5rem;
+            padding: 0.8rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -64,29 +64,29 @@
         }
 
         .tabs { 
-            margin-top: 1.8rem; 
+            margin-top: 1rem; 
             display: flex; 
-            gap: 0.75rem; 
+            gap: 0.6rem; 
             width: 100%; 
             max-width: 1400px; 
-            padding: 0 2rem; 
+            padding: 0 1.5rem; 
             flex-wrap: wrap;
         }
 
         .tab {
-            padding: 0.85rem 1.6rem;
+            padding: 0.6rem 1.2rem;
             background: rgba(255, 255, 255, 0.04);
-            border-radius: 12px 12px 0 0;
+            border-radius: 10px 10px 0 0;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.92rem;
+            font-size: 0.85rem;
             border: 1px solid var(--border-color);
             border-bottom: none;
             color: var(--text-muted);
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             user-select: none;
         }
 
@@ -105,13 +105,13 @@
         .container {
             width: 100%;
             max-width: 1400px;
-            padding: 2rem;
+            padding: 1.2rem;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            border-radius: 0 16px 16px 16px;
+            border-radius: 0 12px 12px 12px;
             min-height: 75vh;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* Views */
@@ -132,8 +132,8 @@
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.88rem; }
-        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px; }
+        th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
+        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
         tr:hover { background: rgba(255, 255, 255, 0.03); cursor: pointer; }
         tr:last-child td { border-bottom: none; }
 
@@ -146,24 +146,24 @@
         .shop-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: 14px;
+            padding: 1rem;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.25s;
             text-align: center;
         }
         .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.06); }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 
         /* Form Inputs */
         input, select, textarea {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.8rem;
             background: rgba(11, 15, 25, 0.7);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text-main);
-            font-size: 0.92rem;
+            font-size: 0.85rem;
             transition: all 0.25s ease;
         }
         input:focus, select:focus, textarea:focus {
@@ -428,7 +428,7 @@
             </div>
 
             <!-- Form and History Grid -->
-            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem;">
+            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.2rem;">
                 <!-- Main Shop Direct Sales Entry Form -->
                 <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
                     <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: white;">Main Shop Direct Sale Entry</h2>
@@ -500,8 +500,11 @@
 
                 <!-- Main Shop Sales History Table -->
                 <div>
-                    <h2 style="font-size: 1.15rem; color: white; margin-bottom: 1rem;">Main Shop Direct Sales History</h2>
-                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.15rem; color: white;">Main Shop Direct Sales History</h2>
+                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 250px;" oninput="renderMainShopProfitView()">
+                    </div>
+                    <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
                         <table>
                             <thead>
                                 <tr>
@@ -525,7 +528,7 @@
 
         <!-- Inventory Manager View -->
         <div id="inventoryView" class="view">
-            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 1.2rem;">
                 <!-- Add Inventory Form -->
                 <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: white;">Add Head Office Stock</h2>
@@ -716,6 +719,22 @@
             <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Scan Barcode</h2>
             <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden;"></div>
             <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Transfer Stock Modal -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="modal-close" onclick="closeTransferModal()">&times;</span>
+            <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Transfer Stock</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;" id="transferItemName">Item: ...</p>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Target Shop / Branch Location</label>
+                <input type="text" id="transferShopInput" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name...">
+            </div>
+            
+            <button id="confirmTransferBtn" class="action-btn" style="width: 100%; background: var(--primary);">Confirm Transfer</button>
         </div>
     </div>
 
@@ -1421,6 +1440,7 @@
 
             const customStart = document.getElementById('profitStartDate')?.value || '';
             const customEnd = document.getElementById('profitEndDate')?.value || '';
+            const searchInput = (document.getElementById('mainShopSearch')?.value || '').toLowerCase();
 
             let totalMrp = 0;
             let totalBuyPrice = 0;
@@ -1445,9 +1465,18 @@
                 } else if (currentProfitRange === 'custom') {
                     if (customStart && item.date < customStart) return false;
                     if (customEnd && item.date > customEnd) return false;
-                    return true;
                 }
-                return true; // all time
+                
+                if (searchInput) {
+                    const matchSearch = (item.imei || '').toLowerCase().includes(searchInput) ||
+                                        (item.custNic || '').toLowerCase().includes(searchInput) ||
+                                        (item.spNumber || '').toLowerCase().includes(searchInput) ||
+                                        (item.model || '').toLowerCase().includes(searchInput) ||
+                                        (item.custName || '').toLowerCase().includes(searchInput);
+                    if (!matchSearch) return false;
+                }
+                
+                return true;
             });
 
             filteredSales.forEach(item => {
@@ -1553,7 +1582,10 @@
                         <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
                         <td>${badge}</td>
                         <td>
-                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Remove Stock">
+                            <button onclick="openTransferModal('${docId}', '${data.imei}', '${data.model}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
+                                🔄
+                            </button>
+                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
                                 🗑️
                             </button>
                         </td>
@@ -1617,6 +1649,45 @@
                 btn.disabled = false;
             });
         });
+
+        // Stock Transfer Logic
+        let currentTransferDocId = null;
+        window.openTransferModal = function(docId, imei, model) {
+            currentTransferDocId = docId;
+            document.getElementById('transferItemName').innerText = `Item: ${model} (IMEI: ${imei})`;
+            document.getElementById('transferShopInput').value = '';
+            document.getElementById('transferModal').style.display = 'flex';
+        };
+
+        window.closeTransferModal = function() {
+            currentTransferDocId = null;
+            document.getElementById('transferModal').style.display = 'none';
+        };
+
+        const confirmTransferBtn = document.getElementById('confirmTransferBtn');
+        if (confirmTransferBtn) {
+            confirmTransferBtn.addEventListener('click', async () => {
+                const targetShop = document.getElementById('transferShopInput').value.trim();
+                if (!targetShop) return showToast("Please enter or select a target shop", "warning");
+                if (!currentTransferDocId) return;
+
+                const btn = confirmTransferBtn;
+                btn.disabled = true;
+                btn.innerText = 'Transferring...';
+
+                try {
+                    await updateDoc(doc(db, "inventory", currentTransferDocId), { shop: targetShop });
+                    showToast(`Stock transferred to ${targetShop} successfully!`, "success");
+                    closeTransferModal();
+                } catch (e) {
+                    console.error("Transfer error:", e);
+                    showToast("Failed to transfer stock: " + e.message, "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Confirm Transfer';
+                }
+            });
+        }
 
         // ==========================================
         // STAFF PROFILES & ACTIVATOR PAYMENTS
