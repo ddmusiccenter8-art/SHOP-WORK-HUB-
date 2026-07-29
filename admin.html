@@ -251,6 +251,11 @@
             METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
         </h1>
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
+                <option value="en">English</option>
+                <option value="si">සිංහල</option>
+                <option value="ta">தமிழ்</option>
+            </select>
             <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">🟢 Firebase Connected</span>
             <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
         </div>
@@ -351,6 +356,25 @@
                 <button onclick="backToShops()" style="background: rgba(255,255,255,0.08); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
                 <h2 id="profileTitle" style="color: white; margin-bottom: 1rem;">Shop Profile</h2>
                 
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sale (MRP)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 700; color: white; margin-top: 0.2rem;" id="shopTotalMrp">Rs. 0.00</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Loans Issued</h3>
+                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--info); margin-top: 0.2rem;" id="shopTotalLoan">Rs. 0.00</p>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
+                        <h3 style="color: var(--success); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Paid)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--success); margin-top: 0.2rem;" id="shopTotalPaid">Rs. 0.00</p>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.4);">
+                        <h3 style="color: var(--warning); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Pending)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--warning); margin-top: 0.2rem;" id="shopTotalPending">Rs. 0.00</p>
+                    </div>
+                </div>
+
                 <div style="width: 100%; height: 280px; margin: 1rem 0 2rem 0; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <canvas id="shopChart"></canvas>
                 </div>
@@ -759,6 +783,99 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Translation Dictionary & Logic
+        const langDict = {
+            "Admin Dashboard": { si: "පරිපාලක පුවරුව", ta: "நிர்வாக டாஷ்போர்டு" },
+            "All Submissions": { si: "සියලුම වාර්තා", ta: "அனைத்து அறிக்கைகளும்" },
+            "Shop Profiles": { si: "අලෙවිසැල් ගිණුම්", ta: "கடை சுயவிவரங்கள்" },
+            "Main Shop Profit & Sales": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම්", ta: "முக்கிய கடை விற்பனை" },
+            "Inventory Manager": { si: "තොග කළමනාකරණය", ta: "பங்கு மேலாளர்" },
+            "Staff Profiles": { si: "කාර්ය මණ්ඩල ගිණුම්", ta: "பணியாளர் சுயவிவரங்கள்" },
+            "Logout": { si: "ඉවත් වන්න", ta: "வெளியேறு" },
+            "All Entries": { si: "සියලුම ඇතුළත් කිරීම්", ta: "அனைத்து உள்ளீடுகளும்" },
+            "Pending Settlements": { si: "ගෙවීමට ඇති මුදල්", ta: "நிலுவையில் உள்ள கொடுப்பனவுகள்" },
+            "Paid / Completed": { si: "ගෙවා නිම කළ", ta: "செலுத்தப்பட்ட / முடிக்கப்பட்ட" },
+            "Date": { si: "දිනය", ta: "தேதி" },
+            "Shop": { si: "අලෙවිසැල", ta: "கடை" },
+            "Customer & Device": { si: "පාරිභෝගිකයා සහ දුරකථනය", ta: "வாடிக்கையாளர் மற்றும் சாதனம்" },
+            "Loan / Settlement": { si: "ණය / පියවීම", ta: "கடன் / தீர்வு" },
+            "Status": { si: "තත්ත්වය", ta: "நிலை" },
+            "Registered Shops Directory": { si: "ලියාපදිංචි අලෙවිසැල්", ta: "பதிவு செய்யப்பட்ட கடைகள்" },
+            "Register New Shop Profile": { si: "නව අලෙවිසැලක් ලියාපදිංචි කරන්න", ta: "புதிய கடையை பதிவு செய்க" },
+            "Back to Shops Directory": { si: "නැවත අලෙවිසැල් පිටුවට", ta: "மீண்டும் கடைகள் பக்கத்திற்கு" },
+            "Shop Profile": { si: "අලෙවිසැල් ගිණුම", ta: "கடை சுயவிவரம்" },
+            "Total Sale (MRP)": { si: "මුළු විකුණුම් (MRP)", ta: "மொத்த விற்பனை (MRP)" },
+            "Total Loans Issued": { si: "ලබා දුන් මුළු ණය", ta: "வழங்கப்பட்ட மொத்த கடன்கள்" },
+            "Settlement (Paid)": { si: "ගෙවා ඇති මුදල්", ta: "தீர்வு (செலுத்தப்பட்டது)" },
+            "Settlement (Pending)": { si: "ගෙවීමට ඇති මුදල්", ta: "தீர்வு (நிலுவையில் உள்ளது)" },
+            "Export CSV": { si: "CSV ලබාගන්න", ta: "CSV ஆக ஏற்றுமதி செய்" },
+            "Main Shop Direct Sale Entry": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම් ඇතුළත් කිරීම", ta: "முக்கிய கடை நேரடி விற்பனை உள்ளீடு" },
+            "Main Shop Direct Sales History": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම් ඉතිහාසය", ta: "முக்கிய கடை நேரடி விற்பனை வரலாறு" },
+            "Add Main Shop Sale Entry": { si: "ප්‍රධාන අලෙවිසැල් විකුණුමක් ඇතුළත් කරන්න", ta: "முக்கிய கடை விற்பனை உள்ளீட்டைச் சேர்க்கவும்" },
+            "Activations": { si: "සක්‍රිය කිරීම්", ta: "செயல்பாடுகள்" },
+            "Pending Fee": { si: "ගෙවීමට ඇති මුදල", ta: "நிலுவையில் உள்ள கட்டணம்" },
+            "Action": { si: "ක්‍රියාව", ta: "செயல்" },
+            "Payment Status": { si: "ගෙවීම් තත්ත්වය", ta: "கட்டண நிலை" },
+            "Fee Amount": { si: "ගාස්තු මුදල", ta: "கட்டண தொகை" },
+            "Live Net Profit:": { si: "ශුද්ධ ලාභය:", ta: "நிகர லாபம்:" },
+            "Search IMEI, SP, NIC, Shop...": { si: "IMEI, SP, NIC, Shop සොයන්න...", ta: "IMEI, SP, NIC, Shop தேட..." }
+        };
+
+        window.walkNodeAndTranslate = function(node, lang) {
+            if (node.nodeType === 3) {
+                const text = node.nodeValue.trim();
+                if (text && !text.includes('{') && !text.includes('}')) {
+                    if (!node.originalText) {
+                        node.originalText = node.nodeValue;
+                    }
+                    const key = node.originalText.trim();
+                    if (lang === 'en') {
+                        node.nodeValue = node.originalText;
+                    } else if (langDict[key] && langDict[key][lang]) {
+                        node.nodeValue = node.originalText.replace(key, langDict[key][lang]);
+                    }
+                }
+            } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+                if (node.tagName === 'INPUT' && node.placeholder) {
+                    if (!node.originalPlaceholder) node.originalPlaceholder = node.placeholder;
+                    const pKey = node.originalPlaceholder.trim();
+                    if (lang === 'en') {
+                        node.placeholder = node.originalPlaceholder;
+                    } else if (langDict[pKey] && langDict[pKey][lang]) {
+                        node.placeholder = langDict[pKey][lang];
+                    }
+                }
+                for (let i = 0; i < node.childNodes.length; i++) {
+                    window.walkNodeAndTranslate(node.childNodes[i], lang);
+                }
+            }
+        };
+
+        window.currentLang = localStorage.getItem('preferredLang') || 'en';
+        
+        window.changeLanguage = function(lang) {
+            window.currentLang = lang;
+            localStorage.setItem('preferredLang', lang);
+            document.getElementById('langSwitcher').value = lang;
+            window.walkNodeAndTranslate(document.body, lang);
+        };
+        
+        // Call it initially after a small delay to ensure DOM is ready
+        setTimeout(() => window.changeLanguage(window.currentLang), 500);
+
+        // Auto-translate dynamic content
+        let isTranslating = false;
+        const observer = new MutationObserver((mutations) => {
+            if (isTranslating || window.currentLang === 'en') return;
+            let hasNewNodes = mutations.some(m => m.addedNodes.length > 0);
+            if (hasNewNodes) {
+                isTranslating = true;
+                window.walkNodeAndTranslate(document.body, window.currentLang);
+                setTimeout(() => { isTranslating = false; }, 50);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
         // Connection Status Listener
         window.addEventListener('online', () => {
             const badge = document.getElementById('connectionBadge');
@@ -1131,10 +1248,33 @@
             document.getElementById('singleShopSection').style.display = 'block';
             document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
 
+            let totalMrp = 0;
+            let totalLoan = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+
             const salesByDate = {};
             shopSales.forEach(s => {
-                if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + (parseFloat(s.loanAmount)||0);
+                const mrp = parseFloat(s.mrp) || 0;
+                const loan = parseFloat(s.loanAmount) || 0;
+                const set = parseFloat(s.settlement) || 0;
+
+                totalMrp += mrp;
+                totalLoan += loan;
+                if (s.paymentStatus === 'Paid') {
+                    totalPaid += set;
+                } else {
+                    totalPending += set;
+                }
+
+                if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + loan;
             });
+
+            document.getElementById('shopTotalMrp').innerText = 'Rs. ' + totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalLoan').innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
+
             const dates = Object.keys(salesByDate).sort();
             const amounts = dates.map(d => salesByDate[d]);
 
