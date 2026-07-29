@@ -16,6 +16,8 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.12);
+            --success: #10b981;
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
@@ -37,7 +39,7 @@
             border-radius: 20px;
             padding: 2.5rem;
             width: 100%;
-            max-width: 440px;
+            max-width: 450px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
@@ -68,7 +70,7 @@
         p.subtitle {
             color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
 
         .form-group {
@@ -166,6 +168,15 @@
             text-align: left;
         }
 
+        .session-banner {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
         .footer-note {
             margin-top: 2rem;
             font-size: 0.8rem;
@@ -184,6 +195,15 @@
         <h1>METHMI WORK HUB</h1>
         <p class="subtitle">Enter your credentials to access the portal<br><span style="font-size: 0.82rem; opacity: 0.8;">(පද්ධතියට ඇතුළත් වීමට ලොග් වන්න)</span></p>
         
+        <!-- Saved Session Banner (If already logged in) -->
+        <div id="sessionBanner" class="session-banner" style="display: none;">
+            <p style="font-size: 0.85rem; color: #c7d2fe; margin-bottom: 0.75rem;">Currently Signed In As:<br><strong id="currentLoggedInEmail" style="color: white; font-size: 0.95rem;">-</strong></p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="goToDashboard()" style="flex: 1; background: var(--primary); color: white; border: none; padding: 0.6rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">🚀 Open Dashboard</button>
+                <button onclick="forceLogout()" style="flex: 1; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; padding: 0.6rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">🚪 Sign Out</button>
+            </div>
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address (විද්‍යුත් තැපෑල)</label>
@@ -206,13 +226,6 @@
             <div id="errorMessage" class="error-message">Invalid email or password.</div>
         </form>
 
-        <div id="sessionNotice" style="display: none; margin-top: 1rem; padding: 0.8rem; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 10px;">
-            <p style="font-size: 0.82rem; color: #a5b4fc; margin-bottom: 0.5rem;" id="sessionEmailText">Currently logged in...</p>
-            <button onclick="forceLogout()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 600;">
-                🚪 Sign Out / Change Account
-            </button>
-        </div>
-
         <div class="footer-note">
             Methmi Mobile (Pvt) Ltd &bull; Work Hub System
         </div>
@@ -222,7 +235,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
             authDomain: "methmi-work-hub.firebaseapp.com",
@@ -235,6 +247,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        let activeUserEmail = null;
+
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMessage');
@@ -243,34 +257,35 @@
 
         window.forceLogout = function() {
             signOut(auth).then(() => {
-                document.getElementById('sessionNotice').style.display = 'none';
+                activeUserEmail = null;
+                document.getElementById('sessionBanner').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'none';
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = '<span>Login to Work Hub</span>';
-                alert("Logged out successfully! You can now enter your email and password.");
-            });
+                alert("Logged out successfully! You can now enter your account credentials below.");
+            }).catch(err => console.error("Signout error:", err));
         };
 
-        // Check if user is already logged in
+        window.goToDashboard = function() {
+            if (activeUserEmail) {
+                redirectUser(activeUserEmail);
+            }
+        };
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('sessionNotice').style.display = 'block';
-                document.getElementById('sessionEmailText').innerText = `Logged in as: ${user.email}`;
-                redirectUser(user.email);
+                activeUserEmail = user.email;
+                document.getElementById('sessionBanner').style.display = 'block';
+                document.getElementById('currentLoggedInEmail').innerText = user.email;
             } else {
-                document.getElementById('sessionNotice').style.display = 'none';
+                activeUserEmail = null;
+                document.getElementById('sessionBanner').style.display = 'none';
             }
         });
 
         togglePassword.addEventListener('click', () => {
             const isPassword = passwordInput.getAttribute('type') === 'password';
             passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-            
-            if (isPassword) {
-                togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
-            } else {
-                togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-            }
         });
 
         loginForm.addEventListener('submit', async (e) => {

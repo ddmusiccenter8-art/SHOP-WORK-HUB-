@@ -347,7 +347,7 @@
         </h1>
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <span id="userEmailDisplay" style="color: var(--accent-purple); font-weight: 600; font-size: 0.9rem;"></span>
-            <button class="logout-btn" id="logoutBtn">Logout</button>
+            <button class="logout-btn" id="logoutBtn" onclick="doLogout()">Logout</button>
         </div>
     </div>
 
@@ -621,9 +621,19 @@
             }
         });
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth);
-        });
+        window.doLogout = async function() {
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.error("Signout error:", e);
+            }
+            window.location.href = 'index.html';
+        };
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', window.doLogout);
+        }
 
         // Tab Switching Logic
         window.switchTab = function(tabName) {
