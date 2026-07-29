@@ -16,8 +16,6 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.12);
-            --success: #10b981;
-            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
@@ -39,7 +37,7 @@
             border-radius: 20px;
             padding: 2.5rem;
             width: 100%;
-            max-width: 450px;
+            max-width: 440px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
@@ -70,7 +68,7 @@
         p.subtitle {
             color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 1.8rem;
+            margin-bottom: 2rem;
         }
 
         .form-group {
@@ -168,15 +166,6 @@
             text-align: left;
         }
 
-        .session-banner {
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
         .footer-note {
             margin-top: 2rem;
             font-size: 0.8rem;
@@ -195,19 +184,10 @@
         <h1>METHMI WORK HUB</h1>
         <p class="subtitle">Enter your credentials to access the portal<br><span style="font-size: 0.82rem; opacity: 0.8;">(පද්ධතියට ඇතුළත් වීමට ලොග් වන්න)</span></p>
         
-        <!-- Saved Session Banner (If already logged in) -->
-        <div id="sessionBanner" class="session-banner" style="display: none;">
-            <p style="font-size: 0.85rem; color: #c7d2fe; margin-bottom: 0.75rem;">Currently Signed In As:<br><strong id="currentLoggedInEmail" style="color: white; font-size: 0.95rem;">-</strong></p>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button onclick="goToDashboard()" style="flex: 1; background: var(--primary); color: white; border: none; padding: 0.6rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">🚀 Open Dashboard</button>
-                <button onclick="forceLogout()" style="flex: 1; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; padding: 0.6rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">🚪 Sign Out</button>
-            </div>
-        </div>
-
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address (විද්‍යුත් තැපෑල)</label>
-                <input type="email" id="email" required placeholder="spmsolutions2001@gmail.com" autocomplete="email">
+                <input type="email" id="email" required placeholder="methmimobilepvtltd@gmail.com" autocomplete="email">
             </div>
             
             <div class="form-group">
@@ -233,8 +213,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
             authDomain: "methmi-work-hub.firebaseapp.com",
@@ -247,39 +228,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        let activeUserEmail = null;
-
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMessage');
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
-        window.forceLogout = function() {
-            signOut(auth).then(() => {
-                activeUserEmail = null;
-                document.getElementById('sessionBanner').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'none';
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = '<span>Login to Work Hub</span>';
-                alert("Logged out successfully! You can now enter your account credentials below.");
-            }).catch(err => console.error("Signout error:", err));
-        };
-
-        window.goToDashboard = function() {
-            if (activeUserEmail) {
-                redirectUser(activeUserEmail);
-            }
-        };
-
+        // Auto redirect if already logged in
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                activeUserEmail = user.email;
-                document.getElementById('sessionBanner').style.display = 'block';
-                document.getElementById('currentLoggedInEmail').innerText = user.email;
-            } else {
-                activeUserEmail = null;
-                document.getElementById('sessionBanner').style.display = 'none';
+                redirectUser(user.email);
             }
         });
 
@@ -321,14 +279,11 @@
 
         function redirectUser(email) {
             const adminEmails = [
-                'spmsolutions2001@gmail.com',
-                'spmsolutions@gmail.com',
                 'admin@methmi.com', 
                 'methmimobilepvtltd@gmail.com', 
                 'ddmusiccenter8@gmail.com'
             ];
             const isAdmin = email.toLowerCase().includes('admin') || 
-                            email.toLowerCase().includes('spm') || 
                             adminEmails.includes(email.toLowerCase());
             
             if (isAdmin) {

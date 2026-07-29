@@ -250,7 +250,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
         </h1>
-        <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">🟢 Firebase Connected</span>
+            <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
+        </div>
     </div>
 
     <div class="tabs">
@@ -657,7 +660,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
+        import { getFirestore, initializeFirestore, memoryLocalCache, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -671,7 +674,34 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        
+        let db;
+        try {
+            db = initializeFirestore(app, { localCache: memoryLocalCache() });
+        } catch(e) {
+            db = getFirestore(app);
+        }
+
+        // Connection Status Listener
+        window.addEventListener('online', () => {
+            const badge = document.getElementById('connectionBadge');
+            if (badge) {
+                badge.style.background = 'rgba(16,185,129,0.2)';
+                badge.style.borderColor = 'rgba(16,185,129,0.4)';
+                badge.style.color = 'var(--success)';
+                badge.innerHTML = '🟢 Firebase Connected';
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            const badge = document.getElementById('connectionBadge');
+            if (badge) {
+                badge.style.background = 'rgba(239,68,68,0.2)';
+                badge.style.borderColor = 'rgba(239,68,68,0.4)';
+                badge.style.color = '#fca5a5';
+                badge.innerHTML = '🔴 Network Offline';
+            }
+        });
 
         let allSales = [];
         let allMainShopSales = [];
@@ -743,14 +773,11 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const adminEmails = [
-                    'spmsolutions2001@gmail.com',
-                    'spmsolutions@gmail.com',
                     'admin@methmi.com', 
                     'methmimobilepvtltd@gmail.com', 
                     'ddmusiccenter8@gmail.com'
                 ];
                 const isAdmin = user.email.toLowerCase().includes('admin') || 
-                                user.email.toLowerCase().includes('spm') || 
                                 adminEmails.includes(user.email.toLowerCase());
 
                 if (!isAdmin) {
