@@ -595,13 +595,9 @@
                 const adminEmails = [
                     'admin@methmi.com', 
                     'methmimobilepvtltd@gmail.com', 
-                    'ddmusiccenter8@gmail.com',
-                    'spmsolutions2001@gmail.com',
-                    'spmsolutions@gmail.com'
+                    'ddmusiccenter8@gmail.com'
                 ];
                 const isAdmin = user.email.toLowerCase().includes('admin') || 
-                                user.email.toLowerCase().includes('spm') || 
-                                user.email.toLowerCase().includes('methmi') || 
                                 adminEmails.includes(user.email.toLowerCase());
 
                 if (isAdmin) {
