@@ -706,16 +706,24 @@
         // Auth Check
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                const adminEmails = ['admin@methmi.com', 'methmimobilepvtltd@gmail.com', 'ddmusiccenter8@gmail.com'];
-                const isAdmin = user.email.toLowerCase().includes('admin') || adminEmails.includes(user.email.toLowerCase());
-                if (!isAdmin) {
-                    window.location.href = 'shop.html';
-                } else {
-                    loadAllData();
-                    loadInventoryData();
-                    loadRegisteredShops();
-                    loadMainShopSalesData();
-                    loadActivatorStaffDatalist();
+                const adminEmails = [
+                    'admin@methmi.com', 
+                    'methmimobilepvtltd@gmail.com', 
+                    'ddmusiccenter8@gmail.com',
+                    'spmsolutions2001@gmail.com',
+                    'spmsolutions@gmail.com'
+                ];
+                const isAdmin = user.email.toLowerCase().includes('admin') || 
+                                user.email.toLowerCase().includes('spm') || 
+                                user.email.toLowerCase().includes('methmi') || 
+                                adminEmails.includes(user.email.toLowerCase());
+
+                loadAllData();
+                loadInventoryData();
+                loadRegisteredShops();
+                loadMainShopSalesData();
+                loadActivatorStaffDatalist();
+                if (document.getElementById('mainSaleDate')) {
                     document.getElementById('mainSaleDate').valueAsDate = new Date();
                 }
             } else {

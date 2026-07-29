@@ -592,7 +592,19 @@
         // Auth Check
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (user.email.toLowerCase().includes('admin')) {
+                const adminEmails = [
+                    'admin@methmi.com', 
+                    'methmimobilepvtltd@gmail.com', 
+                    'ddmusiccenter8@gmail.com',
+                    'spmsolutions2001@gmail.com',
+                    'spmsolutions@gmail.com'
+                ];
+                const isAdmin = user.email.toLowerCase().includes('admin') || 
+                                user.email.toLowerCase().includes('spm') || 
+                                user.email.toLowerCase().includes('methmi') || 
+                                adminEmails.includes(user.email.toLowerCase());
+
+                if (isAdmin) {
                     window.location.href = 'admin.html';
                 } else {
                     currentUser = user;
