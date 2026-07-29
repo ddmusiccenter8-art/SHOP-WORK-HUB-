@@ -273,6 +273,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             Inventory Manager
         </div>
+        <div class="tab" data-tab="staffProfiles" onclick="switchTab('staffProfiles')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Staff Profiles
+        </div>
     </div>
 
     <div class="container">
@@ -579,6 +583,21 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <!-- Staff Profiles View -->
+        <div id="staffProfilesView" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.3rem; color: white; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Activator Staff Profiles
+                </h2>
+            </div>
+            
+            <div id="staffGrid" class="shop-grid">
+                <!-- Staff cards will be injected here -->
+            </div>
+        </div>
     </div>
 
     <!-- Add New Shop Profile Modal -->
@@ -640,6 +659,52 @@
                 <button id="saveUpdatesBtn" class="action-btn" style="flex: 2; background: var(--primary); min-width: 160px;">Save Updates</button>
                 <button id="completeProcessBtn" class="action-btn" style="display: none; flex: 2; background: var(--success); min-width: 160px;">Complete Process ✅</button>
                 <button id="deleteEntryBtn" class="action-btn" style="flex: 1; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; min-width: 110px;">Delete Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Profile Detailed Modal -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="modal-close" onclick="closeStaffModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;" id="staffModalInitials"></div>
+                <div>
+                    <h2 style="font-size: 1.4rem; color: white; margin: 0;" id="staffModalName">Staff Name</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Activator Performance & Payments</p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Activations</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: white; margin-top: 0.4rem;" id="staffTotalActivations">0</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Paid</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin-top: 0.4rem;" id="staffTotalPaid">Rs. 0.00</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Pending Balance</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin-top: 0.4rem;" id="staffTotalPending">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem;">Activation History</h3>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer & Device</th>
+                            <th>Fee Amount</th>
+                            <th>Payment Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffHistoryTableBody">
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1225,6 +1290,7 @@
                 updateActivatorDatalist(Array.from(staffSet));
 
                 renderMainShopProfitView();
+                renderStaffProfiles(); // Re-render staff profiles when data changes
             }, (err) => console.error("Main shop sales fetch error:", err));
         }
 
@@ -1271,6 +1337,7 @@
                 leaseFee: leaseFee,
                 staffName: staffName,
                 staffFee: staffFee,
+                staffPaymentStatus: 'Pending',
                 netProfit: netProfit,
                 timestamp: Date.now()
             };
@@ -1550,6 +1617,143 @@
                 btn.disabled = false;
             });
         });
+
+        // ==========================================
+        // STAFF PROFILES & ACTIVATOR PAYMENTS
+        // ==========================================
+
+        function renderStaffProfiles() {
+            const grid = document.getElementById('staffGrid');
+            if (!grid) return;
+            
+            const staffMap = {};
+            
+            allMainShopSales.forEach(s => {
+                const name = (s.staffName || '').trim();
+                if (!name) return;
+                
+                const lowerName = name.toLowerCase();
+                if (!staffMap[lowerName]) {
+                    staffMap[lowerName] = {
+                        originalName: name,
+                        sales: [],
+                        totalCount: 0,
+                        totalPaid: 0,
+                        totalPending: 0
+                    };
+                }
+                
+                staffMap[lowerName].sales.push(s);
+                staffMap[lowerName].totalCount++;
+                
+                const fee = parseFloat(s.staffFee) || 0;
+                if (s.staffPaymentStatus === 'Paid') {
+                    staffMap[lowerName].totalPaid += fee;
+                } else {
+                    // Treat missing or 'Pending' as pending
+                    staffMap[lowerName].totalPending += fee;
+                }
+            });
+            
+            const staffArray = Object.values(staffMap).sort((a, b) => b.totalPending - a.totalPending);
+            
+            grid.innerHTML = '';
+            
+            if (staffArray.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1;">No activator staff records found yet.</p>';
+                return;
+            }
+            
+            staffArray.forEach(staff => {
+                const initial = staff.originalName.charAt(0).toUpperCase();
+                
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.onclick = () => viewStaffProfile(staff.originalName, staff.sales, staff.totalCount, staff.totalPaid, staff.totalPending);
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
+                            ${initial}
+                        </div>
+                        <h3 style="color: white; margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Activations:</span>
+                            <span style="color: white; font-weight: bold;">${staff.totalCount} Phones</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Pending Fee:</span>
+                            <span style="color: var(--warning); font-weight: bold;">Rs. ${staff.totalPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;">View Profile Details</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.viewStaffProfile = function(name, sales, totalCount, totalPaid, totalPending) {
+            document.getElementById('staffModalName').innerText = name;
+            document.getElementById('staffModalInitials').innerText = name.charAt(0).toUpperCase();
+            
+            document.getElementById('staffTotalActivations').innerText = totalCount;
+            document.getElementById('staffTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('staffTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            const tbody = document.getElementById('staffHistoryTableBody');
+            tbody.innerHTML = '';
+            
+            // Sort sales by newest first
+            const sortedSales = [...sales].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            
+            sortedSales.forEach(s => {
+                const tr = document.createElement('tr');
+                const isPaid = s.staffPaymentStatus === 'Paid';
+                const fee = parseFloat(s.staffFee) || 0;
+                
+                const statusBadge = isPaid 
+                    ? '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.2)">Paid</span>' 
+                    : '<span class="badge badge-replied">Pending</span>';
+                    
+                const actionBtn = isPaid
+                    ? `<button disabled style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: not-allowed; font-size: 0.75rem;">Done</button>`
+                    : `<button onclick="markStaffFeePaid('${s.id}')" style="background: var(--success); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;">Mark as Paid</button>`;
+
+                tr.innerHTML = `
+                    <td>${s.date || '-'}</td>
+                    <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
+                    <td style="font-weight: 600; color: white;">Rs. ${fee.toLocaleString()}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('staffModal').style.display = 'flex';
+        };
+
+        window.closeStaffModal = function() {
+            document.getElementById('staffModal').style.display = 'none';
+        };
+
+        window.markStaffFeePaid = async function(docId) {
+            if(!confirm("Mark this activation fee as paid?")) return;
+            try {
+                await updateDoc(doc(db, "main_shop_sales", docId), { staffPaymentStatus: 'Paid' });
+                showToast("Fee marked as paid successfully!", "success");
+                // The onSnapshot will automatically re-render the profiles, 
+                // but we also need to close the modal or re-render it. 
+                // For simplicity, we close it so they can click again to see the updated view.
+                closeStaffModal();
+            } catch(e) {
+                console.error(e);
+                showToast("Failed to update fee status: " + e.message, "error");
+            }
+        };
 
         // Barcode Scanner Logic
         let html5QrcodeScanner = null;
