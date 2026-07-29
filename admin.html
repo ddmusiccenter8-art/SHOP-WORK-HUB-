@@ -747,7 +747,7 @@
 
         // Load All Submissions
         function loadAllData() {
-            const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
+            const q = query(collection(db, "sales"));
             
             onSnapshot(q, (snapshot) => {
                 allSales = [];
@@ -759,6 +759,8 @@
                     allSales.push(data);
                     if (data.shopId) uniqueShops.add(data.shopId);
                 });
+
+                allSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
                 renderAllSubmissions();
                 renderShopDirectory(Array.from(uniqueShops));
@@ -1140,7 +1142,7 @@
         // ==========================================
         
         function loadMainShopSalesData() {
-            onSnapshot(query(collection(db, "main_shop_sales"), orderBy("timestamp", "desc")), (snapshot) => {
+            onSnapshot(collection(db, "main_shop_sales"), (snapshot) => {
                 allMainShopSales = [];
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
@@ -1380,7 +1382,7 @@
 
         // Inventory Logic
         function loadInventoryData() {
-            const q = query(collection(db, "inventory"), orderBy("timestamp", "desc"));
+            const q = query(collection(db, "inventory"));
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('inventoryTableBody');
                 const datalist = document.getElementById('shopDatalist');
