@@ -491,7 +491,7 @@
                 <datalist id="branchDatalist"></datalist>
                 <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.8rem;" onclick="loadMyStock(true)">View Stock</button>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Phones transferred to your branch from Head Office (6% discount rate applies to these IMEIs when selling).</p>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Phones transferred to your branch from Head Office (Shop receives 4% profit settlement when sold).</p>
         </div>
 
         <div class="table-container">
@@ -637,7 +637,6 @@
 
         // Auto Calculation & Inventory Check Logic
         let currentStockSource = 'Shop';
-        let currentDiscount = 0.04;
         let matchedInventoryDocId = null;
 
         const imeiInput = document.getElementById('imei');
@@ -677,7 +676,6 @@
             if (val.length < 4) {
                 imeiStatus.innerText = '';
                 currentStockSource = 'Shop';
-                currentDiscount = 0.04;
                 matchedInventoryDocId = null;
                 calculateSettlement();
                 return;
@@ -691,17 +689,15 @@
                     const invDoc = snapshot.docs[0];
                     const data = invDoc.data();
                     
-                    imeiStatus.innerHTML = '<span style="color: var(--success);">✅ Head Office Stock (6% Discount Applied)</span>';
+                    imeiStatus.innerHTML = '<span style="color: var(--success);">✅ Head Office Stock (4% Profit Settlement)</span>';
                     if (data.model) modelInput.value = data.model;
                     if (data.storage) storageInput.value = data.storage;
                     
                     currentStockSource = 'HO';
-                    currentDiscount = 0.06;
                     matchedInventoryDocId = invDoc.id;
                 } else {
-                    imeiStatus.innerHTML = '<span style="color: var(--info);">Shop Own Stock (4% Discount Applied)</span>';
+                    imeiStatus.innerHTML = '<span style="color: var(--info);">Shop Own Stock (4% Discount Settlement)</span>';
                     currentStockSource = 'Shop';
-                    currentDiscount = 0.04;
                     matchedInventoryDocId = null;
                 }
             } catch (err) {
@@ -715,8 +711,15 @@
             const dp = parseFloat(downPaymentInput.value) || 0;
             const docCharge = parseFloat(documentInput.value) || 0;
 
-            const discountedMrp = mrp - (mrp * currentDiscount);
-            const settlement = discountedMrp - dp - docCharge;
+            let settlement = 0;
+            if (currentStockSource === 'HO') {
+                // For Head Office Stock: Settlement is ONLY 4% Profit of MRP
+                settlement = mrp * 0.04;
+            } else {
+                // For Shop Own Stock: Settlement = (MRP - 4%) - Down Payment - Document Fee
+                const discountedMrp = mrp - (mrp * 0.04);
+                settlement = discountedMrp - dp - docCharge;
+            }
 
             if (mrp > 0 || dp > 0 || docCharge > 0) {
                 settlementInput.value = settlement.toFixed(2);
@@ -754,7 +757,7 @@
                 status: 'New', 
                 adminReply: '',
                 stockSource: currentStockSource,
-                discountApplied: (currentDiscount * 100) + '%',
+                discountApplied: currentStockSource === 'HO' ? '4% Profit' : '4% Discount',
                 timestamp: Date.now()
             };
 
@@ -768,7 +771,6 @@
                 salesForm.reset();
                 imeiStatus.innerText = '';
                 currentStockSource = 'Shop';
-                currentDiscount = 0.04;
                 matchedInventoryDocId = null;
                 document.getElementById('date').valueAsDate = new Date();
             }).catch(error => {
@@ -1000,7 +1002,6 @@
                 if (savedBranch) {
                     document.getElementById('myBranchName').value = savedBranch;
                 } else if (uniqueLocs.size > 0 && currentUser) {
-                    // Try auto matching user email to available branches
                     const userPrefix = currentUser.email.split('@')[0].toLowerCase();
                     const matchedBranch = Array.from(uniqueLocs).find(loc => loc.toLowerCase().includes(userPrefix));
                     if (matchedBranch) {
@@ -1027,7 +1028,6 @@
             if (branch) {
                 q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
             } else {
-                // If branch is empty, load all available Head Office stock items so shop can see all allocated stock
                 q = query(collection(db, "inventory"), where("status", "==", "Available"));
             }
 

@@ -612,8 +612,8 @@
                 
                 let statusHtml = getStatusBadge(data.status);
                 let sourceHtml = data.stockSource === 'HO' 
-                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (6%)</span>' 
-                    : '<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (4%)</span>';
+                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (4% Profit)</span>' 
+                    : '<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (4% Discount)</span>';
                 
                 const shopName = data.shopId ? data.shopId.split('@')[0].toUpperCase() : 'UNKNOWN';
                 
@@ -732,7 +732,7 @@
             shopSales.forEach(data => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => openDetailsModal(data);
-                let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (6%)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4%)</span>';
+                let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (4% Profit)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4% Discount)</span>';
                 
                 tr.innerHTML = `
                     <td>${data.date}</td>
@@ -755,8 +755,8 @@
             currentModalDocId = data.id;
             const content = document.getElementById('modalContent');
             let sourceHtml = data.stockSource === 'HO' 
-                ? '<span style="color:var(--success); font-weight:600;">Head Office Stock (6% discount applied)</span>' 
-                : '<span style="color:var(--text-muted);">Shop Own Stock (4% discount applied)</span>';
+                ? '<span style="color:var(--success); font-weight:600;">Head Office Stock (4% Profit Settlement)</span>' 
+                : '<span style="color:var(--text-muted);">Shop Own Stock (4% Discount Settlement)</span>';
             
             content.innerHTML = `
                 <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
