@@ -68,17 +68,18 @@
             display: flex; 
             gap: 0.75rem; 
             width: 100%; 
-            max-width: 1350px; 
+            max-width: 1400px; 
             padding: 0 2rem; 
+            flex-wrap: wrap;
         }
 
         .tab {
-            padding: 0.85rem 1.8rem;
+            padding: 0.85rem 1.6rem;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 12px 12px 0 0;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             border: 1px solid var(--border-color);
             border-bottom: none;
             color: var(--text-muted);
@@ -86,6 +87,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            user-select: none;
         }
 
         .tab:hover {
@@ -102,7 +104,7 @@
 
         .container {
             width: 100%;
-            max-width: 1350px;
+            max-width: 1400px;
             padding: 2rem;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -130,7 +132,7 @@
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th, td { padding: 1rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.88rem; }
         th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px; }
         tr:hover { background: rgba(255, 255, 255, 0.03); cursor: pointer; }
         tr:last-child td { border-bottom: none; }
@@ -153,6 +155,24 @@
         .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.06); }
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
 
+        /* Form Inputs */
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.92rem;
+            transition: all 0.25s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
         /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -174,15 +194,10 @@
         .detail-item strong { color: var(--text-muted); font-size: 0.82rem; display: block; margin-bottom: 0.25rem; }
         .detail-item span.val { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
         
-        textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem; min-height: 80px; font-size: 0.9rem; }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        
         button.action-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.9rem; }
         button.action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-reply { background: var(--warning); color: black;}
-        .btn-pay { background: var(--primary); }
 
-        .filter-btn { padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.88rem; }
+        .filter-btn { padding: 0.55rem 1.1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500; }
         .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
 
@@ -223,7 +238,7 @@
             .container { padding: 1.2rem; border-radius: 12px; }
             .header { flex-direction: column; gap: 1rem; text-align: center; padding: 1rem; }
             .detail-grid { grid-template-columns: 1fr; }
-            #inventoryView > div { grid-template-columns: 1fr; }
+            #inventoryView > div, #mainProfitView > div.grid-layout { grid-template-columns: 1fr !important; }
             th, td { padding: 0.75rem 0.6rem; font-size: 0.82rem; }
         }
     </style>
@@ -246,6 +261,10 @@
         <div class="tab" data-tab="shops" onclick="switchTab('shops')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             Shop Profiles
+        </div>
+        <div class="tab" data-tab="mainProfit" onclick="switchTab('mainProfit')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Main Shop Profit & Sales
         </div>
         <div class="tab" data-tab="inventory" onclick="switchTab('inventory')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
@@ -309,7 +328,13 @@
         <!-- Shop Profiles View -->
         <div id="shopsView" class="view">
             <div id="shopListSection">
-                <h2 style="font-size: 1.3rem; margin-bottom: 1.2rem; color: white;">Registered Shops Directory</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+                    <h2 style="font-size: 1.3rem; color: white; margin: 0;">Registered Shops Directory</h2>
+                    <button onclick="openAddShopModal()" style="background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
+                        ➕ Register New Shop Profile
+                    </button>
+                </div>
+
                 <div class="shop-grid" id="shopGrid">
                     <!-- Shop cards populated dynamically -->
                 </div>
@@ -337,6 +362,156 @@
                         </thead>
                         <tbody id="singleShopTable"></tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Shop Profit & Sales Manager View -->
+        <div id="mainProfitView" class="view">
+            <!-- Date Filter Controls Header -->
+            <div style="background: rgba(255,255,255,0.02); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 1.8rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <h2 style="font-size: 1.2rem; color: white; margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="mainProfitDateFilters">
+                        <button class="filter-btn active" data-range="today" onclick="filterMainShopByDateRange('today')">Today</button>
+                        <button class="filter-btn" data-range="week" onclick="filterMainShopByDateRange('week')">This Week</button>
+                        <button class="filter-btn" data-range="month" onclick="filterMainShopByDateRange('month')">This Month</button>
+                        <button class="filter-btn" data-range="3months" onclick="filterMainShopByDateRange('3months')">3 Months</button>
+                        <button class="filter-btn" data-range="year" onclick="filterMainShopByDateRange('year')">This Year</button>
+                        <button class="filter-btn" data-range="all" onclick="filterMainShopByDateRange('all')">All Time</button>
+                    </div>
+                </div>
+
+                <!-- Custom Range Date Pickers -->
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">Custom Date Range:</span>
+                    <input type="date" id="profitStartDate" style="max-width: 170px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
+                    <span style="color: var(--text-muted);">to</span>
+                    <input type="date" id="profitEndDate" style="max-width: 170px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
+                    <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary);">Apply Range</button>
+                </div>
+            </div>
+
+            <!-- Financial Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Sales (MRP)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: white; margin-top: 0.4rem;" id="mainTotalMrp">Rs. 0.00</p>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Phone Cost (Buy Price)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: #fca5a5; margin-top: 0.4rem;" id="mainTotalBuyPrice">Rs. 0.00</p>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Leasing Fees (2% MRP)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin-top: 0.4rem;" id="mainTotalLeasingFees">Rs. 0.00</p>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Staff Fees (Rs. 500)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent-purple); margin-top: 0.4rem;" id="mainTotalStaffFees">Rs. 0.00</p>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.15); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(16, 185, 129, 0.4);">
+                    <h3 style="color: var(--success); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">NET PROFIT (ශුද්ධ ලාභය)</h3>
+                    <p style="font-size: 1.6rem; font-weight: 800; color: var(--success); margin-top: 0.4rem;" id="mainTotalNetProfit">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Form and History Grid -->
+            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem;">
+                <!-- Main Shop Direct Sales Entry Form -->
+                <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: white;">Main Shop Direct Sale Entry</h2>
+                    <form id="mainSaleForm">
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Date (දිනය)</label>
+                            <input type="date" id="mainSaleDate" required>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">SP Number / Invoice Ref</label>
+                            <input type="text" id="mainSaleSp" required placeholder="e.g. SP-MAIN-101">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Customer Name & NIC</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="mainSaleCustName" placeholder="Name" required style="flex: 1;">
+                                <input type="text" id="mainSaleCustNic" placeholder="NIC" required style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI & Model</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="mainSaleImei" placeholder="IMEI" required style="flex: 1;">
+                                <input type="text" id="mainSaleModel" placeholder="Model" required style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල)</label>
+                            <input type="number" id="mainSaleMrp" step="0.01" required placeholder="100000.00" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Mobile Buy Price / Cost (අපේ මිලදී ගත් මිල)</label>
+                            <input type="number" id="mainSaleBuyPrice" step="0.01" required placeholder="80000.00" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Leasing Company Fee % (Fintrex etc.)</label>
+                            <input type="number" id="mainSaleLeasePercent" step="0.1" value="2.0" required placeholder="2.0" oninput="calculateMainShopLiveProfit()">
+                            <span id="leaseFeeDisplay" style="font-size: 0.8rem; color: var(--warning); display: block; margin-top: 2px;">Leasing Fee: Rs. 0.00</span>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Staff Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                            <input type="text" id="mainSaleStaffName" list="activatorDatalist" required placeholder="Type or select staff name..." autocomplete="off">
+                            <datalist id="activatorDatalist"></datalist>
+                        </div>
+
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Staff Activator Fee (ගෙවන මුදල)</label>
+                            <input type="number" id="mainSaleStaffFee" step="1" value="500" required placeholder="500" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <!-- Live Calculated Net Profit Banner -->
+                        <div style="background: rgba(16, 185, 129, 0.12); padding: 0.9rem 1.1rem; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 1.2rem;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Calculated Net Profit:</span>
+                            <span id="liveNetProfitVal" style="font-size: 1.35rem; font-weight: 800; color: var(--success);">Rs. 0.00</span>
+                        </div>
+
+                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
+                            Add Main Shop Sale Entry
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Main Shop Sales History Table -->
+                <div>
+                    <h2 style="font-size: 1.15rem; color: white; margin-bottom: 1rem;">Main Shop Direct Sales History</h2>
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date & SP</th>
+                                    <th>Device & Customer</th>
+                                    <th>Activator</th>
+                                    <th>MRP & Cost</th>
+                                    <th>Fees (2% & 500)</th>
+                                    <th>Net Profit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mainShopTableBody">
+                                <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading main shop sales...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -400,6 +575,33 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Add New Shop Profile Modal -->
+    <div id="addShopModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
+            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
+            <form id="addShopForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop / Branch Name</label>
+                    <input type="text" id="newShopName" placeholder="e.g. PULASTHIGAMA POLONNARUWA" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop Login Email</label>
+                    <input type="email" id="newShopEmail" placeholder="e.g. pulasthigama@methmi.com" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Contact Number</label>
+                    <input type="text" id="newShopPhone" placeholder="e.g. 0771234567">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">City / Location</label>
+                    <input type="text" id="newShopLocation" placeholder="e.g. Polonnaruwa">
+                </div>
+                <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: var(--primary);">Register Shop</button>
+            </form>
         </div>
     </div>
 
@@ -472,9 +674,12 @@
         const db = getFirestore(app);
 
         let allSales = [];
+        let allMainShopSales = [];
+        let registeredShopsList = [];
         let currentModalDocId = null;
         let chartInstance = null;
         let currentFilter = 'All';
+        let currentProfitRange = 'today';
 
         // Toast Helper
         window.showToast = function(message, type = 'info') {
@@ -508,6 +713,10 @@
                 } else {
                     loadAllData();
                     loadInventoryData();
+                    loadRegisteredShops();
+                    loadMainShopSalesData();
+                    loadActivatorStaffDatalist();
+                    document.getElementById('mainSaleDate').valueAsDate = new Date();
                 }
             } else {
                 window.location.href = 'index.html';
@@ -536,7 +745,7 @@
             renderAllSubmissions();
         };
 
-        // Load All Data
+        // Load All Submissions
         function loadAllData() {
             const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
             
@@ -569,7 +778,6 @@
 
             const searchTerm = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
 
-            // Calculate overall totals accurately
             allSales.forEach(data => {
                 const s = parseFloat(data.settlement) || 0;
                 overallLoan += (parseFloat(data.loanAmount) || 0);
@@ -674,27 +882,51 @@
             showToast("CSV report generated successfully!", "success");
         };
 
-        // Shop Directory
-        function renderShopDirectory(shops) {
+        // Registered Shops Directory & Modal
+        function loadRegisteredShops() {
+            onSnapshot(collection(db, "registered_shops"), (snapshot) => {
+                registeredShopsList = [];
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    d.id = docSnap.id;
+                    registeredShopsList.push(d);
+                });
+                renderShopDirectory();
+            }, (err) => console.error("Registered shops fetch error:", err));
+        }
+
+        function renderShopDirectory(discoveredShops = []) {
             const grid = document.getElementById('shopGrid');
             grid.innerHTML = '';
 
-            if (shops.length === 0) {
-                grid.innerHTML = '<p style="color:var(--text-muted)">No registered shops yet.</p>';
+            const allShopsSet = new Set();
+            registeredShopsList.forEach(s => if (s.email) allShopsSet.add(s.email.toLowerCase()));
+            
+            allSales.forEach(s => if (s.shopId) allShopsSet.add(s.shopId.toLowerCase()));
+            discoveredShops.forEach(s => if (s) allShopsSet.add(s.toLowerCase()));
+
+            const shopsArray = Array.from(allShopsSet);
+
+            if (shopsArray.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted)">No registered shops yet. Click "Register New Shop Profile" above.</p>';
                 return;
             }
 
-            shops.forEach(shop => {
-                const shopSales = allSales.filter(s => s.shopId === shop);
+            shopsArray.forEach(shopEmail => {
+                const shopSales = allSales.filter(s => (s.shopId || '').toLowerCase() === shopEmail);
                 const totalLoan = shopSales.reduce((sum, s) => sum + (parseFloat(s.loanAmount)||0), 0);
+                const regInfo = registeredShopsList.find(r => (r.email || '').toLowerCase() === shopEmail);
+                
+                const displayName = regInfo ? regInfo.name : shopEmail.split('@')[0].toUpperCase();
                 
                 const card = document.createElement('div');
                 card.className = 'shop-card';
-                card.onclick = () => viewShopProfile(shop, shopSales);
+                card.onclick = () => viewShopProfile(shopEmail, shopSales);
                 card.innerHTML = `
-                    <h3 style="color: white; margin-bottom: 0.4rem; font-size: 1.1rem;">${shop.split('@')[0].toUpperCase()}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">${shop}</p>
-                    <div style="padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="color: white; margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
+                    ${regInfo && regInfo.phone ? `<p style="color: var(--accent-purple); font-size: 0.8rem;">📞 ${regInfo.phone}</p>` : ''}
+                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
                         <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
                     </div>
@@ -703,12 +935,48 @@
             });
         }
 
+        window.openAddShopModal = function() {
+            document.getElementById('addShopModal').style.display = 'flex';
+        };
+
+        window.closeAddShopModal = function() {
+            document.getElementById('addShopModal').style.display = 'none';
+        };
+
+        document.getElementById('addShopForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveShopBtn');
+            btn.disabled = true;
+            btn.innerText = 'Registering...';
+
+            const name = document.getElementById('newShopName').value.trim();
+            const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('newShopPhone').value.trim();
+            const location = document.getElementById('newShopLocation').value.trim();
+
+            addDoc(collection(db, "registered_shops"), {
+                name: name,
+                email: email,
+                phone: phone,
+                location: location,
+                timestamp: Date.now()
+            }).then(() => {
+                showToast(`Shop ${name} registered successfully!`, "success");
+                document.getElementById('addShopForm').reset();
+                closeAddShopModal();
+            }).catch(err => {
+                showToast("Failed to register shop: " + err.message, "error");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Register Shop';
+            });
+        });
+
         window.viewShopProfile = function(shopEmail, shopSales) {
             document.getElementById('shopListSection').style.display = 'none';
             document.getElementById('singleShopSection').style.display = 'block';
             document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
 
-            // Chart
             const salesByDate = {};
             shopSales.forEach(s => {
                 if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + (parseFloat(s.loanAmount)||0);
@@ -726,7 +994,6 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Table
             const tbody = document.getElementById('singleShopTable');
             tbody.innerHTML = '';
             shopSales.forEach(data => {
@@ -868,6 +1135,249 @@
             }
         });
 
+        // ==========================================
+        // MAIN SHOP DIRECT PROFIT & SALES MANAGER LOGIC
+        // ==========================================
+        
+        function loadMainShopSalesData() {
+            onSnapshot(query(collection(db, "main_shop_sales"), orderBy("timestamp", "desc")), (snapshot) => {
+                allMainShopSales = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    allMainShopSales.push(data);
+                });
+
+                // Auto update Staff Autocomplete Datalist
+                const staffSet = new Set();
+                allMainShopSales.forEach(s => if (s.staffName) staffSet.add(s.staffName.trim()));
+                updateActivatorDatalist(Array.from(staffSet));
+
+                renderMainShopProfitView();
+            }, (err) => console.error("Main shop sales fetch error:", err));
+        }
+
+        window.calculateMainShopLiveProfit = function() {
+            const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
+            const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
+            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+
+            const leaseFee = mrp * (leasePct / 100);
+            document.getElementById('leaseFeeDisplay').innerText = `Leasing Fee (${leasePct}%): Rs. ` + leaseFee.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            const netProfit = mrp - buyPrice - leaseFee - staffFee;
+            const profitEl = document.getElementById('liveNetProfitVal');
+            profitEl.innerText = 'Rs. ' + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            if (netProfit < 0) profitEl.style.color = 'var(--danger)';
+            else profitEl.style.color = 'var(--success)';
+        };
+
+        document.getElementById('mainSaleForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('mainSaleSubmitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving Entry...';
+
+            const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
+            const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
+            const leaseFee = mrp * (leasePct / 100);
+            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+            const staffName = document.getElementById('mainSaleStaffName').value.trim();
+            const netProfit = mrp - buyPrice - leaseFee - staffFee;
+
+            const payload = {
+                date: document.getElementById('mainSaleDate').value,
+                spNumber: document.getElementById('mainSaleSp').value.trim(),
+                custName: document.getElementById('mainSaleCustName').value.trim(),
+                custNic: document.getElementById('mainSaleCustNic').value.trim(),
+                imei: document.getElementById('mainSaleImei').value.trim(),
+                model: document.getElementById('mainSaleModel').value.trim(),
+                mrp: mrp,
+                buyPrice: buyPrice,
+                leasePercent: leasePct,
+                leaseFee: leaseFee,
+                staffName: staffName,
+                staffFee: staffFee,
+                netProfit: netProfit,
+                timestamp: Date.now()
+            };
+
+            addDoc(collection(db, "main_shop_sales"), payload).then(() => {
+                showToast("Main shop sale entry added!", "success");
+                saveActivatorStaffName(staffName);
+                document.getElementById('mainSaleForm').reset();
+                document.getElementById('mainSaleDate').valueAsDate = new Date();
+                document.getElementById('mainSaleLeasePercent').value = "2.0";
+                document.getElementById('mainSaleStaffFee').value = "500";
+                calculateMainShopLiveProfit();
+            }).catch(err => {
+                showToast("Error adding sale entry: " + err.message, "error");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Add Main Shop Sale Entry';
+            });
+        });
+
+        // Activator Staff Auto-Complete
+        function saveActivatorStaffName(name) {
+            if (!name) return;
+            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+            if (!saved.includes(name)) {
+                saved.push(name);
+                localStorage.setItem('activatorStaffNames', JSON.stringify(saved));
+                updateActivatorDatalist(saved);
+            }
+        }
+
+        function loadActivatorStaffDatalist() {
+            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+            updateActivatorDatalist(saved);
+        }
+
+        function updateActivatorDatalist(namesArray) {
+            const datalist = document.getElementById('activatorDatalist');
+            if (!datalist) return;
+            const uniqueNames = new Set(namesArray);
+            datalist.innerHTML = '';
+            uniqueNames.forEach(n => {
+                if (n) {
+                    const opt = document.createElement('option');
+                    opt.value = n;
+                    datalist.appendChild(opt);
+                }
+            });
+        }
+
+        // Date Range Filtering for Main Shop
+        window.filterMainShopByDateRange = function(rangeType) {
+            currentProfitRange = rangeType;
+            document.querySelectorAll('#mainProfitDateFilters .filter-btn').forEach(btn => {
+                if (btn.dataset.range === rangeType) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            renderMainShopProfitView();
+        };
+
+        window.applyCustomDateRange = function() {
+            currentProfitRange = 'custom';
+            document.querySelectorAll('#mainProfitDateFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
+            renderMainShopProfitView();
+        };
+
+        function renderMainShopProfitView() {
+            const tbody = document.getElementById('mainShopTableBody');
+            tbody.innerHTML = '';
+
+            const now = new Date();
+            const todayStr = now.toISOString().slice(0, 10);
+            
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0,0,0,0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOf3Months = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+            const customStart = document.getElementById('profitStartDate')?.value || '';
+            const customEnd = document.getElementById('profitEndDate')?.value || '';
+
+            let totalMrp = 0;
+            let totalBuyPrice = 0;
+            let totalLeaseFees = 0;
+            let totalStaffFees = 0;
+            let totalNetProfit = 0;
+
+            const filteredSales = allMainShopSales.filter(item => {
+                if (!item.date) return true;
+                const itemDate = new Date(item.date);
+                
+                if (currentProfitRange === 'today') {
+                    return item.date === todayStr;
+                } else if (currentProfitRange === 'week') {
+                    return itemDate >= startOfWeek;
+                } else if (currentProfitRange === 'month') {
+                    return itemDate >= startOfMonth;
+                } else if (currentProfitRange === '3months') {
+                    return itemDate >= startOf3Months;
+                } else if (currentProfitRange === 'year') {
+                    return itemDate >= startOfYear;
+                } else if (currentProfitRange === 'custom') {
+                    if (customStart && item.date < customStart) return false;
+                    if (customEnd && item.date > customEnd) return false;
+                    return true;
+                }
+                return true; // all time
+            });
+
+            filteredSales.forEach(item => {
+                const mrp = parseFloat(item.mrp) || 0;
+                const buy = parseFloat(item.buyPrice) || 0;
+                const lease = parseFloat(item.leaseFee) || 0;
+                const staff = parseFloat(item.staffFee) || 0;
+                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+
+                totalMrp += mrp;
+                totalBuyPrice += buy;
+                totalLeaseFees += lease;
+                totalStaffFees += staff;
+                totalNetProfit += net;
+            });
+
+            document.getElementById('mainTotalMrp').innerText = 'Rs. ' + totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalBuyPrice').innerText = 'Rs. ' + totalBuyPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalLeasingFees').innerText = 'Rs. ' + totalLeaseFees.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalStaffFees').innerText = 'Rs. ' + totalStaffFees.toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            const netProfitEl = document.getElementById('mainTotalNetProfit');
+            netProfitEl.innerText = 'Rs. ' + totalNetProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            if (totalNetProfit < 0) netProfitEl.style.color = 'var(--danger)';
+            else netProfitEl.style.color = 'var(--success)';
+
+            if (filteredSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records for selected time range.</td></tr>';
+                return;
+            }
+
+            filteredSales.forEach(item => {
+                const tr = document.createElement('tr');
+                const mrp = parseFloat(item.mrp) || 0;
+                const buy = parseFloat(item.buyPrice) || 0;
+                const lease = parseFloat(item.leaseFee) || 0;
+                const staff = parseFloat(item.staffFee) || 0;
+                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+
+                let profitColor = net >= 0 ? 'var(--success)' : 'var(--danger)';
+
+                tr.innerHTML = `
+                    <td><strong>${item.date || '-'}</strong><br><span style="color:var(--text-muted)">${item.spNumber || '-'}</span></td>
+                    <td><strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span></td>
+                    <td><span class="badge badge-new">${item.staffName || 'Staff'}</span></td>
+                    <td>MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span></td>
+                    <td>Lease 2%: Rs. ${lease.toLocaleString()}<br>Staff: Rs. ${staff.toLocaleString()}</td>
+                    <td><strong style="color:${profitColor}; font-size:1rem;">Rs. ${net.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></td>
+                    <td>
+                        <button onclick="deleteMainShopSale('${item.id}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Delete Record">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.deleteMainShopSale = async function(id) {
+            if (!confirm("Delete this Main Shop direct sale record?")) return;
+            try {
+                await deleteDoc(doc(db, "main_shop_sales", id));
+                showToast("Record deleted", "warning");
+            } catch (e) {
+                showToast("Failed to delete record: " + e.message, "error");
+            }
+        };
+
         // Inventory Logic
         function loadInventoryData() {
             const q = query(collection(db, "inventory"), orderBy("timestamp", "desc"));
@@ -913,7 +1423,6 @@
                     tbody.appendChild(tr);
                 });
 
-                // Update Dropdown List
                 datalist.innerHTML = '';
                 uniqueLocations.forEach(loc => {
                     if (loc) {
