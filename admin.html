@@ -4,192 +4,303 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            --primary: #4F46E5;
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0b0f19;
+            --card-bg: rgba(23, 32, 54, 0.75);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.12);
             --success: #10b981;
             --warning: #f59e0b;
             --info: #3b82f6;
+            --danger: #ef4444;
+            --accent-purple: #c084fc;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, var(--bg-color) 0%, #1e1b4b 100%);
+            background: radial-gradient(circle at top right, #1e1b4b 0%, #0b0f19 60%, #05070e 100%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 2rem;
         }
 
         .header {
             width: 100%;
-            background: var(--card-bg);
-            padding: 1rem 2rem;
+            background: rgba(23, 32, 54, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1.2rem 2.5rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
-            font-size: 1.5rem;
-            background: -webkit-linear-gradient(45deg, #818cf8, #c084fc);
+            font-size: 1.45rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .tabs { margin-top: 2rem; display: flex; gap: 1rem; width: 100%; max-width: 1300px; padding: 0 2rem; }
+        .tabs { 
+            margin-top: 1.8rem; 
+            display: flex; 
+            gap: 0.75rem; 
+            width: 100%; 
+            max-width: 1350px; 
+            padding: 0 2rem; 
+        }
+
         .tab {
-            padding: 0.8rem 2rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px 8px 0 0;
+            padding: 0.85rem 1.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px 12px 0 0;
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.95rem;
             border: 1px solid var(--border-color);
             border-bottom: none;
             color: var(--text-muted);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .tab.active { background: var(--card-bg); color: white; border-top: 2px solid var(--primary); }
+
+        .tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tab.active { 
+            background: var(--card-bg); 
+            color: white; 
+            border-top: 3px solid var(--primary); 
+            box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.15);
+        }
 
         .container {
             width: 100%;
-            max-width: 1300px;
+            max-width: 1350px;
             padding: 2rem;
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            border-radius: 0 12px 12px 12px;
-            min-height: 70vh;
+            border-radius: 0 16px 16px 16px;
+            min-height: 75vh;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         /* Views */
         .view { display: none; }
-        .view.active { display: block; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-        th { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
-        tr:hover { background: rgba(255, 255, 255, 0.02); cursor: pointer; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
-        .badge-new { background: rgba(59, 130, 246, 0.2); color: var(--info); }
-        .badge-replied { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .badge-sent { background: rgba(139, 92, 246, 0.2); color: #c084fc; }
-        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px; }
+        tr:hover { background: rgba(255, 255, 255, 0.03); cursor: pointer; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-new { background: rgba(59, 130, 246, 0.2); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.4); }
+        .badge-replied { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-sent { background: rgba(192, 132, 252, 0.2); color: var(--accent-purple); border: 1px solid rgba(192, 132, 252, 0.4); }
+        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
 
         .shop-card {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-color);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s;
             text-align: center;
         }
-        .shop-card:hover { border-color: var(--primary); transform: translateY(-3px); }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.06); }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
 
         /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
             z-index: 1000; align-items: center; justify-content: center;
+            padding: 1rem;
         }
         .modal-content {
-            background: var(--bg-color); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 2rem; width: 90%; max-width: 600px;
-            max-height: 90vh; overflow-y: auto;
+            background: #0f172a; border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 2rem; width: 100%; max-width: 650px;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
         }
-        .modal-close { float: right; cursor: pointer; font-size: 1.5rem; }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-        .detail-item { background: rgba(255,255,255,0.02); padding: 0.8rem; border-radius: 6px; }
+        .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; cursor: pointer; font-size: 1.5rem; color: var(--text-muted); transition: 0.2s; }
+        .modal-close:hover { color: white; }
         
-        textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 1rem; border-radius: 8px; margin-top: 1rem; min-height: 80px; }
-        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 1rem; color: white;}
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .detail-item { background: rgba(255,255,255,0.03); padding: 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .detail-item strong { color: var(--text-muted); font-size: 0.82rem; display: block; margin-bottom: 0.25rem; }
+        .detail-item span.val { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+        
+        textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem; min-height: 80px; font-size: 0.9rem; }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        
+        button.action-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.9rem; }
+        button.action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-reply { background: var(--warning); color: black;}
         .btn-pay { background: var(--primary); }
 
-        .filter-btn { padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; margin-top: 0; }
-        .filter-btn.active { background: var(--primary); border-color: var(--primary); }
+        .filter-btn { padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.88rem; }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+
+        /* Toast Notifications */
+        #toastContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s forwards;
+            max-width: 350px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .tabs { flex-direction: column; gap: 0.5rem; padding: 0 1rem; margin-top: 1rem; }
-            .tab { border-radius: 8px; border-bottom: 1px solid var(--border-color); text-align: center; }
-            .container { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
+            .tab { border-radius: 10px; border-bottom: 1px solid var(--border-color); text-align: center; justify-content: center; }
+            .container { padding: 1.2rem; border-radius: 12px; }
             .header { flex-direction: column; gap: 1rem; text-align: center; padding: 1rem; }
-            
+            .detail-grid { grid-template-columns: 1fr; }
             #inventoryView > div { grid-template-columns: 1fr; }
-            #submissionsView > div { grid-template-columns: 1fr; }
-            
-            th, td { padding: 0.8rem 0.5rem; font-size: 0.8rem; }
-            .badge { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+            th, td { padding: 0.75rem 0.6rem; font-size: 0.82rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>METHMI WORK HUB <span style="font-size: 1rem; color: var(--text-muted);">| Admin Dashboard</span></h1>
-        <button id="logoutBtn" style="margin: 0; padding: 0.5rem 1rem; background: transparent; border: 1px solid var(--primary); color: var(--primary);">Logout</button>
+        <h1>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
+        </h1>
+        <button id="logoutBtn" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('submissions')">All Submissions</div>
-        <div class="tab" onclick="switchTab('shops')">Shop Profiles</div>
-        <div class="tab" onclick="switchTab('inventory')">Inventory Manager</div>
+        <div class="tab active" data-tab="submissions" onclick="switchTab('submissions')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            All Submissions
+        </div>
+        <div class="tab" data-tab="shops" onclick="switchTab('shops')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Shop Profiles
+        </div>
+        <div class="tab" data-tab="inventory" onclick="switchTab('inventory')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            Inventory Manager
+        </div>
     </div>
 
     <div class="container">
         <!-- All Submissions View -->
         <div id="submissionsView" class="view active">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Total Loan Amount</h3>
-                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--success);" id="totalLoanVal">Rs. 0</p>
+            <!-- Stats Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Total Loans Issued</h3>
+                    <p style="font-size: 1.75rem; font-weight: 700; color: #818cf8;" id="totalLoanVal">Rs. 0.00</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Settlement (Completed)</h3>
-                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--primary);" id="totalPaidVal">Rs. 0</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Settlement (Paid)</h3>
+                    <p style="font-size: 1.75rem; font-weight: 700; color: var(--success);" id="totalPaidVal">Rs. 0.00</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Settlement (Pending)</h3>
-                    <p style="font-size: 1.8rem; font-weight: bold; color: var(--warning);" id="totalPendingVal">Rs. 0</p>
+                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Settlement (Pending)</h3>
+                    <p style="font-size: 1.75rem; font-weight: 700; color: var(--warning);" id="totalPendingVal">Rs. 0.00</p>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button class="filter-btn active" onclick="filterSubmissions('All')">All</button>
-                    <button class="filter-btn" onclick="filterSubmissions('Pending')">Pending Settlements</button>
-                    <button class="filter-btn" onclick="filterSubmissions('Paid')">Completed / Paid</button>
+            <!-- Controls & Filters Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <button class="filter-btn active" data-filter="All" onclick="filterSubmissions('All')">All Entries</button>
+                    <button class="filter-btn" data-filter="Pending" onclick="filterSubmissions('Pending')">Pending Settlements</button>
+                    <button class="filter-btn" data-filter="Paid" onclick="filterSubmissions('Paid')">Paid / Completed</button>
                 </div>
-                <input type="text" id="adminSearchInput" placeholder="Search IMEI, SP, NIC, Model..." onkeyup="filterSubmissions(currentFilter)" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.6rem 1rem; border-radius: 8px; width: 100%; max-width: 300px;">
+                
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; width: 100%; max-width: 480px;">
+                    <input type="text" id="adminSearchInput" placeholder="Search IMEI, SP, NIC, Shop..." onkeyup="renderAllSubmissions()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.6rem 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
+                    <button onclick="exportToCSV()" style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: var(--success); padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                        📥 Export CSV
+                    </button>
+                </div>
             </div>
 
-            <div style="overflow-x: auto; margin-top: 1.5rem;">
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>Date</th>
                             <th>Shop</th>
-                            <th>Customer / Model</th>
+                            <th>Customer & Device</th>
                             <th>Loan / Settlement</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="allSubmissionsBody">
-                        <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading sales data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -198,26 +309,28 @@
         <!-- Shop Profiles View -->
         <div id="shopsView" class="view">
             <div id="shopListSection">
-                <h2>Registered Shops</h2>
-                <div class="shop-grid" id="shopGrid" style="margin-top: 1.5rem;">
-                    <!-- Shop cards will populate here -->
+                <h2 style="font-size: 1.3rem; margin-bottom: 1.2rem; color: white;">Registered Shops Directory</h2>
+                <div class="shop-grid" id="shopGrid">
+                    <!-- Shop cards populated dynamically -->
                 </div>
             </div>
 
             <div id="singleShopSection" style="display: none;">
-                <button onclick="backToShops()" style="background: rgba(255,255,255,0.1); margin-bottom: 1rem; border: none; padding: 0.5rem 1rem; color: white; border-radius: 4px; cursor: pointer;">&larr; Back to Shops</button>
-                <h2 id="profileTitle">Shop Profile</h2>
-                <div style="width: 100%; height: 300px; margin: 1.5rem 0;">
+                <button onclick="backToShops()" style="background: rgba(255,255,255,0.08); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
+                <h2 id="profileTitle" style="color: white; margin-bottom: 1rem;">Shop Profile</h2>
+                
+                <div style="width: 100%; height: 280px; margin: 1rem 0 2rem 0; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <canvas id="shopChart"></canvas>
                 </div>
-                <h3>Shop's Entries</h3>
-                <div style="overflow-x: auto; margin-top: 1rem;">
+
+                <h3 style="margin-bottom: 1rem; color: white;">Shop Submissions History</h3>
+                <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Customer / Device</th>
-                                <th>Source</th>
+                                <th>Customer & Device</th>
+                                <th>Stock Source</th>
                                 <th>Loan Amount</th>
                                 <th>Status</th>
                             </tr>
@@ -230,35 +343,46 @@
 
         <!-- Inventory Manager View -->
         <div id="inventoryView" class="view">
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 2rem;">
                 <!-- Add Inventory Form -->
-                <div style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); height: fit-content;">
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Add Head Office Stock</h2>
+                <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: white;">Add Head Office Stock</h2>
                     <form id="inventoryForm">
-                        <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">IMEI Number</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 1rem;">
-                            <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin: 0; min-width: 0;">
-                            <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; margin: 0; white-space: nowrap;">📷 Scan</button>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number</label>
+                            <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+                                <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
+                            </div>
                         </div>
                         
-                        <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Model</label>
-                        <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Model Name</label>
+                            <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                        </div>
                         
-                        <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Storage</label>
-                        <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
+                            <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                        </div>
                         
-                        <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Transfer To (Shop / Branch)</label>
-                        <input type="text" id="invShop" list="shopDatalist" autocomplete="off" required placeholder="Select or type new branch..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <datalist id="shopDatalist"></datalist>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Target Shop / Branch Location</label>
+                            <input type="text" id="invShop" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name..." style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                            <datalist id="shopDatalist"></datalist>
+                        </div>
                         
-                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Add to Inventory</button>
+                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">Add to Head Office Inventory</button>
                     </form>
                 </div>
 
                 <!-- Inventory List -->
                 <div>
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Current Stock List</h2>
-                    <div style="overflow-x: auto; max-height: 500px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.2rem; color: white;">Current Stock List</h2>
+                        <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
+                    </div>
+                    <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
                         <table>
                             <thead>
                                 <tr>
@@ -266,10 +390,11 @@
                                     <th>Model & Storage</th>
                                     <th>Location</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody">
-                                <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading inventory...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -278,54 +403,59 @@
         </div>
     </div>
 
-    <!-- Details Modal -->
+    <!-- Entry Details Modal -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h2>Entry Details</h2>
+            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Submission Details</h2>
+            
             <div id="modalContent" class="detail-grid"></div>
             
             <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
-            <h3 style="font-size: 1rem; color: var(--warning);">Admin Actions</h3>
+            <h3 style="font-size: 1rem; color: var(--warning); margin-bottom: 1rem;">Admin Actions & Settlement Update</h3>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                 <div>
-                    <label style="color: var(--text-muted); font-size: 0.9rem;">Send Reply / Note to Shop</label>
-                    <textarea id="replyText" placeholder="Write your message here..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; min-height: 80px; margin-top: 0.5rem;"></textarea>
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Send Reply / Note to Shop</label>
+                    <textarea id="replyText" placeholder="Write message or note for shop..."></textarea>
                 </div>
                 <div>
-                    <label style="color: var(--text-muted); font-size: 0.9rem;">Fintrex Payment Update</label>
-                    <input type="text" id="fintrexPaymentText" placeholder="e.g. Approved 25,000" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; margin-top: 0.5rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Fintrex Payment Reference</label>
+                    <input type="text" id="fintrexPaymentText" placeholder="e.g. Approved LKR 25,000" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; margin-bottom: 0.8rem;">
                     
-                    <label style="color: var(--text-muted); font-size: 0.9rem;">Payment Status (Shop Settlement)</label>
-                    <select id="paymentStatusSelect" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Shop Settlement Status</label>
+                    <select id="paymentStatusSelect" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
                         <option value="Pending">Pending (ගෙවීමට ඇත)</option>
                         <option value="Paid">Paid (ගෙව්වා)</option>
                     </select>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button id="saveUpdatesBtn" style="flex: 1; background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Save All Updates</button>
-                <button id="completeProcessBtn" style="display: none; flex: 1; background: var(--success); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Complete Process ✅</button>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                <button id="saveUpdatesBtn" class="action-btn" style="flex: 2; background: var(--primary); min-width: 160px;">Save Updates</button>
+                <button id="completeProcessBtn" class="action-btn" style="display: none; flex: 2; background: var(--success); min-width: 160px;">Complete Process ✅</button>
+                <button id="deleteEntryBtn" class="action-btn" style="flex: 1; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; min-width: 110px;">Delete Entry</button>
             </div>
         </div>
     </div>
 
     <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 1rem;">
+        <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
-            <h2 style="margin-bottom: 1rem; color: white;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 300px; background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden;"></div>
-            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); width: 100%; margin-top: 1rem;">Cancel</button>
+            <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Scan Barcode</h2>
+            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden;"></div>
+            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">Cancel</button>
         </div>
     </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, serverTimestamp } 
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -344,6 +474,29 @@
         let allSales = [];
         let currentModalDocId = null;
         let chartInstance = null;
+        let currentFilter = 'All';
+
+        // Toast Helper
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            let color = 'var(--info)';
+            if (type === 'success') color = 'var(--success)';
+            if (type === 'error') color = 'var(--danger)';
+            if (type === 'warning') color = 'var(--warning)';
+
+            toast.style.borderLeft = `4px solid ${color}`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
 
         // Auth Check
         onAuthStateChanged(auth, (user) => {
@@ -365,17 +518,21 @@
 
         // Tab Switching
         window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.dataset.tab === tabName) t.classList.add('active');
+                else t.classList.remove('active');
+            });
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabName + 'View').classList.add('active');
+            const targetView = document.getElementById(tabName + 'View');
+            if (targetView) targetView.classList.add('active');
         };
 
-        let currentFilter = 'All';
         window.filterSubmissions = function(filter) {
             currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
             renderAllSubmissions();
         };
 
@@ -396,46 +553,56 @@
 
                 renderAllSubmissions();
                 renderShopDirectory(Array.from(uniqueShops));
+            }, (err) => {
+                console.error("Firestore snapshot error:", err);
+                showToast("Failed to sync sales data: " + err.message, "error");
             });
         }
 
-        function renderAllSubmissions() {
+        window.renderAllSubmissions = function() {
             const tbody = document.getElementById('allSubmissionsBody');
             tbody.innerHTML = '';
             
-            let totalLoan = 0;
-            let totalPaid = 0;
-            let totalPending = 0;
-            
-            const searchTerm = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
+            let overallLoan = 0;
+            let overallPaid = 0;
+            let overallPending = 0;
+
+            const searchTerm = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
+
+            // Calculate overall totals accurately
+            allSales.forEach(data => {
+                const s = parseFloat(data.settlement) || 0;
+                overallLoan += (parseFloat(data.loanAmount) || 0);
+                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
+                if (isPaid) {
+                    overallPaid += s;
+                } else {
+                    overallPending += s;
+                }
+            });
+
+            document.getElementById('totalLoanVal').innerText = 'Rs. ' + overallLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalPaidVal').innerText = 'Rs. ' + overallPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalPendingVal').innerText = 'Rs. ' + overallPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
             const filteredSales = allSales.filter(data => {
-                const s = parseFloat(data.settlement) || 0;
-                totalLoan += (parseFloat(data.loanAmount) || 0);
-                
                 const matchesSearch = (data.imei || '').toString().toLowerCase().includes(searchTerm) || 
                                       (data.spNumber || '').toString().toLowerCase().includes(searchTerm) || 
                                       (data.nic || '').toString().toLowerCase().includes(searchTerm) ||
-                                      (data.model || '').toString().toLowerCase().includes(searchTerm);
+                                      (data.model || '').toString().toLowerCase().includes(searchTerm) ||
+                                      (data.shopId || '').toString().toLowerCase().includes(searchTerm) ||
+                                      (data.name || '').toString().toLowerCase().includes(searchTerm);
                 if (!matchesSearch) return false;
 
                 const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
-                if (isPaid) {
-                    totalPaid += s;
-                    if (currentFilter === 'Pending') return false;
-                } else {
-                    totalPending += s;
-                    if (currentFilter === 'Paid') return false;
-                }
+                if (currentFilter === 'Pending' && isPaid) return false;
+                if (currentFilter === 'Paid' && !isPaid) return false;
+                
                 return true;
             });
 
-            document.getElementById('totalLoanVal').innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('totalPaidVal').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('totalPendingVal').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
             if (filteredSales.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No records found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching submission records found.</td></tr>';
                 return;
             }
 
@@ -444,32 +611,79 @@
                 tr.onclick = () => openDetailsModal(data);
                 
                 let statusHtml = getStatusBadge(data.status);
-                let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (6%)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4%)</span>';
+                let sourceHtml = data.stockSource === 'HO' 
+                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (6%)</span>' 
+                    : '<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (4%)</span>';
+                
+                const shopName = data.shopId ? data.shopId.split('@')[0].toUpperCase() : 'UNKNOWN';
                 
                 tr.innerHTML = `
-                    <td>${data.date}</td>
-                    <td style="color: #c084fc;">${data.shopId.split('@')[0]}</td>
-                    <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span><br>${sourceHtml}</td>
-                    <td>L: ${data.loanAmount || '-'}<br>S: ${data.settlement || '-'}</td>
+                    <td>${data.date || '-'}</td>
+                    <td style="color: var(--accent-purple); font-weight: 600;">${shopName}</td>
+                    <td><strong>${data.name || '-'}</strong><br><span style="color:var(--text-muted)">${data.model || '-'}</span><br>${sourceHtml}</td>
+                    <td>L: Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}<br><span style="color:var(--warning)">S: Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></td>
                     <td>${statusHtml}</td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
+        };
 
         function getStatusBadge(status) {
             if (status === 'New') return '<span class="badge badge-new">New</span>';
             if (status === 'Admin Replied') return '<span class="badge badge-replied">Replied</span>';
             if (status === 'Payment Sent') return '<span class="badge badge-sent">Pay Sent</span>';
             if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
-            if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:var(--success)">Completed</span>';
+            if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">Completed ✅</span>';
             return `<span class="badge">${status}</span>`;
         }
+
+        // CSV Export Feature
+        window.exportToCSV = function() {
+            if (allSales.length === 0) return showToast("No data to export", "warning");
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Date,Shop,Customer Name,NIC,IMEI,Model,SP Number,MRP,Loan Amount,Settlement,Stock Source,Status,Payment Status\n";
+
+            allSales.forEach(s => {
+                const row = [
+                    `"${s.date || ''}"`,
+                    `"${s.shopId || ''}"`,
+                    `"${(s.name || '').replace(/"/g, '""')}"`,
+                    `"${s.nic || ''}"`,
+                    `"${s.imei || ''}"`,
+                    `"${(s.model || '').replace(/"/g, '""')}"`,
+                    `"${s.spNumber || ''}"`,
+                    `"${s.mrp || 0}"`,
+                    `"${s.loanAmount || 0}"`,
+                    `"${s.settlement || 0}"`,
+                    `"${s.stockSource || 'Shop'}"`,
+                    `"${s.status || ''}"`,
+                    `"${s.paymentStatus || 'Pending'}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `methmi_work_hub_submissions_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV report generated successfully!", "success");
+        };
 
         // Shop Directory
         function renderShopDirectory(shops) {
             const grid = document.getElementById('shopGrid');
             grid.innerHTML = '';
+
+            if (shops.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted)">No registered shops yet.</p>';
+                return;
+            }
+
             shops.forEach(shop => {
                 const shopSales = allSales.filter(s => s.shopId === shop);
                 const totalLoan = shopSales.reduce((sum, s) => sum + (parseFloat(s.loanAmount)||0), 0);
@@ -478,11 +692,11 @@
                 card.className = 'shop-card';
                 card.onclick = () => viewShopProfile(shop, shopSales);
                 card.innerHTML = `
-                    <h3 style="color: white; margin-bottom: 0.5rem;">${shop.split('@')[0].toUpperCase()}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">${shop}</p>
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                        <p style="color: var(--success); font-weight: bold;">Total Loans: Rs. ${totalLoan.toLocaleString()}</p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">${shopSales.length} Entries</p>
+                    <h3 style="color: white; margin-bottom: 0.4rem; font-size: 1.1rem;">${shop.split('@')[0].toUpperCase()}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">${shop}</p>
+                    <div style="padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
+                        <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -492,7 +706,7 @@
         window.viewShopProfile = function(shopEmail, shopSales) {
             document.getElementById('shopListSection').style.display = 'none';
             document.getElementById('singleShopSection').style.display = 'block';
-            document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile';
+            document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
 
             // Chart
             const salesByDate = {};
@@ -507,7 +721,7 @@
                 type: 'bar',
                 data: {
                     labels: dates,
-                    datasets: [{ label: 'Daily Loans', data: amounts, backgroundColor: '#8b5cf6', borderRadius: 4 }]
+                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#6366f1', borderRadius: 6 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -522,9 +736,9 @@
                 
                 tr.innerHTML = `
                     <td>${data.date}</td>
-                    <td>${data.name}<br><span style="color:var(--text-muted)">${data.model}</span></td>
+                    <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span></td>
                     <td>${sourceHtml}</td>
-                    <td>${data.loanAmount}</td>
+                    <td>Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}</td>
                     <td>${getStatusBadge(data.status)}</td>
                 `;
                 tbody.appendChild(tr);
@@ -540,23 +754,25 @@
         window.openDetailsModal = function(data) {
             currentModalDocId = data.id;
             const content = document.getElementById('modalContent');
-            let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-weight:bold;">Head Office Stock (6% applied)</span>' : '<span style="color:var(--text-muted);">Shop Own Stock (4% applied)</span>';
+            let sourceHtml = data.stockSource === 'HO' 
+                ? '<span style="color:var(--success); font-weight:600;">Head Office Stock (6% discount applied)</span>' 
+                : '<span style="color:var(--text-muted);">Shop Own Stock (4% discount applied)</span>';
             
             content.innerHTML = `
-                <div class="detail-item"><strong>Date:</strong> <br>${data.date}</div>
-                <div class="detail-item"><strong>Shop:</strong> <br>${data.shopId}</div>
-                <div class="detail-item"><strong>Customer:</strong> <br>${data.name}</div>
-                <div class="detail-item"><strong>NIC:</strong> <br>${data.nic}</div>
-                <div class="detail-item"><strong>Model & Storage:</strong> <br>${data.model} ${data.storage ? '- '+data.storage : ''}</div>
-                <div class="detail-item"><strong>IMEI:</strong> <br>${data.imei || '-'}</div>
-                <div class="detail-item"><strong>Stock Source:</strong> <br>${sourceHtml}</div>
-                <div class="detail-item"><strong>SP Number:</strong> <br>${data.spNumber}</div>
-                <div class="detail-item"><strong>MRP:</strong> <br>${data.mrp}</div>
-                <div class="detail-item"><strong>Down Payment:</strong> <br>${data.downPayment}</div>
-                <div class="detail-item"><strong>Document Charge:</strong> <br>${data.document}</div>
-                <div class="detail-item" style="color:var(--success);"><strong>Loan Amount:</strong> <br>${data.loanAmount}</div>
-                <div class="detail-item" style="color:var(--warning);"><strong>Settlement:</strong> <br>${data.settlement}</div>
-                <div class="detail-item"><strong>Current Status:</strong> <br>${getStatusBadge(data.status)}</div>
+                <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
+                <div class="detail-item"><strong>Shop:</strong> <span class="val">${data.shopId || '-'}</span></div>
+                <div class="detail-item"><strong>Customer Name:</strong> <span class="val">${data.name || '-'}</span></div>
+                <div class="detail-item"><strong>Customer NIC:</strong> <span class="val">${data.nic || '-'}</span></div>
+                <div class="detail-item"><strong>Phone Model & Storage:</strong> <span class="val">${data.model || '-'} ${data.storage ? ' ('+data.storage+')' : ''}</span></div>
+                <div class="detail-item"><strong>IMEI Number:</strong> <span class="val">${data.imei || '-'}</span></div>
+                <div class="detail-item"><strong>Stock Source:</strong> <span class="val">${sourceHtml}</span></div>
+                <div class="detail-item"><strong>SP Number:</strong> <span class="val">${data.spNumber || '-'}</span></div>
+                <div class="detail-item"><strong>MRP Price:</strong> <span class="val">Rs. ${parseFloat(data.mrp || 0).toLocaleString()}</span></div>
+                <div class="detail-item"><strong>Down Payment:</strong> <span class="val">Rs. ${parseFloat(data.downPayment || 0).toLocaleString()}</span></div>
+                <div class="detail-item"><strong>Document Charge:</strong> <span class="val">Rs. ${parseFloat(data.document || 0).toLocaleString()}</span></div>
+                <div class="detail-item"><strong>Loan Amount:</strong> <span class="val" style="color:var(--success); font-weight:bold;">Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}</span></div>
+                <div class="detail-item"><strong>Settlement Amount:</strong> <span class="val" style="color:var(--warning); font-weight:bold;">Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></div>
+                <div class="detail-item"><strong>Current Status:</strong> <span class="val">${getStatusBadge(data.status)}</span></div>
             `;
             
             document.getElementById('replyText').value = data.adminReply || '';
@@ -578,7 +794,7 @@
             currentModalDocId = null;
         };
 
-        // Actions
+        // Save Modal Updates
         document.getElementById('saveUpdatesBtn').addEventListener('click', async () => {
             if (!currentModalDocId) return;
             
@@ -588,9 +804,9 @@
             
             const btn = document.getElementById('saveUpdatesBtn');
             btn.innerText = 'Saving...';
+            btn.disabled = true;
             
             try {
-                // Determine new status unless it is already Completed/Confirmed
                 const currentData = allSales.find(s => s.id === currentModalDocId);
                 let newMainStatus = currentData ? currentData.status : 'New';
                 
@@ -608,24 +824,47 @@
                     fintrexPayment: fintrex,
                     paymentStatus: pStatus
                 });
+                
+                showToast("Updates saved successfully!", "success");
                 closeModal();
-            } catch (e) { alert("Error saving updates"); }
-            
-            btn.innerText = 'Save All Updates';
+            } catch (e) { 
+                console.error("Save error:", e);
+                showToast("Error saving updates: " + e.message, "error"); 
+            } finally {
+                btn.innerText = 'Save Updates';
+                btn.disabled = false;
+            }
         });
 
+        // Complete Process Action
         document.getElementById('completeProcessBtn').addEventListener('click', async () => {
             if (!currentModalDocId) return;
             const btn = document.getElementById('completeProcessBtn');
             btn.innerText = 'Completing...';
             try {
-                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Completed' });
+                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Completed', paymentStatus: 'Paid' });
+                showToast("Process marked as completed!", "success");
                 closeModal();
             } catch (e) {
                 console.error(e);
-                alert("Error completing process");
+                showToast("Error completing process: " + e.message, "error");
             } finally {
                 btn.innerText = 'Complete Process ✅';
+            }
+        });
+
+        // Delete Entry Action
+        document.getElementById('deleteEntryBtn').addEventListener('click', async () => {
+            if (!currentModalDocId) return;
+            if (!confirm("Are you sure you want to delete this submission entry? This action cannot be undone.")) return;
+
+            try {
+                await deleteDoc(doc(db, "sales", currentModalDocId));
+                showToast("Submission deleted successfully", "warning");
+                closeModal();
+            } catch (e) {
+                console.error("Delete error:", e);
+                showToast("Failed to delete entry: " + e.message, "error");
             }
         });
 
@@ -635,31 +874,41 @@
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('inventoryTableBody');
                 const datalist = document.getElementById('shopDatalist');
+                const stockBadge = document.getElementById('stockCountBadge');
                 tbody.innerHTML = '';
                 
-                if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No stock items added yet.</td></tr>';
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items added yet.</td></tr>';
                     datalist.innerHTML = '';
+                    stockBadge.innerText = '0 Items';
                     return;
                 }
                 
+                stockBadge.innerText = `${snapshot.size} Items`;
                 const uniqueLocations = new Set();
                 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
+                    const docId = docSnap.id;
                     const tr = document.createElement('tr');
-                    let badge = data.status === 'Available' ? '<span class="badge badge-confirmed">Available</span>' : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Sold</span>';
-                    let location = data.shop || '-';
                     
-                    if (data.shop) {
-                        uniqueLocations.add(data.shop.trim());
-                    }
+                    let badge = data.status === 'Available' 
+                        ? '<span class="badge badge-confirmed">Available</span>' 
+                        : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Sold</span>';
+                    
+                    let location = data.shop || '-';
+                    if (data.shop) uniqueLocations.add(data.shop.trim());
                     
                     tr.innerHTML = `
                         <td><strong>${data.imei}</strong></td>
                         <td>${data.model} - ${data.storage}</td>
-                        <td><span style="color: #c084fc;">${location}</span></td>
+                        <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
                         <td>${badge}</td>
+                        <td>
+                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Remove Stock">
+                                🗑️
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -673,41 +922,53 @@
                         datalist.appendChild(option);
                     }
                 });
+            }, (err) => {
+                console.error("Inventory error:", err);
             });
         }
+
+        window.deleteInventoryItem = async function(id, imei) {
+            if (!confirm(`Delete stock item with IMEI ${imei}?`)) return;
+            try {
+                await deleteDoc(doc(db, "inventory", id));
+                showToast(`Inventory item ${imei} deleted`, "warning");
+            } catch (e) {
+                showToast("Failed to delete stock item: " + e.message, "error");
+            }
+        };
 
         document.getElementById('inventoryForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
             
-            // Fire and forget to prevent UI hanging
+            const imei = document.getElementById('invImei').value.trim();
+            const model = document.getElementById('invModel').value.trim();
+            const storage = document.getElementById('invStorage').value.trim();
+            const shop = document.getElementById('invShop').value.trim();
+
+            if (!imei || !model || !storage || !shop) return showToast("Please fill all inventory fields", "warning");
+
+            btn.disabled = true;
+            btn.innerText = 'Adding Stock...';
+
             addDoc(collection(db, "inventory"), {
-                imei: document.getElementById('invImei').value.trim(),
-                model: document.getElementById('invModel').value.trim(),
-                storage: document.getElementById('invStorage').value.trim(),
-                shop: document.getElementById('invShop').value.trim(),
+                imei: imei,
+                model: model,
+                storage: storage,
+                shop: shop,
                 status: 'Available',
-                timestamp: Date.now() // Used instead of serverTimestamp for instant local ordering
+                timestamp: Date.now()
+            }).then(() => {
+                showToast(`Added ${model} (${imei}) to ${shop}`, "success");
+                document.getElementById('invImei').value = '';
+                document.getElementById('invImei').focus();
             }).catch(err => {
                 console.error("Error adding inventory item:", err);
-                alert("Error adding item: " + err.message);
-            });
-
-            // Immediately reset ONLY the IMEI field for fast scanning of the next item
-            const imeiInput = document.getElementById('invImei');
-            imeiInput.value = '';
-            
-            // Show success briefly
-            btn.innerText = 'Added! ✅';
-            btn.style.background = 'var(--success)';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                btn.innerText = 'Add to Inventory';
-                btn.style.background = 'var(--primary)';
+                showToast("Error adding item: " + err.message, "error");
+            }).finally(() => {
+                btn.innerText = 'Add to Head Office Inventory';
                 btn.disabled = false;
-                document.getElementById('invImei').focus(); // Auto-focus for next entry
-            }, 600);
+            });
         });
 
         // Barcode Scanner Logic
@@ -715,21 +976,28 @@
         window.startScanner = function(inputId) {
             document.getElementById('scannerModal').style.display = 'flex';
             
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-                fps: 10, 
-                qrbox: { width: 250, height: 100 },
-                formatsToSupport: [ Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A ]
-            }, false);
-                
-            html5QrcodeScanner.render((decodedText) => {
-                document.getElementById(inputId).value = decodedText;
-                stopScanner();
-                
-                // Optionally auto-submit if fields are filled
-                if(document.getElementById('invModel').value && document.getElementById('invShop').value) {
-                    document.getElementById('invSubmitBtn').click();
-                }
-            }, (error) => { /* ignore */ });
+            try {
+                html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                    fps: 10, 
+                    qrbox: { width: 250, height: 100 },
+                    formatsToSupport: [ 
+                        Html5QrcodeSupportedFormats.CODE_128, 
+                        Html5QrcodeSupportedFormats.CODE_39, 
+                        Html5QrcodeSupportedFormats.EAN_13, 
+                        Html5QrcodeSupportedFormats.EAN_8, 
+                        Html5QrcodeSupportedFormats.UPC_A 
+                    ]
+                }, false);
+                    
+                html5QrcodeScanner.render((decodedText) => {
+                    document.getElementById(inputId).value = decodedText;
+                    stopScanner();
+                    showToast("Barcode scanned: " + decodedText, "success");
+                }, (error) => { /* scanning */ });
+            } catch (err) {
+                console.error("Scanner error:", err);
+                showToast("Could not access camera scanner", "error");
+            }
         };
 
         window.stopScanner = function() {
