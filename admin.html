@@ -250,7 +250,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
         </h1>
-        <button id="logoutBtn" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
+        <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
     </div>
 
     <div class="tabs">
@@ -684,6 +684,7 @@
         // Toast Helper
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = 'toast';
             
@@ -702,36 +703,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         };
-
-        // Auth Check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const adminEmails = [
-                    'admin@methmi.com', 
-                    'methmimobilepvtltd@gmail.com', 
-                    'ddmusiccenter8@gmail.com'
-                ];
-                const isAdmin = user.email.toLowerCase().includes('admin') || 
-                                adminEmails.includes(user.email.toLowerCase());
-
-                if (!isAdmin) {
-                    window.location.href = 'shop.html';
-                } else {
-                    loadAllData();
-                    loadInventoryData();
-                    loadRegisteredShops();
-                    loadMainShopSalesData();
-                    loadActivatorStaffDatalist();
-                    if (document.getElementById('mainSaleDate')) {
-                        document.getElementById('mainSaleDate').valueAsDate = new Date();
-                    }
-                }
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         // Tab Switching
         window.switchTab = function(tabName) {
@@ -753,6 +724,52 @@
             renderAllSubmissions();
         };
 
+        // Logout Action
+        window.doLogout = async function() {
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.error("Signout error:", e);
+            }
+            window.location.href = 'index.html';
+        };
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', window.doLogout);
+        }
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const adminEmails = [
+                    'admin@methmi.com', 
+                    'methmimobilepvtltd@gmail.com', 
+                    'ddmusiccenter8@gmail.com'
+                ];
+                const isAdmin = user.email.toLowerCase().includes('admin') || 
+                                adminEmails.includes(user.email.toLowerCase());
+
+                if (!isAdmin) {
+                    window.location.href = 'shop.html';
+                }
+            }
+        });
+
+        // Immediate Data Load on script execution
+        try {
+            loadAllData();
+            loadInventoryData();
+            loadRegisteredShops();
+            loadMainShopSalesData();
+            loadActivatorStaffDatalist();
+            if (document.getElementById('mainSaleDate')) {
+                document.getElementById('mainSaleDate').valueAsDate = new Date();
+            }
+        } catch (e) {
+            console.error("Immediate load error:", e);
+        }
+
         // Load All Submissions
         function loadAllData() {
             const q = query(collection(db, "sales"));
@@ -760,6 +777,13 @@
             onSnapshot(q, (snapshot) => {
                 allSales = [];
                 const uniqueShops = new Set();
+
+                if (snapshot.empty) {
+                    const tbody = document.getElementById('allSubmissionsBody');
+                    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submission records found in database.</td></tr>';
+                    renderAllSubmissions();
+                    return;
+                }
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
@@ -774,6 +798,8 @@
                 renderShopDirectory(Array.from(uniqueShops));
             }, (err) => {
                 console.error("Firestore snapshot error:", err);
+                const tbody = document.getElementById('allSubmissionsBody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 2rem;">Database Sync Error: ' + err.message + '</td></tr>';
                 showToast("Failed to sync sales data: " + err.message, "error");
             });
         }
