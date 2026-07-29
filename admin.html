@@ -971,10 +971,10 @@
             grid.innerHTML = '';
 
             const allShopsSet = new Set();
-            registeredShopsList.forEach(s => if (s.email) allShopsSet.add(s.email.toLowerCase()));
+            registeredShopsList.forEach(s => { if (s.email) allShopsSet.add(s.email.toLowerCase()) });
             
-            allSales.forEach(s => if (s.shopId) allShopsSet.add(s.shopId.toLowerCase()));
-            discoveredShops.forEach(s => if (s) allShopsSet.add(s.toLowerCase()));
+            allSales.forEach(s => { if (s.shopId) allShopsSet.add(s.shopId.toLowerCase()) });
+            discoveredShops.forEach(s => { if (s) allShopsSet.add(s.toLowerCase()) });
 
             const shopsArray = Array.from(allShopsSet);
 
@@ -1221,7 +1221,7 @@
 
                 // Auto update Staff Autocomplete Datalist
                 const staffSet = new Set();
-                allMainShopSales.forEach(s => if (s.staffName) staffSet.add(s.staffName.trim()));
+                allMainShopSales.forEach(s => { if (s.staffName) staffSet.add(s.staffName.trim()) });
                 updateActivatorDatalist(Array.from(staffSet));
 
                 renderMainShopProfitView();
