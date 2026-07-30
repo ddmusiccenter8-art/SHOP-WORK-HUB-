@@ -403,33 +403,31 @@
         <!-- Main Shop Profit & Sales Manager View -->
         <div id="mainProfitView" class="view">
             <!-- Date Filter Controls Header -->
-            <div style="background: rgba(255,255,255,0.02); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 1.8rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    <h2 style="font-size: 1.2rem; color: white; margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
-                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
-                        <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="3months">3 Months</option>
-                            <option value="year">This Year</option>
-                            <option value="all">All Time</option>
-                            <option value="custom">Custom Range...</option>
-                        </select>
+            <div style="background: rgba(255,255,255,0.02); padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 1.1rem; color: white; margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
+                    <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="3months">3 Months</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                        <option value="custom">Custom Range...</option>
+                    </select>
 
-                        <!-- Custom Range Date Pickers (hidden by default) -->
-                        <div id="customDateRangeContainer" style="display: none; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                            <input type="date" id="profitStartDate" style="max-width: 140px; padding: 0.45rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">
-                            <span style="color: var(--text-muted);">to</span>
-                            <input type="date" id="profitEndDate" style="max-width: 140px; padding: 0.45rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">
-                            <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary); padding: 0.45rem 1rem;">Apply Range</button>
-                        </div>
+                    <!-- Custom Range Date Pickers (hidden by default) -->
+                    <div id="customDateRangeContainer" style="display: none; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <input type="date" id="profitStartDate" style="max-width: 140px; padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 6px;">
+                        <span style="color: var(--text-muted);">to</span>
+                        <input type="date" id="profitEndDate" style="max-width: 140px; padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 6px;">
+                        <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary); padding: 0.4rem 0.8rem;">Apply Range</button>
                     </div>
                 </div>
+            </div>
 
             <!-- Financial Summary Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
                 <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sales (MRP)</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: white; margin-top: 0.2rem;" id="mainTotalMrp">Rs. 0.00</p>
