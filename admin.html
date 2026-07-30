@@ -405,26 +405,28 @@
             <!-- Date Filter Controls Header -->
             <div style="background: rgba(255,255,255,0.02); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 1.8rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
                     <h2 style="font-size: 1.2rem; color: white; margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="mainProfitDateFilters">
-                        <button class="filter-btn active" data-range="today" onclick="filterMainShopByDateRange('today')">Today</button>
-                        <button class="filter-btn" data-range="week" onclick="filterMainShopByDateRange('week')">This Week</button>
-                        <button class="filter-btn" data-range="month" onclick="filterMainShopByDateRange('month')">This Month</button>
-                        <button class="filter-btn" data-range="3months" onclick="filterMainShopByDateRange('3months')">3 Months</button>
-                        <button class="filter-btn" data-range="year" onclick="filterMainShopByDateRange('year')">This Year</button>
-                        <button class="filter-btn" data-range="all" onclick="filterMainShopByDateRange('all')">All Time</button>
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
+                        <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="3months">3 Months</option>
+                            <option value="year">This Year</option>
+                            <option value="all">All Time</option>
+                            <option value="custom">Custom Range...</option>
+                        </select>
+
+                        <!-- Custom Range Date Pickers (hidden by default) -->
+                        <div id="customDateRangeContainer" style="display: none; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <input type="date" id="profitStartDate" style="max-width: 140px; padding: 0.45rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">
+                            <span style="color: var(--text-muted);">to</span>
+                            <input type="date" id="profitEndDate" style="max-width: 140px; padding: 0.45rem 0.8rem; font-size: 0.85rem; border-radius: 6px;">
+                            <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary); padding: 0.45rem 1rem;">Apply Range</button>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Custom Range Date Pickers -->
-                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">Custom Date Range:</span>
-                    <input type="date" id="profitStartDate" style="max-width: 170px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
-                    <span style="color: var(--text-muted);">to</span>
-                    <input type="date" id="profitEndDate" style="max-width: 170px; padding: 0.45rem 0.8rem; font-size: 0.85rem;">
-                    <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary);">Apply Range</button>
-                </div>
-            </div>
 
             <!-- Financial Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
@@ -743,8 +745,17 @@
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
             <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden;"></div>
-            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">Cancel</button>
+            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
+                </div>
+            </div>
+
+            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
         </div>
     </div>
 
@@ -1549,18 +1560,22 @@
         }
 
         // Date Range Filtering for Main Shop
+        window.handleMainProfitDateSelection = function(val) {
+            if (val === 'custom') {
+                document.getElementById('customDateRangeContainer').style.display = 'flex';
+            } else {
+                document.getElementById('customDateRangeContainer').style.display = 'none';
+                filterMainShopByDateRange(val);
+            }
+        };
+
         window.filterMainShopByDateRange = function(rangeType) {
             currentProfitRange = rangeType;
-            document.querySelectorAll('#mainProfitDateFilters .filter-btn').forEach(btn => {
-                if (btn.dataset.range === rangeType) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
             renderMainShopProfitView();
         };
 
         window.applyCustomDateRange = function() {
             currentProfitRange = 'custom';
-            document.querySelectorAll('#mainProfitDateFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
             renderMainShopProfitView();
         };
 
@@ -2021,14 +2036,22 @@
         };
 
         // Barcode Scanner Logic
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
+        let currentScannerInputId = null;
+
         window.startScanner = function(inputId) {
+            currentScannerInputId = inputId;
+            document.getElementById('manualScannerInput').value = '';
             document.getElementById('scannerModal').style.display = 'flex';
             
             try {
-                html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+                
+                const config = { 
                     fps: 10, 
-                    qrbox: { width: 250, height: 100 },
+                    qrbox: { width: 300, height: 60 },
                     formatsToSupport: [ 
                         Html5QrcodeSupportedFormats.CODE_128, 
                         Html5QrcodeSupportedFormats.CODE_39, 
@@ -2036,23 +2059,50 @@
                         Html5QrcodeSupportedFormats.EAN_8, 
                         Html5QrcodeSupportedFormats.UPC_A 
                     ]
-                }, false);
-                    
-                html5QrcodeScanner.render((decodedText) => {
-                    document.getElementById(inputId).value = decodedText;
-                    stopScanner();
-                    showToast("Barcode scanned: " + decodedText, "success");
-                }, (error) => { /* scanning */ });
+                };
+
+                html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    config,
+                    (decodedText) => {
+                        const inputEl = document.getElementById(inputId);
+                        inputEl.value = decodedText;
+                        stopScanner();
+                        showToast("Barcode scanned: " + decodedText, "success");
+                        
+                        const event = new Event('input', { bubbles: true });
+                        inputEl.dispatchEvent(event);
+                    },
+                    (errorMessage) => {
+                        // scanning - ignore
+                    }
+                ).catch(err => {
+                    console.error("Camera error:", err);
+                });
             } catch (err) {
                 console.error("Scanner error:", err);
                 showToast("Could not access camera scanner", "error");
             }
         };
 
+        window.submitManualScan = function() {
+            const val = document.getElementById('manualScannerInput').value.trim();
+            if (!val) return;
+            const inputEl = document.getElementById(currentScannerInputId);
+            if (inputEl) {
+                inputEl.value = val;
+                const event = new Event('input', { bubbles: true });
+                inputEl.dispatchEvent(event);
+                showToast("Entered manually: " + val, "success");
+            }
+            stopScanner();
+        };
+
         window.stopScanner = function() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(e => console.error(e));
             }
             document.getElementById('scannerModal').style.display = 'none';
         };

@@ -544,8 +544,17 @@
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
             <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden;"></div>
-            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">Cancel</button>
+            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
+                </div>
+            </div>
+
+            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
         </div>
     </div>
 
@@ -1202,14 +1211,22 @@
         };
 
         // Barcode Scanner Logic
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
+        let currentScannerInputId = null;
+
         window.startScanner = function(inputId) {
+            currentScannerInputId = inputId;
+            document.getElementById('manualScannerInput').value = '';
             document.getElementById('scannerModal').style.display = 'flex';
             
             try {
-                html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+                
+                const config = { 
                     fps: 10, 
-                    qrbox: { width: 250, height: 100 },
+                    qrbox: { width: 300, height: 60 },
                     formatsToSupport: [ 
                         Html5QrcodeSupportedFormats.CODE_128, 
                         Html5QrcodeSupportedFormats.CODE_39, 
@@ -1217,27 +1234,51 @@
                         Html5QrcodeSupportedFormats.EAN_8, 
                         Html5QrcodeSupportedFormats.UPC_A 
                     ]
-                }, false);
-                    
-                html5QrcodeScanner.render((decodedText) => {
-                    const inputEl = document.getElementById(inputId);
-                    inputEl.value = decodedText;
-                    stopScanner();
-                    showToast("Scanned: " + decodedText, "success");
-                    
-                    const event = new Event('input', { bubbles: true });
-                    inputEl.dispatchEvent(event);
-                }, (error) => { /* scanning */ });
+                };
+
+                html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    config,
+                    (decodedText) => {
+                        const inputEl = document.getElementById(inputId);
+                        inputEl.value = decodedText;
+                        stopScanner();
+                        showToast("Scanned: " + decodedText, "success");
+                        
+                        const event = new Event('input', { bubbles: true });
+                        inputEl.dispatchEvent(event);
+                    },
+                    (errorMessage) => {
+                        // scanning - ignore
+                    }
+                ).catch(err => {
+                    console.error("Camera error:", err);
+                    // showToast("Could not start camera automatically", "error");
+                });
             } catch (err) {
                 console.error("Scanner error:", err);
                 showToast("Could not access camera scanner", "error");
             }
         };
 
+        window.submitManualScan = function() {
+            const val = document.getElementById('manualScannerInput').value.trim();
+            if (!val) return;
+            const inputEl = document.getElementById(currentScannerInputId);
+            if (inputEl) {
+                inputEl.value = val;
+                const event = new Event('input', { bubbles: true });
+                inputEl.dispatchEvent(event);
+                showToast("Entered manually: " + val, "success");
+            }
+            stopScanner();
+        };
+
         window.stopScanner = function() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(e => console.error(e));
             }
             document.getElementById('scannerModal').style.display = 'none';
         };
