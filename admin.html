@@ -1924,6 +1924,22 @@
             
             sortedSales.forEach(s => {
                 const tr = document.createElement('tr');
+                tr.style.cursor = 'pointer';
+                tr.title = "Click to view more details";
+                tr.onclick = function(e) {
+                    if (e.target.tagName === 'BUTTON') return; // Prevent expanding when clicking the action button
+                    const detailsRow = this.nextElementSibling;
+                    if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
+                        if (detailsRow.style.display === 'none') {
+                            detailsRow.style.display = 'table-row';
+                            this.style.background = 'rgba(255,255,255,0.05)';
+                        } else {
+                            detailsRow.style.display = 'none';
+                            this.style.background = '';
+                        }
+                    }
+                };
+
                 const isPaid = s.staffPaymentStatus === 'Paid';
                 const fee = parseFloat(s.staffFee) || 0;
                 
@@ -1943,6 +1959,43 @@
                     <td>${actionBtn}</td>
                 `;
                 tbody.appendChild(tr);
+
+                // Expandable Details Row
+                const detailsTr = document.createElement('tr');
+                detailsTr.className = 'staff-details-row';
+                detailsTr.style.display = 'none';
+                detailsTr.style.background = 'rgba(0,0,0,0.2)';
+                detailsTr.innerHTML = `
+                    <td colspan="5" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Customer NIC</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">${s.custNic || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Contact Number</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">${s.contact || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">IMEI Number</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">${s.imei || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Storage / RAM</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">${s.storage || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Retail Price (MRP)</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Price</p>
+                                <p style="color: white; margin: 0; font-weight: 500;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(detailsTr);
             });
             
             document.getElementById('staffModal').style.display = 'flex';
