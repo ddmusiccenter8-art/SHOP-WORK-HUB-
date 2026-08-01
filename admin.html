@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,11 +16,11 @@
         :root {
             --primary: #e50000;
             --primary-hover: #cc0000;
-            --bg-color: #050505;
-            --card-bg: #141414;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #2a2a2a;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
             --success: #10b981;
             --warning: #f59e0b;
             --info: #3b82f6;
@@ -31,7 +31,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
 
         body {
-            background: radial-gradient(circle at top right, #1e1b4b 0%, #0b0f19 60%, #05070e 100%);
+            background: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -100,7 +100,7 @@
 
         .tab.active { 
             background: var(--card-bg); 
-            color: white; 
+            color: var(--text-main); 
             border-top: 3px solid var(--primary); 
             box-shadow: 0 -4px 15px rgba(229, 0, 0, 0.15);
         }
@@ -137,7 +137,7 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
         th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
-        tr:hover { background: rgba(255, 255, 255, 0.03); cursor: pointer; }
+        tr:hover { background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; }
         tr:last-child td { border-bottom: none; }
 
         .badge { padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
@@ -147,7 +147,7 @@
         .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
 
         .shop-card {
-            background: rgba(255,255,255,0.03);
+            background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
             padding: 1rem;
             border-radius: 12px;
@@ -173,7 +173,7 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.2);
-            background: rgba(15, 23, 42, 0.9);
+            background: #ffffff;
         }
 
         /* Modal */
@@ -190,19 +190,19 @@
             position: relative;
         }
         .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; cursor: pointer; font-size: 1.5rem; color: var(--text-muted); transition: 0.2s; }
-        .modal-close:hover { color: white; }
+        .modal-close:hover { color: var(--text-main); }
         
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-        .detail-item { background: rgba(255,255,255,0.03); padding: 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .detail-item { background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
         .detail-item strong { color: var(--text-muted); font-size: 0.82rem; display: block; margin-bottom: 0.25rem; }
         .detail-item span.val { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
         
-        button.action-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; transition: all 0.2s; font-size: 0.9rem; }
+        button.action-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text-main); transition: all 0.2s; font-size: 0.9rem; }
         button.action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        .filter-btn { padding: 0.55rem 1.1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500; }
+        .filter-btn { padding: 0.55rem 1.1rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500; }
         .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(229, 0, 0, 0.3); }
-        .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+        .filter-btn:hover:not(.active) { background: #f9fafb; }
 
         /* Toast Notifications */
         #toastContainer {
@@ -217,7 +217,7 @@
 
         .toast {
             background: #1e293b;
-            color: white;
+            color: var(--text-main);
             padding: 12px 20px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
@@ -254,7 +254,7 @@
             METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
         </h1>
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
+            <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
                 <option value="en">English</option>
                 <option value="si">සිංහල</option>
                 <option value="ta">தமிழ்</option>
@@ -292,15 +292,15 @@
         <div id="submissionsView" class="view active">
             <!-- Stats Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
-                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Total Loans Issued</h3>
                     <p style="font-size: 1.75rem; font-weight: 700; color: #818cf8;" id="totalLoanVal">Rs. 0.00</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Settlement (Paid)</h3>
                     <p style="font-size: 1.75rem; font-weight: 700; color: var(--success);" id="totalPaidVal">Rs. 0.00</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.4rem; text-transform: uppercase;">Settlement (Pending)</h3>
                     <p style="font-size: 1.75rem; font-weight: 700; color: var(--warning);" id="totalPendingVal">Rs. 0.00</p>
                 </div>
@@ -315,7 +315,7 @@
                 </div>
                 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; width: 100%; max-width: 480px;">
-                    <input type="text" id="adminSearchInput" placeholder="Search IMEI, SP, NIC, Shop..." onkeyup="renderAllSubmissions()" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.6rem 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
+                    <input type="text" id="adminSearchInput" placeholder="Search IMEI, SP, NIC, Shop..." onkeyup="renderAllSubmissions()" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
                     <button onclick="exportToCSV()" style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: var(--success); padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
                         📥 Export CSV
                     </button>
@@ -344,7 +344,7 @@
         <div id="shopsView" class="view">
             <div id="shopListSection">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
-                    <h2 style="font-size: 1.3rem; color: white; margin: 0;">Registered Shops Directory</h2>
+                    <h2 style="font-size: 1.3rem; color: var(--text-main); margin: 0;">Registered Shops Directory</h2>
                     <button onclick="openAddShopModal()" style="background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
                         ➕ Register New Shop Profile
                     </button>
@@ -357,14 +357,14 @@
 
             <div id="singleShopSection" style="display: none;">
                 <button onclick="backToShops()" style="background: rgba(255,255,255,0.08); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
-                <h2 id="profileTitle" style="color: white; margin-bottom: 1rem;">Shop Profile</h2>
+                <h2 id="profileTitle" style="color: var(--text-main); margin-bottom: 1rem;">Shop Profile</h2>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sale (MRP)</h3>
-                        <p style="font-size: 1.4rem; font-weight: 700; color: white; margin-top: 0.2rem;" id="shopTotalMrp">Rs. 0.00</p>
+                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="shopTotalMrp">Rs. 0.00</p>
                     </div>
-                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Loans Issued</h3>
                         <p style="font-size: 1.4rem; font-weight: 700; color: var(--info); margin-top: 0.2rem;" id="shopTotalLoan">Rs. 0.00</p>
                     </div>
@@ -378,11 +378,11 @@
                     </div>
                 </div>
 
-                <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 2rem 0; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 2rem 0; background: #f3f4f6; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <canvas id="shopChart"></canvas>
                 </div>
 
-                <h3 style="margin-bottom: 1rem; color: white;">Shop Submissions History</h3>
+                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Shop Submissions History</h3>
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -403,10 +403,10 @@
         <!-- Main Shop Profit & Sales Manager View -->
         <div id="mainProfitView" class="view">
             <!-- Date Filter Controls Header -->
-            <div style="background: rgba(255,255,255,0.02); padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="font-size: 1.1rem; color: white; margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
+            <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 1.1rem; color: var(--text-main); margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
                 <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
-                    <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
                         <option value="today">Today</option>
                         <option value="week">This Week</option>
                         <option value="month">This Month</option>
@@ -428,22 +428,22 @@
 
             <!-- Financial Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
-                <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sales (MRP)</h3>
-                    <p style="font-size: 1.4rem; font-weight: 700; color: white; margin-top: 0.2rem;" id="mainTotalMrp">Rs. 0.00</p>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="mainTotalMrp">Rs. 0.00</p>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Phone Cost (Buy Price)</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: #fca5a5; margin-top: 0.2rem;" id="mainTotalBuyPrice">Rs. 0.00</p>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Leasing Fees (2% MRP)</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: var(--warning); margin-top: 0.2rem;" id="mainTotalLeasingFees">Rs. 0.00</p>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Staff Fees (Rs. 500)</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: var(--accent-purple); margin-top: 0.2rem;" id="mainTotalStaffFees">Rs. 0.00</p>
                 </div>
@@ -457,8 +457,8 @@
             <!-- Form and History Grid -->
             <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.2rem;">
                 <!-- Main Shop Direct Sales Entry Form -->
-                <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
-                    <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: white;">Main Shop Direct Sale Entry</h2>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: var(--text-main);">Main Shop Direct Sale Entry</h2>
                     <form id="mainSaleForm">
                         <div style="margin-bottom: 0.9rem;">
                             <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Date (දිනය)</label>
@@ -528,7 +528,7 @@
                 <!-- Main Shop Sales History Table -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <h2 style="font-size: 1.15rem; color: white;">Main Shop Direct Sales History</h2>
+                        <h2 style="font-size: 1.15rem; color: var(--text-main);">Main Shop Direct Sales History</h2>
                         <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 250px;" oninput="renderMainShopProfitView()">
                     </div>
                     <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
@@ -557,30 +557,30 @@
         <div id="inventoryView" class="view">
             <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 1.2rem;">
                 <!-- Add Inventory Form -->
-                <div style="background: rgba(255,255,255,0.02); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: white;">Add Head Office Stock</h2>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main);">Add Head Office Stock</h2>
                     <form id="inventoryForm">
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number</label>
                             <div style="display: flex; gap: 0.5rem; align-items: stretch;">
-                                <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
                                 <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
                             </div>
                         </div>
                         
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Model Name</label>
-                            <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                            <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
                         
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
-                            <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                            <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Target Shop / Branch Location</label>
-                            <input type="text" id="invShop" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name..." style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+                            <input type="text" id="invShop" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name..." style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                             <datalist id="shopDatalist"></datalist>
                         </div>
                         
@@ -591,7 +591,7 @@
                 <!-- Inventory List -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h2 style="font-size: 1.2rem; color: white;">Current Stock List</h2>
+                        <h2 style="font-size: 1.2rem; color: var(--text-main);">Current Stock List</h2>
                         <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
                     </div>
                     <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
@@ -617,7 +617,7 @@
         <!-- Staff Profiles View -->
         <div id="staffProfilesView" class="view">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.3rem; color: white; display: flex; align-items: center; gap: 0.5rem;">
+                <h2 style="font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     Activator Staff Profiles
                 </h2>
@@ -633,7 +633,7 @@
     <div id="addShopModal" class="modal">
         <div class="modal-content" style="max-width: 480px;">
             <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
-            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
+            <h2 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
             <form id="addShopForm">
                 <div style="margin-bottom: 1rem;">
                     <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop / Branch Name</label>
@@ -660,7 +660,7 @@
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Submission Details</h2>
+            <h2 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Submission Details</h2>
             
             <div id="modalContent" class="detail-grid"></div>
             
@@ -674,10 +674,10 @@
                 </div>
                 <div>
                     <label style="color: var(--text-muted); font-size: 0.85rem;">Fintrex Payment Reference</label>
-                    <input type="text" id="fintrexPaymentText" placeholder="e.g. Approved LKR 25,000" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; margin-bottom: 0.8rem;">
+                    <input type="text" id="fintrexPaymentText" placeholder="e.g. Approved LKR 25,000" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem; margin-bottom: 0.8rem;">
                     
                     <label style="color: var(--text-muted); font-size: 0.85rem;">Shop Settlement Status</label>
-                    <select id="paymentStatusSelect" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
+                    <select id="paymentStatusSelect" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
                         <option value="Pending">Pending (ගෙවීමට ඇත)</option>
                         <option value="Paid">Paid (ගෙව්වා)</option>
                     </select>
@@ -699,27 +699,27 @@
             <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
                 <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;" id="staffModalInitials"></div>
                 <div>
-                    <h2 style="font-size: 1.4rem; color: white; margin: 0;" id="staffModalName">Staff Name</h2>
+                    <h2 style="font-size: 1.4rem; color: var(--text-main); margin: 0;" id="staffModalName">Staff Name</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Activator Performance & Payments</p>
                 </div>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Activations</h3>
-                    <p style="font-size: 1.5rem; font-weight: 700; color: white; margin-top: 0.4rem;" id="staffTotalActivations">0</p>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-top: 0.4rem;" id="staffTotalActivations">0</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Paid</h3>
                     <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin-top: 0.4rem;" id="staffTotalPaid">Rs. 0.00</p>
                 </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Pending Balance</h3>
                     <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin-top: 0.4rem;" id="staffTotalPending">Rs. 0.00</p>
                 </div>
             </div>
 
-            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem;">Activation History</h3>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem;">Activation History</h3>
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                 <table>
                     <thead>
@@ -742,18 +742,18 @@
     <div id="scannerModal" class="modal">
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
-            <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 280px; background: rgba(0,0,0,0.5); border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Scan Barcode</h2>
+            <div id="reader" style="width: 100%; min-height: 280px; background: #f3f4f6; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
             
             <div style="text-align: left; margin-bottom: 1rem;">
                 <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-main); outline: none;">
                     <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
                 </div>
             </div>
 
-            <button onclick="stopScanner()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
+            <button onclick="stopScanner()" style="background: #f9fafb; border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
         </div>
     </div>
 
@@ -761,7 +761,7 @@
     <div id="transferModal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
             <span class="modal-close" onclick="closeTransferModal()">&times;</span>
-            <h2 style="margin-bottom: 1rem; color: white; font-size: 1.2rem;">Transfer Stock</h2>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Transfer Stock</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;" id="transferItemName">Item: ...</p>
             
             <div style="margin-bottom: 1.5rem;">
@@ -1206,7 +1206,7 @@
                 card.className = 'shop-card';
                 card.onclick = () => viewShopProfile(shopEmail, shopSales);
                 card.innerHTML = `
-                    <h3 style="color: white; margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
+                    <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
                     ${regInfo && regInfo.phone ? `<p style="color: var(--accent-purple); font-size: 0.8rem;">📞 ${regInfo.phone}</p>` : ''}
                     <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
@@ -1901,13 +1901,13 @@
                         <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
                             ${initial}
                         </div>
-                        <h3 style="color: white; margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
+                        <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
                     </div>
                     
-                    <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="background: #f3f4f6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span style="color: var(--text-muted); font-size: 0.85rem;">Activations:</span>
-                            <span style="color: white; font-weight: bold;">${staff.totalCount} Phones</span>
+                            <span style="color: var(--text-main); font-weight: bold;">${staff.totalCount} Phones</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: var(--text-muted); font-size: 0.85rem;">Pending Fee:</span>
@@ -1915,7 +1915,7 @@
                         </div>
                     </div>
                     
-                    <button class="action-btn" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white;">View Profile Details</button>
+                    <button class="action-btn" style="width: 100%; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: white;">View Profile Details</button>
                 `;
                 grid.appendChild(card);
             });
@@ -1961,13 +1961,13 @@
                     : '<span class="badge badge-replied">Pending</span>';
                     
                 const actionBtn = isPaid
-                    ? `<button disabled style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: not-allowed; font-size: 0.75rem;">Done</button>`
+                    ? `<button disabled style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: not-allowed; font-size: 0.75rem;">Done</button>`
                     : `<button onclick="markStaffFeePaid('${s.id}')" style="background: var(--success); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;">Mark as Paid</button>`;
 
                 tr.innerHTML = `
                     <td>${s.date || '-'}</td>
                     <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
-                    <td style="font-weight: 600; color: white;">Rs. ${fee.toLocaleString()}</td>
+                    <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
                     <td>${statusBadge}</td>
                     <td>${actionBtn}</td>
                 `;
@@ -1983,27 +1983,27 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Customer NIC</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">${s.custNic || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.custNic || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Contact Number</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">${s.contact || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.contact || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">IMEI Number</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">${s.imei || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.imei || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Storage / RAM</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">${s.storage || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.storage || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Retail Price (MRP)</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Price</p>
-                                <p style="color: white; margin: 0; font-weight: 500;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
                             </div>
                         </div>
                     </td>
