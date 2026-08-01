@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Shop Dashboard</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#e50000">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +14,8 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
+            --primary: #e50000;
+            --primary-hover: #cc0000;
             --bg-color: #0b0f19;
             --card-bg: rgba(23, 32, 54, 0.75);
             --text-main: #f8fafc;
@@ -121,7 +121,7 @@
             background: var(--card-bg); 
             color: white; 
             border-top: 3px solid var(--primary); 
-            box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.15);
+            box-shadow: 0 -4px 15px rgba(229, 0, 0, 0.15);
         }
 
         .view { 
@@ -188,14 +188,14 @@
         input:focus, select:focus { 
             outline: none; 
             border-color: var(--primary); 
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.2);
             background: rgba(15, 23, 42, 0.9);
         }
 
         .submit-btn {
             width: 100%;
             padding: 0.95rem;
-            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #990000 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -203,13 +203,13 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 4px 15px rgba(229, 0, 0, 0.35);
             transition: all 0.25s ease;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 6px 20px rgba(229, 0, 0, 0.5);
         }
 
         .submit-btn:disabled {
@@ -220,7 +220,7 @@
         }
 
         .filter-btn { padding: 0.5rem 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
-        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(229, 0, 0, 0.3); }
         .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
 
         /* Table Styles */
@@ -1057,8 +1057,8 @@
                         { 
                             label: 'Total Loan Amount (Rs.)', 
                             data: revenueData, 
-                            borderColor: '#6366f1', 
-                            backgroundColor: 'rgba(99, 102, 241, 0.15)', 
+                            borderColor: '#e50000', 
+                            backgroundColor: 'rgba(229, 0, 0, 0.15)', 
                             fill: true, 
                             tension: 0.4,
                             borderWidth: 2,

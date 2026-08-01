@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Admin Dashboard</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#e50000">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +14,8 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
+            --primary: #e50000;
+            --primary-hover: #cc0000;
             --bg-color: #0b0f19;
             --card-bg: rgba(23, 32, 54, 0.75);
             --text-main: #f8fafc;
@@ -102,7 +102,7 @@
             background: var(--card-bg); 
             color: white; 
             border-top: 3px solid var(--primary); 
-            box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.15);
+            box-shadow: 0 -4px 15px rgba(229, 0, 0, 0.15);
         }
 
         .container {
@@ -155,7 +155,7 @@
             transition: all 0.25s;
             text-align: center;
         }
-        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.06); }
+        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(229, 0, 0, 0.2); background: rgba(255,255,255,0.06); }
         .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 
         /* Form Inputs */
@@ -172,7 +172,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.2);
             background: rgba(15, 23, 42, 0.9);
         }
 
@@ -201,7 +201,7 @@
         button.action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
         .filter-btn { padding: 0.55rem 1.1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500; }
-        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(229, 0, 0, 0.3); }
         .filter-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
 
         /* Toast Notifications */
@@ -345,7 +345,7 @@
             <div id="shopListSection">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
                     <h2 style="font-size: 1.3rem; color: white; margin: 0;">Registered Shops Directory</h2>
-                    <button onclick="openAddShopModal()" style="background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
+                    <button onclick="openAddShopModal()" style="background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
                         ➕ Register New Shop Profile
                     </button>
                 </div>
@@ -519,7 +519,7 @@
                             <span id="liveNetProfitVal" style="font-size: 1.35rem; font-weight: 800; color: var(--success);">Rs. 0.00</span>
                         </div>
 
-                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
+                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
                             Add Main Shop Sale Entry
                         </button>
                     </form>
@@ -584,7 +584,7 @@
                             <datalist id="shopDatalist"></datalist>
                         </div>
                         
-                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">Add to Head Office Inventory</button>
+                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add to Head Office Inventory</button>
                     </form>
                 </div>
 
@@ -697,7 +697,7 @@
         <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close" onclick="closeStaffModal()">&times;</span>
             <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;" id="staffModalInitials"></div>
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;" id="staffModalInitials"></div>
                 <div>
                     <h2 style="font-size: 1.4rem; color: white; margin: 0;" id="staffModalName">Staff Name</h2>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Activator Performance & Payments</p>
@@ -1295,7 +1295,7 @@
                 type: 'bar',
                 data: {
                     labels: dates,
-                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#6366f1', borderRadius: 6 }]
+                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#e50000', borderRadius: 6 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -1898,7 +1898,7 @@
                 
                 card.innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
                             ${initial}
                         </div>
                         <h3 style="color: white; margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
