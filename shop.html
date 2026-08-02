@@ -347,10 +347,10 @@
         <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
                 <option value="en">English</option>
-                <option value="si">?????</option>
-                <option value="ta">?????</option>
+                <option value="si">සිංහල</option>
+                <option value="ta">தமிழ்</option>
             </select>
-            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">?? Firebase Connected</span>
+            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">🟢 Firebase Connected</span>
             <span id="userEmailDisplay" style="color: var(--accent-purple); font-weight: 600; font-size: 0.9rem;"></span>
             <button class="logout-btn" id="logoutBtn" onclick="doLogout()">Logout</button>
         </div>
@@ -371,70 +371,70 @@
     <div id="newEntryView" class="view active">
         <!-- New Entry Form -->
         <div class="glass-panel">
-            <h2>New Entry <span class="lang-si">(?? ???? ?????? ?????)</span></h2>
+            <h2>New Entry <span class="lang-si">(නව දත්ත ඇතුලත් කිරීම)</span></h2>
             
             <form id="salesForm">
                 <div class="form-group">
-                    <label for="date">Date <span class="lang-si">(????)</span></label>
+                    <label for="date">Date <span class="lang-si">(දිනය)</span></label>
                     <input type="date" id="date" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="spNumber">SP Number <span class="lang-si">(SP ????)</span></label>
+                    <label for="spNumber">SP Number <span class="lang-si">(SP අංකය)</span></label>
                     <input type="text" id="spNumber" placeholder="e.g. SP-1024" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="nic">Customer NIC <span class="lang-si">(??. ??. ????)</span></label>
+                    <label for="nic">Customer NIC <span class="lang-si">(පාරිභෝගික ජා. හැ. අංකය)</span></label>
                     <input type="text" id="nic" placeholder="e.g. 199512345678 or 951234567V" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="name">Customer Name <span class="lang-si">(??)</span></label>
+                    <label for="name">Customer Name <span class="lang-si">(පාරිභෝගික නම)</span></label>
                     <input type="text" id="name" placeholder="e.g. A.B. Perera" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="imei">IMEI Number <span class="lang-si">(IMEI ????)</span></label>
+                    <label for="imei">IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
                     <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 0.5rem;">
                         <input type="text" id="imei" required placeholder="Type or scan IMEI..." style="flex: 1; min-width: 0;">
-                        <button type="button" onclick="startScanner('imei')" style="background: var(--info); color: white; border: none; padding: 0 1.2rem; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 600;">?? Scan</button>
+                        <button type="button" onclick="startScanner('imei')" style="background: var(--info); color: white; border: none; padding: 0 1.2rem; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
                     </div>
                     <div id="imeiStatus" style="font-size: 0.85rem; min-height: 22px; font-weight: 600;"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="model">Phone Model <span class="lang-si">(?????? ???????)</span></label>
-                    <input type="text" id="model" placeholder="e.g. Samsung Galaxy A14" required>
+                    <label for="model">Phone Model <span class="lang-si">(දුරකථන මාදිලිය)</span></label>
+                    <input type="text" id="model" placeholder="e.g. Samsung A05" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="storage">Storage Capacity <span class="lang-si">(????????)</span></label>
-                    <input type="text" id="storage" placeholder="e.g. 128GB">
+                    <label for="storage">Storage Capacity <span class="lang-si">(ධාරිතාව)</span></label>
+                    <input type="text" id="storage" placeholder="e.g. 4+64GB">
                 </div>
 
                 <div class="form-group">
-                    <label for="mrp">MRP <span class="lang-si">(????? ?????? ???)</span></label>
+                    <label for="mrp">MRP <span class="lang-si">(සිල්ලර මිල MRP)</span></label>
                     <input type="number" id="mrp" placeholder="0.00" step="0.01" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="downPayment">Down Payment <span class="lang-si">(????? ?????)</span></label>
+                    <label for="downPayment">Down Payment <span class="lang-si">(මූලික ගෙවීම)</span></label>
                     <input type="number" id="downPayment" placeholder="0.00" step="0.01" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="document">Document Fee <span class="lang-si">(???? ???????)</span></label>
+                    <label for="document">Document Fee <span class="lang-si">(ලිපි ලේඛන ගාස්තු)</span></label>
                     <input type="number" id="document" placeholder="0.00" step="0.01">
                 </div>
 
                 <div class="form-group">
-                    <label for="loanAmount">Loan Amount <span class="lang-si">(?? ????)</span></label>
+                    <label for="loanAmount">Loan Amount <span class="lang-si">(ණය මුදල)</span></label>
                     <input type="number" id="loanAmount" placeholder="0.00" step="0.01" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="settlement">Settlement <span class="lang-si">(?????? - Auto Calculated)</span></label>
+                    <label for="settlement">Settlement <span class="lang-si">(පියවීම - Auto Calculated)</span></label>
                     <input type="number" id="settlement" placeholder="0.00" step="0.01" readonly style="background: #f3f4f6; font-weight: bold; color: var(--warning);">
                 </div>
 
@@ -445,7 +445,7 @@
         <!-- Data View & Chart Section -->
         <div>
             <div class="glass-panel" style="padding-bottom: 1.2rem;">
-                <h2>Sales Analytics <span class="lang-si">(???????? ????????)</span></h2>
+                <h2>Sales Analytics <span class="lang-si">(විකුණුම් වාර්තා)</span></h2>
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
                 </div>
@@ -453,7 +453,7 @@
 
             <div class="glass-panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                    <h2 style="margin: 0;">My Submissions <span class="lang-si">(?? ?????? ?? ????)</span></h2>
+                    <h2 style="margin: 0;">My Submissions <span class="lang-si">(මගේ ඇතුලත් කිරීම්)</span></h2>
                     <input type="text" id="shopSearchInput" placeholder="Search IMEI, SP, NIC, Model..." onkeyup="renderShopSales()" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 1rem; border-radius: 8px; width: 100%; max-width: 250px;">
                 </div>
                 
@@ -470,7 +470,7 @@
                                 <th>Date</th>
                                 <th>SP / Model</th>
                                 <th>Amounts</th>
-                                <th>Status <span class="lang-si">(?????)</span></th>
+                                <th>Status <span class="lang-si">(තත්වය)</span></th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -485,7 +485,7 @@
     <!-- My Stock View -->
     <div id="myStockView" class="view" style="background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem;">
-            <h2>My Head Office Stock <span class="lang-si">(?? ??? ??? ???)</span></h2>
+            <h2>My Head Office Stock <span class="lang-si">(මගේ ප්‍රධාන කාර්යාල තොගය)</span></h2>
             <span id="stockBadgeCount" style="background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem;">Checking Stock...</span>
         </div>
 
@@ -579,40 +579,40 @@
 
         // Translation Dictionary & Logic
         const langDict = {
-            "Shop Dashboard": { si: "????????? ??????", ta: "??? ??????????" },
-            "New Submissions & History": { si: "?? ?????? ?????? ?? ???????", ta: "????? ??????????????? ??????? ??????" },
-            "My Head Office Stock": { si: "??? ??????? ??????? ????", ta: "???? ????? ?????? ???????" },
-            "New Entry": { si: "?? ???? ?????? ?????", ta: "????? ???????" },
-            "Date": { si: "????", ta: "????" },
-            "SP Number": { si: "SP ????", ta: "SP ???" },
-            "Customer NIC": { si: "????????? ??. ??. ????", ta: "????????????? NIC" },
-            "Customer Name": { si: "????????????? ??", ta: "????????????? ?????" },
-            "IMEI Number": { si: "IMEI ????", ta: "IMEI ???" },
-            "Device Model": { si: "?????? ???????", ta: "???? ??????" },
-            "Storage / RAM": { si: "??????? (Storage / RAM)", ta: "???????? / RAM" },
-            "Retail Price (MRP)": { si: "???????? ??? (MRP)", ta: "??????? ???? (MRP)" },
-            "Down Payment": { si: "????? ?????", ta: "????????" },
-            "Document Charges": { si: "???? ??????", ta: "??? ???????" },
-            "Loan Amount": { si: "?? ????", ta: "???? ????" },
-            "Stock Source": { si: "???? ?????? ??????", ta: "????? ??????" },
-            "Shop Stock": { si: "????????? ????", ta: "??? ?????" },
-            "Head Office Stock": { si: "??????? ??????? ????", ta: "????? ?????? ???????" },
-            "Branch Name": { si: "?????? ??", ta: "???? ?????" },
-            "Calculated Settlement": { si: "???? ?? ??????? ????", ta: "????????????? ?????? ????" },
-            "Submit Sales Entry": { si: "???? ?????? ?????", ta: "??????? ??????????? ???????????????" },
-            "Sales Analytics": { si: "???????? ?????????", ta: "??????? ???????????" },
-            "Recent Submissions": { si: "??? ?????? ??????", ta: "????????? ???????????????" },
-            "All Entries": { si: "?????? ?????? ??????", ta: "??????? ????????????" },
-            "Pending": { si: "????????", ta: "??????????" },
-            "Confirmed": { si: "?????? ??", ta: "?????????????????????" },
-            "Paid": { si: "???? ??", ta: "???????????????" },
-            "Logout": { si: "???? ????", ta: "????????" },
-            "Status": { si: "???????", ta: "????" },
-            "Action": { si: "????????", ta: "?????" },
-            "Type or scan IMEI...": { si: "IMEI ???? ?????? ?????...", ta: "IMEI ? ?????????? ?????? ?????? ?????????..." },
-            "e.g. SP-1024": { si: "???: SP-1024", ta: "?.??: SP-1024" },
-            "e.g. 199512345678 or 951234567V": { si: "???: 199512345678 ?? 951234567V", ta: "?.??: 199512345678 ?????? 951234567V" },
-            "e.g. A.B. Perera": { si: "???: A.B. ??????", ta: "?.??: ?.??. ??????" }
+            "Shop Dashboard": { si: "සාප්පු මුහුණත", ta: "கடை டாஷ்போர்டு" },
+            "New Submissions & History": { si: "නව ඇතුලත් කිරීම් සහ ඉතිහාසය", ta: "புதிய உள்ளீடுகள் மற்றும் வரலாறு" },
+            "My Head Office Stock": { si: "මගේ ප්‍රධාන කාර්යාල තොගය", ta: "எனது தலைமை அலுவலக இருப்பு" },
+            "New Entry": { si: "නව දත්ත ඇතුලත් කිරීම", ta: "புதிய பதிவு" },
+            "Date": { si: "දිනය", ta: "தேதி" },
+            "SP Number": { si: "SP අංකය", ta: "SP எண்" },
+            "Customer NIC": { si: "පාරිභෝගික ජා. හැ. අංකය", ta: "வாடிக்கையாளர் NIC" },
+            "Customer Name": { si: "පාරිභෝගික නම", ta: "வாடிக்கையாளர் பெயர்" },
+            "IMEI Number": { si: "IMEI අංකය", ta: "IMEI எண்" },
+            "Device Model": { si: "දුරකථන මාදිලිය", ta: "சாதன மாதிரி" },
+            "Storage / RAM": { si: "ධාරිතාව (Storage / RAM)", ta: "சேமிப்பு / RAM" },
+            "Retail Price (MRP)": { si: "සිල්ලර මිල (MRP)", ta: "சில்லறை விலை (MRP)" },
+            "Down Payment": { si: "මූලික ගෙවීම", ta: "முன்பணம்" },
+            "Document Charges": { si: "ලිපි ලේඛන ගාස්තු", ta: "ஆவண கட்டணம்" },
+            "Loan Amount": { si: "ණය මුදල", ta: "கடன் தொகை" },
+            "Stock Source": { si: "තොගය පැමිණි ස්ථානය", ta: "பங்கு ஆதாரம்" },
+            "Shop Stock": { si: "සාප්පුවේ තොගය", ta: "கடை இருப்பு" },
+            "Head Office Stock": { si: "ප්‍රධාන කාර්යාල තොගය", ta: "தலைமை அலுவலக இருப்பு" },
+            "Branch Name": { si: "ශාඛාවේ නම", ta: "கிளை பெயர்" },
+            "Calculated Settlement": { si: "ගණනය කළ පියවීම් මුදල", ta: "கணக்கிடப்பட்ட தீர்வு" },
+            "Submit Sales Entry": { si: "දත්ත ඇතුලත් කරන්න", ta: "விற்பனை உள்ளீட்டைச் சமர்ப்பிக்கவும்" },
+            "Sales Analytics": { si: "විකුණුම් වාර්තා", ta: "விற்பனை பகுப்பாய்வு" },
+            "Recent Submissions": { si: "මෑතකාලීන ඇතුලත් කිරීම්", ta: "சமீபத்திய உள்ளீடுகள்" },
+            "All Entries": { si: "සියලුම ඇතුලත් කිරීම්", ta: "அனைத்து உள்ளீடுகளும்" },
+            "Pending": { si: "පොරොත්තු", ta: "நிலுவையில்" },
+            "Confirmed": { si: "තහවුරු කර ඇත", ta: "உறுதிப்படுத்தப்பட்டது" },
+            "Paid": { si: "ගෙවා ඇත", ta: "செலுத்தப்பட்டது" },
+            "Logout": { si: "ඉවත් වන්න", ta: "வெளியேறு" },
+            "Status": { si: "තත්වය", ta: "நிலை" },
+            "Action": { si: "ක්‍රියාව", ta: "செயல்" },
+            "Type or scan IMEI...": { si: "IMEI අංකය ඇතුලත් කරන්න...", ta: "IMEI ஐ தட்டச்சு செய்க..." },
+            "e.g. SP-1024": { si: "උදා: SP-1024", ta: "உ.ம்: SP-1024" },
+            "e.g. 199512345678 or 951234567V": { si: "උදා: 199512345678 හෝ 951234567V", ta: "உ.ம்: 199512345678 அல்லது 951234567V" },
+            "e.g. A.B. Perera": { si: "උදා: A.B. පෙරේරා", ta: "உ.ம்: A.B. பெரேரா" }
         };
 
         window.walkNodeAndTranslate = function(node, lang) {
@@ -675,7 +675,7 @@
                 badge.style.background = 'rgba(16,185,129,0.2)';
                 badge.style.borderColor = 'rgba(16,185,129,0.4)';
                 badge.style.color = 'var(--success)';
-                badge.innerHTML = '?? Firebase Connected';
+                badge.innerHTML = '🟢 Firebase Connected';
             }
         });
 
@@ -685,7 +685,7 @@
                 badge.style.background = 'rgba(239,68,68,0.2)';
                 badge.style.borderColor = 'rgba(239,68,68,0.4)';
                 badge.style.color = '#fca5a5';
-                badge.innerHTML = '?? Network Offline';
+                badge.innerHTML = '🔴 Network Offline';
             }
         });
 
@@ -833,7 +833,7 @@
                     const invDoc = snapshot.docs[0];
                     const data = invDoc.data();
                     
-                    imeiStatus.innerHTML = '<span style="color: var(--success);">? Head Office Stock (4% Profit Settlement)</span>';
+                    imeiStatus.innerHTML = '<span style="color: var(--success);">🏷️ Head Office Stock (4% Profit Settlement)</span>';
                     if (data.model) modelInput.value = data.model;
                     if (data.storage) storageInput.value = data.storage;
                     
@@ -970,14 +970,14 @@
                 
                 let statusHtml = '';
                 let paymentNote = data.paymentStatus === 'Paid' 
-                    ? '<br><span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ??</span>' 
-                    : '<br><span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending ?</span>';
+                    ? '<br><span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✅</span>' 
+                    : '<br><span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending ⏳</span>';
 
                 if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                 else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
                 else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.fintrexPayment || '')}')">Payment Sent - Confirm</span>`;
                 else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed by Shop</span>';
-                else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">? Completed</span>';
+                else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">✅ Completed</span>';
 
                 tr.innerHTML = `
                     <td>${data.date || '-'}</td>
