@@ -404,6 +404,20 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Stock Type <span class="lang-si">(තොග වර්ගය)</span></label>
+                    <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid var(--border-color); transition: 0.2s;" id="stockTypeHOLabel">
+                            <input type="radio" name="stockType" value="HO" id="stockTypeHO" style="accent-color: var(--primary);">
+                            <span style="font-weight: 600;">Main Shop Stock (6%)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.6rem 1rem; border-radius: 8px; border: 2px solid var(--border-color); transition: 0.2s;" id="stockTypeShopLabel">
+                            <input type="radio" name="stockType" value="Shop" id="stockTypeShop" checked style="accent-color: var(--primary);">
+                            <span style="font-weight: 600;">Sub Shop Stock (4%)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="model">Phone Model <span class="lang-si">(දුරකථන මාදිලිය)</span></label>
                     <input type="text" id="model" placeholder="e.g. Samsung A05" required>
                 </div>
@@ -792,6 +806,31 @@
         const documentInput = document.getElementById('document');
         const loanAmountInput = document.getElementById('loanAmount');
         const settlementInput = document.getElementById('settlement');
+        const stockTypeHO = document.getElementById('stockTypeHO');
+        const stockTypeShop = document.getElementById('stockTypeShop');
+        const stockTypeHOLabel = document.getElementById('stockTypeHOLabel');
+        const stockTypeShopLabel = document.getElementById('stockTypeShopLabel');
+
+        // Radio button change listener
+        function updateStockTypeUI() {
+            if (stockTypeHO.checked) {
+                currentStockSource = 'HO';
+                stockTypeHOLabel.style.borderColor = 'var(--primary)';
+                stockTypeHOLabel.style.background = 'rgba(229, 0, 0, 0.08)';
+                stockTypeShopLabel.style.borderColor = 'var(--border-color)';
+                stockTypeShopLabel.style.background = 'transparent';
+            } else {
+                currentStockSource = 'Shop';
+                stockTypeShopLabel.style.borderColor = 'var(--primary)';
+                stockTypeShopLabel.style.background = 'rgba(229, 0, 0, 0.08)';
+                stockTypeHOLabel.style.borderColor = 'var(--border-color)';
+                stockTypeHOLabel.style.background = 'transparent';
+            }
+            calculateSettlement();
+        }
+        stockTypeHO.addEventListener('change', updateStockTypeUI);
+        stockTypeShop.addEventListener('change', updateStockTypeUI);
+        updateStockTypeUI();
 
         // Auto calculate Loan Amount when MRP or DownPayment change
         mrpInput.addEventListener('input', () => {
@@ -819,9 +858,9 @@
             const val = e.target.value.trim();
             if (val.length < 4) {
                 imeiStatus.innerText = '';
-                currentStockSource = 'Shop';
+                stockTypeShop.checked = true;
+                updateStockTypeUI();
                 matchedInventoryDocId = null;
-                calculateSettlement();
                 return;
             }
             
@@ -857,8 +896,8 @@
 
             let settlement = 0;
             if (currentStockSource === 'HO') {
-                // For Head Office Stock: Settlement is ONLY 4% Profit of MRP
-                settlement = mrp * 0.04;
+                // For Main Shop / Head Office Stock: Settlement is 6% Profit of MRP
+                settlement = mrp * 0.06;
             } else {
                 // For Shop Own Stock: Settlement = (MRP - 4%) - Down Payment - Document Fee
                 const discountedMrp = mrp - (mrp * 0.04);
@@ -901,7 +940,7 @@
                 status: 'New', 
                 adminReply: '',
                 stockSource: currentStockSource,
-                discountApplied: currentStockSource === 'HO' ? '4% Profit' : '4% Discount',
+                discountApplied: currentStockSource === 'HO' ? '6% Profit (Main Shop)' : '4% Discount (Sub Shop)',
                 timestamp: Date.now()
             };
 
