@@ -1,35 +1,27 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Login</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#e50000">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #e50000;
-            --primary-hover: #cc0000;
-            --bg-color: #f4f6f8;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --danger: #ef4444;
-            --accent-purple: #c084fc;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #0b0f19;
+            --card-bg: rgba(23, 32, 54, 0.85);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
 
         body {
-            background: var(--bg-color);
+            background: radial-gradient(circle at top right, #1e1b4b 0%, #0b0f19 60%, #05070e 100%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -53,16 +45,16 @@
         .brand-icon {
             width: 64px;
             height: 64px;
-            background: linear-gradient(135deg, var(--primary), #ff3333);
+            background: linear-gradient(135deg, var(--primary), #a855f7);
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem auto;
-            box-shadow: 0 10px 25px rgba(229, 0, 0, 0.4);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
         }
 
-        .brand-icon svg { width: 36px; height: 36px; color: var(--text-main); }
+        .brand-icon svg { width: 36px; height: 36px; color: white; }
 
         h1 {
             font-size: 1.6rem;
@@ -106,8 +98,8 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.25);
-            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+            background: rgba(15, 23, 42, 0.9);
         }
 
         .password-container {
@@ -133,15 +125,15 @@
         button.submit-btn {
             width: 100%;
             padding: 0.9rem;
-            background: linear-gradient(135deg, var(--primary) 0%, #cc0000 100%);
-            color: var(--text-main);
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: white;
             border: none;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(229, 0, 0, 0.35);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
             margin-top: 0.5rem;
             display: flex;
             align-items: center;
@@ -151,7 +143,7 @@
 
         button.submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(229, 0, 0, 0.5);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
         }
 
         button.submit-btn:disabled {
@@ -299,19 +291,6 @@
             } else {
                 window.location.href = 'shop.html';
             }
-        }
-
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
         }
     </script>
 </body>
