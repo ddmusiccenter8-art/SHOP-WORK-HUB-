@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Admin Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e50000">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +16,7 @@
         :root {
             --primary: #e50000;
             --primary-hover: #cc0000;
-            --bg-color: #fffbe6;
+            --bg-color: #f4f6f8;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #6b7280;
@@ -31,68 +34,31 @@
             background: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-bottom: 2rem;
-        }
-
-        .header {
-            width: 100%;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 0.6rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-
-        @keyframes titleGlow {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.02); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .header h1 {
-            font-size: 1.45rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 0;
-            animation: titleGlow 2.5s infinite ease-in-out;
-        }
-
         .tabs { 
-            margin-top: 1.8rem; 
+            margin-top: 0; 
             display: flex; 
-            gap: 0.75rem; 
+            gap: 0.6rem; 
             width: 100%; 
-            max-width: 1350px; 
-            padding: 0 2rem; 
+            max-width: 1400px; 
+            padding: 0 1.5rem; 
+            flex-wrap: wrap;
         }
 
         .tab {
-            padding: 0.85rem 1.8rem;
+            padding: 0.6rem 1.2rem;
             background: rgba(255, 255, 255, 0.04);
-            border-radius: 12px 12px 0 0;
+            border-radius: 10px 10px 0 0;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             border: 1px solid var(--border-color);
             border-bottom: none;
             color: var(--text-muted);
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            user-select: none;
         }
 
         .tab:hover {
@@ -104,19 +70,19 @@
             background: var(--card-bg); 
             color: var(--text-main); 
             border-top: 3px solid var(--primary); 
-            box-shadow: 0 -4px 15px rgba(99, 102, 241, 0.15);
+            box-shadow: 0 -4px 15px rgba(229, 0, 0, 0.15);
         }
 
         .container {
             width: 100%;
-            max-width: 1350px;
-            padding: 2rem;
+            max-width: 1400px;
+            padding: 1.2rem;
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            border-radius: 0 16px 16px 16px;
+            border-radius: 0 12px 12px 12px;
             min-height: 75vh;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* Views */
@@ -137,8 +103,8 @@
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem 1.1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.5px; }
+        th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
+        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
         tr:hover { background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; }
         tr:last-child td { border-bottom: none; }
 
@@ -151,14 +117,32 @@
         .shop-card {
             background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: 14px;
+            padding: 1rem;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.25s;
             text-align: center;
         }
-        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); background: rgba(255,255,255,0.06); }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(229, 0, 0, 0.2); background: rgba(255,255,255,0.06); }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+
+        /* Form Inputs */
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.2);
+            background: #ffffff;
+        }
 
         /* Modal */
         .modal {
@@ -181,16 +165,11 @@
         .detail-item strong { color: var(--text-muted); font-size: 0.82rem; display: block; margin-bottom: 0.25rem; }
         .detail-item span.val { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
         
-        textarea { width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem; min-height: 80px; font-size: 0.9rem; }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        
         button.action-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text-main); transition: all 0.2s; font-size: 0.9rem; }
         button.action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-reply { background: var(--warning); color: black;}
-        .btn-pay { background: var(--primary); }
 
-        .filter-btn { padding: 0.6rem 1.2rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.88rem; }
-        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .filter-btn { padding: 0.55rem 1.1rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-weight: 500; }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(229, 0, 0, 0.3); }
         .filter-btn:hover:not(.active) { background: #f9fafb; }
 
         /* Toast Notifications */
@@ -230,7 +209,7 @@
             .container { padding: 1.2rem; border-radius: 12px; }
             .header { flex-direction: column; gap: 1rem; text-align: center; padding: 1rem; }
             .detail-grid { grid-template-columns: 1fr; }
-            #inventoryView > div { grid-template-columns: 1fr; }
+            #inventoryView > div, #mainProfitView > div.grid-layout { grid-template-columns: 1fr !important; }
             th, td { padding: 0.75rem 0.6rem; font-size: 0.82rem; }
         }
     </style>
@@ -242,7 +221,15 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             METHMI WORK HUB <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: normal;">| Admin Dashboard</span>
         </h1>
-        <button id="logoutBtn" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.85rem;">
+                <option value="en">English</option>
+                <option value="si">සිංහල</option>
+                <option value="ta">தமிழ்</option>
+            </select>
+            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">🟢 Firebase Connected</span>
+            <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
+        </div>
     </div>
 
     <div class="tabs">
@@ -254,17 +241,17 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             Shop Profiles
         </div>
+        <div class="tab" data-tab="mainProfit" onclick="switchTab('mainProfit')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Main Shop Profit & Sales
+        </div>
         <div class="tab" data-tab="inventory" onclick="switchTab('inventory')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             Inventory Manager
         </div>
-        <div class="tab" data-tab="profit" onclick="switchTab('profit')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            Main Shop Profit
-        </div>
-        <div class="tab" data-tab="staff" onclick="switchTab('staff')">
+        <div class="tab" data-tab="staffProfiles" onclick="switchTab('staffProfiles')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            Staff Profile
+            Staff Profiles
         </div>
     </div>
 
@@ -324,23 +311,42 @@
         <!-- Shop Profiles View -->
         <div id="shopsView" class="view">
             <div id="shopListSection">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
-                    <h2 style="font-size: 1.3rem; color: var(--text-main);">Registered Shops Directory</h2>
-                    <button onclick="document.getElementById('addShopModal').style.display='flex'" style="background: var(--primary); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;">+ Add New Shop</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+                    <h2 style="font-size: 1.3rem; color: var(--text-main); margin: 0;">Registered Shops Directory</h2>
+                    <button onclick="openAddShopModal()" style="background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
+                        ➕ Register New Shop Profile
+                    </button>
                 </div>
+
                 <div class="shop-grid" id="shopGrid">
                     <!-- Shop cards populated dynamically -->
                 </div>
             </div>
 
             <div id="singleShopSection" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
-                    <button onclick="backToShops()" style="background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: var(--text-main); border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
-                    <button id="deleteShopBtn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Delete Shop</button>
-                </div>
+                <button onclick="backToShops()" style="background: rgba(255,255,255,0.08); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
                 <h2 id="profileTitle" style="color: var(--text-main); margin-bottom: 1rem;">Shop Profile</h2>
                 
-                <div style="width: 100%; height: 280px; margin: 1rem 0 2rem 0; background: #f3f4f6; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sale (MRP)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="shopTotalMrp">Rs. 0.00</p>
+                    </div>
+                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Loans Issued</h3>
+                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--info); margin-top: 0.2rem;" id="shopTotalLoan">Rs. 0.00</p>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
+                        <h3 style="color: var(--success); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Paid)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--success); margin-top: 0.2rem;" id="shopTotalPaid">Rs. 0.00</p>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.4);">
+                        <h3 style="color: var(--warning); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Pending)</h3>
+                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--warning); margin-top: 0.2rem;" id="shopTotalPending">Rs. 0.00</p>
+                    </div>
+                </div>
+
+                <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 2rem 0; background: #f3f4f6; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <canvas id="shopChart"></canvas>
                 </div>
 
@@ -362,9 +368,162 @@
             </div>
         </div>
 
+        <!-- Main Shop Profit & Sales Manager View -->
+        <div id="mainProfitView" class="view">
+            <!-- Date Filter Controls Header -->
+            <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 1.1rem; color: var(--text-main); margin: 0;">Main Shop Direct Profit & Sales Accounting</h2>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
+                    <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; outline: none; cursor: pointer;">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="3months">3 Months</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                        <option value="custom">Custom Range...</option>
+                    </select>
+
+                    <!-- Custom Range Date Pickers (hidden by default) -->
+                    <div id="customDateRangeContainer" style="display: none; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <input type="date" id="profitStartDate" style="max-width: 140px; padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 6px;">
+                        <span style="color: var(--text-muted);">to</span>
+                        <input type="date" id="profitEndDate" style="max-width: 140px; padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 6px;">
+                        <button onclick="applyCustomDateRange()" class="filter-btn" style="background: var(--primary); border-color: var(--primary); padding: 0.4rem 0.8rem;">Apply Range</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sales (MRP)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="mainTotalMrp">Rs. 0.00</p>
+                </div>
+
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Phone Cost (Buy Price)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: #fca5a5; margin-top: 0.2rem;" id="mainTotalBuyPrice">Rs. 0.00</p>
+                </div>
+
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Leasing Fees (2% MRP)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--warning); margin-top: 0.2rem;" id="mainTotalLeasingFees">Rs. 0.00</p>
+                </div>
+
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Staff Fees (Rs. 500)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--accent-purple); margin-top: 0.2rem;" id="mainTotalStaffFees">Rs. 0.00</p>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
+                    <h3 style="color: var(--success); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">NET PROFIT (ශුද්ධ ලාභය)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 800; color: var(--success); margin-top: 0.2rem;" id="mainTotalNetProfit">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Form and History Grid -->
+            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.2rem;">
+                <!-- Main Shop Direct Sales Entry Form -->
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
+                    <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: var(--text-main);">Main Shop Direct Sale Entry</h2>
+                    <form id="mainSaleForm">
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Date (දිනය)</label>
+                            <input type="date" id="mainSaleDate" required>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">SP Number / Invoice Ref</label>
+                            <input type="text" id="mainSaleSp" required placeholder="e.g. SP-MAIN-101">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Customer Name & NIC</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="mainSaleCustName" placeholder="Name" required style="flex: 1;">
+                                <input type="text" id="mainSaleCustNic" placeholder="NIC" required style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI & Model</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="mainSaleImei" placeholder="IMEI" required style="flex: 1;">
+                                <input type="text" id="mainSaleModel" placeholder="Model" required style="flex: 1;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල)</label>
+                            <input type="number" id="mainSaleMrp" step="0.01" required placeholder="100000.00" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Mobile Buy Price / Cost (අපේ මිලදී ගත් මිල)</label>
+                            <input type="number" id="mainSaleBuyPrice" step="0.01" required placeholder="80000.00" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Leasing Company Fee % (Fintrex etc.)</label>
+                            <input type="number" id="mainSaleLeasePercent" step="0.1" value="2.0" required placeholder="2.0" oninput="calculateMainShopLiveProfit()">
+                            <span id="leaseFeeDisplay" style="font-size: 0.8rem; color: var(--warning); display: block; margin-top: 2px;">Leasing Fee: Rs. 0.00</span>
+                        </div>
+
+                        <div style="margin-bottom: 0.9rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Staff Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                            <input type="text" id="mainSaleStaffName" list="activatorDatalist" required placeholder="Type or select staff name..." autocomplete="off">
+                            <datalist id="activatorDatalist"></datalist>
+                        </div>
+
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Staff Activator Fee (ගෙවන මුදල)</label>
+                            <input type="number" id="mainSaleStaffFee" step="1" value="500" required placeholder="500" oninput="calculateMainShopLiveProfit()">
+                        </div>
+
+                        <!-- Live Calculated Net Profit Banner -->
+                        <div style="background: rgba(16, 185, 129, 0.12); padding: 0.9rem 1.1rem; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 1.2rem;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Calculated Net Profit:</span>
+                            <span id="liveNetProfitVal" style="font-size: 1.35rem; font-weight: 800; color: var(--success);">Rs. 0.00</span>
+                        </div>
+
+                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
+                            Add Main Shop Sale Entry
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Main Shop Sales History Table -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.15rem; color: var(--text-main);">Main Shop Direct Sales History</h2>
+                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 250px;" oninput="renderMainShopProfitView()">
+                    </div>
+                    <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date & SP</th>
+                                    <th>Device & Customer</th>
+                                    <th>Activator</th>
+                                    <th>MRP & Cost</th>
+                                    <th>Fees (2% & 500)</th>
+                                    <th>Net Profit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mainShopTableBody">
+                                <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading main shop sales...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Inventory Manager View -->
         <div id="inventoryView" class="view">
-            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 1.2rem;">
                 <!-- Add Inventory Form -->
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main);">Add Head Office Stock</h2>
@@ -393,7 +552,7 @@
                             <datalist id="shopDatalist"></datalist>
                         </div>
                         
-                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">Add to Head Office Inventory</button>
+                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add to Head Office Inventory</button>
                     </form>
                 </div>
 
@@ -423,68 +582,45 @@
             </div>
         </div>
 
-        <!-- Main Shop Profit & Sales View -->
-        <div id="profitView" class="view">
-            <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-main);">Main Shop Profit & Sales Overview</h2>
+        <!-- Staff Profiles View -->
+        <div id="staffProfilesView" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Activator Staff Profiles
+                </h2>
+            </div>
             
-            <!-- Profit Summary Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
-                <div style="background: linear-gradient(135deg, #e50000 0%, #cc0000 100%); padding: 1.4rem; border-radius: 14px; color: white;">
-                    <h3 style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.4rem; text-transform: uppercase;">Total Sales (MRP)</h3>
-                    <p style="font-size: 1.6rem; font-weight: 700;" id="profitTotalMRP">Rs. 0.00</p>
-                </div>
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 1.4rem; border-radius: 14px; color: white;">
-                    <h3 style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.4rem; text-transform: uppercase;">Total Profit (HO Stock 4%)</h3>
-                    <p style="font-size: 1.6rem; font-weight: 700;" id="profitTotalHO">Rs. 0.00</p>
-                </div>
-                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 1.4rem; border-radius: 14px; color: white;">
-                    <h3 style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.4rem; text-transform: uppercase;">Total Discount Given</h3>
-                    <p style="font-size: 1.6rem; font-weight: 700;" id="profitTotalDiscount">Rs. 0.00</p>
-                </div>
-                <div style="background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); padding: 1.4rem; border-radius: 14px; color: white;">
-                    <h3 style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 0.4rem; text-transform: uppercase;">Net Profit</h3>
-                    <p style="font-size: 1.6rem; font-weight: 700;" id="profitNetTotal">Rs. 0.00</p>
-                </div>
-            </div>
-
-            <!-- Profit Chart -->
-            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
-                <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-main);">Monthly Sales Chart</h3>
-                <div style="width: 100%; height: 300px;">
-                    <canvas id="profitChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Sales Breakdown Table -->
-            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border-color);">
-                <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-main);">Sales Breakdown by Shop</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Shop</th>
-                                <th>Total Sales</th>
-                                <th>HO Stock Sales</th>
-                                <th>Shop Stock Sales</th>
-                                <th>HO Profit (4%)</th>
-                                <th>Devices Sold</th>
-                            </tr>
-                        </thead>
-                        <tbody id="profitTableBody"></tbody>
-                    </table>
-                </div>
+            <div id="staffGrid" class="shop-grid">
+                <!-- Staff cards will be injected here -->
             </div>
         </div>
+    </div>
 
-        <!-- Staff Profile View -->
-        <div id="staffView" class="view">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.3rem; color: var(--text-main);">Activator Staff Profiles</h2>
-                <button onclick="document.getElementById('addStaffModal').style.display='flex'" style="background: var(--primary); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;">+ Add Staff</button>
-            </div>
-            <div class="shop-grid" id="staffGrid">
-                <p style="color: var(--text-muted);">Loading staff profiles...</p>
-            </div>
+    <!-- Add New Shop Profile Modal -->
+    <div id="addShopModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
+            <h2 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
+            <form id="addShopForm">
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop / Branch Name</label>
+                    <input type="text" id="newShopName" placeholder="e.g. PULASTHIGAMA POLONNARUWA" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop Login Email</label>
+                    <input type="email" id="newShopEmail" placeholder="e.g. pulasthigama@methmi.com" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Contact Number</label>
+                    <input type="text" id="newShopPhone" placeholder="e.g. 0771234567">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">City / Location</label>
+                    <input type="text" id="newShopLocation" placeholder="e.g. Polonnaruwa">
+                </div>
+                <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: var(--primary);">Register Shop</button>
+            </form>
         </div>
     </div>
 
@@ -524,97 +660,46 @@
         </div>
     </div>
 
-    <!-- Add Shop Modal -->
-    <div id="addShopModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <span class="modal-close" onclick="document.getElementById('addShopModal').style.display='none'">&times;</span>
-            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Add New Shop</h2>
-            <form id="addShopForm">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Shop Name / Branch</label>
-                    <input type="text" id="newShopName" required placeholder="e.g. Nugegoda Branch" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
+    <!-- Staff Profile Detailed Modal -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="modal-close" onclick="closeStaffModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;" id="staffModalInitials"></div>
+                <div>
+                    <h2 style="font-size: 1.4rem; color: var(--text-main); margin: 0;" id="staffModalName">Staff Name</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Activator Performance & Payments</p>
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Shop Email</label>
-                    <input type="email" id="newShopEmail" required placeholder="shop@methmi.com" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Password</label>
-                    <input type="password" id="newShopPassword" required placeholder="Min 6 characters" minlength="6" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <button type="submit" style="width: 100%; background: var(--primary); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Create Shop Account</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Add Staff Modal -->
-    <div id="addStaffModal" class="modal">
-        <div class="modal-content" style="max-width: 450px;">
-            <span class="modal-close" onclick="document.getElementById('addStaffModal').style.display='none'">&times;</span>
-            <h2 style="font-size: 1.25rem; color: white; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Add Staff Member</h2>
-            <form id="addStaffForm">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Full Name</label>
-                    <input type="text" id="staffName" required placeholder="e.g. Kasun Perera" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Role / Position</label>
-                    <input type="text" id="staffRole" required placeholder="e.g. Sales Executive" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Phone Number</label>
-                    <input type="text" id="staffPhone" required placeholder="e.g. 077 123 4567" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Assigned Shop / Branch</label>
-                    <input type="text" id="staffShop" required placeholder="e.g. Nugegoda Branch" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Basic Salary (Rs.)</label>
-                    <input type="number" id="staffSalary" required placeholder="e.g. 35000" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); color: white; padding: 0.8rem; border-radius: 8px;">
-                </div>
-                <button type="submit" style="width: 100%; background: var(--primary); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add Staff Member</button>
-            </form>
-        </div>
-    </div>
-
-        <!-- Staff Detailed Profile Modal -->
-    <div id="staffDetailModal" class="modal">
-        <div class="modal-content" style="max-width: 800px; width: 95%;">
-            <span class="modal-close" onclick="document.getElementById('staffDetailModal').style.display='none'">&times;</span>
-            <h2 id="staffDetailName" style="font-size: 1.4rem; color: white; margin-bottom: 0.5rem;">Staff Name</h2>
-            <p id="staffDetailRole" style="color: var(--primary); font-weight: 600; margin-bottom: 1.5rem;">Role</p>
+            </div>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                <div class="stat-card" style="background: rgba(30, 41, 59, 0.5);">
-                    <div class="stat-title">Total Activations</div>
-                    <div class="stat-value" id="staffTotalActivations">0</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Activations</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-top: 0.4rem;" id="staffTotalActivations">0</p>
                 </div>
-                <div class="stat-card" style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid var(--success);">
-                    <div class="stat-title">Total Paid (Rs. 500/ea)</div>
-                    <div class="stat-value" style="color: var(--success);" id="staffTotalPaid">Rs. 0</div>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Paid</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--success); margin-top: 0.4rem;" id="staffTotalPaid">Rs. 0.00</p>
                 </div>
-                <div class="stat-card" style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning);">
-                    <div class="stat-title">Total Pending</div>
-                    <div class="stat-value" style="color: var(--warning);" id="staffTotalPending">Rs. 0</div>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Pending Balance</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--warning); margin-top: 0.4rem;" id="staffTotalPending">Rs. 0.00</p>
                 </div>
             </div>
 
-            <h3 style="color: white; margin-bottom: 1rem;">Activation History</h3>
-            <div class="table-container" style="max-height: 350px; overflow-y: auto;">
-                <table class="data-table">
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem;">Activation History</h3>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table>
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>IMEI</th>
-                            <th>Model</th>
-                            <th>Commission</th>
-                            <th>Status</th>
+                            <th>Customer & Device</th>
+                            <th>Fee Amount</th>
+                            <th>Payment Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="staffHistoryBody">
-                        <!-- Loaded via JS -->
+                    <tbody id="staffHistoryTableBody">
                     </tbody>
                 </table>
             </div>
@@ -626,8 +711,33 @@
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
             <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 280px; background: #f3f4f6; border-radius: 10px; overflow: hidden;"></div>
-            <button onclick="stopScanner()" style="background: #f9fafb; border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; margin-top: 1rem; cursor: pointer;">Cancel</button>
+            <div id="reader" style="width: 100%; min-height: 280px; background: #f3f4f6; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-main); outline: none;">
+                    <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
+                </div>
+            </div>
+
+            <button onclick="stopScanner()" style="background: #f9fafb; border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Transfer Stock Modal -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="modal-close" onclick="closeTransferModal()">&times;</span>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Transfer Stock</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;" id="transferItemName">Item: ...</p>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Target Shop / Branch Location</label>
+                <input type="text" id="transferShopInput" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name...">
+            </div>
+            
+            <button id="confirmTransferBtn" class="action-btn" style="width: 100%; background: var(--primary);">Confirm Transfer</button>
         </div>
     </div>
 
@@ -636,8 +746,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -653,20 +763,132 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Secondary app for creating users without signing out the admin
-        const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
-        const secondaryAuth = getAuth(secondaryApp);
+        // Translation Dictionary & Logic
+        const langDict = {
+            "Admin Dashboard": { si: "පරිපාලක පුවරුව", ta: "நிர்வாக டாஷ்போர்டு" },
+            "All Submissions": { si: "සියලුම වාර්තා", ta: "அனைத்து அறிக்கைகளும்" },
+            "Shop Profiles": { si: "අලෙවිසැල් ගිණුම්", ta: "கடை சுயவிவரங்கள்" },
+            "Main Shop Profit & Sales": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම්", ta: "முக்கிய கடை விற்பனை" },
+            "Inventory Manager": { si: "තොග කළමනාකරණය", ta: "பங்கு மேலாளர்" },
+            "Staff Profiles": { si: "කාර්ය මණ්ඩල ගිණුම්", ta: "பணியாளர் சுயவிவரங்கள்" },
+            "Logout": { si: "ඉවත් වන්න", ta: "வெளியேறு" },
+            "All Entries": { si: "සියලුම ඇතුළත් කිරීම්", ta: "அனைத்து உள்ளீடுகளும்" },
+            "Pending Settlements": { si: "ගෙවීමට ඇති මුදල්", ta: "நிலுவையில் உள்ள கொடுப்பனவுகள்" },
+            "Paid / Completed": { si: "ගෙවා නිම කළ", ta: "செலுத்தப்பட்ட / முடிக்கப்பட்ட" },
+            "Date": { si: "දිනය", ta: "தேதி" },
+            "Shop": { si: "අලෙවිසැල", ta: "கடை" },
+            "Customer & Device": { si: "පාරිභෝගිකයා සහ දුරකථනය", ta: "வாடிக்கையாளர் மற்றும் சாதனம்" },
+            "Loan / Settlement": { si: "ණය / පියවීම", ta: "கடன் / தீர்வு" },
+            "Status": { si: "තත්ත්වය", ta: "நிலை" },
+            "Registered Shops Directory": { si: "ලියාපදිංචි අලෙවිසැල්", ta: "பதிவு செய்யப்பட்ட கடைகள்" },
+            "Register New Shop Profile": { si: "නව අලෙවිසැලක් ලියාපදිංචි කරන්න", ta: "புதிய கடையை பதிவு செய்க" },
+            "Back to Shops Directory": { si: "නැවත අලෙවිසැල් පිටුවට", ta: "மீண்டும் கடைகள் பக்கத்திற்கு" },
+            "Shop Profile": { si: "අලෙවිසැල් ගිණුම", ta: "கடை சுயவிவரம்" },
+            "Total Sale (MRP)": { si: "මුළු විකුණුම් (MRP)", ta: "மொத்த விற்பனை (MRP)" },
+            "Total Loans Issued": { si: "ලබා දුන් මුළු ණය", ta: "வழங்கப்பட்ட மொத்த கடன்கள்" },
+            "Settlement (Paid)": { si: "ගෙවා ඇති මුදල්", ta: "தீர்வு (செலுத்தப்பட்டது)" },
+            "Settlement (Pending)": { si: "ගෙවීමට ඇති මුදල්", ta: "தீர்வு (நிலுவையில் உள்ளது)" },
+            "Export CSV": { si: "CSV ලබාගන්න", ta: "CSV ஆக ஏற்றுமதி செய்" },
+            "Main Shop Direct Sale Entry": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම් ඇතුළත් කිරීම", ta: "முக்கிய கடை நேரடி விற்பனை உள்ளீடு" },
+            "Main Shop Direct Sales History": { si: "ප්‍රධාන අලෙවිසැල් විකුණුම් ඉතිහාසය", ta: "முக்கிய கடை நேரடி விற்பனை வரலாறு" },
+            "Add Main Shop Sale Entry": { si: "ප්‍රධාන අලෙවිසැල් විකුණුමක් ඇතුළත් කරන්න", ta: "முக்கிய கடை விற்பனை உள்ளீட்டைச் சேர்க்கவும்" },
+            "Activations": { si: "සක්‍රිය කිරීම්", ta: "செயல்பாடுகள்" },
+            "Pending Fee": { si: "ගෙවීමට ඇති මුදල", ta: "நிலுவையில் உள்ள கட்டணம்" },
+            "Action": { si: "ක්‍රියාව", ta: "செயல்" },
+            "Payment Status": { si: "ගෙවීම් තත්ත්වය", ta: "கட்டண நிலை" },
+            "Fee Amount": { si: "ගාස්තු මුදල", ta: "கட்டண தொகை" },
+            "Live Net Profit:": { si: "ශුද්ධ ලාභය:", ta: "நிகர லாபம்:" },
+            "Search IMEI, SP, NIC, Shop...": { si: "IMEI, SP, NIC, Shop සොයන්න...", ta: "IMEI, SP, NIC, Shop தேட..." }
+        };
+
+        window.walkNodeAndTranslate = function(node, lang) {
+            if (node.nodeType === 3) {
+                const text = node.nodeValue.trim();
+                if (text && !text.includes('{') && !text.includes('}')) {
+                    if (!node.originalText) {
+                        node.originalText = node.nodeValue;
+                    }
+                    const key = node.originalText.trim();
+                    if (lang === 'en') {
+                        node.nodeValue = node.originalText;
+                    } else if (langDict[key] && langDict[key][lang]) {
+                        node.nodeValue = node.originalText.replace(key, langDict[key][lang]);
+                    }
+                }
+            } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+                if (node.tagName === 'INPUT' && node.placeholder) {
+                    if (!node.originalPlaceholder) node.originalPlaceholder = node.placeholder;
+                    const pKey = node.originalPlaceholder.trim();
+                    if (lang === 'en') {
+                        node.placeholder = node.originalPlaceholder;
+                    } else if (langDict[pKey] && langDict[pKey][lang]) {
+                        node.placeholder = langDict[pKey][lang];
+                    }
+                }
+                for (let i = 0; i < node.childNodes.length; i++) {
+                    window.walkNodeAndTranslate(node.childNodes[i], lang);
+                }
+            }
+        };
+
+        window.currentLang = localStorage.getItem('preferredLang') || 'en';
+        
+        window.changeLanguage = function(lang) {
+            window.currentLang = lang;
+            localStorage.setItem('preferredLang', lang);
+            document.getElementById('langSwitcher').value = lang;
+            window.walkNodeAndTranslate(document.body, lang);
+        };
+        
+        // Call it initially after a small delay to ensure DOM is ready
+        setTimeout(() => window.changeLanguage(window.currentLang), 500);
+
+        // Auto-translate dynamic content
+        let isTranslating = false;
+        const observer = new MutationObserver((mutations) => {
+            if (isTranslating || window.currentLang === 'en') return;
+            let hasNewNodes = mutations.some(m => m.addedNodes.length > 0);
+            if (hasNewNodes) {
+                isTranslating = true;
+                window.walkNodeAndTranslate(document.body, window.currentLang);
+                setTimeout(() => { isTranslating = false; }, 50);
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Connection Status Listener
+        window.addEventListener('online', () => {
+            const badge = document.getElementById('connectionBadge');
+            if (badge) {
+                badge.style.background = 'rgba(16,185,129,0.2)';
+                badge.style.borderColor = 'rgba(16,185,129,0.4)';
+                badge.style.color = 'var(--success)';
+                badge.innerHTML = '🟢 Firebase Connected';
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            const badge = document.getElementById('connectionBadge');
+            if (badge) {
+                badge.style.background = 'rgba(239,68,68,0.2)';
+                badge.style.borderColor = 'rgba(239,68,68,0.4)';
+                badge.style.color = '#fca5a5';
+                badge.innerHTML = '🔴 Network Offline';
+            }
+        });
 
         let allSales = [];
-        let allStaff = [];
-        let currentViewedStaff = null;
+        let allMainShopSales = [];
+        let registeredShopsList = [];
         let currentModalDocId = null;
         let chartInstance = null;
         let currentFilter = 'All';
+        let currentProfitRange = 'today';
 
         // Toast Helper
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = 'toast';
             
@@ -685,65 +907,6 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         };
-
-        // Auth Check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const adminEmails = ['admin@methmi.com', 'methmimobilepvtltd@gmail.com', 'ddmusiccenter8@gmail.com'];
-                const isAdmin = user.email.toLowerCase().includes('admin') || adminEmails.includes(user.email.toLowerCase());
-                if (!isAdmin) {
-                    window.location.href = 'shop.html';
-                } else {
-                    loadAllData();
-                    loadInventoryData();
-                    window.doLogout = function() {
-                        signOut(auth).then(() => {
-                            window.location.href = 'index.html';
-                        });
-                    };
-
-                    // Add Shop Form Logic
-                    document.getElementById('addShopForm').addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const shopEmail = document.getElementById('newShopEmail').value.trim();
-                        const shopPassword = document.getElementById('newShopPassword').value;
-                        
-                        try {
-                            await createUserWithEmailAndPassword(secondaryAuth, shopEmail, shopPassword);
-                            showToast("Shop account created successfully!", "success");
-                            document.getElementById('addShopModal').style.display = 'none';
-                            document.getElementById('addShopForm').reset();
-                        } catch (err) {
-                            console.error("Create shop error:", err);
-                            showToast("Error creating shop: " + err.message, "error");
-                        }
-                    });
-
-                    // Delete Shop Logic
-                    document.getElementById('deleteShopBtn').addEventListener('click', async () => {
-                        if (!window.currentViewedShop) return;
-                        
-                        if (confirm("Are you sure you want to delete this shop and ALL its sales records? This cannot be undone.")) {
-                            try {
-                                const shopSales = allSales.filter(s => s.shopId === window.currentViewedShop);
-                                for (let s of shopSales) {
-                                    await deleteDoc(doc(db, "sales", s.id));
-                                }
-                                showToast("Shop and all related sales records deleted.", "success");
-                                backToShops();
-                            } catch (err) {
-                                console.error("Delete shop error:", err);
-                                showToast("Failed to delete shop records: " + err.message, "error");
-                            }
-                        }
-                    });
-                }
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         // Tab Switching
         window.switchTab = function(tabName) {
@@ -765,28 +928,95 @@
             renderAllSubmissions();
         };
 
+        // Logout Action
+        window.doLogout = async function() {
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.error("Signout error:", e);
+            }
+            window.location.href = 'index.html';
+        };
+
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', window.doLogout);
+        }
+
+        // Auth Check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const adminEmails = [
+                    'admin@methmi.com', 
+                    'methmimobilepvtltd@gmail.com', 
+                    'ddmusiccenter8@gmail.com'
+                ];
+                const isAdmin = user.email.toLowerCase().includes('admin') || 
+                                adminEmails.includes(user.email.toLowerCase());
+
+                if (!isAdmin) {
+                    window.location.href = 'shop.html';
+                }
+            }
+        });
+
+        // Immediate Data Load on script execution
+        try {
+            loadAllData();
+            loadInventoryData();
+            loadRegisteredShops();
+            loadMainShopSalesData();
+            loadActivatorStaffDatalist();
+            if (document.getElementById('mainSaleDate')) {
+                document.getElementById('mainSaleDate').valueAsDate = new Date();
+            }
+        } catch (e) {
+            console.error("Immediate load error:", e);
+        }
+
+        // Load All Submissions
         function loadAllData() {
-            const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                allSales = [];
-                const uniqueShops = new Set();
+            // Immediate HTTP fetch backup
+            getDocs(collection(db, "sales")).then((snapshot) => {
+                if (snapshot && !snapshot.empty) {
+                    processSalesSnapshot(snapshot);
+                }
+            }).catch(e => console.error("getDocs sales error:", e));
 
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    data.id = docSnap.id;
-                    allSales.push(data);
-                    if (data.shopId) uniqueShops.add(data.shopId);
-                });
-
-                renderAllSubmissions();
-                renderShopDirectory(Array.from(uniqueShops));
-                renderProfitView();
-                renderActivatorStaffProfiles();
+            // Realtime listener
+            onSnapshot(collection(db, "sales"), (snapshot) => {
+                processSalesSnapshot(snapshot);
             }, (err) => {
                 console.error("Firestore snapshot error:", err);
-                showToast("Failed to sync sales data: " + err.message, "error");
+                const tbody = document.getElementById('allSubmissionsBody');
+                if (tbody && (!allSales || allSales.length === 0)) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 2rem;">Database Sync Error: ' + err.message + '</td></tr>';
+                }
             });
+        }
+
+        function processSalesSnapshot(snapshot) {
+            const tbody = document.getElementById('allSubmissionsBody');
+            allSales = [];
+            const uniqueShops = new Set();
+
+            if (snapshot.empty) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submission records found in database.</td></tr>';
+                renderAllSubmissions();
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                data.id = docSnap.id;
+                allSales.push(data);
+                if (data.shopId) uniqueShops.add(data.shopId);
+            });
+
+            allSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            renderAllSubmissions();
+            renderShopDirectory(Array.from(uniqueShops));
         }
 
         window.renderAllSubmissions = function() {
@@ -799,7 +1029,6 @@
 
             const searchTerm = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
 
-            // Calculate overall totals accurately
             allSales.forEach(data => {
                 const s = parseFloat(data.settlement) || 0;
                 overallLoan += (parseFloat(data.loanAmount) || 0);
@@ -904,27 +1133,51 @@
             showToast("CSV report generated successfully!", "success");
         };
 
-        // Shop Directory
-        function renderShopDirectory(shops) {
+        // Registered Shops Directory & Modal
+        function loadRegisteredShops() {
+            onSnapshot(collection(db, "registered_shops"), (snapshot) => {
+                registeredShopsList = [];
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    d.id = docSnap.id;
+                    registeredShopsList.push(d);
+                });
+                renderShopDirectory();
+            }, (err) => console.error("Registered shops fetch error:", err));
+        }
+
+        function renderShopDirectory(discoveredShops = []) {
             const grid = document.getElementById('shopGrid');
             grid.innerHTML = '';
 
-            if (shops.length === 0) {
-                grid.innerHTML = '<p style="color:var(--text-muted)">No registered shops yet.</p>';
+            const allShopsSet = new Set();
+            registeredShopsList.forEach(s => { if (s.email) allShopsSet.add(s.email.toLowerCase()) });
+            
+            allSales.forEach(s => { if (s.shopId) allShopsSet.add(s.shopId.toLowerCase()) });
+            discoveredShops.forEach(s => { if (s) allShopsSet.add(s.toLowerCase()) });
+
+            const shopsArray = Array.from(allShopsSet);
+
+            if (shopsArray.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted)">No registered shops yet. Click "Register New Shop Profile" above.</p>';
                 return;
             }
 
-            shops.forEach(shop => {
-                const shopSales = allSales.filter(s => s.shopId === shop);
+            shopsArray.forEach(shopEmail => {
+                const shopSales = allSales.filter(s => (s.shopId || '').toLowerCase() === shopEmail);
                 const totalLoan = shopSales.reduce((sum, s) => sum + (parseFloat(s.loanAmount)||0), 0);
+                const regInfo = registeredShopsList.find(r => (r.email || '').toLowerCase() === shopEmail);
+                
+                const displayName = regInfo ? regInfo.name : shopEmail.split('@')[0].toUpperCase();
                 
                 const card = document.createElement('div');
                 card.className = 'shop-card';
-                card.onclick = () => viewShopProfile(shop, shopSales);
+                card.onclick = () => viewShopProfile(shopEmail, shopSales);
                 card.innerHTML = `
-                    <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${shop.split('@')[0].toUpperCase()}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">${shop}</p>
-                    <div style="padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
+                    ${regInfo && regInfo.phone ? `<p style="color: var(--accent-purple); font-size: 0.8rem;">📞 ${regInfo.phone}</p>` : ''}
+                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
                         <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
                     </div>
@@ -933,17 +1186,75 @@
             });
         }
 
+        window.openAddShopModal = function() {
+            document.getElementById('addShopModal').style.display = 'flex';
+        };
+
+        window.closeAddShopModal = function() {
+            document.getElementById('addShopModal').style.display = 'none';
+        };
+
+        document.getElementById('addShopForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveShopBtn');
+            btn.disabled = true;
+            btn.innerText = 'Registering...';
+
+            const name = document.getElementById('newShopName').value.trim();
+            const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
+            const phone = document.getElementById('newShopPhone').value.trim();
+            const location = document.getElementById('newShopLocation').value.trim();
+
+            addDoc(collection(db, "registered_shops"), {
+                name: name,
+                email: email,
+                phone: phone,
+                location: location,
+                timestamp: Date.now()
+            }).then(() => {
+                showToast(`Shop ${name} registered successfully!`, "success");
+                document.getElementById('addShopForm').reset();
+                closeAddShopModal();
+            }).catch(err => {
+                showToast("Failed to register shop: " + err.message, "error");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Register Shop';
+            });
+        });
+
         window.viewShopProfile = function(shopEmail, shopSales) {
-            window.currentViewedShop = shopEmail;
             document.getElementById('shopListSection').style.display = 'none';
             document.getElementById('singleShopSection').style.display = 'block';
             document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
 
-            // Chart
+            let totalMrp = 0;
+            let totalLoan = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+
             const salesByDate = {};
             shopSales.forEach(s => {
-                if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + (parseFloat(s.loanAmount)||0);
+                const mrp = parseFloat(s.mrp) || 0;
+                const loan = parseFloat(s.loanAmount) || 0;
+                const set = parseFloat(s.settlement) || 0;
+
+                totalMrp += mrp;
+                totalLoan += loan;
+                if (s.paymentStatus === 'Paid') {
+                    totalPaid += set;
+                } else {
+                    totalPending += set;
+                }
+
+                if (s.date) salesByDate[s.date] = (salesByDate[s.date] || 0) + loan;
             });
+
+            document.getElementById('shopTotalMrp').innerText = 'Rs. ' + totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalLoan').innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('shopTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
+
             const dates = Object.keys(salesByDate).sort();
             const amounts = dates.map(d => salesByDate[d]);
 
@@ -952,12 +1263,11 @@
                 type: 'bar',
                 data: {
                     labels: dates,
-                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#6366f1', borderRadius: 6 }]
+                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#e50000', borderRadius: 6 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Table
             const tbody = document.getElementById('singleShopTable');
             tbody.innerHTML = '';
             shopSales.forEach(data => {
@@ -1099,9 +1409,267 @@
             }
         });
 
+        // ==========================================
+        // MAIN SHOP DIRECT PROFIT & SALES MANAGER LOGIC
+        // ==========================================
+        
+        function loadMainShopSalesData() {
+            onSnapshot(collection(db, "main_shop_sales"), (snapshot) => {
+                allMainShopSales = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    allMainShopSales.push(data);
+                });
+
+                // Auto update Staff Autocomplete Datalist
+                const staffSet = new Set();
+                allMainShopSales.forEach(s => { if (s.staffName) staffSet.add(s.staffName.trim()) });
+                updateActivatorDatalist(Array.from(staffSet));
+
+                renderMainShopProfitView();
+                renderStaffProfiles(); // Re-render staff profiles when data changes
+            }, (err) => console.error("Main shop sales fetch error:", err));
+        }
+
+        window.calculateMainShopLiveProfit = function() {
+            const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
+            const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
+            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+
+            const leaseFee = mrp * (leasePct / 100);
+            document.getElementById('leaseFeeDisplay').innerText = `Leasing Fee (${leasePct}%): Rs. ` + leaseFee.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            const netProfit = mrp - buyPrice - leaseFee - staffFee;
+            const profitEl = document.getElementById('liveNetProfitVal');
+            profitEl.innerText = 'Rs. ' + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            if (netProfit < 0) profitEl.style.color = 'var(--danger)';
+            else profitEl.style.color = 'var(--success)';
+        };
+
+        document.getElementById('mainSaleForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('mainSaleSubmitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving Entry...';
+
+            const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
+            const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
+            const leaseFee = mrp * (leasePct / 100);
+            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+            const staffName = document.getElementById('mainSaleStaffName').value.trim();
+            const netProfit = mrp - buyPrice - leaseFee - staffFee;
+
+            const payload = {
+                date: document.getElementById('mainSaleDate').value,
+                spNumber: document.getElementById('mainSaleSp').value.trim(),
+                custName: document.getElementById('mainSaleCustName').value.trim(),
+                custNic: document.getElementById('mainSaleCustNic').value.trim(),
+                imei: document.getElementById('mainSaleImei').value.trim(),
+                model: document.getElementById('mainSaleModel').value.trim(),
+                mrp: mrp,
+                buyPrice: buyPrice,
+                leasePercent: leasePct,
+                leaseFee: leaseFee,
+                staffName: staffName,
+                staffFee: staffFee,
+                netProfit: netProfit,
+                timestamp: Date.now()
+            };
+
+            addDoc(collection(db, "main_shop_sales"), payload).then(() => {
+                showToast("Main shop sale entry added!", "success");
+                saveActivatorStaffName(staffName);
+                document.getElementById('mainSaleForm').reset();
+                document.getElementById('mainSaleDate').valueAsDate = new Date();
+                document.getElementById('mainSaleLeasePercent').value = "2.0";
+                document.getElementById('mainSaleStaffFee').value = "500";
+                calculateMainShopLiveProfit();
+            }).catch(err => {
+                showToast("Error adding sale entry: " + err.message, "error");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = 'Add Main Shop Sale Entry';
+            });
+        });
+
+        // Activator Staff Auto-Complete
+        function saveActivatorStaffName(name) {
+            if (!name) return;
+            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+            if (!saved.includes(name)) {
+                saved.push(name);
+                localStorage.setItem('activatorStaffNames', JSON.stringify(saved));
+                updateActivatorDatalist(saved);
+            }
+        }
+
+        function loadActivatorStaffDatalist() {
+            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+            updateActivatorDatalist(saved);
+        }
+
+        function updateActivatorDatalist(namesArray) {
+            const datalist = document.getElementById('activatorDatalist');
+            if (!datalist) return;
+            const uniqueNames = new Set(namesArray);
+            datalist.innerHTML = '';
+            uniqueNames.forEach(n => {
+                if (n) {
+                    const opt = document.createElement('option');
+                    opt.value = n;
+                    datalist.appendChild(opt);
+                }
+            });
+        }
+
+        // Date Range Filtering for Main Shop
+        window.handleMainProfitDateSelection = function(val) {
+            if (val === 'custom') {
+                document.getElementById('customDateRangeContainer').style.display = 'flex';
+            } else {
+                document.getElementById('customDateRangeContainer').style.display = 'none';
+                filterMainShopByDateRange(val);
+            }
+        };
+
+        window.filterMainShopByDateRange = function(rangeType) {
+            currentProfitRange = rangeType;
+            renderMainShopProfitView();
+        };
+
+        window.applyCustomDateRange = function() {
+            currentProfitRange = 'custom';
+            renderMainShopProfitView();
+        };
+
+        function renderMainShopProfitView() {
+            const tbody = document.getElementById('mainShopTableBody');
+            tbody.innerHTML = '';
+
+            const now = new Date();
+            const todayStr = now.toISOString().slice(0, 10);
+            
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0,0,0,0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOf3Months = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+            const customStart = document.getElementById('profitStartDate')?.value || '';
+            const customEnd = document.getElementById('profitEndDate')?.value || '';
+            const searchInput = (document.getElementById('mainShopSearch')?.value || '').toLowerCase();
+
+            let totalMrp = 0;
+            let totalBuyPrice = 0;
+            let totalLeaseFees = 0;
+            let totalStaffFees = 0;
+            let totalNetProfit = 0;
+
+            const filteredSales = allMainShopSales.filter(item => {
+                if (!item.date) return true;
+                const itemDate = new Date(item.date);
+                
+                if (currentProfitRange === 'today') {
+                    return item.date === todayStr;
+                } else if (currentProfitRange === 'week') {
+                    return itemDate >= startOfWeek;
+                } else if (currentProfitRange === 'month') {
+                    return itemDate >= startOfMonth;
+                } else if (currentProfitRange === '3months') {
+                    return itemDate >= startOf3Months;
+                } else if (currentProfitRange === 'year') {
+                    return itemDate >= startOfYear;
+                } else if (currentProfitRange === 'custom') {
+                    if (customStart && item.date < customStart) return false;
+                    if (customEnd && item.date > customEnd) return false;
+                }
+                
+                if (searchInput) {
+                    const matchSearch = (item.imei || '').toLowerCase().includes(searchInput) ||
+                                        (item.custNic || '').toLowerCase().includes(searchInput) ||
+                                        (item.spNumber || '').toLowerCase().includes(searchInput) ||
+                                        (item.model || '').toLowerCase().includes(searchInput) ||
+                                        (item.custName || '').toLowerCase().includes(searchInput);
+                    if (!matchSearch) return false;
+                }
+                
+                return true;
+            });
+
+            filteredSales.forEach(item => {
+                const mrp = parseFloat(item.mrp) || 0;
+                const buy = parseFloat(item.buyPrice) || 0;
+                const lease = parseFloat(item.leaseFee) || 0;
+                const staff = parseFloat(item.staffFee) || 0;
+                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+
+                totalMrp += mrp;
+                totalBuyPrice += buy;
+                totalLeaseFees += lease;
+                totalStaffFees += staff;
+                totalNetProfit += net;
+            });
+
+            document.getElementById('mainTotalMrp').innerText = 'Rs. ' + totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalBuyPrice').innerText = 'Rs. ' + totalBuyPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalLeasingFees').innerText = 'Rs. ' + totalLeaseFees.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('mainTotalStaffFees').innerText = 'Rs. ' + totalStaffFees.toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            const netProfitEl = document.getElementById('mainTotalNetProfit');
+            netProfitEl.innerText = 'Rs. ' + totalNetProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            if (totalNetProfit < 0) netProfitEl.style.color = 'var(--danger)';
+            else netProfitEl.style.color = 'var(--success)';
+
+            if (filteredSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records for selected time range.</td></tr>';
+                return;
+            }
+
+            filteredSales.forEach(item => {
+                const tr = document.createElement('tr');
+                const mrp = parseFloat(item.mrp) || 0;
+                const buy = parseFloat(item.buyPrice) || 0;
+                const lease = parseFloat(item.leaseFee) || 0;
+                const staff = parseFloat(item.staffFee) || 0;
+                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+
+                let profitColor = net >= 0 ? 'var(--success)' : 'var(--danger)';
+
+                tr.innerHTML = `
+                    <td><strong>${item.date || '-'}</strong><br><span style="color:var(--text-muted)">${item.spNumber || '-'}</span></td>
+                    <td><strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span></td>
+                    <td><span class="badge badge-new">${item.staffName || 'Staff'}</span></td>
+                    <td>MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span></td>
+                    <td>Lease 2%: Rs. ${lease.toLocaleString()}<br>Staff: Rs. ${staff.toLocaleString()}</td>
+                    <td><strong style="color:${profitColor}; font-size:1rem;">Rs. ${net.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></td>
+                    <td>
+                        <button onclick="deleteMainShopSale('${item.id}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Delete Record">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.deleteMainShopSale = async function(id) {
+            if (!confirm("Delete this Main Shop direct sale record?")) return;
+            try {
+                await deleteDoc(doc(db, "main_shop_sales", id));
+                showToast("Record deleted", "warning");
+            } catch (e) {
+                showToast("Failed to delete record: " + e.message, "error");
+            }
+        };
+
         // Inventory Logic
         function loadInventoryData() {
-            const q = query(collection(db, "inventory"), orderBy("timestamp", "desc"));
+            const q = query(collection(db, "inventory"));
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('inventoryTableBody');
                 const datalist = document.getElementById('shopDatalist');
@@ -1136,7 +1704,10 @@
                         <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
                         <td>${badge}</td>
                         <td>
-                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Remove Stock">
+                            <button onclick="openTransferModal('${docId}', '${data.imei}', '${data.model}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
+                                🔄
+                            </button>
+                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
                                 🗑️
                             </button>
                         </td>
@@ -1144,7 +1715,6 @@
                     tbody.appendChild(tr);
                 });
 
-                // Update Dropdown List
                 datalist.innerHTML = '';
                 uniqueLocations.forEach(loc => {
                     if (loc) {
@@ -1202,15 +1772,252 @@
             });
         });
 
+        // Stock Transfer Logic
+        let currentTransferDocId = null;
+        window.openTransferModal = function(docId, imei, model) {
+            currentTransferDocId = docId;
+            document.getElementById('transferItemName').innerText = `Item: ${model} (IMEI: ${imei})`;
+            document.getElementById('transferShopInput').value = '';
+            document.getElementById('transferModal').style.display = 'flex';
+        };
+
+        window.closeTransferModal = function() {
+            currentTransferDocId = null;
+            document.getElementById('transferModal').style.display = 'none';
+        };
+
+        const confirmTransferBtn = document.getElementById('confirmTransferBtn');
+        if (confirmTransferBtn) {
+            confirmTransferBtn.addEventListener('click', async () => {
+                const targetShop = document.getElementById('transferShopInput').value.trim();
+                if (!targetShop) return showToast("Please enter or select a target shop", "warning");
+                if (!currentTransferDocId) return;
+
+                const btn = confirmTransferBtn;
+                btn.disabled = true;
+                btn.innerText = 'Transferring...';
+
+                try {
+                    await updateDoc(doc(db, "inventory", currentTransferDocId), { shop: targetShop });
+                    showToast(`Stock transferred to ${targetShop} successfully!`, "success");
+                    closeTransferModal();
+                } catch (e) {
+                    console.error("Transfer error:", e);
+                    showToast("Failed to transfer stock: " + e.message, "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Confirm Transfer';
+                }
+            });
+        }
+
+        // ==========================================
+        // STAFF PROFILES & ACTIVATOR PAYMENTS
+        // ==========================================
+
+        function renderStaffProfiles() {
+            const grid = document.getElementById('staffGrid');
+            if (!grid) return;
+            
+            const staffMap = {};
+            
+            allMainShopSales.forEach(s => {
+                const name = (s.staffName || '').trim();
+                if (!name) return;
+                
+                const lowerName = name.toLowerCase();
+                if (!staffMap[lowerName]) {
+                    staffMap[lowerName] = {
+                        originalName: name,
+                        sales: [],
+                        totalCount: 0,
+                        totalPaid: 0,
+                        totalPending: 0
+                    };
+                }
+                
+                staffMap[lowerName].sales.push(s);
+                staffMap[lowerName].totalCount++;
+                
+                const fee = parseFloat(s.staffFee) || 0;
+                if (s.staffPaymentStatus === 'Paid') {
+                    staffMap[lowerName].totalPaid += fee;
+                } else {
+                    // Treat missing or 'Pending' as pending
+                    staffMap[lowerName].totalPending += fee;
+                }
+            });
+            
+            const staffArray = Object.values(staffMap).sort((a, b) => b.totalPending - a.totalPending);
+            
+            grid.innerHTML = '';
+            
+            if (staffArray.length === 0) {
+                grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1;">No activator staff records found yet.</p>';
+                return;
+            }
+            
+            staffArray.forEach(staff => {
+                const initial = staff.originalName.charAt(0).toUpperCase();
+                
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.onclick = () => viewStaffProfile(staff.originalName, staff.sales, staff.totalCount, staff.totalPaid, staff.totalPending);
+                
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
+                            ${initial}
+                        </div>
+                        <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
+                    </div>
+                    
+                    <div style="background: #f3f4f6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Activations:</span>
+                            <span style="color: var(--text-main); font-weight: bold;">${staff.totalCount} Phones</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Pending Fee:</span>
+                            <span style="color: var(--warning); font-weight: bold;">Rs. ${staff.totalPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn" style="width: 100%; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: white;">View Profile Details</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.viewStaffProfile = function(name, sales, totalCount, totalPaid, totalPending) {
+            document.getElementById('staffModalName').innerText = name;
+            document.getElementById('staffModalInitials').innerText = name.charAt(0).toUpperCase();
+            
+            document.getElementById('staffTotalActivations').innerText = totalCount;
+            document.getElementById('staffTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('staffTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            const tbody = document.getElementById('staffHistoryTableBody');
+            tbody.innerHTML = '';
+            
+            // Sort sales by newest first
+            const sortedSales = [...sales].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            
+            sortedSales.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.style.cursor = 'pointer';
+                tr.title = "Click to view more details";
+                tr.onclick = function(e) {
+                    if (e.target.tagName === 'BUTTON') return; // Prevent expanding when clicking the action button
+                    const detailsRow = this.nextElementSibling;
+                    if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
+                        if (detailsRow.style.display === 'none') {
+                            detailsRow.style.display = 'table-row';
+                            this.style.background = 'rgba(255,255,255,0.05)';
+                        } else {
+                            detailsRow.style.display = 'none';
+                            this.style.background = '';
+                        }
+                    }
+                };
+
+                const isPaid = s.staffPaymentStatus === 'Paid';
+                const fee = parseFloat(s.staffFee) || 0;
+                
+                const statusBadge = isPaid 
+                    ? '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.2)">Paid</span>' 
+                    : '<span class="badge badge-replied">Pending</span>';
+                    
+                const actionBtn = isPaid
+                    ? `<button disabled style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: not-allowed; font-size: 0.75rem;">Done</button>`
+                    : `<button onclick="markStaffFeePaid('${s.id}')" style="background: var(--success); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;">Mark as Paid</button>`;
+
+                tr.innerHTML = `
+                    <td>${s.date || '-'}</td>
+                    <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
+                    <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+
+                // Expandable Details Row
+                const detailsTr = document.createElement('tr');
+                detailsTr.className = 'staff-details-row';
+                detailsTr.style.display = 'none';
+                detailsTr.style.background = 'rgba(0,0,0,0.2)';
+                detailsTr.innerHTML = `
+                    <td colspan="5" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Customer NIC</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.custNic || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Contact Number</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.contact || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">IMEI Number</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.imei || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Storage / RAM</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.storage || '-'}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Retail Price (MRP)</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Price</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(detailsTr);
+            });
+            
+            document.getElementById('staffModal').style.display = 'flex';
+        };
+
+        window.closeStaffModal = function() {
+            document.getElementById('staffModal').style.display = 'none';
+        };
+
+        window.markStaffFeePaid = async function(docId) {
+            if(!confirm("Mark this activation fee as paid?")) return;
+            try {
+                await updateDoc(doc(db, "main_shop_sales", docId), { staffPaymentStatus: 'Paid' });
+                showToast("Fee marked as paid successfully!", "success");
+                // The onSnapshot will automatically re-render the profiles, 
+                // but we also need to close the modal or re-render it. 
+                // For simplicity, we close it so they can click again to see the updated view.
+                closeStaffModal();
+            } catch(e) {
+                console.error(e);
+                showToast("Failed to update fee status: " + e.message, "error");
+            }
+        };
+
         // Barcode Scanner Logic
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
+        let currentScannerInputId = null;
+
         window.startScanner = function(inputId) {
+            currentScannerInputId = inputId;
+            document.getElementById('manualScannerInput').value = '';
             document.getElementById('scannerModal').style.display = 'flex';
             
             try {
-                html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+                
+                const config = { 
                     fps: 10, 
-                    qrbox: { width: 250, height: 100 },
+                    qrbox: { width: 300, height: 60 },
                     formatsToSupport: [ 
                         Html5QrcodeSupportedFormats.CODE_128, 
                         Html5QrcodeSupportedFormats.CODE_39, 
@@ -1218,298 +2025,67 @@
                         Html5QrcodeSupportedFormats.EAN_8, 
                         Html5QrcodeSupportedFormats.UPC_A 
                     ]
-                }, false);
-                    
-                html5QrcodeScanner.render((decodedText) => {
-                    document.getElementById(inputId).value = decodedText;
-                    stopScanner();
-                    showToast("Barcode scanned: " + decodedText, "success");
-                }, (error) => { /* scanning */ });
+                };
+
+                html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    config,
+                    (decodedText) => {
+                        const inputEl = document.getElementById(inputId);
+                        inputEl.value = decodedText;
+                        stopScanner();
+                        showToast("Barcode scanned: " + decodedText, "success");
+                        
+                        const event = new Event('input', { bubbles: true });
+                        inputEl.dispatchEvent(event);
+                    },
+                    (errorMessage) => {
+                        // scanning - ignore
+                    }
+                ).catch(err => {
+                    console.error("Camera error:", err);
+                });
             } catch (err) {
                 console.error("Scanner error:", err);
                 showToast("Could not access camera scanner", "error");
             }
         };
 
+        window.submitManualScan = function() {
+            const val = document.getElementById('manualScannerInput').value.trim();
+            if (!val) return;
+            const inputEl = document.getElementById(currentScannerInputId);
+            if (inputEl) {
+                inputEl.value = val;
+                const event = new Event('input', { bubbles: true });
+                inputEl.dispatchEvent(event);
+                showToast("Entered manually: " + val, "success");
+            }
+            stopScanner();
+        };
+
         window.stopScanner = function() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(e => console.error(e));
-                html5QrcodeScanner = null;
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(e => console.error(e));
             }
             document.getElementById('scannerModal').style.display = 'none';
         };
 
-        // ====== PROFIT VIEW LOGIC ======
-        let profitChartInstance = null;
-
-        function renderProfitView() {
-            let totalMRP = 0;
-            let totalHOProfit = 0;
-            let totalDiscount = 0;
-            const shopBreakdown = {};
-            const monthlyData = {};
-
-            allSales.forEach(sale => {
-                const mrp = parseFloat(sale.loanAmount) || 0;
-                const shopId = sale.shopId || 'Unknown';
-                const isHO = sale.stockSource === 'HO';
-                
-                totalMRP += mrp;
-                if (isHO) {
-                    totalHOProfit += mrp * 0.04;
-                } else {
-                    totalDiscount += mrp * 0.04;
-                }
-
-                if (!shopBreakdown[shopId]) {
-                    shopBreakdown[shopId] = { totalSales: 0, hoSales: 0, shopSales: 0, hoProfit: 0, devices: 0 };
-                }
-                shopBreakdown[shopId].totalSales += mrp;
-                shopBreakdown[shopId].devices += 1;
-                if (isHO) {
-                    shopBreakdown[shopId].hoSales += mrp;
-                    shopBreakdown[shopId].hoProfit += mrp * 0.04;
-                } else {
-                    shopBreakdown[shopId].shopSales += mrp;
-                }
-
-                // Monthly grouping
-                const dateStr = sale.date || '';
-                const month = dateStr.substring(0, 7) || 'Unknown';
-                if (!monthlyData[month]) monthlyData[month] = 0;
-                monthlyData[month] += mrp;
-            });
-
-            const netProfit = totalHOProfit - totalDiscount;
-
-            document.getElementById('profitTotalMRP').innerText = 'Rs. ' + totalMRP.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('profitTotalHO').innerText = 'Rs. ' + totalHOProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('profitTotalDiscount').innerText = 'Rs. ' + totalDiscount.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('profitNetTotal').innerText = 'Rs. ' + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
-
-            // Render chart
-            const months = Object.keys(monthlyData).sort();
-            const amounts = months.map(m => monthlyData[m]);
-
-            if (profitChartInstance) profitChartInstance.destroy();
-            const ctx = document.getElementById('profitChart');
-            if (ctx) {
-                profitChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: months,
-                        datasets: [{ 
-                            label: 'Monthly Sales (Rs.)', 
-                            data: amounts, 
-                            backgroundColor: '#e50000', 
-                            borderRadius: 6 
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            }
-
-            // Render table
-            const tbody = document.getElementById('profitTableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                const shopIds = Object.keys(shopBreakdown).sort();
-                if (shopIds.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No sales data available yet.</td></tr>';
-                    return;
-                }
-                shopIds.forEach(shopId => {
-                    const d = shopBreakdown[shopId];
-                    const shopName = shopId.split('@')[0].toUpperCase();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${shopName}</strong><br><span style="color:var(--text-muted); font-size:0.8rem;">${shopId}</span></td>
-                        <td>Rs. ${d.totalSales.toLocaleString()}</td>
-                        <td style="color: var(--success);">Rs. ${d.hoSales.toLocaleString()}</td>
-                        <td style="color: var(--warning);">Rs. ${d.shopSales.toLocaleString()}</td>
-                        <td style="color: var(--primary); font-weight: 700;">Rs. ${d.hoProfit.toLocaleString()}</td>
-                        <td>${d.devices}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        // ====== STAFF PROFILE LOGIC ======
-        function loadStaffData() {
-            const q = query(collection(db, "staff"), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snapshot) => {
-                allStaff = [];
-                snapshot.forEach(docSnap => {
-                    let d = docSnap.data();
-                    d.id = docSnap.id;
-                    allStaff.push(d);
-                });
-                renderActivatorStaffProfiles();
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
         }
-
-        window.renderActivatorStaffProfiles = function() {
-            const grid = document.getElementById('staffGrid');
-            if(!grid) return;
-            grid.innerHTML = '';
-
-            if (allStaff.length === 0) {
-                grid.innerHTML = '<p style="color: var(--text-muted);">No staff members added yet. Click "+ Add Staff" to add one.</p>';
-                return;
-            }
-
-            allStaff.forEach(staff => {
-                // Calculate stats based on allSales
-                let activations = 0;
-                let pendingAmount = 0;
-                
-                allSales.forEach(sale => {
-                    if (sale.activatorName === staff.name) {
-                        activations++;
-                        // Treat 'Pending' or undefined as pending for backward compatibility if needed, but per plan we set it to 'Pending'.
-                        const status = sale.activatorPaymentStatus || 'Pending';
-                        if (status === 'Pending') {
-                            pendingAmount += 500;
-                        }
-                    }
-                });
-
-                const card = document.createElement('div');
-                card.className = 'shop-card';
-                card.style.textAlign = 'left';
-                card.style.cursor = 'pointer';
-                card.onclick = (e) => {
-                    if(!e.target.closest('button')) {
-                        openStaffModal(staff);
-                    }
-                };
-                
-                card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
-                        <div>
-                            <h3 style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.2rem;">${staff.name || '-'}</h3>
-                            <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600;">${staff.role || '-'}</span>
-                        </div>
-                        <button onclick="deleteStaff('${staff.id}','${(staff.name||'').replace(/'/g, '')}')" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; z-index: 2;">Delete</button>
-                    </div>
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 0.8rem; display: grid; gap: 0.5rem;">
-                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Total Activations:</span><span style="font-weight: 600; font-size: 0.9rem; color: var(--info);">${activations}</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Pending Amount:</span><span style="font-weight: 700; font-size: 0.95rem; color: var(--warning);">Rs. ${pendingAmount.toLocaleString()}</span></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-
-            // If a modal is open, refresh its data too
-            if (currentViewedStaff && document.getElementById('staffDetailModal').style.display === 'flex') {
-                const updatedStaff = allStaff.find(s => s.name === currentViewedStaff.name);
-                if(updatedStaff) openStaffModal(updatedStaff);
-            }
-        };
-
-        window.openStaffModal = function(staff) {
-            currentViewedStaff = staff;
-            document.getElementById('staffDetailName').innerText = staff.name;
-            document.getElementById('staffDetailRole').innerText = staff.role;
-            
-            let totalActivations = 0;
-            let totalPaid = 0;
-            let totalPending = 0;
-            let historyHtml = '';
-
-            const staffSales = allSales.filter(s => s.activatorName === staff.name);
-            
-            staffSales.forEach(sale => {
-                totalActivations++;
-                const status = sale.activatorPaymentStatus || 'Pending';
-                
-                if (status === 'Paid') {
-                    totalPaid += 500;
-                } else {
-                    totalPending += 500;
-                }
-
-                const statusBadge = status === 'Paid' 
-                    ? `<span style="background: rgba(34, 197, 94, 0.15); color: var(--success); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Paid</span>`
-                    : `<span style="background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Pending</span>`;
-
-                const actionBtn = status === 'Pending'
-                    ? `<button onclick="markActivatorPaid('${sale.id}')" style="background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Mark as Paid</button>`
-                    : `<span style="color: var(--text-muted); font-size: 0.8rem;">Done</span>`;
-
-                historyHtml += `
-                    <tr>
-                        <td>${sale.date || '-'}</td>
-                        <td style="font-family: monospace; color: var(--info);">${sale.imei || '-'}</td>
-                        <td>${sale.model || '-'}</td>
-                        <td style="font-weight: 600;">Rs. 500</td>
-                        <td>${statusBadge}</td>
-                        <td>${actionBtn}</td>
-                    </tr>
-                `;
-            });
-
-            if (staffSales.length === 0) {
-                historyHtml = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No activations found for this staff member.</td></tr>`;
-            }
-
-            document.getElementById('staffTotalActivations').innerText = totalActivations;
-            document.getElementById('staffTotalPaid').innerText = `Rs. ${totalPaid.toLocaleString()}`;
-            document.getElementById('staffTotalPending').innerText = `Rs. ${totalPending.toLocaleString()}`;
-            document.getElementById('staffHistoryBody').innerHTML = historyHtml;
-
-            document.getElementById('staffDetailModal').style.display = 'flex';
-        };
-
-        window.markActivatorPaid = async function(saleId) {
-            try {
-                await updateDoc(doc(db, "sales", saleId), {
-                    activatorPaymentStatus: 'Paid'
-                });
-                showToast("Activation marked as paid!", "success");
-            } catch(e) {
-                console.error("Error marking as paid:", e);
-                showToast("Error updating status.", "error");
-            }
-        };
-
-        // Call loadStaffData from auth check
-        loadStaffData();
-
-        window.deleteStaff = async function(id, name) {
-            if (!confirm('Are you sure you want to delete staff member "' + name + '"?')) return;
-            try {
-                await deleteDoc(doc(db, "staff", id));
-                showToast('Staff member "' + name + '" deleted.', 'warning');
-            } catch (e) {
-                showToast('Failed to delete: ' + e.message, 'error');
-            }
-        };
-
-        document.getElementById('addStaffForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('staffName').value.trim();
-            const role = document.getElementById('staffRole').value.trim();
-            const phone = document.getElementById('staffPhone').value.trim();
-            const shop = document.getElementById('staffShop').value.trim();
-            const salary = document.getElementById('staffSalary').value.trim();
-
-            if (!name || !role || !phone || !shop || !salary) return showToast('Please fill all fields', 'warning');
-
-            try {
-                await addDoc(collection(db, "staff"), {
-                    name, role, phone, shop, salary,
-                    timestamp: Date.now()
-                });
-                showToast('Staff member "' + name + '" added successfully!', 'success');
-                document.getElementById('addStaffModal').style.display = 'none';
-                document.getElementById('addStaffForm').reset();
-            } catch (err) {
-                showToast('Error adding staff: ' + err.message, 'error');
-            }
-        });
-
     </script>
 </body>
 </html>
+
