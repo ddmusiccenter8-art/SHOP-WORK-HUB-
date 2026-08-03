@@ -730,6 +730,26 @@
         };
 
         // Auth Check
+                // Fetch staff members to populate Activator dropdown
+        async function fetchStaffMembers() {
+            try {
+                const staffSelect = document.getElementById('activator');
+                if (!staffSelect) return;
+                
+                const q = query(collection(db, "staff"));
+                const snapshot = await getDocs(q);
+                let options = '<option value="">-- Select Staff Member --</option>';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    options += `<option value="${data.name}">${data.name}</option>`;
+                });
+                staffSelect.innerHTML = options;
+            } catch(e) {
+                console.error("Error fetching staff:", e);
+            }
+        }
+        fetchStaffMembers();
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const adminEmails = [

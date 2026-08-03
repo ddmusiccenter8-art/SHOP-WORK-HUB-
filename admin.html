@@ -479,7 +479,7 @@
         <!-- Staff Profile View -->
         <div id="staffView" class="view">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.3rem; color: var(--text-main);">Staff Profiles</h2>
+                <h2 style="font-size: 1.3rem; color: var(--text-main);">Activator Staff Profiles</h2>
                 <button onclick="document.getElementById('addStaffModal').style.display='flex'" style="background: var(--primary); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;">+ Add Staff</button>
             </div>
             <div class="shop-grid" id="staffGrid">
@@ -578,6 +578,49 @@
         </div>
     </div>
 
+        <!-- Staff Detailed Profile Modal -->
+    <div id="staffDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; width: 95%;">
+            <span class="modal-close" onclick="document.getElementById('staffDetailModal').style.display='none'">&times;</span>
+            <h2 id="staffDetailName" style="font-size: 1.4rem; color: white; margin-bottom: 0.5rem;">Staff Name</h2>
+            <p id="staffDetailRole" style="color: var(--primary); font-weight: 600; margin-bottom: 1.5rem;">Role</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="background: rgba(30, 41, 59, 0.5);">
+                    <div class="stat-title">Total Activations</div>
+                    <div class="stat-value" id="staffTotalActivations">0</div>
+                </div>
+                <div class="stat-card" style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid var(--success);">
+                    <div class="stat-title">Total Paid (Rs. 500/ea)</div>
+                    <div class="stat-value" style="color: var(--success);" id="staffTotalPaid">Rs. 0</div>
+                </div>
+                <div class="stat-card" style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning);">
+                    <div class="stat-title">Total Pending</div>
+                    <div class="stat-value" style="color: var(--warning);" id="staffTotalPending">Rs. 0</div>
+                </div>
+            </div>
+
+            <h3 style="color: white; margin-bottom: 1rem;">Activation History</h3>
+            <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>IMEI</th>
+                            <th>Model</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffHistoryBody">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
@@ -615,6 +658,8 @@
         const secondaryAuth = getAuth(secondaryApp);
 
         let allSales = [];
+        let allStaff = [];
+        let currentViewedStaff = null;
         let currentModalDocId = null;
         let chartInstance = null;
         let currentFilter = 'All';
@@ -737,6 +782,7 @@
                 renderAllSubmissions();
                 renderShopDirectory(Array.from(uniqueShops));
                 renderProfitView();
+                renderActivatorStaffProfiles();
             }, (err) => {
                 console.error("Firestore snapshot error:", err);
                 showToast("Failed to sync sales data: " + err.message, "error");
@@ -1293,40 +1339,140 @@
         function loadStaffData() {
             const q = query(collection(db, "staff"), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
-                const grid = document.getElementById('staffGrid');
-                grid.innerHTML = '';
-
-                if (snapshot.empty) {
-                    grid.innerHTML = '<p style="color: var(--text-muted);">No staff members added yet. Click "+ Add Staff" to add one.</p>';
-                    return;
-                }
-
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const docId = docSnap.id;
-                    const card = document.createElement('div');
-                    card.className = 'shop-card';
-                    card.style.textAlign = 'left';
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
-                            <div>
-                                <h3 style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.2rem;">${data.name || '-'}</h3>
-                                <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600;">${data.role || '-'}</span>
-                            </div>
-                            <button onclick="deleteStaff('${docId}','${(data.name||'').replace(/'/g, '')}')" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Delete</button>
-                        </div>
-                        <div style="border-top: 1px solid var(--border-color); padding-top: 0.8rem; display: grid; gap: 0.5rem;">
-                            <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Phone:</span><span style="font-weight: 600; font-size: 0.9rem;">${data.phone || '-'}</span></div>
-                            <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Branch:</span><span style="font-weight: 600; font-size: 0.9rem; color: var(--accent-purple);">${data.shop || '-'}</span></div>
-                            <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Salary:</span><span style="font-weight: 700; font-size: 0.95rem; color: var(--success);">Rs. ${parseFloat(data.salary||0).toLocaleString()}</span></div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
+                allStaff = [];
+                snapshot.forEach(docSnap => {
+                    let d = docSnap.data();
+                    d.id = docSnap.id;
+                    allStaff.push(d);
                 });
-            }, (err) => {
-                console.error("Staff data error:", err);
+                renderActivatorStaffProfiles();
             });
         }
+
+        window.renderActivatorStaffProfiles = function() {
+            const grid = document.getElementById('staffGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            if (allStaff.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-muted);">No staff members added yet. Click "+ Add Staff" to add one.</p>';
+                return;
+            }
+
+            allStaff.forEach(staff => {
+                // Calculate stats based on allSales
+                let activations = 0;
+                let pendingAmount = 0;
+                
+                allSales.forEach(sale => {
+                    if (sale.activatorName === staff.name) {
+                        activations++;
+                        // Treat 'Pending' or undefined as pending for backward compatibility if needed, but per plan we set it to 'Pending'.
+                        const status = sale.activatorPaymentStatus || 'Pending';
+                        if (status === 'Pending') {
+                            pendingAmount += 500;
+                        }
+                    }
+                });
+
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.style.textAlign = 'left';
+                card.style.cursor = 'pointer';
+                card.onclick = (e) => {
+                    if(!e.target.closest('button')) {
+                        openStaffModal(staff);
+                    }
+                };
+                
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                        <div>
+                            <h3 style="color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.2rem;">${staff.name || '-'}</h3>
+                            <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600;">${staff.role || '-'}</span>
+                        </div>
+                        <button onclick="deleteStaff('${staff.id}','${(staff.name||'').replace(/'/g, '')}')" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; z-index: 2;">Delete</button>
+                    </div>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 0.8rem; display: grid; gap: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Total Activations:</span><span style="font-weight: 600; font-size: 0.9rem; color: var(--info);">${activations}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted); font-size: 0.85rem;">Pending Amount:</span><span style="font-weight: 700; font-size: 0.95rem; color: var(--warning);">Rs. ${pendingAmount.toLocaleString()}</span></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // If a modal is open, refresh its data too
+            if (currentViewedStaff && document.getElementById('staffDetailModal').style.display === 'flex') {
+                const updatedStaff = allStaff.find(s => s.name === currentViewedStaff.name);
+                if(updatedStaff) openStaffModal(updatedStaff);
+            }
+        };
+
+        window.openStaffModal = function(staff) {
+            currentViewedStaff = staff;
+            document.getElementById('staffDetailName').innerText = staff.name;
+            document.getElementById('staffDetailRole').innerText = staff.role;
+            
+            let totalActivations = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+            let historyHtml = '';
+
+            const staffSales = allSales.filter(s => s.activatorName === staff.name);
+            
+            staffSales.forEach(sale => {
+                totalActivations++;
+                const status = sale.activatorPaymentStatus || 'Pending';
+                
+                if (status === 'Paid') {
+                    totalPaid += 500;
+                } else {
+                    totalPending += 500;
+                }
+
+                const statusBadge = status === 'Paid' 
+                    ? `<span style="background: rgba(34, 197, 94, 0.15); color: var(--success); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Paid</span>`
+                    : `<span style="background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Pending</span>`;
+
+                const actionBtn = status === 'Pending'
+                    ? `<button onclick="markActivatorPaid('${sale.id}')" style="background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Mark as Paid</button>`
+                    : `<span style="color: var(--text-muted); font-size: 0.8rem;">Done</span>`;
+
+                historyHtml += `
+                    <tr>
+                        <td>${sale.date || '-'}</td>
+                        <td style="font-family: monospace; color: var(--info);">${sale.imei || '-'}</td>
+                        <td>${sale.model || '-'}</td>
+                        <td style="font-weight: 600;">Rs. 500</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            });
+
+            if (staffSales.length === 0) {
+                historyHtml = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No activations found for this staff member.</td></tr>`;
+            }
+
+            document.getElementById('staffTotalActivations').innerText = totalActivations;
+            document.getElementById('staffTotalPaid').innerText = `Rs. ${totalPaid.toLocaleString()}`;
+            document.getElementById('staffTotalPending').innerText = `Rs. ${totalPending.toLocaleString()}`;
+            document.getElementById('staffHistoryBody').innerHTML = historyHtml;
+
+            document.getElementById('staffDetailModal').style.display = 'flex';
+        };
+
+        window.markActivatorPaid = async function(saleId) {
+            try {
+                await updateDoc(doc(db, "sales", saleId), {
+                    activatorPaymentStatus: 'Paid'
+                });
+                showToast("Activation marked as paid!", "success");
+            } catch(e) {
+                console.error("Error marking as paid:", e);
+                showToast("Error updating status.", "error");
+            }
+        };
 
         // Call loadStaffData from auth check
         loadStaffData();
