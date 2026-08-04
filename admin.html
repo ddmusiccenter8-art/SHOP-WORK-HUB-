@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -227,7 +227,7 @@
                 <option value="si">Sinhala</option>
                 <option value="ta">Tamil</option>
             </select>
-            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">🟢 Firebase Connected</span>
+            <span id="connectionBadge" style="font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid rgba(16,185,129,0.4); font-weight: 600;">ðŸŸ¢ Firebase Connected</span>
             <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">Logout</button>
         </div>
     </div>
@@ -324,7 +324,7 @@
             </div>
 
             <div id="singleShopSection" style="display: none;">
-                <button onclick="backToShops()" style="background: rgba(255,255,255,0.08); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
+                <button onclick="backToShops()" style="background: #f3f4f6; margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: var(--text-main); border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
                 <h2 id="profileTitle" style="color: var(--text-main); margin-bottom: 1rem;">Shop Profile</h2>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
@@ -615,9 +615,13 @@
                     <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Contact Number</label>
                     <input type="text" id="newShopPhone" placeholder="e.g. 0771234567">
                 </div>
-                <div style="margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
                     <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">City / Location</label>
                     <input type="text" id="newShopLocation" placeholder="e.g. Polonnaruwa">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Login Password</label>
+                    <input type="text" id="newShopPassword" value="1234" required placeholder="Default 1234">
                 </div>
                 <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: var(--primary);">Register Shop</button>
             </form>
@@ -1173,6 +1177,20 @@
                 const card = document.createElement('div');
                 card.className = 'shop-card';
                 card.onclick = () => viewShopProfile(shopEmail, shopSales);
+                let actionsHTML = '';
+                if (regInfo && regInfo.id) {
+                    const safeName = (regInfo.name || '').replace(/'/g, "\\'");
+                    const safeEmail = (regInfo.email || '').replace(/'/g, "\\'");
+                    const safePhone = (regInfo.phone || '').replace(/'/g, "\\'");
+                    const safeLoc = (regInfo.location || '').replace(/'/g, "\\'");
+                    actionsHTML = `
+                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; gap: 0.5rem; justify-content: center;">
+                            <button onclick="event.stopPropagation(); editShop('${regInfo.id}', '${safeName}', '${safeEmail}', '${safePhone}', '${safeLoc}')" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Edit</button>
+                            <button onclick="event.stopPropagation(); deleteShop('${regInfo.id}', '${safeName}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Delete</button>
+                        </div>
+                    `;
+                }
+
                 card.innerHTML = `
                     <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
@@ -1181,6 +1199,7 @@
                         <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
                     </div>
+                    ${actionsHTML}
                 `;
                 grid.appendChild(card);
             });
@@ -1204,12 +1223,14 @@
             const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
             const phone = document.getElementById('newShopPhone').value.trim();
             const location = document.getElementById('newShopLocation').value.trim();
+            const password = document.getElementById('newShopPassword').value.trim();
 
             addDoc(collection(db, "registered_shops"), {
                 name: name,
                 email: email,
                 phone: phone,
                 location: location,
+                password: password,
                 timestamp: Date.now()
             }).then(() => {
                 showToast(`Shop ${name} registered successfully!`, "success");
@@ -2085,6 +2106,46 @@
                     });
             });
         }
+        window.deleteShop = async function(shopId, shopName) {
+            const pwd = prompt(`Enter admin password to delete ${shopName}:`);
+            if (pwd !== '1234') {
+                if (pwd !== null) showToast("Incorrect password!", "error");
+                return;
+            }
+            if(confirm(`Are you sure you want to completely delete ${shopName}?`)) {
+                try {
+                    await deleteDoc(doc(db, "registered_shops", shopId));
+                    showToast("Shop deleted successfully", "success");
+                } catch(e) {
+                    showToast("Failed to delete shop", "error");
+                }
+            }
+        };
+
+        window.editShop = async function(shopId, name, email, phone, location) {
+            const pwd = prompt(`Enter admin password to edit ${name}:`);
+            if (pwd !== '1234') {
+                if (pwd !== null) showToast("Incorrect password!", "error");
+                return;
+            }
+            const newName = prompt("Edit Shop Name:", name);
+            if(newName === null) return;
+            const newPhone = prompt("Edit Phone:", phone);
+            if(newPhone === null) return;
+            const newLoc = prompt("Edit Location:", location);
+            if(newLoc === null) return;
+
+            try {
+                await updateDoc(doc(db, "registered_shops", shopId), {
+                    name: newName,
+                    phone: newPhone,
+                    location: newLoc
+                });
+                showToast("Shop updated successfully!", "success");
+            } catch(e) {
+                showToast("Failed to update shop", "error");
+            }
+        };
     </script>
 </body>
 </html>
