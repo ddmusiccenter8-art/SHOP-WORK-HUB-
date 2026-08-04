@@ -750,7 +750,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -765,6 +765,8 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+        const secondaryAuth = getAuth(secondaryApp);
         const db = getFirestore(app);
 
         // Translation Dictionary & Logic
@@ -1213,7 +1215,7 @@
             document.getElementById('addShopModal').style.display = 'none';
         };
 
-        document.getElementById('addShopForm').addEventListener('submit', (e) => {
+        document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveShopBtn');
             btn.disabled = true;
@@ -1225,23 +1227,31 @@
             const location = document.getElementById('newShopLocation').value.trim();
             const password = document.getElementById('newShopPassword').value.trim();
 
-            addDoc(collection(db, "registered_shops"), {
-                name: name,
-                email: email,
-                phone: phone,
-                location: location,
-                password: password,
-                timestamp: Date.now()
-            }).then(() => {
+            try {
+                // 1. Create Firebase Auth user using secondary app so it doesn't log admin out
+                await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                await signOut(secondaryAuth); // clear secondary session
+
+                // 2. Save shop data to Firestore
+                await addDoc(collection(db, "registered_shops"), {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    location: location,
+                    password: password,
+                    timestamp: Date.now()
+                });
+
                 showToast(`Shop ${name} registered successfully!`, "success");
                 document.getElementById('addShopForm').reset();
                 closeAddShopModal();
-            }).catch(err => {
+            } catch(err) {
+                console.error("Shop registration failed:", err);
                 showToast("Failed to register shop: " + err.message, "error");
-            }).finally(() => {
+            } finally {
                 btn.disabled = false;
                 btn.innerText = 'Register Shop';
-            });
+            }
         });
 
         window.viewShopProfile = function(shopEmail, shopSales) {
