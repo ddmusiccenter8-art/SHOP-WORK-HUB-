@@ -970,8 +970,8 @@
                 
                 let statusHtml = '';
                 let paymentNote = data.paymentStatus === 'Paid' 
-                    ? '<br><span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ??</span>' 
-                    : '<br><span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending ?</span>';
+                    ? '<br><span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✓</span>' 
+                    : '<br><span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending</span>';
 
                 if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                 else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
