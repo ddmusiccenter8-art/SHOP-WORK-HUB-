@@ -1197,9 +1197,12 @@
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const tr = document.createElement('tr');
+                    const catBadge = data.category === 'Dialog Lesi Pay'
+                        ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
+                        : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">📦 Own Buy</span>';
                     tr.innerHTML = `
                         <td><strong>${data.imei || '-'}</strong></td>
-                        <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}</td>
+                        <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}<br>${catBadge}</td>
                         <td><span style="color: var(--accent-purple); font-weight: 600;">${data.shop || '-'}</span></td>
                         <td><span class="badge badge-confirmed">Available</span></td>
                     `;

@@ -437,6 +437,11 @@
                     <p style="font-size: 1.4rem; font-weight: 700; color: var(--accent-purple); margin-top: 0.2rem;" id="mainTotalStaffFees">Rs. 0.00</p>
                 </div>
 
+                <div style="background: rgba(59, 130, 246, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.4);">
+                    <h3 style="color: #3b82f6; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">DIALOG LESI PAY PROFIT (7% MRP)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 800; color: #3b82f6; margin-top: 0.2rem;" id="mainDialogLesiPayProfit">Rs. 0.00</p>
+                </div>
+
                 <div style="background: rgba(16, 185, 129, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
                     <h3 style="color: var(--success); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">NET PROFIT (ශුද්ධ ලාභය)</h3>
                     <p style="font-size: 1.5rem; font-weight: 800; color: var(--success); margin-top: 0.2rem;" id="mainTotalNetProfit">Rs. 0.00</p>
@@ -550,9 +555,17 @@
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main);">Add Head Office Stock</h2>
                     <form id="inventoryForm">
                         <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number</label>
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
+                            <select id="invCategory" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                                <option value="Main Shop (Own Buy)" selected>📦 Main Shop (Own Purchased Stock)</option>
+                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Stock</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Enter single IMEI or multiple IMEIs separated by commas or new lines for bulk 10+ items)</span></label>
                             <div style="display: flex; gap: 0.5rem; align-items: stretch;">
-                                <input type="text" id="invImei" required placeholder="e.g. 351234567890123" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                <textarea id="invImei" required placeholder="Type/paste IMEIs (e.g. 351234567890123, 351234567890124)" rows="2" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0.8rem; border-radius: 8px; font-family: monospace; resize: vertical; min-width: 0;"></textarea>
                                 <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
                             </div>
                         </div>
@@ -565,6 +578,11 @@
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
                             <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Own Buy items)</span></label>
+                            <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">
@@ -579,9 +597,16 @@
 
                 <!-- Inventory List -->
                 <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h2 style="font-size: 1.2rem; color: var(--text-main);">Current Stock List</h2>
-                        <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0;">Current Stock List</h2>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <select id="stockFilterCategory" onchange="filterInventoryTable()" style="width: auto; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.82rem;">
+                                <option value="ALL">All Stock Categories</option>
+                                <option value="Main Shop (Own Buy)">📦 Own Buy Stock</option>
+                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
+                            </select>
+                            <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
+                        </div>
                     </div>
                     <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
                         <table>
@@ -589,13 +614,14 @@
                                 <tr>
                                     <th>IMEI</th>
                                     <th>Model & Storage</th>
+                                    <th>Category & Cost</th>
                                     <th>Location</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading inventory...</td></tr>
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading inventory...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1682,6 +1708,19 @@
             if (totalNetProfit < 0) netProfitEl.style.color = 'var(--danger)';
             else netProfitEl.style.color = 'var(--success)';
 
+            // Calculate Dialog Lesi Pay (7% of MRP) Profit separately
+            let totalDialogLesiPayProfit = 0;
+            allMainShopSales.concat(allSales || []).forEach(item => {
+                if (item.category === 'Dialog Lesi Pay' || item.source === 'Dialog Lesi Pay') {
+                    const mrpVal = parseFloat(item.mrp || item.loanAmount) || 0;
+                    totalDialogLesiPayProfit += mrpVal * 0.07;
+                }
+            });
+            const lesiPayEl = document.getElementById('mainDialogLesiPayProfit');
+            if (lesiPayEl) {
+                lesiPayEl.innerText = 'Rs. ' + totalDialogLesiPayProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            }
+
             if (filteredSales.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records for selected time range.</td></tr>';
                 return;
@@ -1725,52 +1764,23 @@
         };
 
         // Inventory Logic
+        let allInventoryItems = [];
+
         function loadInventoryData() {
             const q = query(collection(db, "inventory"));
             onSnapshot(q, (snapshot) => {
-                const tbody = document.getElementById('inventoryTableBody');
+                allInventoryItems = [];
                 const datalist = document.getElementById('shopDatalist');
-                const stockBadge = document.getElementById('stockCountBadge');
-                tbody.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items added yet.</td></tr>';
-                    datalist.innerHTML = '';
-                    stockBadge.innerText = '0 Items';
-                    return;
-                }
-                
-                stockBadge.innerText = `${snapshot.size} Items`;
                 const uniqueLocations = new Set();
                 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const docId = docSnap.id;
-                    const tr = document.createElement('tr');
-                    
-                    let badge = data.status === 'Available' 
-                        ? '<span class="badge badge-confirmed">Available</span>' 
-                        : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Sold</span>';
-                    
-                    let location = data.shop || '-';
+                    data.id = docSnap.id;
+                    allInventoryItems.push(data);
                     if (data.shop) uniqueLocations.add(data.shop.trim());
-                    
-                    tr.innerHTML = `
-                        <td><strong>${data.imei}</strong></td>
-                        <td>${data.model} - ${data.storage}</td>
-                        <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
-                        <td>${badge}</td>
-                        <td>
-                            <button onclick="openTransferModal('${docId}', '${data.imei}', '${data.model}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
-                                🔄
-                            </button>
-                            <button onclick="deleteInventoryItem('${docId}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
-                                🗑️
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
                 });
+
+                allInventoryItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
                 datalist.innerHTML = '';
                 uniqueLocations.forEach(loc => {
@@ -1780,10 +1790,64 @@
                         datalist.appendChild(option);
                     }
                 });
+
+                filterInventoryTable();
             }, (err) => {
                 console.error("Inventory error:", err);
             });
         }
+
+        window.filterInventoryTable = function() {
+            const tbody = document.getElementById('inventoryTableBody');
+            const stockBadge = document.getElementById('stockCountBadge');
+            const filterCat = document.getElementById('stockFilterCategory') ? document.getElementById('stockFilterCategory').value : 'ALL';
+            
+            tbody.innerHTML = '';
+
+            let filtered = allInventoryItems;
+            if (filterCat !== 'ALL') {
+                filtered = allInventoryItems.filter(item => (item.category || 'Main Shop (Own Buy)') === filterCat);
+            }
+
+            stockBadge.innerText = `${filtered.length} Items`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items matching filter.</td></tr>';
+                return;
+            }
+
+            filtered.forEach((data) => {
+                const tr = document.createElement('tr');
+                
+                let badge = data.status === 'Available' 
+                    ? '<span class="badge badge-confirmed">Available</span>' 
+                    : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Sold</span>';
+                
+                let location = data.shop || '-';
+                let catLabel = data.category === 'Dialog Lesi Pay'
+                    ? '<span style="color: #3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
+                    : '<span style="color: #10b981; font-weight:600;">📦 Own Buy</span>';
+                
+                let costStr = data.buyPrice ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">Buy: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>` : '';
+
+                tr.innerHTML = `
+                    <td><strong>${data.imei}</strong></td>
+                    <td>${data.model} - ${data.storage}</td>
+                    <td>${catLabel}${costStr}</td>
+                    <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
+                    <td>${badge}</td>
+                    <td>
+                        <button onclick="openTransferModal('${data.id}', '${data.imei}', '${data.model}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
+                            🔄
+                        </button>
+                        <button onclick="deleteInventoryItem('${data.id}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
 
         window.deleteInventoryItem = async function(id, imei) {
             if (!confirm(`Delete stock item with IMEI ${imei}?`)) return;
@@ -1795,38 +1859,51 @@
             }
         };
 
-        document.getElementById('inventoryForm').addEventListener('submit', (e) => {
+        document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
             
-            const imei = document.getElementById('invImei').value.trim();
+            const category = document.getElementById('invCategory').value;
+            const imeiText = document.getElementById('invImei').value.trim();
             const model = document.getElementById('invModel').value.trim();
             const storage = document.getElementById('invStorage').value.trim();
+            const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
             const shop = document.getElementById('invShop').value.trim();
 
-            if (!imei || !model || !storage || !shop) return showToast("Please fill all inventory fields", "warning");
+            if (!imeiText || !model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
+
+            const imeiList = imeiText.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if (imeiList.length === 0) return showToast("Please enter at least one valid IMEI", "warning");
 
             btn.disabled = true;
-            btn.innerText = 'Adding Stock...';
+            btn.innerText = `Adding ${imeiList.length} Stock Item(s)...`;
 
-            addDoc(collection(db, "inventory"), {
-                imei: imei,
-                model: model,
-                storage: storage,
-                shop: shop,
-                status: 'Available',
-                timestamp: Date.now()
-            }).then(() => {
-                showToast(`Added ${model} (${imei}) to ${shop}`, "success");
+            try {
+                const addPromises = imeiList.map(imei => {
+                    return addDoc(collection(db, "inventory"), {
+                        imei: imei,
+                        model: model,
+                        storage: storage,
+                        shop: shop,
+                        category: category,
+                        buyPrice: buyPrice,
+                        status: 'Available',
+                        timestamp: Date.now()
+                    });
+                });
+
+                await Promise.all(addPromises);
+                showToast(`Successfully added ${imeiList.length} item(s) (${model}) to ${shop}!`, "success");
                 document.getElementById('invImei').value = '';
+                document.getElementById('invBuyPrice').value = '';
                 document.getElementById('invImei').focus();
-            }).catch(err => {
-                console.error("Error adding inventory item:", err);
-                showToast("Error adding item: " + err.message, "error");
-            }).finally(() => {
+            } catch (err) {
+                console.error("Error adding inventory items:", err);
+                showToast("Error adding inventory: " + err.message, "error");
+            } finally {
                 btn.innerText = 'Add to Head Office Inventory';
                 btn.disabled = false;
-            });
+            }
         });
 
         // Stock Transfer Logic
