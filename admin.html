@@ -563,10 +563,16 @@
                         </div>
 
                         <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Enter single IMEI or multiple IMEIs separated by commas or new lines for bulk 10+ items)</span></label>
-                            <div style="display: flex; gap: 0.5rem; align-items: stretch;">
-                                <textarea id="invImei" required placeholder="Type/paste IMEIs (e.g. 351234567890123, 351234567890124)" rows="2" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 0.8rem; border-radius: 8px; font-family: monospace; resize: vertical; min-width: 0;"></textarea>
-                                <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Type or scan IMEI - press Enter or click + to add)</span></label>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                <input type="text" id="invImei" placeholder="Type or scan IMEI here..." onkeydown="handleImeiInputKeydown(event)" onpaste="handleImeiPaste(event)" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0.8rem 1.1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
+                                <button type="button" onclick="addImeiFromInput()" style="background: #10b981; color: white; border: none; padding: 0.8rem 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1rem;" title="Add IMEI to List">+</button>
+                            </div>
+                            
+                            <!-- Dedicated Container for Scanned/Added IMEIs below -->
+                            <div id="scannedImeiContainer" style="background: #f8fafc; border: 1px dashed var(--border-color); padding: 0.6rem; border-radius: 8px; min-height: 48px; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
+                                <span id="scannedImeiPlaceholder" style="font-size: 0.78rem; color: var(--text-muted);">Scanned/Added IMEIs will appear here below...</span>
                             </div>
                         </div>
                         
@@ -1859,27 +1865,90 @@
             }
         };
 
+        // Scanned / Added IMEIs list manager
+        let scannedImeiList = [];
+
+        window.addImeiToList = function(imei) {
+            if (!imei) return;
+            const cleaned = imei.trim();
+            if (!cleaned) return;
+
+            if (scannedImeiList.includes(cleaned)) {
+                showToast("IMEI already in list: " + cleaned, "warning");
+                return;
+            }
+
+            scannedImeiList.push(cleaned);
+            renderScannedImeiChips();
+        };
+
+        window.removeImeiFromList = function(imei) {
+            scannedImeiList = scannedImeiList.filter(i => i !== imei);
+            renderScannedImeiChips();
+        };
+
+        function renderScannedImeiChips() {
+            const container = document.getElementById('scannedImeiContainer');
+            if (!container) return;
+
+            if (scannedImeiList.length === 0) {
+                container.innerHTML = '<span id="scannedImeiPlaceholder" style="font-size: 0.78rem; color: var(--text-muted);">Scanned/Added IMEIs will appear here below...</span>';
+                return;
+            }
+
+            container.innerHTML = '';
+            scannedImeiList.forEach(imei => {
+                const chip = document.createElement('span');
+                chip.style.cssText = 'background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.82rem; font-family: monospace; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;';
+                chip.innerHTML = `${imei} <span onclick="removeImeiFromList('${imei}')" style="cursor: pointer; color: #ef4444; font-weight: bold; font-size: 1rem; margin-left: 2px;" title="Remove IMEI">&times;</span>`;
+                container.appendChild(chip);
+            });
+        }
+
+        window.addImeiFromInput = function() {
+            const input = document.getElementById('invImei');
+            if (!input) return;
+            const val = input.value.trim();
+            if (!val) return;
+
+            const items = val.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            items.forEach(item => addImeiToList(item));
+            input.value = '';
+        };
+
+        window.handleImeiInputKeydown = function(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addImeiFromInput();
+            }
+        };
+
+        window.handleImeiPaste = function(e) {
+            setTimeout(() => {
+                addImeiFromInput();
+            }, 50);
+        };
+
         document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
             
+            addImeiFromInput();
+
             const category = document.getElementById('invCategory').value;
-            const imeiText = document.getElementById('invImei').value.trim();
             const model = document.getElementById('invModel').value.trim();
             const storage = document.getElementById('invStorage').value.trim();
             const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
             const shop = document.getElementById('invShop').value.trim();
 
-            if (!imeiText || !model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
-
-            const imeiList = imeiText.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 0);
-            if (imeiList.length === 0) return showToast("Please enter at least one valid IMEI", "warning");
+            if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
+            if (!model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
 
             btn.disabled = true;
-            btn.innerText = `Adding ${imeiList.length} Stock Item(s)...`;
+            btn.innerText = `Adding ${scannedImeiList.length} Stock Item(s)...`;
 
             try {
-                const addPromises = imeiList.map(imei => {
+                const addPromises = scannedImeiList.map(imei => {
                     return addDoc(collection(db, "inventory"), {
                         imei: imei,
                         model: model,
@@ -1893,7 +1962,10 @@
                 });
 
                 await Promise.all(addPromises);
-                showToast(`Successfully added ${imeiList.length} item(s) (${model}) to ${shop}!`, "success");
+                showToast(`Successfully added ${scannedImeiList.length} item(s) (${model}) to ${shop}!`, "success");
+                
+                scannedImeiList = [];
+                renderScannedImeiChips();
                 document.getElementById('invImei').value = '';
                 document.getElementById('invBuyPrice').value = '';
                 document.getElementById('invImei').focus();
@@ -2166,11 +2238,15 @@
                 };
 
                 const onScanSuccess = (decodedText) => {
-                    const inputEl = document.getElementById(inputId);
-                    if (inputEl) {
-                        inputEl.value = decodedText;
-                        const event = new Event('input', { bubbles: true });
-                        inputEl.dispatchEvent(event);
+                    if (currentScannerInputId === 'invImei' && typeof addImeiToList === 'function') {
+                        addImeiToList(decodedText);
+                    } else {
+                        const inputEl = document.getElementById(currentScannerInputId);
+                        if (inputEl) {
+                            inputEl.value = decodedText;
+                            const event = new Event('input', { bubbles: true });
+                            inputEl.dispatchEvent(event);
+                        }
                     }
                     stopScanner();
                     showToast("Barcode Scanned: " + decodedText, "success");
@@ -2258,14 +2334,18 @@
         window.submitManualScan = function() {
             const val = document.getElementById('manualScannerInput').value.trim();
             if (!val) return;
-            const inputEl = document.getElementById(currentScannerInputId);
-            if (inputEl) {
-                inputEl.value = val;
-                const event = new Event('input', { bubbles: true });
-                inputEl.dispatchEvent(event);
-                showToast("Entered manually: " + val, "success");
+            if (currentScannerInputId === 'invImei' && typeof addImeiToList === 'function') {
+                addImeiToList(val);
+            } else {
+                const inputEl = document.getElementById(currentScannerInputId);
+                if (inputEl) {
+                    inputEl.value = val;
+                    const event = new Event('input', { bubbles: true });
+                    inputEl.dispatchEvent(event);
+                }
             }
             stopScanner();
+            showToast("IMEI Added: " + val, "success");
         };
 
         window.stopScanner = function() {
