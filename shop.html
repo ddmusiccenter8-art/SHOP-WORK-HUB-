@@ -550,7 +550,7 @@
             <div style="text-align: left; margin-bottom: 1rem;">
                 <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-main); outline: none;">
+                    <input type="text" id="manualScannerInput" placeholder="Enter IMEI / Barcode" onkeydown="if(event.key==='Enter'){event.preventDefault();submitManualScan();}" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-main); outline: none;">
                     <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
                 </div>
             </div>
