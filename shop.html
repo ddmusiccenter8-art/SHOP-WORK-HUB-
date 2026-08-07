@@ -537,14 +537,15 @@
 
     <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
-        <div class="modal-content" style="max-width: 440px; text-align: center; padding: 1.5rem;">
+        <div class="modal-content" style="max-width: 440px; text-align: center; padding: 1.2rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h2 style="margin: 0; color: var(--text-main); font-size: 1.2rem;">📷 Scan Barcode</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                <h2 style="margin: 0; color: var(--text-main); font-size: 1.1rem;">📷 Scan Barcode</h2>
                 <select id="cameraSelect" onchange="switchCamera(this.value)" style="display: none; width: auto; max-width: 170px; padding: 0.3rem 0.6rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); background: #f3f4f6; color: var(--text-main);">
                 </select>
             </div>
-            <div id="reader" style="width: 100%; min-height: 280px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; position: relative;"></div>
+            <div id="reader" style="width: 100%; min-height: 260px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem; position: relative;"></div>
+            <div style="font-size: 0.8rem; color: #ef4444; margin-bottom: 0.8rem; font-weight: 600;">🎯 එක IMEI Barcode එකක් පමණක් කොටුව මැදට කෙලින් තබන්න</div>
             
             <div style="text-align: left; margin-bottom: 1rem;">
                 <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
@@ -1227,24 +1228,17 @@
                 }
                 
                 const config = { 
-                    fps: 25, 
+                    fps: 15, 
                     qrbox: (viewfinderWidth, viewfinderHeight) => {
-                        const w = Math.min(viewfinderWidth * 0.9, 340);
-                        const h = Math.min(viewfinderHeight * 0.45, 130);
+                        const w = Math.min(viewfinderWidth * 0.92, 340);
+                        const h = Math.min(viewfinderHeight * 0.28, 75);
                         return { width: Math.floor(w), height: Math.floor(h) };
                     },
                     aspectRatio: 1.333333,
+                    disableFlip: false,
                     experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
-                    },
-                    formatsToSupport: [ 
-                        Html5QrcodeSupportedFormats.CODE_128, 
-                        Html5QrcodeSupportedFormats.CODE_39, 
-                        Html5QrcodeSupportedFormats.EAN_13, 
-                        Html5QrcodeSupportedFormats.EAN_8, 
-                        Html5QrcodeSupportedFormats.UPC_A,
-                        Html5QrcodeSupportedFormats.ITF
-                    ]
+                        useBarCodeDetectorIfSupported: false
+                    }
                 };
 
                 const onScanSuccess = (decodedText) => {
@@ -1314,22 +1308,15 @@
         window.switchCamera = async function(cameraId) {
             if (!cameraId || !html5QrCode) return;
             const config = { 
-                fps: 25, 
+                fps: 15, 
                 qrbox: (viewfinderWidth, viewfinderHeight) => {
-                    const w = Math.min(viewfinderWidth * 0.9, 340);
-                    const h = Math.min(viewfinderHeight * 0.45, 130);
+                    const w = Math.min(viewfinderWidth * 0.92, 340);
+                    const h = Math.min(viewfinderHeight * 0.28, 75);
                     return { width: Math.floor(w), height: Math.floor(h) };
                 },
                 aspectRatio: 1.333333,
-                experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-                formatsToSupport: [ 
-                    Html5QrcodeSupportedFormats.CODE_128, 
-                    Html5QrcodeSupportedFormats.CODE_39, 
-                    Html5QrcodeSupportedFormats.EAN_13, 
-                    Html5QrcodeSupportedFormats.EAN_8, 
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.ITF
-                ]
+                disableFlip: false,
+                experimentalFeatures: { useBarCodeDetectorIfSupported: false }
             };
             const onScanSuccess = (decodedText) => {
                 const inputEl = document.getElementById(currentScannerInputId);
