@@ -733,10 +733,14 @@
 
     <!-- Scanner Modal -->
     <div id="scannerModal" class="modal">
-        <div class="modal-content" style="max-width: 420px; text-align: center; padding: 1.5rem;">
+        <div class="modal-content" style="max-width: 440px; text-align: center; padding: 1.5rem;">
             <span class="modal-close" onclick="stopScanner()">&times;</span>
-            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Scan Barcode</h2>
-            <div id="reader" style="width: 100%; min-height: 280px; background: #f3f4f6; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                <h2 style="margin: 0; color: var(--text-main); font-size: 1.2rem;">📷 Scan Barcode</h2>
+                <select id="cameraSelect" onchange="switchCamera(this.value)" style="display: none; width: auto; max-width: 170px; padding: 0.3rem 0.6rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); background: #f3f4f6; color: var(--text-main);">
+                </select>
+            </div>
+            <div id="reader" style="width: 100%; min-height: 280px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; position: relative;"></div>
             
             <div style="text-align: left; margin-bottom: 1rem;">
                 <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Or Type Manually</label>
@@ -746,7 +750,7 @@
                 </div>
             </div>
 
-            <button onclick="stopScanner()" style="background: #f9fafb; border: 1px solid var(--border-color); color: white; width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer;">Cancel</button>
+            <button onclick="stopScanner()" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
         </div>
     </div>
 
@@ -2057,7 +2061,7 @@
         let html5QrCode = null;
         let currentScannerInputId = null;
 
-        window.startScanner = function(inputId) {
+        window.startScanner = async function(inputId) {
             currentScannerInputId = inputId;
             document.getElementById('manualScannerInput').value = '';
             document.getElementById('scannerModal').style.display = 'flex';
@@ -2065,14 +2069,10 @@
             try {
                 if (!html5QrCode) {
                     html5QrCode = new Html5Qrcode("reader");
+                } else if (html5QrCode.isScanning) {
+                    await html5QrCode.stop();
                 }
                 
-                const cameraConfig = { 
-                    facingMode: "environment",
-                    width: { min: 640, ideal: 1280, max: 1920 },
-                    height: { min: 480, ideal: 720, max: 1080 }
-                };
-
                 const config = { 
                     fps: 25, 
                     qrbox: (viewfinderWidth, viewfinderHeight) => {
@@ -2080,7 +2080,7 @@
                         const h = Math.min(viewfinderHeight * 0.45, 130);
                         return { width: Math.floor(w), height: Math.floor(h) };
                     },
-                    aspectRatio: 1.777778,
+                    aspectRatio: 1.333333,
                     experimentalFeatures: {
                         useBarCodeDetectorIfSupported: true
                     },
@@ -2094,51 +2094,101 @@
                     ]
                 };
 
-                html5QrCode.start(
-                    cameraConfig, 
-                    config,
-                    (decodedText) => {
-                        const inputEl = document.getElementById(inputId);
+                const onScanSuccess = (decodedText) => {
+                    const inputEl = document.getElementById(inputId);
+                    if (inputEl) {
                         inputEl.value = decodedText;
-                        stopScanner();
-                        showToast("Barcode scanned: " + decodedText, "success");
-                        
                         const event = new Event('input', { bubbles: true });
                         inputEl.dispatchEvent(event);
-                    },
-                    (errorMessage) => {
-                        // scanning...
                     }
-                ).then(() => {
-                    try {
-                        const track = html5QrCode.getRunningTrack();
-                        if (track && track.getCapabilities) {
-                            const capabilities = track.getCapabilities();
-                            if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
-                                track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
-                            }
-                        }
-                    } catch(e) {}
-                }).catch(err => {
-                    console.error("High-res camera error, using fallback:", err);
-                    html5QrCode.start(
-                        { facingMode: "environment" }, 
-                        config,
-                        (decodedText) => {
-                            const inputEl = document.getElementById(inputId);
-                            inputEl.value = decodedText;
-                            stopScanner();
-                            showToast("Barcode scanned: " + decodedText, "success");
-                            const event = new Event('input', { bubbles: true });
-                            inputEl.dispatchEvent(event);
-                        },
-                        () => {}
-                    ).catch(e => console.error("Fallback camera error:", e));
-                });
+                    stopScanner();
+                    showToast("Barcode Scanned: " + decodedText, "success");
+                };
+
+                try {
+                    const devices = await Html5Qrcode.getCameras();
+                    const camSelect = document.getElementById('cameraSelect');
+                    if (camSelect && devices && devices.length > 0) {
+                        camSelect.innerHTML = '';
+                        devices.forEach((dev, idx) => {
+                            const opt = document.createElement('option');
+                            opt.value = dev.id;
+                            opt.innerText = dev.label || `Camera ${idx + 1}`;
+                            camSelect.appendChild(opt);
+                        });
+                        camSelect.style.display = devices.length > 1 ? 'inline-block' : 'none';
+
+                        let selectedCam = devices.find(d => {
+                            const lbl = (d.label || '').toLowerCase();
+                            return (lbl.includes('back') || lbl.includes('rear') || lbl.includes('0')) && !lbl.includes('wide') && !lbl.includes('ultra');
+                        }) || devices.find(d => {
+                            const lbl = (d.label || '').toLowerCase();
+                            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('environment');
+                        }) || devices[devices.length - 1];
+
+                        camSelect.value = selectedCam.id;
+                        await startCameraWithId(selectedCam.id, config, onScanSuccess);
+                        return;
+                    }
+                } catch(e) {
+                    console.log("getCameras enumeration fallback", e);
+                }
+
+                await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, () => {});
             } catch (err) {
                 console.error("Scanner error:", err);
                 showToast("Could not access camera scanner", "error");
             }
+        };
+
+        window.startCameraWithId = async function(cameraId, config, onScanSuccess) {
+            if (!html5QrCode) return;
+            if (html5QrCode.isScanning) {
+                await html5QrCode.stop();
+            }
+            await html5QrCode.start(cameraId, config, onScanSuccess, () => {});
+            try {
+                const track = html5QrCode.getRunningTrack();
+                if (track && track.getCapabilities) {
+                    const capabilities = track.getCapabilities();
+                    if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+                        await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+                    }
+                }
+            } catch(e) {}
+        };
+
+        window.switchCamera = async function(cameraId) {
+            if (!cameraId || !html5QrCode) return;
+            const config = { 
+                fps: 25, 
+                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                    const w = Math.min(viewfinderWidth * 0.9, 340);
+                    const h = Math.min(viewfinderHeight * 0.45, 130);
+                    return { width: Math.floor(w), height: Math.floor(h) };
+                },
+                aspectRatio: 1.333333,
+                experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+                formatsToSupport: [ 
+                    Html5QrcodeSupportedFormats.CODE_128, 
+                    Html5QrcodeSupportedFormats.CODE_39, 
+                    Html5QrcodeSupportedFormats.EAN_13, 
+                    Html5QrcodeSupportedFormats.EAN_8, 
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.ITF
+                ]
+            };
+            const onScanSuccess = (decodedText) => {
+                const inputEl = document.getElementById(currentScannerInputId);
+                if (inputEl) {
+                    inputEl.value = decodedText;
+                    const event = new Event('input', { bubbles: true });
+                    inputEl.dispatchEvent(event);
+                }
+                stopScanner();
+                showToast("Barcode Scanned: " + decodedText, "success");
+            };
+            await startCameraWithId(cameraId, config, onScanSuccess);
         };
 
         window.submitManualScan = function() {
