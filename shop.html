@@ -1136,44 +1136,71 @@
 
         let myRegisteredShopProfile = null;
 
-        // Auto-match current shop profile from registered_shops & inventory
+        // Auto-match current shop's OWN branch profile only (hide other branches)
         async function loadBranchOptions() {
             try {
                 if (!currentUser) return;
                 const email = currentUser.email.toLowerCase().trim();
+                const emailPrefix = email.split('@')[0].toLowerCase();
                 
-                // 1. Fetch registered shop profile by email
+                // 1. Fetch registered shop profile for this email
                 const qShops = query(collection(db, "registered_shops"));
                 const shopSnap = await getDocs(qShops);
                 
                 let foundProfile = null;
-                const allBranchOptions = new Set();
-
                 shopSnap.forEach(docSnap => {
                     const sData = docSnap.data();
                     if ((sData.email || '').toLowerCase().trim() === email) {
                         foundProfile = sData;
                     }
-                    if (sData.name) allBranchOptions.add(sData.name.trim());
-                    if (sData.location) allBranchOptions.add(sData.location.trim());
                 });
 
-                // 2. Also fetch all active branch locations from inventory
+                // 2. Fetch inventory locations to find this shop's specific location name if not registered
                 const invSnap = await getDocs(collection(db, "inventory"));
+                const allInvLocations = new Set();
                 invSnap.forEach(docSnap => {
                     const d = docSnap.data();
                     const shopLoc = (d.shop || '').trim();
                     if (shopLoc && shopLoc !== 'MAIN SHOP' && shopLoc !== 'Head Office' && shopLoc !== 'Main Shop') {
-                        allBranchOptions.add(shopLoc);
+                        allInvLocations.add(shopLoc);
                     }
                 });
 
+                // 3. Resolve THIS user's specific branch name
+                let myOwnBranchName = '';
+                if (foundProfile && foundProfile.name) {
+                    myOwnBranchName = foundProfile.name.trim();
+                } else {
+                    // Match against inventory locations
+                    const matched = Array.from(allInvLocations).find(b => {
+                        const bLow = b.toLowerCase();
+                        return bLow.includes(emailPrefix) || emailPrefix.includes(bLow) ||
+                               (email.includes('spm') && (bLow.includes('pulasthigama') || bLow.includes('spm')));
+                    });
+                    myOwnBranchName = matched || emailPrefix.toUpperCase();
+                }
+
                 myRegisteredShopProfile = foundProfile;
+
+                // Update shop email/name badge in top header
+                const shopDisplay = document.getElementById('userEmailDisplay');
+                if (shopDisplay) {
+                    shopDisplay.innerHTML = `<strong>${myOwnBranchName}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">(${currentUser.email})</span>`;
+                }
+
+                // 4. Populate dropdown ONLY with HEAD OFFICE and THIS shop's own branch
                 const branchSelect = document.getElementById('myBranchName');
-                
                 if (branchSelect) {
-                    branchSelect.innerHTML = '<option value="">-- Choose Your Branch --</option>';
+                    branchSelect.innerHTML = '';
                     
+                    // User's Own Branch Option (Default)
+                    const myOpt = document.createElement('option');
+                    myOpt.value = myOwnBranchName;
+                    myOpt.innerText = `🏪 ${myOwnBranchName} (My Branch)`;
+                    myOpt.style.fontWeight = 'bold';
+                    branchSelect.appendChild(myOpt);
+
+                    // Head Office Option
                     const hoOpt = document.createElement('option');
                     hoOpt.value = 'HEAD OFFICE';
                     hoOpt.innerText = '🏢 HEAD OFFICE / MAIN SHOP';
@@ -1181,39 +1208,14 @@
                     hoOpt.style.color = '#e50000';
                     branchSelect.appendChild(hoOpt);
 
-                    Array.from(allBranchOptions).sort().forEach(branch => {
-                        const opt = document.createElement('option');
-                        opt.value = branch;
-                        opt.innerText = branch;
-                        branchSelect.appendChild(opt);
-                    });
-                }
-
-                // 3. Determine best matching default branch for current user
-                let defaultBranch = '';
-                const userKey = 'myBranch_' + email;
-                const userSavedBranch = localStorage.getItem(userKey);
-
-                if (foundProfile && foundProfile.name) {
-                    defaultBranch = foundProfile.name;
-                    const shopDisplay = document.getElementById('userEmailDisplay');
-                    if (shopDisplay) {
-                        shopDisplay.innerHTML = `<strong>${foundProfile.name}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">(${currentUser.email})</span>`;
+                    // Set default selection to My Branch (or saved preference)
+                    const userKey = 'myBranch_' + email;
+                    const userSaved = localStorage.getItem(userKey);
+                    if (userSaved === 'HEAD OFFICE') {
+                        branchSelect.value = 'HEAD OFFICE';
+                    } else {
+                        branchSelect.value = myOwnBranchName;
                     }
-                } else if (userSavedBranch && (allBranchOptions.has(userSavedBranch) || userSavedBranch === 'HEAD OFFICE')) {
-                    defaultBranch = userSavedBranch;
-                } else {
-                    const emailPrefix = email.split('@')[0].toLowerCase();
-                    const matched = Array.from(allBranchOptions).find(b => {
-                        const bLow = b.toLowerCase();
-                        return bLow.includes(emailPrefix) || emailPrefix.includes(bLow) ||
-                               (email.includes('spm') && (bLow.includes('pulasthigama') || bLow.includes('spm')));
-                    });
-                    if (matched) defaultBranch = matched;
-                }
-
-                if (defaultBranch && branchSelect) {
-                    branchSelect.value = defaultBranch;
                 }
 
                 loadMyStock();
@@ -1235,7 +1237,7 @@
             }
 
             if (myStockUnsubscribe) myStockUnsubscribe();
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading branch stock...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading stock...</td></tr>';
 
             // Query all available inventory
             const q = query(collection(db, "inventory"), where("status", "==", "Available"));
@@ -1264,12 +1266,14 @@
                     if (isHeadOfficeSelected) {
                         if (isItemHeadOffice) isMatch = true;
                     } else {
-                        // When viewing a branch, do not show Head office stock
+                        // When viewing own branch, do not show Head office stock
                         if (isItemHeadOffice) return;
 
                         if (selBranchLow) {
                             isMatch = (itemShop === selBranchLow || itemShop.includes(selBranchLow) || selBranchLow.includes(itemShop));
-                        } else {
+                        }
+                        
+                        if (!isMatch) {
                             if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
                                 isMatch = true;
                             } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
@@ -1289,7 +1293,7 @@
                     stockBadge.innerText = '0 Stock Items';
                     stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
                     stockBadge.style.color = 'var(--danger)';
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now. Please select your branch name above.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this selection right now.</td></tr>';
                     return;
                 }
 
