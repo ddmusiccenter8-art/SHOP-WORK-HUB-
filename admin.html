@@ -279,6 +279,26 @@
     <div class="container">
         <!-- All Submissions View -->
         <div id="submissionsView" class="view active">
+            <!-- Shop / Branch Filter Bar -->
+            <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem 1.4rem; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+                    <label for="adminShopFilterSelect" style="font-weight: 700; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                        🏪 Select Shop / Branch:
+                    </label>
+                    <select id="adminShopFilterSelect" onchange="renderAllSubmissions()" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; padding: 0.55rem 1rem; border-radius: 10px; font-size: 0.95rem; outline: none; cursor: pointer; min-width: 280px;">
+                        <option value="ALL">🏢 All Shops (Combined Overview)</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;" id="adminSelectedShopBadges">
+                    <span id="badgeShopSubmissions" style="font-size: 0.82rem; color: #3b82f6; font-weight: 600; background: rgba(59,130,246,0.1); padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+                        📑 Total: 0 Submissions
+                    </span>
+                    <span id="badgeShopStock" style="font-size: 0.82rem; color: var(--success); font-weight: 600; background: rgba(16,185,129,0.1); padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid rgba(16,185,129,0.2);">
+                        📦 Allocated: 0 Stock
+                    </span>
+                </div>
+            </div>
+
             <!-- Stats Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.4rem; border-radius: 14px; border: 1px solid var(--border-color);">
@@ -1067,6 +1087,7 @@
             if (snapshot.empty) {
                 if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No submission records found in database.</td></tr>';
                 renderAllSubmissions();
+                updateAdminShopFilterOptions();
                 return;
             }
 
@@ -1079,21 +1100,73 @@
 
             allSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
+            updateAdminShopFilterOptions();
             renderAllSubmissions();
             renderShopDirectory(Array.from(uniqueShops));
+        }
+
+        function updateAdminShopFilterOptions() {
+            const select = document.getElementById('adminShopFilterSelect');
+            if (!select) return;
+
+            const previousVal = select.value;
+            select.innerHTML = '<option value="ALL">🏢 All Shops (Combined Overview)</option>';
+
+            const allShopsMap = new Map(); // email -> displayName
+
+            // 1. Registered shops
+            (registeredShopsList || []).forEach(s => {
+                if (s.email) {
+                    const eLow = s.email.toLowerCase().trim();
+                    const label = s.name ? `${s.name} (${s.email})` : s.email;
+                    allShopsMap.set(eLow, label);
+                }
+            });
+
+            // 2. Active sales shops
+            (allSales || []).forEach(s => {
+                if (s.shopId) {
+                    const eLow = s.shopId.toLowerCase().trim();
+                    if (!allShopsMap.has(eLow)) {
+                        const name = eLow.split('@')[0].toUpperCase();
+                        allShopsMap.set(eLow, `${name} (${s.shopId})`);
+                    }
+                }
+            });
+
+            Array.from(allShopsMap.entries()).sort((a,b) => a[1].localeCompare(b[1])).forEach(([email, label]) => {
+                const opt = document.createElement('option');
+                opt.value = email;
+                opt.innerText = `🏪 ${label}`;
+                select.appendChild(opt);
+            });
+
+            if (previousVal && (previousVal === 'ALL' || allShopsMap.has(previousVal))) {
+                select.value = previousVal;
+            }
         }
 
         window.renderAllSubmissions = function() {
             const tbody = document.getElementById('allSubmissionsBody');
             tbody.innerHTML = '';
             
+            const selectedShop = (document.getElementById('adminShopFilterSelect')?.value || 'ALL').toLowerCase().trim();
+            const searchTerm = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
+
+            // Filter sales for the selected shop first
+            const shopSalesScope = allSales.filter(data => {
+                if (selectedShop === 'all' || !selectedShop) return true;
+                const itemShop = (data.shopId || '').toLowerCase().trim();
+                const itemPrefix = itemShop.split('@')[0];
+                const selPrefix = selectedShop.split('@')[0];
+                return itemShop === selectedShop || (itemPrefix && selPrefix && (itemPrefix.includes(selPrefix) || selPrefix.includes(itemPrefix)));
+            });
+
             let overallLoan = 0;
             let overallPaid = 0;
             let overallPending = 0;
 
-            const searchTerm = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
-
-            allSales.forEach(data => {
+            shopSalesScope.forEach(data => {
                 const s = parseFloat(data.settlement) || 0;
                 overallLoan += (parseFloat(data.loanAmount) || 0);
                 const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
@@ -1104,11 +1177,45 @@
                 }
             });
 
+            // Update KPI cards reactively for selected shop
             document.getElementById('totalLoanVal').innerText = 'Rs. ' + overallLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('totalPaidVal').innerText = 'Rs. ' + overallPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('totalPendingVal').innerText = 'Rs. ' + overallPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            const filteredSales = allSales.filter(data => {
+            // Update live summary badges
+            const badgeSubmissions = document.getElementById('badgeShopSubmissions');
+            const badgeStock = document.getElementById('badgeShopStock');
+
+            if (badgeSubmissions) {
+                badgeSubmissions.innerText = `📑 Total: ${shopSalesScope.length} Submissions`;
+            }
+
+            if (badgeStock) {
+                let stockCount = 0;
+                if (selectedShop === 'all' || !selectedShop) {
+                    stockCount = (allInventoryItems || []).filter(i => i.status === 'Available').length;
+                    badgeStock.innerText = `📦 Total Stock: ${stockCount} Available`;
+                } else {
+                    const regInfo = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === selectedShop);
+                    stockCount = (allInventoryItems || []).filter(item => {
+                        if (item.status !== 'Available') return false;
+                        const itemShop = (item.shop || '').toLowerCase().trim();
+                        const sName = (regInfo?.name || '').toLowerCase().trim();
+                        const sLoc = (regInfo?.location || '').toLowerCase().trim();
+                        const sEmail = selectedShop;
+                        const sPrefix = sEmail.split('@')[0].toLowerCase().trim();
+
+                        return (sName && (itemShop === sName || itemShop.includes(sName))) ||
+                               (sLoc && (itemShop === sLoc || itemShop.includes(sLoc))) ||
+                               (itemShop === sEmail || itemShop === sPrefix) ||
+                               (sEmail.includes('spm') && itemShop.includes('pulasthigama'));
+                    }).length;
+                    badgeStock.innerText = `📦 Allocated Stock: ${stockCount} Available`;
+                }
+            }
+
+            // Apply search and status tab filters
+            const filteredSales = shopSalesScope.filter(data => {
                 const matchesSearch = (data.imei || '').toString().toLowerCase().includes(searchTerm) || 
                                       (data.spNumber || '').toString().toLowerCase().includes(searchTerm) || 
                                       (data.nic || '').toString().toLowerCase().includes(searchTerm) ||
@@ -1125,7 +1232,7 @@
             });
 
             if (filteredSales.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching submission records found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching submission records found for this selection.</td></tr>';
                 return;
             }
 
@@ -1160,14 +1267,23 @@
             return `<span class="badge">${status}</span>`;
         }
 
-        // CSV Export Feature
+        // CSV Export Feature (Scoped by Selected Shop)
         window.exportToCSV = function() {
-            if (allSales.length === 0) return showToast("No data to export", "warning");
+            const selectedShop = (document.getElementById('adminShopFilterSelect')?.value || 'ALL').toLowerCase().trim();
+            const exportSales = allSales.filter(data => {
+                if (selectedShop === 'all' || !selectedShop) return true;
+                const itemShop = (data.shopId || '').toLowerCase().trim();
+                const itemPrefix = itemShop.split('@')[0];
+                const selPrefix = selectedShop.split('@')[0];
+                return itemShop === selectedShop || (itemPrefix && selPrefix && (itemPrefix.includes(selPrefix) || selPrefix.includes(itemPrefix)));
+            });
+
+            if (exportSales.length === 0) return showToast("No data to export", "warning");
 
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Date,Shop,Customer Name,NIC,IMEI,Model,SP Number,MRP,Loan Amount,Settlement,Stock Source,Status,Payment Status\n";
 
-            allSales.forEach(s => {
+            exportSales.forEach(s => {
                 const row = [
                     `"${s.date || ''}"`,
                     `"${s.shopId || ''}"`,
@@ -1189,7 +1305,8 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `methmi_work_hub_submissions_${new Date().toISOString().slice(0,10)}.csv`);
+            const shopSuffix = selectedShop !== 'all' ? `_${selectedShop.split('@')[0]}` : '';
+            link.setAttribute("download", `methmi_work_hub_submissions${shopSuffix}_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1234,6 +1351,8 @@
                 });
                 renderShopDirectory();
                 updateShopDatalists();
+                updateAdminShopFilterOptions();
+                renderAllSubmissions();
             }, (err) => console.error("Registered shops fetch error:", err));
         }
 
@@ -1849,6 +1968,7 @@
                 updateShopDatalists();
                 renderShopDirectory();
                 filterInventoryTable();
+                renderAllSubmissions();
             }, (err) => {
                 console.error("Inventory error:", err);
             });
