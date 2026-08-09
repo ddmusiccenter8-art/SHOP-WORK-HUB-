@@ -444,6 +444,27 @@
 
         <!-- Data View & Chart Section -->
         <div>
+            <!-- Financial & Profit Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">Total Loans</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: #818cf8; margin: 0;" id="shopTotalLoans">Rs. 0.00</p>
+                </div>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">My Earned Profit</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: #10b981; margin: 0;" id="shopTotalProfit">Rs. 0.00</p>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);">HO (4%) + Own (6%)</span>
+                </div>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">Settlement (Paid)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--success); margin: 0;" id="shopTotalPaid">Rs. 0.00</p>
+                </div>
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">Settlement (Pending)</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--warning); margin: 0;" id="shopTotalPending">Rs. 0.00</p>
+                </div>
+            </div>
+
             <div class="glass-panel" style="padding-bottom: 1.2rem;">
                 <h2>Sales Analytics <span class="lang-si">(විකුණුම් විශ්ලේෂණය)</span></h2>
                 <div class="chart-container">
@@ -845,14 +866,14 @@
                     const invDoc = snapshot.docs[0];
                     const data = invDoc.data();
                     
-                    imeiStatus.innerHTML = '<span style="color: var(--success);">? Head Office Stock (4% Profit Settlement)</span>';
+                    imeiStatus.innerHTML = '<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (4% Shop Profit)</span>';
                     if (data.model) modelInput.value = data.model;
                     if (data.storage) storageInput.value = data.storage;
                     
                     currentStockSource = 'HO';
                     matchedInventoryDocId = invDoc.id;
                 } else {
-                    imeiStatus.innerHTML = '<span style="color: var(--info);">Shop Own Stock (4% Discount Settlement)</span>';
+                    imeiStatus.innerHTML = '<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (6% Shop Profit)</span>';
                     currentStockSource = 'Shop';
                     matchedInventoryDocId = null;
                 }
@@ -868,17 +889,15 @@
             const docCharge = parseFloat(documentInput.value) || 0;
 
             let settlement = 0;
-            if (currentStockSource === 'HO') {
-                // For Head Office Stock: Settlement is ONLY 4% Profit of MRP
-                settlement = mrp * 0.04;
-            } else {
-                // For Shop Own Stock: Settlement = (MRP - 4%) - Down Payment - Document Fee
-                const discountedMrp = mrp - (mrp * 0.04);
-                settlement = discountedMrp - dp - docCharge;
-            }
+            const isHO = (currentStockSource === 'HO');
+            const profitRate = isHO ? 0.04 : 0.06;
+            
+            // Settlement = (MRP - Profit) - Down Payment - Document Fee
+            const discountedMrp = mrp - (mrp * profitRate);
+            settlement = discountedMrp - dp - docCharge;
 
             if (mrp > 0 || dp > 0 || docCharge > 0) {
-                settlementInput.value = settlement.toFixed(2);
+                settlementInput.value = Math.max(0, settlement).toFixed(2);
             } else {
                 settlementInput.value = '';
             }
@@ -901,49 +920,58 @@
                 spNumber: document.getElementById('spNumber').value.trim(),
                 nic: document.getElementById('nic').value.trim(),
                 name: document.getElementById('name').value.trim(),
-                imei: imeiInput.value.trim(),
-                model: modelInput.value.trim(),
-                storage: storageInput.value.trim(),
+                imei: document.getElementById('imei').value.trim(),
+                model: document.getElementById('model').value.trim(),
+                storage: document.getElementById('storage').value.trim(),
                 mrp: parseFloat(document.getElementById('mrp').value) || 0,
-                loanAmount: parseFloat(loanAmountInput.value) || 0,
-                settlement: parseFloat(settlementInput.value) || 0,
-                downPayment: parseFloat(downPaymentInput.value) || 0,
-                document: parseFloat(documentInput.value) || 0,
-                fintrexPayment: '',
-                status: 'New', 
-                adminReply: '',
+                downPayment: parseFloat(document.getElementById('downPayment').value) || 0,
+                document: parseFloat(document.getElementById('document').value) || 0,
+                loanAmount: parseFloat(document.getElementById('loanAmount').value) || 0,
+                settlement: parseFloat(document.getElementById('settlement').value) || 0,
                 stockSource: currentStockSource,
-                discountApplied: currentStockSource === 'HO' ? '4% Profit' : '4% Discount',
+                inventoryDocId: matchedInventoryDocId,
+                status: 'New',
+                paymentStatus: 'Pending',
                 timestamp: Date.now()
             };
 
-            addDoc(collection(db, "sales"), payload).then(() => {
+            addDoc(collection(db, "sales"), payload).then(async (docRef) => {
                 showToast("Sales entry submitted successfully!", "success");
-                
-                if (matchedInventoryDocId) {
-                    updateDoc(doc(db, "inventory", matchedInventoryDocId), { status: 'Sold' }).catch(console.error);
-                }
-
                 salesForm.reset();
-                imeiStatus.innerText = '';
+                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('imeiStatus').innerText = '';
                 currentStockSource = 'Shop';
                 matchedInventoryDocId = null;
-                document.getElementById('date').valueAsDate = new Date();
-            }).catch(error => {
-                console.error(error);
-                showToast("Error saving data: " + error.message, "error");
+
+                if (payload.inventoryDocId) {
+                    try {
+                        await updateDoc(doc(db, "inventory", payload.inventoryDocId), {
+                            status: 'Sold',
+                            soldAt: Date.now(),
+                            soldBy: currentUser.email,
+                            salesDocId: docRef.id
+                        });
+                    } catch (invErr) {
+                        console.error("Error marking inventory as sold:", invErr);
+                    }
+                }
+            }).catch(e => {
+                console.error("Submission error:", e);
+                showToast("Submission failed: " + e.message, "error");
             }).finally(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerText = 'Submit Data';
             });
         });
 
+        // Filter & Search Functionality for Shop Sales
         let allShopSales = [];
+        let currentShopFilter = 'All';
 
-        window.filterShopSalesByStatus = function(status) {
-            currentShopFilter = status;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.dataset.filter === status) btn.classList.add('active');
+        window.filterShopSalesByStatus = function(filter) {
+            currentShopFilter = filter;
+            document.querySelectorAll('#newEntryView .filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
             renderShopSales();
@@ -953,6 +981,41 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             
+            let totalLoan = 0;
+            let totalProfit = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+
+            allShopSales.forEach(data => {
+                const loan = parseFloat(data.loanAmount) || 0;
+                const setl = parseFloat(data.settlement) || 0;
+                const mrp = parseFloat(data.mrp) || loan || 0;
+                const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
+                const profitRate = isHO ? 0.04 : 0.06;
+                const profit = mrp * profitRate;
+
+                totalLoan += loan;
+                totalProfit += profit;
+
+                const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
+                if (isPaid) {
+                    totalPaid += setl;
+                } else {
+                    totalPending += setl;
+                }
+            });
+
+            // Update KPI cards
+            const totalLoansEl = document.getElementById('shopTotalLoans');
+            const totalProfitEl = document.getElementById('shopTotalProfit');
+            const totalPaidEl = document.getElementById('shopTotalPaid');
+            const totalPendingEl = document.getElementById('shopTotalPending');
+
+            if (totalLoansEl) totalLoansEl.innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (totalProfitEl) totalProfitEl.innerText = 'Rs. ' + totalProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (totalPaidEl) totalPaidEl.innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (totalPendingEl) totalPendingEl.innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
             const searchTerm = (document.getElementById('shopSearchInput')?.value || '').trim().toLowerCase();
 
             const filtered = allShopSales.filter(data => {
@@ -980,10 +1043,18 @@
                 const tr = document.createElement('tr');
                 const id = data.id;
                 
+                const mrp = parseFloat(data.mrp) || parseFloat(data.loanAmount) || 0;
+                const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
+                const profitRate = isHO ? 0.04 : 0.06;
+                const profitAmount = mrp * profitRate;
+                const profitBadge = isHO
+                    ? `<span style="color:#10b981; font-size:0.78rem; font-weight:600; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">Profit (4% HO): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`
+                    : `<span style="color:#3b82f6; font-size:0.78rem; font-weight:600; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">Profit (6% Own): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`;
+
                 let statusHtml = '';
                 let paymentNote = data.paymentStatus === 'Paid' 
-                    ? '<br><span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✓</span>' 
-                    : '<br><span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending</span>';
+                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✓</span>' 
+                    : '<span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending</span>';
 
                 if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                 else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
@@ -995,11 +1066,12 @@
                     <td>${data.date || '-'}</td>
                     <td>
                         <strong>${data.spNumber || '-'}</strong><br>
-                        <span style="color: var(--text-muted)">${data.model || '-'} (${data.name || ''})</span>
+                        <span style="color: var(--text-muted)">${data.model || '-'} (${data.name || ''})</span><br>
+                        ${profitBadge}
                     </td>
                     <td>
                         Loan: Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}<br>
-                        Setl: Rs. ${parseFloat(data.settlement || 0).toLocaleString()}${paymentNote}
+                        Setl: Rs. ${parseFloat(data.settlement || 0).toLocaleString()} <span style="font-size:0.75rem;">(${paymentNote})</span>
                     </td>
                     <td>${statusHtml}</td>
                 `;
