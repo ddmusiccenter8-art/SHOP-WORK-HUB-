@@ -507,10 +507,11 @@
                         <th>Model & Storage</th>
                         <th>Assigned Branch</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="myStockBody">
-                    <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading stock data...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading branch allocated stock...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1127,58 +1128,81 @@
             }
         });
 
-        // Load Stock options & branches
-        function loadBranchOptions() {
-            const q = query(collection(db, "inventory"));
-            getDocs(q).then(snapshot => {
+        // Auto-match current shop profile from registered_shops
+        async function loadBranchOptions() {
+            try {
+                if (!currentUser) return;
+                const email = currentUser.email.toLowerCase().trim();
+                
+                // 1. Try finding registered shop profile by email
+                const qShops = query(collection(db, "registered_shops"), where("email", "==", email));
+                const shopSnap = await getDocs(qShops);
+                let matchedName = '';
+                if (!shopSnap.empty) {
+                    const sData = shopSnap.docs[0].data();
+                    matchedName = sData.name || sData.location || '';
+                }
+
+                // 2. Also populate branch datalist from inventory locations
+                const invSnap = await getDocs(collection(db, "inventory"));
                 const uniqueLocs = new Set();
-                snapshot.forEach(docSnap => {
+                invSnap.forEach(docSnap => {
                     const d = docSnap.data();
-                    if (d.shop) uniqueLocs.add(d.shop.trim());
+                    if (d.shop && d.shop !== 'MAIN SHOP' && d.shop !== 'Head Office') {
+                        uniqueLocs.add(d.shop.trim());
+                    }
                 });
 
                 const datalist = document.getElementById('branchDatalist');
-                datalist.innerHTML = '';
-                uniqueLocs.forEach(loc => {
-                    if (loc) {
-                        const opt = document.createElement('option');
-                        opt.value = loc;
-                        datalist.appendChild(opt);
-                    }
-                });
-
-                const savedBranch = localStorage.getItem('myBranchName');
-                if (savedBranch) {
-                    document.getElementById('myBranchName').value = savedBranch;
-                } else if (uniqueLocs.size > 0 && currentUser) {
-                    const userPrefix = currentUser.email.split('@')[0].toLowerCase();
-                    const matchedBranch = Array.from(uniqueLocs).find(loc => loc.toLowerCase().includes(userPrefix));
-                    if (matchedBranch) {
-                        document.getElementById('myBranchName').value = matchedBranch;
-                    }
+                if (datalist) {
+                    datalist.innerHTML = '';
+                    uniqueLocs.forEach(loc => {
+                        if (loc) {
+                            const opt = document.createElement('option');
+                            opt.value = loc;
+                            datalist.appendChild(opt);
+                        }
+                    });
                 }
-            }).catch(e => console.error("Error loading branch options:", e));
+
+                const branchInput = document.getElementById('myBranchName');
+                if (!matchedName && uniqueLocs.size > 0) {
+                    const userPrefix = email.split('@')[0].toLowerCase();
+                    matchedName = Array.from(uniqueLocs).find(loc => loc.toLowerCase().includes(userPrefix)) || '';
+                }
+
+                if (matchedName && branchInput) {
+                    branchInput.value = matchedName;
+                }
+                
+                loadMyStock();
+            } catch (e) {
+                console.error("Error loading branch options:", e);
+                loadMyStock();
+            }
         }
 
         let myStockUnsubscribe = null;
         window.loadMyStock = function(isExplicitClick = false) {
-            let branch = document.getElementById('myBranchName').value.trim();
+            let branch = (document.getElementById('myBranchName')?.value || '').trim();
             const tbody = document.getElementById('myStockBody');
             const stockBadge = document.getElementById('stockBadgeCount');
 
-            if (branch) {
-                localStorage.setItem('myBranchName', branch);
+            if (!branch) {
+                stockBadge.innerText = '0 Stock Items';
+                stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                stockBadge.style.color = 'var(--danger)';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Please enter or select your branch name above to view allocated stock.</td></tr>';
+                return;
             }
+
+            localStorage.setItem('myBranchName', branch);
 
             if (myStockUnsubscribe) myStockUnsubscribe();
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available stock...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available branch stock...</td></tr>';
 
-            let q;
-            if (branch) {
-                q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
-            } else {
-                q = query(collection(db, "inventory"), where("status", "==", "Available"));
-            }
+            // Query ONLY inventory strictly belonging to this branch! Never show MAIN SHOP stock to sub-branches
+            const q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
 
             myStockUnsubscribe = onSnapshot(q, (snapshot) => {
                 tbody.innerHTML = '';
@@ -1186,7 +1210,7 @@
                     stockBadge.innerText = '0 Stock Items';
                     stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
                     stockBadge.style.color = 'var(--danger)';
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now.</td></tr>';
                     return;
                 }
 
@@ -1196,6 +1220,7 @@
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
+                    const docId = docSnap.id;
                     const tr = document.createElement('tr');
                     const catBadge = data.category === 'Dialog Lesi Pay'
                         ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
@@ -1205,13 +1230,32 @@
                         <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}<br>${catBadge}</td>
                         <td><span style="color: var(--accent-purple); font-weight: 600;">${data.shop || '-'}</span></td>
                         <td><span class="badge badge-confirmed">Available</span></td>
+                        <td>
+                            <button onclick="returnStockToMain('${docId}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
+                                🔄 Return to Main
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }, error => {
                 console.error("Stock fetch error:", error);
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--warning);">Error fetching stock: ' + error.message + '</td></tr>';
             });
+        };
+
+        window.returnStockToMain = async function(id, imei) {
+            if (!confirm(`Are you sure you want to transfer unsold stock (IMEI: ${imei}) back to Head Office / Main Shop?`)) return;
+            try {
+                await updateDoc(doc(db, "inventory", id), {
+                    shop: 'MAIN SHOP',
+                    status: 'Available',
+                    returnedAt: Date.now()
+                });
+                showToast(`Stock item ${imei} transferred back to Main Shop!`, "success");
+            } catch (e) {
+                console.error("Return stock error:", e);
+                showToast("Failed to return stock: " + e.message, "error");
+            }
         };
 
         // Barcode Scanner Logic
