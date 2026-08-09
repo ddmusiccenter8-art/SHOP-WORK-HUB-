@@ -1290,6 +1290,13 @@
                             <button onclick="event.stopPropagation(); deleteShop('${regInfo.id}', '${safeName}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Delete</button>
                         </div>
                     `;
+                } else {
+                    const safeEmail = (shopEmail || '').replace(/'/g, "\\'");
+                    actionsHTML = `
+                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: center;">
+                            <button onclick="event.stopPropagation(); quickRegisterShop('${safeEmail}')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 0.3rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight:600;">➕ Complete / Edit Profile</button>
+                        </div>
+                    `;
                 }
 
                 card.innerHTML = `
@@ -1306,6 +1313,15 @@
                 grid.appendChild(card);
             });
         }
+
+        window.quickRegisterShop = function(email) {
+            document.getElementById('newShopEmail').value = email;
+            document.getElementById('newShopName').value = email.split('@')[0].toUpperCase();
+            document.getElementById('newShopPhone').value = '';
+            document.getElementById('newShopLocation').value = '';
+            document.getElementById('newShopPassword').value = '';
+            document.getElementById('addShopModal').style.display = 'flex';
+        };
 
         window.openAddShopModal = function() {
             document.getElementById('addShopModal').style.display = 'flex';

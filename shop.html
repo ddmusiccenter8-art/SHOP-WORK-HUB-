@@ -490,10 +490,11 @@
         </div>
 
         <div style="margin-bottom: 1.5rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-            <label style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location</label>
+            <label style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location <span style="color:var(--info); font-size:0.75rem;">(ශාඛාව තෝරන්න)</span></label>
             <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="myBranchName" list="branchDatalist" placeholder="e.g. PULASTHIGAMA POLONNARUWA" style="max-width: 420px; flex: 1; margin: 0; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
-                <datalist id="branchDatalist"></datalist>
+                <select id="myBranchName" onchange="loadMyStock(true)" style="max-width: 420px; flex: 1; margin: 0; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; font-weight:600; font-size: 0.95rem;">
+                    <option value="">-- Choose Your Branch --</option>
+                </select>
                 <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.8rem;" onclick="loadMyStock(true)">View Stock</button>
             </div>
             <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Phones transferred to your branch from Head Office (Shop receives 4% profit settlement when sold).</p>
@@ -739,11 +740,6 @@
                     document.getElementById('userEmailDisplay').innerText = user.email;
                     loadShopData(user.email);
                     loadBranchOptions();
-                    
-                    const savedBranch = localStorage.getItem('myBranchName');
-                    if (savedBranch) {
-                        document.getElementById('myBranchName').value = savedBranch;
-                    }
                 }
             } else {
                 window.location.href = 'index.html';
@@ -1130,7 +1126,7 @@
 
         let myRegisteredShopProfile = null;
 
-        // Auto-match current shop profile from registered_shops
+        // Auto-match current shop profile from registered_shops & inventory
         async function loadBranchOptions() {
             try {
                 if (!currentUser) return;
@@ -1141,35 +1137,67 @@
                 const shopSnap = await getDocs(qShops);
                 
                 let foundProfile = null;
-                const datalist = document.getElementById('branchDatalist');
-                if (datalist) datalist.innerHTML = '';
+                const allBranchOptions = new Set();
 
                 shopSnap.forEach(docSnap => {
                     const sData = docSnap.data();
                     if ((sData.email || '').toLowerCase().trim() === email) {
                         foundProfile = sData;
                     }
-                    if (sData.name && datalist) {
-                        const opt = document.createElement('option');
-                        opt.value = sData.name;
-                        datalist.appendChild(opt);
+                    if (sData.name) allBranchOptions.add(sData.name.trim());
+                    if (sData.location) allBranchOptions.add(sData.location.trim());
+                });
+
+                // 2. Also fetch all active branch locations from inventory
+                const invSnap = await getDocs(collection(db, "inventory"));
+                invSnap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const shopLoc = (d.shop || '').trim();
+                    if (shopLoc && shopLoc !== 'MAIN SHOP' && shopLoc !== 'Head Office' && shopLoc !== 'Main Shop') {
+                        allBranchOptions.add(shopLoc);
                     }
                 });
 
                 myRegisteredShopProfile = foundProfile;
-                const branchInput = document.getElementById('myBranchName');
+                const branchSelect = document.getElementById('myBranchName');
                 
+                if (branchSelect) {
+                    branchSelect.innerHTML = '<option value="">-- Choose Your Branch --</option>';
+                    Array.from(allBranchOptions).sort().forEach(branch => {
+                        const opt = document.createElement('option');
+                        opt.value = branch;
+                        opt.innerText = branch;
+                        branchSelect.appendChild(opt);
+                    });
+                }
+
+                // 3. Determine best matching default branch for current user
+                let defaultBranch = '';
+                const userKey = 'myBranch_' + email;
+                const userSavedBranch = localStorage.getItem(userKey);
+
                 if (foundProfile && foundProfile.name) {
-                    if (branchInput) branchInput.value = foundProfile.name;
+                    defaultBranch = foundProfile.name;
                     const shopDisplay = document.getElementById('userEmailDisplay');
                     if (shopDisplay) {
                         shopDisplay.innerHTML = `<strong>${foundProfile.name}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">(${currentUser.email})</span>`;
                     }
-                } else if (branchInput && !branchInput.value) {
-                    const fallback = email.split('@')[0].toUpperCase();
-                    branchInput.value = fallback;
+                } else if (userSavedBranch && allBranchOptions.has(userSavedBranch)) {
+                    defaultBranch = userSavedBranch;
+                } else {
+                    const emailPrefix = email.split('@')[0].toLowerCase();
+                    const matched = Array.from(allBranchOptions).find(b => {
+                        const bLow = b.toLowerCase();
+                        return bLow.includes(emailPrefix) || emailPrefix.includes(bLow) ||
+                               (email.includes('spm') && (bLow.includes('pulasthigama') || bLow.includes('spm')));
+                    });
+                    if (matched) defaultBranch = matched;
                 }
-                
+
+                if (defaultBranch && branchSelect) {
+                    branchSelect.value = defaultBranch;
+                }
+
                 loadMyStock();
             } catch (e) {
                 console.error("Error loading branch options:", e);
@@ -1181,17 +1209,23 @@
         window.loadMyStock = function(isExplicitClick = false) {
             const tbody = document.getElementById('myStockBody');
             const stockBadge = document.getElementById('stockBadgeCount');
-            const branchInputVal = (document.getElementById('myBranchName')?.value || '').trim().toLowerCase();
+            const branchSelect = document.getElementById('myBranchName');
+            let selectedBranch = (branchSelect?.value || '').trim();
+
+            if (selectedBranch && currentUser) {
+                localStorage.setItem('myBranch_' + currentUser.email.toLowerCase(), selectedBranch);
+            }
 
             if (myStockUnsubscribe) myStockUnsubscribe();
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available branch stock...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading branch stock...</td></tr>';
 
-            // Query all available inventory and filter with robust matching
+            // Query all available inventory
             const q = query(collection(db, "inventory"), where("status", "==", "Available"));
 
             myStockUnsubscribe = onSnapshot(q, (snapshot) => {
                 tbody.innerHTML = '';
 
+                const selBranchLow = selectedBranch.toLowerCase();
                 const myEmail = (currentUser?.email || '').toLowerCase().trim();
                 const myPrefix = myEmail.split('@')[0].toLowerCase().trim();
                 const regName = (myRegisteredShopProfile?.name || '').toLowerCase().trim();
@@ -1209,20 +1243,23 @@
                         return;
                     }
 
-                    // Check if item belongs to this branch
-                    let isMine = false;
+                    // Check if item belongs to selected branch
+                    let isMatch = false;
 
-                    if (branchInputVal && (itemShop === branchInputVal || itemShop.includes(branchInputVal) || branchInputVal.includes(itemShop))) {
-                        isMine = true;
-                    } else if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
-                        isMine = true;
-                    } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
-                        isMine = true;
-                    } else if (itemShop === myEmail || (myPrefix && (itemShop.includes(myPrefix) || myPrefix.includes(itemShop)))) {
-                        isMine = true;
+                    if (selBranchLow) {
+                        isMatch = (itemShop === selBranchLow || itemShop.includes(selBranchLow) || selBranchLow.includes(itemShop));
+                    } else {
+                        // If no branch chosen, match against user profile
+                        if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
+                            isMatch = true;
+                        } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
+                            isMatch = true;
+                        } else if (itemShop === myEmail || (myPrefix && (itemShop.includes(myPrefix) || myPrefix.includes(itemShop)))) {
+                            isMatch = true;
+                        }
                     }
 
-                    if (isMine) {
+                    if (isMatch) {
                         allocatedItems.push({ id: docId, ...data });
                     }
                 });
@@ -1231,7 +1268,7 @@
                     stockBadge.innerText = '0 Stock Items';
                     stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
                     stockBadge.style.color = 'var(--danger)';
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this branch right now. Please select your branch name above.</td></tr>';
                     return;
                 }
 
@@ -1245,7 +1282,7 @@
                         ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
                         : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">📦 Own Buy</span>';
                     
-                    const displayBranch = myRegisteredShopProfile?.name || data.shop || '-';
+                    const displayBranch = data.shop || selectedBranch || '-';
 
                     tr.innerHTML = `
                         <td><strong>${data.imei || '-'}</strong></td>
