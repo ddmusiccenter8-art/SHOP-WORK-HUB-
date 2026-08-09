@@ -1173,6 +1173,14 @@
                 
                 if (branchSelect) {
                     branchSelect.innerHTML = '<option value="">-- Choose Your Branch --</option>';
+                    
+                    const hoOpt = document.createElement('option');
+                    hoOpt.value = 'HEAD OFFICE';
+                    hoOpt.innerText = '🏢 HEAD OFFICE / MAIN SHOP';
+                    hoOpt.style.fontWeight = 'bold';
+                    hoOpt.style.color = '#e50000';
+                    branchSelect.appendChild(hoOpt);
+
                     Array.from(allBranchOptions).sort().forEach(branch => {
                         const opt = document.createElement('option');
                         opt.value = branch;
@@ -1192,7 +1200,7 @@
                     if (shopDisplay) {
                         shopDisplay.innerHTML = `<strong>${foundProfile.name}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">(${currentUser.email})</span>`;
                     }
-                } else if (userSavedBranch && allBranchOptions.has(userSavedBranch)) {
+                } else if (userSavedBranch && (allBranchOptions.has(userSavedBranch) || userSavedBranch === 'HEAD OFFICE')) {
                     defaultBranch = userSavedBranch;
                 } else {
                     const emailPrefix = email.split('@')[0].toLowerCase();
@@ -1241,36 +1249,39 @@
                 const regName = (myRegisteredShopProfile?.name || '').toLowerCase().trim();
                 const regLoc = (myRegisteredShopProfile?.location || '').toLowerCase().trim();
 
+                const isHeadOfficeSelected = selBranchLow === 'head office' || selBranchLow === 'main shop' || selBranchLow.includes('head office') || selBranchLow.includes('main shop');
+
                 const allocatedItems = [];
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const docId = docSnap.id;
                     const itemShop = (data.shop || '').trim().toLowerCase();
+                    const isItemHeadOffice = itemShop === 'main shop' || itemShop === 'head office' || itemShop === 'main';
 
-                    // Never show main shop stock to sub branches
-                    if (itemShop === 'main shop' || itemShop === 'head office' || itemShop === 'main') {
-                        return;
-                    }
-
-                    // Check if item belongs to selected branch
                     let isMatch = false;
 
-                    if (selBranchLow) {
-                        isMatch = (itemShop === selBranchLow || itemShop.includes(selBranchLow) || selBranchLow.includes(itemShop));
+                    if (isHeadOfficeSelected) {
+                        if (isItemHeadOffice) isMatch = true;
                     } else {
-                        // If no branch chosen, match against user profile
-                        if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
-                            isMatch = true;
-                        } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
-                            isMatch = true;
-                        } else if (itemShop === myEmail || (myPrefix && (itemShop.includes(myPrefix) || myPrefix.includes(itemShop)))) {
-                            isMatch = true;
+                        // When viewing a branch, do not show Head office stock
+                        if (isItemHeadOffice) return;
+
+                        if (selBranchLow) {
+                            isMatch = (itemShop === selBranchLow || itemShop.includes(selBranchLow) || selBranchLow.includes(itemShop));
+                        } else {
+                            if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
+                                isMatch = true;
+                            } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
+                                isMatch = true;
+                            } else if (itemShop === myEmail || (myPrefix && (itemShop.includes(myPrefix) || myPrefix.includes(itemShop)))) {
+                                isMatch = true;
+                            }
                         }
                     }
 
                     if (isMatch) {
-                        allocatedItems.push({ id: docId, ...data });
+                        allocatedItems.push({ id: docId, isHeadOffice: isItemHeadOffice, ...data });
                     }
                 });
 
@@ -1292,18 +1303,25 @@
                         ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
                         : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">📦 Own Buy</span>';
                     
-                    const displayBranch = data.shop || selectedBranch || '-';
+                    const displayBranch = data.isHeadOffice ? '🏢 HEAD OFFICE' : (data.shop || selectedBranch || '-');
+
+                    let actionHTML = '';
+                    if (data.isHeadOffice) {
+                        actionHTML = '<span style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">📍 At Head Office</span>';
+                    } else {
+                        actionHTML = `
+                            <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
+                                🔄 Return to Main
+                            </button>
+                        `;
+                    }
 
                     tr.innerHTML = `
                         <td><strong>${data.imei || '-'}</strong></td>
                         <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}<br>${catBadge}</td>
-                        <td><span style="color: var(--accent-purple); font-weight: 600;">${displayBranch}</span></td>
+                        <td><span style="color: ${data.isHeadOffice ? 'var(--primary)' : 'var(--accent-purple)'}; font-weight: 600;">${displayBranch}</span></td>
                         <td><span class="badge badge-confirmed">Available</span></td>
-                        <td>
-                            <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
-                                🔄 Return to Main
-                            </button>
-                        </td>
+                        <td>${actionHTML}</td>
                     `;
                     tbody.appendChild(tr);
                 });
