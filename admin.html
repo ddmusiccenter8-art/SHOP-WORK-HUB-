@@ -1198,6 +1198,32 @@
         };
 
         // Registered Shops Directory & Modal
+        function updateShopDatalists() {
+            const datalist = document.getElementById('shopDatalist');
+            const transferDatalist = document.getElementById('transferShopDatalist');
+            
+            const options = new Set();
+            options.add('MAIN SHOP');
+
+            // Add all registered shops
+            if (Array.isArray(registeredShopsList)) {
+                registeredShopsList.forEach(s => {
+                    if (s.name) options.add(s.name.trim());
+                });
+            }
+
+            // Add any other historical locations from inventory
+            if (Array.isArray(allInventoryItems)) {
+                allInventoryItems.forEach(i => {
+                    if (i.shop) options.add(i.shop.trim());
+                });
+            }
+
+            const html = Array.from(options).map(opt => `<option value="${opt}"></option>`).join('');
+            if (datalist) datalist.innerHTML = html;
+            if (transferDatalist) transferDatalist.innerHTML = html;
+        }
+
         function loadRegisteredShops() {
             onSnapshot(collection(db, "registered_shops"), (snapshot) => {
                 registeredShopsList = [];
@@ -1207,6 +1233,7 @@
                     registeredShopsList.push(d);
                 });
                 renderShopDirectory();
+                updateShopDatalists();
             }, (err) => console.error("Registered shops fetch error:", err));
         }
 
@@ -1234,6 +1261,20 @@
                 
                 const displayName = regInfo ? regInfo.name : shopEmail.split('@')[0].toUpperCase();
                 
+                // Calculate stock currently allocated to this branch
+                const branchStockCount = (allInventoryItems || []).filter(item => {
+                    if (item.status !== 'Available') return false;
+                    const itemShop = (item.shop || '').toLowerCase().trim();
+                    const sName = (regInfo?.name || '').toLowerCase().trim();
+                    const sLoc = (regInfo?.location || '').toLowerCase().trim();
+                    const sEmail = (shopEmail || '').toLowerCase().trim();
+                    const sPrefix = sEmail.split('@')[0].toLowerCase().trim();
+
+                    return (sName && (itemShop === sName || itemShop.includes(sName))) ||
+                           (sLoc && (itemShop === sLoc || itemShop.includes(sLoc))) ||
+                           (itemShop === sEmail || itemShop === sPrefix);
+                }).length;
+
                 const card = document.createElement('div');
                 card.className = 'shop-card';
                 card.onclick = () => viewShopProfile(shopEmail, shopSales);
@@ -1258,6 +1299,7 @@
                     <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
                         <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
+                        <p style="font-size: 0.82rem; color: #3b82f6; font-weight: 600; margin-top: 0.4rem; background: rgba(59,130,246,0.1); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-block;">📦 Allocated Stock: ${branchStockCount} Phones Available</p>
                     </div>
                     ${actionsHTML}
                 `;
@@ -1788,15 +1830,8 @@
 
                 allInventoryItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-                datalist.innerHTML = '';
-                uniqueLocations.forEach(loc => {
-                    if (loc) {
-                        const option = document.createElement('option');
-                        option.value = loc;
-                        datalist.appendChild(option);
-                    }
-                });
-
+                updateShopDatalists();
+                renderShopDirectory();
                 filterInventoryTable();
             }, (err) => {
                 console.error("Inventory error:", err);

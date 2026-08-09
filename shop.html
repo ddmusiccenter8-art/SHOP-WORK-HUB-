@@ -1128,51 +1128,46 @@
             }
         });
 
+        let myRegisteredShopProfile = null;
+
         // Auto-match current shop profile from registered_shops
         async function loadBranchOptions() {
             try {
                 if (!currentUser) return;
                 const email = currentUser.email.toLowerCase().trim();
                 
-                // 1. Try finding registered shop profile by email
-                const qShops = query(collection(db, "registered_shops"), where("email", "==", email));
+                // 1. Fetch registered shop profile by email
+                const qShops = query(collection(db, "registered_shops"));
                 const shopSnap = await getDocs(qShops);
-                let matchedName = '';
-                if (!shopSnap.empty) {
-                    const sData = shopSnap.docs[0].data();
-                    matchedName = sData.name || sData.location || '';
-                }
+                
+                let foundProfile = null;
+                const datalist = document.getElementById('branchDatalist');
+                if (datalist) datalist.innerHTML = '';
 
-                // 2. Also populate branch datalist from inventory locations
-                const invSnap = await getDocs(collection(db, "inventory"));
-                const uniqueLocs = new Set();
-                invSnap.forEach(docSnap => {
-                    const d = docSnap.data();
-                    if (d.shop && d.shop !== 'MAIN SHOP' && d.shop !== 'Head Office') {
-                        uniqueLocs.add(d.shop.trim());
+                shopSnap.forEach(docSnap => {
+                    const sData = docSnap.data();
+                    if ((sData.email || '').toLowerCase().trim() === email) {
+                        foundProfile = sData;
+                    }
+                    if (sData.name && datalist) {
+                        const opt = document.createElement('option');
+                        opt.value = sData.name;
+                        datalist.appendChild(opt);
                     }
                 });
 
-                const datalist = document.getElementById('branchDatalist');
-                if (datalist) {
-                    datalist.innerHTML = '';
-                    uniqueLocs.forEach(loc => {
-                        if (loc) {
-                            const opt = document.createElement('option');
-                            opt.value = loc;
-                            datalist.appendChild(opt);
-                        }
-                    });
-                }
-
+                myRegisteredShopProfile = foundProfile;
                 const branchInput = document.getElementById('myBranchName');
-                if (!matchedName && uniqueLocs.size > 0) {
-                    const userPrefix = email.split('@')[0].toLowerCase();
-                    matchedName = Array.from(uniqueLocs).find(loc => loc.toLowerCase().includes(userPrefix)) || '';
-                }
-
-                if (matchedName && branchInput) {
-                    branchInput.value = matchedName;
+                
+                if (foundProfile && foundProfile.name) {
+                    if (branchInput) branchInput.value = foundProfile.name;
+                    const shopDisplay = document.getElementById('userEmailDisplay');
+                    if (shopDisplay) {
+                        shopDisplay.innerHTML = `<strong>${foundProfile.name}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">(${currentUser.email})</span>`;
+                    }
+                } else if (branchInput && !branchInput.value) {
+                    const fallback = email.split('@')[0].toUpperCase();
+                    branchInput.value = fallback;
                 }
                 
                 loadMyStock();
@@ -1184,29 +1179,55 @@
 
         let myStockUnsubscribe = null;
         window.loadMyStock = function(isExplicitClick = false) {
-            let branch = (document.getElementById('myBranchName')?.value || '').trim();
             const tbody = document.getElementById('myStockBody');
             const stockBadge = document.getElementById('stockBadgeCount');
-
-            if (!branch) {
-                stockBadge.innerText = '0 Stock Items';
-                stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-                stockBadge.style.color = 'var(--danger)';
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Please enter or select your branch name above to view allocated stock.</td></tr>';
-                return;
-            }
-
-            localStorage.setItem('myBranchName', branch);
+            const branchInputVal = (document.getElementById('myBranchName')?.value || '').trim().toLowerCase();
 
             if (myStockUnsubscribe) myStockUnsubscribe();
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Loading available branch stock...</td></tr>';
 
-            // Query ONLY inventory strictly belonging to this branch! Never show MAIN SHOP stock to sub-branches
-            const q = query(collection(db, "inventory"), where("shop", "==", branch), where("status", "==", "Available"));
+            // Query all available inventory and filter with robust matching
+            const q = query(collection(db, "inventory"), where("status", "==", "Available"));
 
             myStockUnsubscribe = onSnapshot(q, (snapshot) => {
                 tbody.innerHTML = '';
-                if (snapshot.empty) {
+
+                const myEmail = (currentUser?.email || '').toLowerCase().trim();
+                const myPrefix = myEmail.split('@')[0].toLowerCase().trim();
+                const regName = (myRegisteredShopProfile?.name || '').toLowerCase().trim();
+                const regLoc = (myRegisteredShopProfile?.location || '').toLowerCase().trim();
+
+                const allocatedItems = [];
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
+                    const itemShop = (data.shop || '').trim().toLowerCase();
+
+                    // Never show main shop stock to sub branches
+                    if (itemShop === 'main shop' || itemShop === 'head office' || itemShop === 'main') {
+                        return;
+                    }
+
+                    // Check if item belongs to this branch
+                    let isMine = false;
+
+                    if (branchInputVal && (itemShop === branchInputVal || itemShop.includes(branchInputVal) || branchInputVal.includes(itemShop))) {
+                        isMine = true;
+                    } else if (regName && (itemShop === regName || itemShop.includes(regName) || regName.includes(itemShop))) {
+                        isMine = true;
+                    } else if (regLoc && (itemShop === regLoc || itemShop.includes(regLoc) || regLoc.includes(itemShop))) {
+                        isMine = true;
+                    } else if (itemShop === myEmail || (myPrefix && (itemShop.includes(myPrefix) || myPrefix.includes(itemShop)))) {
+                        isMine = true;
+                    }
+
+                    if (isMine) {
+                        allocatedItems.push({ id: docId, ...data });
+                    }
+                });
+
+                if (allocatedItems.length === 0) {
                     stockBadge.innerText = '0 Stock Items';
                     stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
                     stockBadge.style.color = 'var(--danger)';
@@ -1214,24 +1235,25 @@
                     return;
                 }
 
-                stockBadge.innerText = `${snapshot.size} Stock Available`;
+                stockBadge.innerText = `${allocatedItems.length} Stock Available`;
                 stockBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
                 stockBadge.style.color = 'var(--success)';
 
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const docId = docSnap.id;
+                allocatedItems.forEach(data => {
                     const tr = document.createElement('tr');
                     const catBadge = data.category === 'Dialog Lesi Pay'
                         ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
                         : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">📦 Own Buy</span>';
+                    
+                    const displayBranch = myRegisteredShopProfile?.name || data.shop || '-';
+
                     tr.innerHTML = `
                         <td><strong>${data.imei || '-'}</strong></td>
                         <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}<br>${catBadge}</td>
-                        <td><span style="color: var(--accent-purple); font-weight: 600;">${data.shop || '-'}</span></td>
+                        <td><span style="color: var(--accent-purple); font-weight: 600;">${displayBranch}</span></td>
                         <td><span class="badge badge-confirmed">Available</span></td>
                         <td>
-                            <button onclick="returnStockToMain('${docId}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
+                            <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
                                 🔄 Return to Main
                             </button>
                         </td>
@@ -1240,6 +1262,7 @@
                 });
             }, error => {
                 console.error("Stock fetch error:", error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--warning);">Error fetching stock: ' + error.message + '</td></tr>';
             });
         };
 
