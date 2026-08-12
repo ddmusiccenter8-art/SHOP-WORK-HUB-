@@ -337,7 +337,7 @@
         }
     </style>
 </head>
-<body>
+<body style="display: none;">
 
     <div class="header">
         <h1>
@@ -753,28 +753,34 @@
             }, 3000);
         };
 
-        // Auth Check
+        // Strict Auth Guard
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const adminEmails = [
-                    'admin@methmi.com', 
-                    'methmimobilepvtltd@gmail.com', 
-                    'ddmusiccenter8@gmail.com'
-                ];
-                const isAdmin = user.email.toLowerCase().includes('admin') || 
-                                adminEmails.includes(user.email.toLowerCase());
-
-                if (isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    currentUser = user;
-                    document.getElementById('userEmailDisplay').innerText = user.email;
-                    loadShopData(user.email);
-                    loadBranchOptions();
-                }
-            } else {
-                window.location.href = 'index.html';
+            if (!user) {
+                window.location.replace('index.html');
+                return;
             }
+
+            const adminEmails = [
+                'admin@methmi.com', 
+                'methmimobilepvtltd@gmail.com', 
+                'ddmusiccenter8@gmail.com'
+            ];
+            const isAdmin = user.email.toLowerCase().includes('admin') || 
+                            adminEmails.includes(user.email.toLowerCase());
+
+            if (isAdmin) {
+                window.location.replace('admin.html');
+                return;
+            }
+
+            currentUser = user;
+            document.body.style.display = 'block';
+            document.getElementById('userEmailDisplay').innerText = user.email;
+            if (document.getElementById('date')) {
+                document.getElementById('date').valueAsDate = new Date();
+            }
+            loadBranchOptions();
+            loadShopData(user.email);
         });
 
         window.doLogout = async function() {
@@ -1081,16 +1087,31 @@
 
         // Load Data & Chart
         function loadShopData(email) {
-            const q = query(collection(db, "sales"), where("shopId", "==", email));
+            if (!email) return;
+            const targetEmail = email.toLowerCase().trim();
+            const targetPrefix = targetEmail.split('@')[0].toLowerCase().trim();
             
-            onSnapshot(q, (snapshot) => {
+            onSnapshot(collection(db, "sales"), (snapshot) => {
                 allShopSales = [];
                 let salesByDate = {};
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     data.id = docSnap.id;
-                    allShopSales.push(data);
+                    const itemShop = (data.shopId || '').toLowerCase().trim();
+                    const itemPrefix = itemShop.split('@')[0].toLowerCase().trim();
+                    const regName = (myRegisteredShopProfile?.name || '').toLowerCase().trim();
+
+                    // Robust matching for this shop
+                    const isMatch = (itemShop === targetEmail) || 
+                                    (itemShop === targetPrefix) ||
+                                    (itemPrefix && targetPrefix && itemPrefix === targetPrefix) ||
+                                    (regName && (itemShop === regName || itemShop.includes(regName))) ||
+                                    (targetEmail.includes('spm') && itemShop.includes('spm'));
+
+                    if (isMatch) {
+                        allShopSales.push(data);
+                    }
                 });
 
                 allShopSales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));

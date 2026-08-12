@@ -235,7 +235,7 @@
         }
     </style>
 </head>
-<body>
+<body style="display: none;">
 
     <div class="header">
         <h1>
@@ -1027,36 +1027,43 @@
             logoutBtn.addEventListener('click', window.doLogout);
         }
 
-        // Auth Check
+        // Strict Auth Guard & Data Loader
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const adminEmails = [
-                    'admin@methmi.com', 
-                    'methmimobilepvtltd@gmail.com', 
-                    'ddmusiccenter8@gmail.com'
-                ];
-                const isAdmin = user.email.toLowerCase().includes('admin') || 
-                                adminEmails.includes(user.email.toLowerCase());
+            if (!user) {
+                // Not authenticated -> immediately redirect to login page
+                window.location.replace('index.html');
+                return;
+            }
 
-                if (!isAdmin) {
-                    window.location.href = 'shop.html';
+            const adminEmails = [
+                'admin@methmi.com', 
+                'methmimobilepvtltd@gmail.com', 
+                'ddmusiccenter8@gmail.com'
+            ];
+            const isAdmin = user.email.toLowerCase().includes('admin') || 
+                            adminEmails.includes(user.email.toLowerCase());
+
+            if (!isAdmin) {
+                // Logged-in as a non-admin shop -> redirect to shop.html
+                window.location.replace('shop.html');
+                return;
+            }
+
+            // User is verified as Admin: Show page and load data securely
+            document.body.style.display = 'block';
+            try {
+                loadAllData();
+                loadInventoryData();
+                loadRegisteredShops();
+                loadMainShopSalesData();
+                loadActivatorStaffDatalist();
+                if (document.getElementById('mainSaleDate')) {
+                    document.getElementById('mainSaleDate').valueAsDate = new Date();
                 }
+            } catch (e) {
+                console.error("Data load error:", e);
             }
         });
-
-        // Immediate Data Load on script execution
-        try {
-            loadAllData();
-            loadInventoryData();
-            loadRegisteredShops();
-            loadMainShopSalesData();
-            loadActivatorStaffDatalist();
-            if (document.getElementById('mainSaleDate')) {
-                document.getElementById('mainSaleDate').valueAsDate = new Date();
-            }
-        } catch (e) {
-            console.error("Immediate load error:", e);
-        }
 
         // Load All Submissions
         function loadAllData() {
