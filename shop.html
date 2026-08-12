@@ -824,8 +824,6 @@
         document.getElementById('date').valueAsDate = new Date();
 
         // Auto Calculation & Inventory Check Logic
-        let currentStockSource = 'Shop';
-        let matchedInventoryDocId = null;
 
         const imeiInput = document.getElementById('imei');
         const imeiStatus = document.getElementById('imeiStatus');
@@ -976,8 +974,6 @@
         });
 
         // Filter & Search Functionality for Shop Sales
-        let allShopSales = [];
-        let currentShopFilter = 'All';
 
         window.filterShopSalesByStatus = function(filter) {
             currentShopFilter = filter;
@@ -1149,7 +1145,6 @@
         }
 
         // Chart Update Function
-        let myChart = null;
         function updateChart(labels, revenueData, maxLoan) {
             const ctx = document.getElementById('salesChart');
             if(!ctx) return;
