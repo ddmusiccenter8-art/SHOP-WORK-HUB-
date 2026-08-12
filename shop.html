@@ -337,7 +337,7 @@
         }
     </style>
 </head>
-<body style="display: none;">
+<body>
 
     <div class="header">
         <h1>
@@ -730,6 +730,11 @@
         let currentUser = null;
         let currentModalDocId = null;
         let currentShopFilter = 'All';
+        let allShopSales = [];
+        let myRegisteredShopProfile = null;
+        let currentStockSource = 'Shop';
+        let matchedInventoryDocId = null;
+        let myChart = null;
 
         // Toast Helper
         window.showToast = function(message, type = 'info') {
@@ -1227,7 +1232,6 @@
             }
         });
 
-        let myRegisteredShopProfile = null;
 
         // Auto-match current shop's OWN branch profile only (hide other branches)
         async function loadBranchOptions() {
