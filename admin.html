@@ -193,6 +193,10 @@
         .filter-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 12px rgba(229, 0, 0, 0.3); }
         .filter-btn:hover:not(.active) { background: #f9fafb; }
 
+        .staff-filter-btn { padding: 0.45rem 0.95rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .staff-filter-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff !important; box-shadow: 0 4px 12px rgba(229, 0, 0, 0.35); }
+        .staff-filter-btn:hover:not(.active) { background: #f3f4f6; }
+
         /* Toast Notifications */
         #toastContainer {
             position: fixed;
@@ -777,7 +781,14 @@
                 </div>
             </div>
 
-            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem;">Activation History</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.1rem; color: var(--text-main); margin: 0;">Activation History</h3>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="staff-filter-btn active" id="btnStaffFilterAll" onclick="filterStaffHistory('All')">All Activations (<span id="staffFilterCountAll">0</span>)</button>
+                    <button class="staff-filter-btn" id="btnStaffFilterPending" onclick="filterStaffHistory('Pending')" style="color: var(--warning);">Pending (<span id="staffFilterCountPending">0</span>)</button>
+                    <button class="staff-filter-btn" id="btnStaffFilterPaid" onclick="filterStaffHistory('Paid')" style="color: var(--success);">Paid / Complete (<span id="staffFilterCountPaid">0</span>)</button>
+                </div>
+            </div>
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                 <table>
                     <thead>
@@ -2310,20 +2321,91 @@
             });
         }
 
+        let currentStaffSales = [];
+        let currentStaffFilter = 'All';
+
         window.viewStaffProfile = function(name, sales, totalCount, totalPaid, totalPending) {
+            currentStaffSales = sales ? [...sales] : [];
+            currentStaffFilter = 'All';
+
             document.getElementById('staffModalName').innerText = name;
             document.getElementById('staffModalInitials').innerText = name.charAt(0).toUpperCase();
             
+            updateStaffModalCounts();
+            renderStaffHistoryTable();
+            
+            document.getElementById('staffModal').style.display = 'flex';
+        };
+
+        function updateStaffModalCounts() {
+            const totalCount = currentStaffSales.length;
+            let totalPaid = 0;
+            let totalPending = 0;
+            let paidCount = 0;
+            let pendingCount = 0;
+
+            currentStaffSales.forEach(s => {
+                const fee = parseFloat(s.staffFee) || 0;
+                if (s.staffPaymentStatus === 'Paid') {
+                    totalPaid += fee;
+                    paidCount++;
+                } else {
+                    totalPending += fee;
+                    pendingCount++;
+                }
+            });
+
             document.getElementById('staffTotalActivations').innerText = totalCount;
             document.getElementById('staffTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('staffTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
-            
+
+            // Update badge counts in filter buttons
+            const elAll = document.getElementById('staffFilterCountAll');
+            const elPending = document.getElementById('staffFilterCountPending');
+            const elPaid = document.getElementById('staffFilterCountPaid');
+            if (elAll) elAll.innerText = totalCount;
+            if (elPending) elPending.innerText = pendingCount;
+            if (elPaid) elPaid.innerText = paidCount;
+
+            // Highlight active filter tab
+            document.querySelectorAll('.staff-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (currentStaffFilter === 'All') document.getElementById('btnStaffFilterAll')?.classList.add('active');
+            if (currentStaffFilter === 'Pending') document.getElementById('btnStaffFilterPending')?.classList.add('active');
+            if (currentStaffFilter === 'Paid') document.getElementById('btnStaffFilterPaid')?.classList.add('active');
+        }
+
+        window.filterStaffHistory = function(filter) {
+            currentStaffFilter = filter;
+            document.querySelectorAll('.staff-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (filter === 'All') document.getElementById('btnStaffFilterAll')?.classList.add('active');
+            if (filter === 'Pending') document.getElementById('btnStaffFilterPending')?.classList.add('active');
+            if (filter === 'Paid') document.getElementById('btnStaffFilterPaid')?.classList.add('active');
+            renderStaffHistoryTable();
+        };
+
+        function renderStaffHistoryTable() {
             const tbody = document.getElementById('staffHistoryTableBody');
             tbody.innerHTML = '';
-            
+
+            // Filter sales based on currentStaffFilter
+            const filteredSales = currentStaffSales.filter(s => {
+                const isPaid = s.staffPaymentStatus === 'Paid';
+                if (currentStaffFilter === 'Pending') return !isPaid;
+                if (currentStaffFilter === 'Paid') return isPaid;
+                return true; // 'All'
+            });
+
             // Sort sales by newest first
-            const sortedSales = [...sales].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            
+            const sortedSales = [...filteredSales].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (sortedSales.length === 0) {
+                const msg = currentStaffFilter === 'All' 
+                    ? 'No activation records found.' 
+                    : `No ${currentStaffFilter.toLowerCase()} activation records found.`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">${msg}</td></tr>`;
+                return;
+            }
+
             sortedSales.forEach(s => {
                 const tr = document.createElement('tr');
                 tr.style.cursor = 'pointer';
@@ -2399,9 +2481,7 @@
                 `;
                 tbody.appendChild(detailsTr);
             });
-            
-            document.getElementById('staffModal').style.display = 'flex';
-        };
+        }
 
         window.closeStaffModal = function() {
             document.getElementById('staffModal').style.display = 'none';
@@ -2412,10 +2492,14 @@
             try {
                 await updateDoc(doc(db, "main_shop_sales", docId), { staffPaymentStatus: 'Paid' });
                 showToast("Fee marked as paid successfully!", "success");
-                // The onSnapshot will automatically re-render the profiles, 
-                // but we also need to close the modal or re-render it. 
-                // For simplicity, we close it so they can click again to see the updated view.
-                closeStaffModal();
+                
+                // Update local list reactively
+                const item = currentStaffSales.find(s => s.id === docId);
+                if (item) {
+                    item.staffPaymentStatus = 'Paid';
+                }
+                updateStaffModalCounts();
+                renderStaffHistoryTable();
             } catch(e) {
                 console.error(e);
                 showToast("Failed to update fee status: " + e.message, "error");

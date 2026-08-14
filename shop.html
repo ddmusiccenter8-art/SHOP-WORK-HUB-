@@ -453,7 +453,7 @@
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">My Earned Profit</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: #10b981; margin: 0;" id="shopTotalProfit">Rs. 0.00</p>
-                    <span style="font-size: 0.72rem; color: var(--text-muted);">HO (4%) + Own (6%)</span>
+                    <span style="font-size: 0.72rem; color: var(--text-muted);" id="shopProfitRateLabel">HO (4%) + Own (6%)</span>
                 </div>
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.2rem; border-radius: 14px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.35rem; text-transform: uppercase;">Settlement (Paid)</h3>
@@ -760,6 +760,26 @@
             }, 3000);
         };
 
+        function updatePercentageDisplay() {
+            const imeiStatus = document.getElementById('imeiStatus');
+            if (imeiStatus && imeiStatus.innerHTML.includes('Head Office Stock')) {
+                imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
+            } else if (imeiStatus && imeiStatus.innerHTML.includes('Shop Own Stock')) {
+                imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
+            }
+            // Update profit rate label in dashboard
+            const profitLabel = document.getElementById('shopProfitRateLabel');
+            if (profitLabel) profitLabel.innerText = `HO (${myHoPercent}%) + Own (${myShopOwnPercent}%)`;
+            // Recalculate settlement with updated percentages
+            if (typeof calculateSettlement === 'function') {
+                try { calculateSettlement(); } catch(e) {}
+            }
+            // Re-render sales with updated percentages
+            if (typeof renderShopSales === 'function') {
+                try { renderShopSales(); } catch(e) {}
+            }
+        }
+
         // Strict Auth Guard
         onAuthStateChanged(auth, (user) => {
             if (!user) {
@@ -813,14 +833,6 @@
             }
         }
 
-        function updatePercentageDisplay() {
-            const imeiStatus = document.getElementById('imeiStatus');
-            if (imeiStatus && imeiStatus.innerHTML.includes('Head Office Stock')) {
-                imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">✅ Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
-            } else if (imeiStatus && imeiStatus.innerHTML.includes('Shop Own Stock')) {
-                imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">📦 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
-            }
-        }
 
         window.doLogout = async function() {
             try {
@@ -909,14 +921,14 @@
                     const invDoc = snapshot.docs[0];
                     const data = invDoc.data();
                     
-                    imeiStatus.innerHTML = '<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (4% Shop Profit)</span>';
+                    imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
                     if (data.model) modelInput.value = data.model;
                     if (data.storage) storageInput.value = data.storage;
                     
                     currentStockSource = 'HO';
                     matchedInventoryDocId = invDoc.id;
                 } else {
-                    imeiStatus.innerHTML = '<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (6% Shop Profit)</span>';
+                    imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
                     currentStockSource = 'Shop';
                     matchedInventoryDocId = null;
                 }
