@@ -696,6 +696,19 @@
                     <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Login Password</label>
                     <input type="text" id="newShopPassword" value="1234" required placeholder="Default 1234">
                 </div>
+                <div style="margin-bottom: 1rem; padding: 0.8rem; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
+                    <label style="color: #10b981; font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">📊 Shop Profit Percentage Settings</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                        <div>
+                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem;">HO Stock Profit %</label>
+                            <input type="number" id="newShopHoPercent" value="4" step="0.1" min="0" max="50" placeholder="4" style="font-weight: 700; color: #10b981;">
+                        </div>
+                        <div>
+                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem;">Shop Own Stock Profit %</label>
+                            <input type="number" id="newShopOwnPercent" value="6" step="0.1" min="0" max="50" placeholder="6" style="font-weight: 700; color: #3b82f6;">
+                        </div>
+                    </div>
+                </div>
                 <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: var(--primary);">Register Shop</button>
             </form>
         </div>
@@ -1248,9 +1261,13 @@
                 tr.onclick = () => openDetailsModal(data);
                 
                 let statusHtml = getStatusBadge(data.status);
+                const saleShopEmail = (data.shopId || '').toLowerCase();
+                const saleShopReg = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === saleShopEmail);
+                const dynHoP = saleShopReg?.hoPercent ?? 4;
+                const dynOwnP = saleShopReg?.shopOwnPercent ?? 6;
                 let sourceHtml = data.stockSource === 'HO' 
-                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (4% Profit)</span>' 
-                    : '<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (4% Discount)</span>';
+                    ? `<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (${dynHoP}% Profit)</span>` 
+                    : `<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (${dynOwnP}% Profit)</span>`;
                 
                 const shopName = data.shopId ? data.shopId.split('@')[0].toUpperCase() : 'UNKNOWN';
                 
@@ -1425,10 +1442,16 @@
                     `;
                 }
 
+                const shopHoP = regInfo?.hoPercent ?? 4;
+                const shopOwnP = regInfo?.shopOwnPercent ?? 6;
                 card.innerHTML = `
                     <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
                     ${regInfo && regInfo.phone ? `<p style="color: var(--accent-purple); font-size: 0.8rem;">📞 ${regInfo.phone}</p>` : ''}
+                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <span style="font-size: 0.78rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 5px;">HO: ${shopHoP}%</span>
+                        <span style="font-size: 0.78rem; font-weight: 700; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 3px 8px; border-radius: 5px;">Own: ${shopOwnP}%</span>
+                    </div>
                     <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
                         <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
@@ -1446,6 +1469,8 @@
             document.getElementById('newShopPhone').value = '';
             document.getElementById('newShopLocation').value = '';
             document.getElementById('newShopPassword').value = '';
+            document.getElementById('newShopHoPercent').value = '4';
+            document.getElementById('newShopOwnPercent').value = '6';
             document.getElementById('addShopModal').style.display = 'flex';
         };
 
@@ -1468,6 +1493,8 @@
             const phone = document.getElementById('newShopPhone').value.trim();
             const location = document.getElementById('newShopLocation').value.trim();
             const password = document.getElementById('newShopPassword').value.trim();
+            const hoPercent = parseFloat(document.getElementById('newShopHoPercent').value) || 4;
+            const shopOwnPercent = parseFloat(document.getElementById('newShopOwnPercent').value) || 6;
 
             try {
                 // 1. Create Firebase Auth user using secondary app so it doesn't log admin out
@@ -1481,6 +1508,8 @@
                     phone: phone,
                     location: location,
                     password: password,
+                    hoPercent: hoPercent,
+                    shopOwnPercent: shopOwnPercent,
                     timestamp: Date.now()
                 });
 
@@ -1546,7 +1575,11 @@
             shopSales.forEach(data => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => openDetailsModal(data);
-                let sourceHtml = data.stockSource === 'HO' ? '<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (4% Profit)</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (4% Discount)</span>';
+                const profShopEmail = (data.shopId || '').toLowerCase();
+                const profShopReg = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === profShopEmail);
+                const pHoP = profShopReg?.hoPercent ?? 4;
+                const pOwnP = profShopReg?.shopOwnPercent ?? 6;
+                let sourceHtml = data.stockSource === 'HO' ? `<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (${pHoP}% Profit)</span>` : `<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (${pOwnP}% Profit)</span>`;
                 
                 tr.innerHTML = `
                     <td>${data.date}</td>
@@ -1568,9 +1601,13 @@
         window.openDetailsModal = function(data) {
             currentModalDocId = data.id;
             const content = document.getElementById('modalContent');
+            const detShopEmail = (data.shopId || '').toLowerCase();
+            const detShopReg = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === detShopEmail);
+            const dHoP = detShopReg?.hoPercent ?? 4;
+            const dOwnP = detShopReg?.shopOwnPercent ?? 6;
             let sourceHtml = data.stockSource === 'HO' 
-                ? '<span style="color:var(--success); font-weight:600;">Head Office Stock (4% Profit Settlement)</span>' 
-                : '<span style="color:var(--text-muted);">Shop Own Stock (4% Discount Settlement)</span>';
+                ? `<span style="color:var(--success); font-weight:600;">Head Office Stock (${dHoP}% Profit Settlement)</span>` 
+                : `<span style="color:var(--text-muted);">Shop Own Stock (${dOwnP}% Profit Settlement)</span>`;
             
             content.innerHTML = `
                 <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
@@ -2569,18 +2606,25 @@
                 if (pwd !== null) showToast("Incorrect password!", "error");
                 return;
             }
+            const regData = (registeredShopsList || []).find(r => r.id === shopId);
             const newName = prompt("Edit Shop Name:", name);
             if(newName === null) return;
             const newPhone = prompt("Edit Phone:", phone);
             if(newPhone === null) return;
             const newLoc = prompt("Edit Location:", location);
             if(newLoc === null) return;
+            const newHoP = prompt("HO Stock Profit % (Head Office stock):", regData?.hoPercent ?? 4);
+            if(newHoP === null) return;
+            const newOwnP = prompt("Shop Own Stock Profit %:", regData?.shopOwnPercent ?? 6);
+            if(newOwnP === null) return;
 
             try {
                 await updateDoc(doc(db, "registered_shops", shopId), {
                     name: newName,
                     phone: newPhone,
-                    location: newLoc
+                    location: newLoc,
+                    hoPercent: parseFloat(newHoP) || 4,
+                    shopOwnPercent: parseFloat(newOwnP) || 6
                 });
                 showToast("Shop updated successfully!", "success");
             } catch(e) {

@@ -195,13 +195,13 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address (විද්‍යුත් තැපෑල)</label>
-                <input type="email" id="email" required placeholder="methmimobilepvtltd@gmail.com" autocomplete="email">
+                <input type="email" id="email" required placeholder="Enter your email..." autocomplete="off">
             </div>
             
             <div class="form-group">
                 <label for="password">Password (මුරපදය)</label>
                 <div class="password-container">
-                    <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+                    <input type="password" id="password" required placeholder="••••••••" autocomplete="off">
                     <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
@@ -221,7 +221,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -242,12 +242,9 @@
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
-        // Auto redirect if already logged in
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                redirectUser(user.email);
-            }
-        });
+        // SECURITY: Always sign out when landing on login page
+        // This ensures the link always shows the login form (never auto-redirects)
+        signOut(auth).catch(() => {});
 
         togglePassword.addEventListener('click', () => {
             const isPassword = passwordInput.getAttribute('type') === 'password';

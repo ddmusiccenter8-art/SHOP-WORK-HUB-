@@ -735,6 +735,8 @@
         let currentStockSource = 'Shop';
         let matchedInventoryDocId = null;
         let myChart = null;
+        let myHoPercent = 4;  // Default HO Stock profit %
+        let myShopOwnPercent = 6;  // Default Shop Own Stock profit %
 
         // Toast Helper
         window.showToast = function(message, type = 'info') {
@@ -784,9 +786,41 @@
             if (document.getElementById('date')) {
                 document.getElementById('date').valueAsDate = new Date();
             }
+            // Fetch shop's custom percentage from registered_shops
+            fetchShopPercentage(user.email);
             loadBranchOptions();
             loadShopData(user.email);
         });
+
+        // Fetch shop percentage from Firestore registered_shops collection
+        async function fetchShopPercentage(email) {
+            try {
+                const snapshot = await getDocs(collection(db, "registered_shops"));
+                const emailLower = email.toLowerCase();
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if ((d.email || '').toLowerCase() === emailLower) {
+                        myHoPercent = parseFloat(d.hoPercent) || 4;
+                        myShopOwnPercent = parseFloat(d.shopOwnPercent) || 6;
+                        myRegisteredShopProfile = d;
+                        myRegisteredShopProfile.id = docSnap.id;
+                        // Update IMEI status display if already shown
+                        updatePercentageDisplay();
+                    }
+                });
+            } catch(e) {
+                console.error('Failed to fetch shop percentage:', e);
+            }
+        }
+
+        function updatePercentageDisplay() {
+            const imeiStatus = document.getElementById('imeiStatus');
+            if (imeiStatus && imeiStatus.innerHTML.includes('Head Office Stock')) {
+                imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">✅ Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
+            } else if (imeiStatus && imeiStatus.innerHTML.includes('Shop Own Stock')) {
+                imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">📦 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
+            }
+        }
 
         window.doLogout = async function() {
             try {
@@ -899,7 +933,7 @@
 
             let settlement = 0;
             const isHO = (currentStockSource === 'HO');
-            const profitRate = isHO ? 0.04 : 0.06;
+            const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
             
             // Settlement = (MRP - Profit) - Down Payment - Document Fee
             const discountedMrp = mrp - (mrp * profitRate);
@@ -998,7 +1032,7 @@
                 const setl = parseFloat(data.settlement) || 0;
                 const mrp = parseFloat(data.mrp) || loan || 0;
                 const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
-                const profitRate = isHO ? 0.04 : 0.06;
+                const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
                 const profit = mrp * profitRate;
 
                 totalLoan += loan;
@@ -1052,11 +1086,11 @@
                 
                 const mrp = parseFloat(data.mrp) || parseFloat(data.loanAmount) || 0;
                 const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
-                const profitRate = isHO ? 0.04 : 0.06;
+                const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
                 const profitAmount = mrp * profitRate;
                 const profitBadge = isHO
-                    ? `<span style="color:#10b981; font-size:0.78rem; font-weight:600; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">Profit (4% HO): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`
-                    : `<span style="color:#3b82f6; font-size:0.78rem; font-weight:600; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">Profit (6% Own): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`;
+                    ? `<span style="color:#10b981; font-size:0.78rem; font-weight:600; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">Profit (${myHoPercent}% HO): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`
+                    : `<span style="color:#3b82f6; font-size:0.78rem; font-weight:600; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">Profit (${myShopOwnPercent}% Own): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`;
 
                 let statusHtml = '';
                 let paymentNote = data.paymentStatus === 'Paid' 
