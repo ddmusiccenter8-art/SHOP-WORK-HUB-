@@ -28,6 +28,11 @@
             --accent-purple: #c084fc;
         }
 
+        .selected-row {
+            background-color: rgba(229, 0, 0, 0.08) !important;
+            border-left: 4px solid var(--primary);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
 
         body {
@@ -442,6 +447,11 @@
             <!-- Financial Summary Cards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1rem;">
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Phones Sold</h3>
+                    <p style="font-size: 1.4rem; font-weight: 700; color: var(--info); margin-top: 0.2rem;" id="mainTotalPhonesSold">0</p>
+                </div>
+                
+                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sales (MRP)</h3>
                     <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="mainTotalMrp">Rs. 0.00</p>
                 </div>
@@ -581,7 +591,7 @@
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
                             <select id="invCategory" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
-                                <option value="Main Shop (Own Buy)" selected>📦 Main Shop (Own Purchased Stock)</option>
+                                <option value="Main Shop (Own Buy)" selected>🟢 Head Office Stock</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Stock</option>
                             </select>
                         </div>
@@ -611,7 +621,7 @@
                         </div>
 
                         <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Own Buy items)</span></label>
+                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
                             <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
                         
@@ -632,9 +642,10 @@
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
                             <select id="stockFilterCategory" onchange="filterInventoryTable()" style="width: auto; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.82rem;">
                                 <option value="ALL">All Stock Categories</option>
-                                <option value="Main Shop (Own Buy)">📦 Own Buy Stock</option>
+                                <option value="Main Shop (Own Buy)">🟢 Head Office Stock</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
                             </select>
+                            <input type="text" id="stockSearchInput" oninput="filterInventoryTable()" placeholder="Search IMEI or Model..." style="width: 180px; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.82rem;">
                             <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
                         </div>
                     </div>
@@ -828,6 +839,40 @@
             </div>
 
             <button onclick="stopScanner()" style="background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); width: 100%; padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Edit Stock Modal -->
+    <div id="editInventoryModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="modal-close" onclick="closeEditInventoryModal()">&times;</span>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Edit Inventory Item</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">IMEI: <span id="editInvImeiLabel" style="font-weight: 600; color: var(--text-main);"></span></p>
+            
+            <form id="editInventoryForm">
+                <input type="hidden" id="editInvId">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
+                    <select id="editInvCategory" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                        <option value="Main Shop (Own Buy)">🟢 Head Office Stock</option>
+                        <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Stock</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Model Name</label>
+                    <input type="text" id="editInvModel" required style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
+                    <input type="text" id="editInvStorage" required style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.)</label>
+                    <input type="number" id="editInvBuyPrice" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                </div>
+                
+                <button type="submit" id="editInvSubmitBtn" style="width: 100%; background: var(--success); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Save Changes</button>
+            </form>
         </div>
     </div>
 
@@ -1936,6 +1981,7 @@
                 totalNetProfit += net;
             });
 
+            document.getElementById('mainTotalPhonesSold').innerText = filteredSales.length.toString();
             document.getElementById('mainTotalMrp').innerText = 'Rs. ' + totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mainTotalBuyPrice').innerText = 'Rs. ' + totalBuyPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('mainTotalLeasingFees').innerText = 'Rs. ' + totalLeaseFees.toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -2041,6 +2087,14 @@
                 filtered = allInventoryItems.filter(item => (item.category || 'Main Shop (Own Buy)') === filterCat);
             }
 
+            const searchInput = (document.getElementById('stockSearchInput')?.value || '').toLowerCase();
+            if (searchInput) {
+                filtered = filtered.filter(item => 
+                    (item.imei || '').toLowerCase().includes(searchInput) || 
+                    (item.model || '').toLowerCase().includes(searchInput)
+                );
+            }
+
             stockBadge.innerText = `${filtered.length} Items`;
 
             if (filtered.length === 0) {
@@ -2058,9 +2112,18 @@
                 let location = data.shop || '-';
                 let catLabel = data.category === 'Dialog Lesi Pay'
                     ? '<span style="color: #3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
-                    : '<span style="color: #10b981; font-weight:600;">📦 Own Buy</span>';
+                    : '<span style="color: #10b981; font-weight:600;">🟢 Head Office Stock</span>';
                 
                 let costStr = data.buyPrice ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">Buy: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>` : '';
+
+                tr.onclick = function() { selectInventoryRow(this); };
+                tr.style.cursor = "pointer";
+                tr.classList.add("inventory-row");
+                
+                // Escape quotes for safely passing to the openEdit function
+                const safeModel = (data.model || '').replace(/'/g, "\\'");
+                const safeStorage = (data.storage || '').replace(/'/g, "\\'");
+                const safeCategory = (data.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
 
                 tr.innerHTML = `
                     <td><strong>${data.imei}</strong></td>
@@ -2069,10 +2132,13 @@
                     <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
                     <td>${badge}</td>
                     <td>
-                        <button onclick="openTransferModal('${data.id}', '${data.imei}', '${data.model}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
+                        <button onclick="event.stopPropagation(); openEditInventoryModal('${data.id}', '${data.imei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${data.buyPrice || ''}')" style="background: transparent; border: none; color: #f59e0b; cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Edit Stock">
+                            ✏️
+                        </button>
+                        <button onclick="event.stopPropagation(); openTransferModal('${data.id}', '${data.imei}', '${safeModel}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
                             🔄
                         </button>
-                        <button onclick="deleteInventoryItem('${data.id}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
+                        <button onclick="event.stopPropagation(); deleteInventoryItem('${data.id}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
                             🗑️
                         </button>
                     </td>
@@ -2715,6 +2781,84 @@
                 showToast("Failed to update shop", "error");
             }
         };
+        // Edit Inventory Logic
+        window.openEditInventoryModal = function(id, imei, model, storage, category, buyPrice) {
+            document.getElementById('editInvId').value = id;
+            document.getElementById('editInvImeiLabel').innerText = imei;
+            document.getElementById('editInvModel').value = model;
+            document.getElementById('editInvStorage').value = storage;
+            document.getElementById('editInvCategory').value = category;
+            document.getElementById('editInvBuyPrice').value = buyPrice;
+            
+            document.getElementById('editInventoryModal').style.display = 'flex';
+        };
+
+        window.closeEditInventoryModal = function() {
+            document.getElementById('editInventoryModal').style.display = 'none';
+        };
+
+        document.getElementById('editInventoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('editInvSubmitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            const id = document.getElementById('editInvId').value;
+            const model = document.getElementById('editInvModel').value.trim();
+            const storage = document.getElementById('editInvStorage').value.trim();
+            const category = document.getElementById('editInvCategory').value;
+            const buyPrice = document.getElementById('editInvBuyPrice').value;
+
+            try {
+                await updateDoc(doc(db, "inventory", id), {
+                    model: model,
+                    storage: storage,
+                    category: category,
+                    buyPrice: buyPrice ? parseFloat(buyPrice) : null,
+                    updatedAt: Date.now()
+                });
+                showToast("Inventory item updated successfully!", "success");
+                closeEditInventoryModal();
+            } catch (err) {
+                console.error("Error updating inventory:", err);
+                showToast("Failed to update item.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Save Changes';
+            }
+        });
+
+        // Keyboard Navigation logic for Inventory List
+        let selectedInventoryRowIndex = -1;
+        
+        window.selectInventoryRow = function(rowElement) {
+            const rows = document.querySelectorAll('.inventory-row');
+            rows.forEach(r => r.classList.remove('selected-row'));
+            rowElement.classList.add('selected-row');
+            selectedInventoryRowIndex = Array.from(rows).indexOf(rowElement);
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('inventoryView').classList.contains('active')) {
+                const rows = document.querySelectorAll('.inventory-row');
+                if (rows.length === 0) return;
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault(); // prevent page scroll
+                    selectedInventoryRowIndex++;
+                    if (selectedInventoryRowIndex >= rows.length) selectedInventoryRowIndex = 0;
+                    selectInventoryRow(rows[selectedInventoryRowIndex]);
+                    rows[selectedInventoryRowIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault(); // prevent page scroll
+                    selectedInventoryRowIndex--;
+                    if (selectedInventoryRowIndex < 0) selectedInventoryRowIndex = rows.length - 1;
+                    selectInventoryRow(rows[selectedInventoryRowIndex]);
+                    rows[selectedInventoryRowIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
