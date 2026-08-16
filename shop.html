@@ -947,9 +947,14 @@
             const isHO = (currentStockSource === 'HO');
             const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
             
-            // Settlement = (MRP - Profit) - Down Payment - Document Fee
-            const discountedMrp = mrp - (mrp * profitRate);
-            settlement = discountedMrp - dp - docCharge;
+            if (isHO) {
+                // For Head Office Stock: Settlement is just the Shop's Profit
+                settlement = mrp * profitRate;
+            } else {
+                // For Shop Own Stock: Settlement = (MRP - HO Cut) - Down Payment - Document Fee
+                const discountedMrp = mrp - (mrp * profitRate);
+                settlement = discountedMrp - dp - docCharge;
+            }
 
             if (mrp > 0 || dp > 0 || docCharge > 0) {
                 settlementInput.value = Math.max(0, settlement).toFixed(2);
