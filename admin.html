@@ -590,26 +590,12 @@
                     <form id="inventoryForm">
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
-                            <select id="invCategory" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            <select id="invCategory" onchange="toggleInvFormFields()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                                 <option value="Main Shop (Own Buy)" selected>🟢 Head Office Stock</option>
-                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Stock</option>
+                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Sale / Activation</option>
                             </select>
                         </div>
 
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Type or scan IMEI - press Enter or click + to add)</span></label>
-                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                                <input type="text" id="invImei" placeholder="Type or scan IMEI here..." onkeydown="handleImeiInputKeydown(event)" onpaste="handleImeiPaste(event)" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
-                                <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0.8rem 1.1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
-                                <button type="button" onclick="addImeiFromInput()" style="background: #10b981; color: white; border: none; padding: 0.8rem 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1rem;" title="Add IMEI to List">+</button>
-                            </div>
-                            
-                            <!-- Dedicated Container for Scanned/Added IMEIs below -->
-                            <div id="scannedImeiContainer" style="background: #f8fafc; border: 1px dashed var(--border-color); padding: 0.6rem; border-radius: 8px; min-height: 48px; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
-                                <span id="scannedImeiPlaceholder" style="font-size: 0.78rem; color: var(--text-muted);">Scanned/Added IMEIs will appear here below...</span>
-                            </div>
-                        </div>
-                        
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Model Name</label>
                             <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
@@ -620,9 +606,72 @@
                             <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
 
-                        <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
-                            <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                        <!-- NORMAL INVENTORY FIELDS -->
+                        <div id="normalInvFields">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Type or scan IMEI - press Enter or click + to add)</span></label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="text" id="invImei" placeholder="Type or scan IMEI here..." onkeydown="handleImeiInputKeydown(event)" onpaste="handleImeiPaste(event)" style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                    <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0.8rem 1.1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
+                                    <button type="button" onclick="addImeiFromInput()" style="background: #10b981; color: white; border: none; padding: 0.8rem 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1rem;" title="Add IMEI to List">+</button>
+                                </div>
+                                
+                                <div id="scannedImeiContainer" style="background: #f8fafc; border: 1px dashed var(--border-color); padding: 0.6rem; border-radius: 8px; min-height: 48px; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
+                                    <span id="scannedImeiPlaceholder" style="font-size: 0.78rem; color: var(--text-muted);">Scanned/Added IMEIs will appear here below...</span>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
+                                <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <!-- LESI PAY FIELDS -->
+                        <div id="lesiPayFields" style="display: none;">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Single IMEI Number</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="text" id="lesiPayImei" placeholder="Enter or scan IMEI..." style="flex: 1; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; min-width: 0;">
+                                    <button type="button" onclick="startScanner('lesiPayImei')" style="background: var(--info); color: white; border: none; padding: 0.8rem 1.1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">MRP (Rs.)</label>
+                                <input type="number" id="lesiPayMrp" step="0.01" oninput="calcLesiPay()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Down Payment (Rs.)</label>
+                                <input type="number" id="lesiPayDp" step="0.01" oninput="calcLesiPay()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Activator Name</label>
+                                <input type="text" id="lesiPayActivator" list="activatorDatalist" autocomplete="off" placeholder="Type to search or add..." style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                                <datalist id="activatorDatalist"></datalist>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Activator Commission (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted);">(e.g. 300, 500)</span></label>
+                                <input type="number" id="lesiPayCommission" step="0.01" oninput="calcLesiPay()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            </div>
+
+                            <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border: 1px dashed #3b82f6; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">Dialog Lesi Pay Profit (7% MRP):</span>
+                                    <strong id="lpProfitCalc" style="color: #3b82f6;">Rs. 0.00</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">Net Profit (Profit - Commission):</span>
+                                    <strong id="lpNetProfitCalc" style="color: var(--success);">Rs. 0.00</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(59, 130, 246, 0.2); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">Settlement to Dialog (MRP - DP - Profit):</span>
+                                    <strong id="lpSettlementCalc" style="color: var(--danger);">Rs. 0.00</strong>
+                                </div>
+                            </div>
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">
@@ -631,7 +680,7 @@
                             <datalist id="shopDatalist"></datalist>
                         </div>
                         
-                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add to Head Office Inventory</button>
+                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Submit Stock / Sale</button>
                     </form>
                 </div>
 
@@ -2165,6 +2214,11 @@
             const cleaned = imei.trim();
             if (!cleaned) return;
 
+            if (allInventoryItems && allInventoryItems.some(item => item.imei === cleaned)) {
+                showToast("IMEI already exists in inventory: " + cleaned, "error");
+                return;
+            }
+
             if (scannedImeiList.includes(cleaned)) {
                 showToast("IMEI already in list: " + cleaned, "warning");
                 return;
@@ -2221,17 +2275,108 @@
             }, 50);
         };
 
+        window.toggleInvFormFields = function() {
+            const cat = document.getElementById('invCategory').value;
+            const isLesi = (cat === 'Dialog Lesi Pay');
+            document.getElementById('normalInvFields').style.display = isLesi ? 'none' : 'block';
+            document.getElementById('lesiPayFields').style.display = isLesi ? 'block' : 'none';
+            document.getElementById('invSubmitBtn').innerText = isLesi ? 'Submit Dialog Lesi Pay Sale' : 'Add to Head Office Inventory';
+            
+            document.getElementById('lesiPayImei').required = isLesi;
+            document.getElementById('lesiPayMrp').required = isLesi;
+            document.getElementById('lesiPayActivator').required = isLesi;
+        };
+
+        window.calcLesiPay = function() {
+            const mrp = parseFloat(document.getElementById('lesiPayMrp').value) || 0;
+            const dp = parseFloat(document.getElementById('lesiPayDp').value) || 0;
+            const comm = parseFloat(document.getElementById('lesiPayCommission').value) || 0;
+            
+            const profit = mrp * 0.07;
+            const netProfit = profit - comm;
+            const settlement = mrp - dp - profit;
+            
+            document.getElementById('lpProfitCalc').innerText = 'Rs. ' + profit.toFixed(2);
+            document.getElementById('lpNetProfitCalc').innerText = 'Rs. ' + netProfit.toFixed(2);
+            document.getElementById('lpSettlementCalc').innerText = 'Rs. ' + settlement.toFixed(2);
+        };
+
         document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
-            
-            addImeiFromInput();
-
             const category = document.getElementById('invCategory').value;
             const model = document.getElementById('invModel').value.trim();
             const storage = document.getElementById('invStorage').value.trim();
-            const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
             const shop = document.getElementById('invShop').value.trim();
+
+            if (category === 'Dialog Lesi Pay') {
+                const imei = document.getElementById('lesiPayImei').value.trim();
+                const mrp = parseFloat(document.getElementById('lesiPayMrp').value) || 0;
+                const dp = parseFloat(document.getElementById('lesiPayDp').value) || 0;
+                const activator = document.getElementById('lesiPayActivator').value.trim();
+                const comm = parseFloat(document.getElementById('lesiPayCommission').value) || 0;
+
+                if (!imei || !mrp || !activator) return showToast("Please fill all Lesi Pay fields", "warning");
+                
+                if (allInventoryItems && allInventoryItems.some(item => item.imei === imei)) {
+                    showToast("IMEI already exists in inventory: " + imei, "error");
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerText = 'Submitting Sale...';
+
+                try {
+                    const profit = mrp * 0.07;
+                    const netProfit = profit - comm;
+                    const settlement = mrp - dp - profit;
+
+                    await addDoc(collection(db, "main_shop_sales"), {
+                        imei: imei,
+                        model: model,
+                        storage: storage,
+                        shop: shop,
+                        category: category,
+                        source: 'Dialog Lesi Pay',
+                        mrp: mrp,
+                        downPayment: dp,
+                        activatorName: activator,
+                        activatorCommission: comm,
+                        profit: profit,
+                        netProfit: netProfit,
+                        settlement: settlement,
+                        customerName: "Dialog Lesi Pay Walk-in",
+                        customerNIC: "-",
+                        saleDate: new Date().toISOString().split('T')[0],
+                        status: 'Sold',
+                        timestamp: Date.now()
+                    });
+                    
+                    showToast(`Successfully added Dialog Lesi Pay Sale (${imei})!`, "success");
+                    document.getElementById('inventoryForm').reset();
+                    toggleInvFormFields();
+                    
+                    // Add activator to datalist if not exists
+                    const dl = document.getElementById('activatorDatalist');
+                    if (dl && ![...dl.options].some(opt => opt.value === activator)) {
+                        const opt = document.createElement('option');
+                        opt.value = activator;
+                        dl.appendChild(opt);
+                    }
+                } catch (err) {
+                    console.error("Error adding sale:", err);
+                    showToast("Error adding sale: " + err.message, "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Submit Dialog Lesi Pay Sale';
+                }
+                return;
+            }
+
+            // Normal Inventory Logic
+            addImeiFromInput();
+
+            const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
             if (!model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
