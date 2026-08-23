@@ -1,12 +1,12 @@
 @echo off
 cd /d "%~dp0"
 echo ==============================================
-echo UPLOADING TO GITHUB...
+echo UPLOADING UPDATES TO GITHUB...
 echo ==============================================
 git add .
 git commit -m "Auto Update"
-git push -u origin main --force
+git push origin main
 echo ==============================================
-echo UPLOAD SUCCESSFUL!
+echo UPLOAD COMPLETED SUCCESSFULLY!
 echo ==============================================
-pause
+timeout /t 3
