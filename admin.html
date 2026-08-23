@@ -16,16 +16,19 @@
         :root {
             --primary: #e50000;
             --primary-hover: #cc0000;
-            --bg-color: #f4f6f8;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.75);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
             --success: #10b981;
             --warning: #f59e0b;
             --info: #3b82f6;
             --danger: #ef4444;
-            --accent-purple: #c084fc;
+            --accent-purple: #8b5cf6;
         }
 
         .selected-row {
@@ -36,7 +39,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Noto Sans Sinhala', sans-serif; }
 
         body {
-            background: var(--bg-color);
+            background: radial-gradient(circle at 10% 20%, #e2e8f0 0%, #f1f5f9 45%, #e0e7ff 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
             padding: 1.5rem 2rem;
@@ -52,12 +56,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            padding: 0.8rem 1.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 0.9rem 1.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255,255,255,0.6);
         }
 
         .tabs { 
@@ -66,49 +71,54 @@
             gap: 0.6rem; 
             width: 100%; 
             max-width: 1400px; 
-            padding: 0 1.5rem; 
+            padding: 0 1rem; 
             flex-wrap: wrap;
         }
 
         .tab {
-            padding: 0.6rem 1.2rem;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 10px 10px 0 0;
+            padding: 0.7rem 1.4rem;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 14px 14px 0 0;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.85rem;
-            border: 1px solid var(--border-color);
+            font-size: 0.88rem;
+            border: 1px solid rgba(255, 255, 255, 0.65);
             border-bottom: none;
             color: var(--text-muted);
-            transition: all 0.25s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             user-select: none;
         }
 
         .tab:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.65);
+            transform: translateY(-2px);
         }
 
         .tab.active { 
-            background: var(--card-bg); 
-            color: var(--text-main); 
+            background: rgba(255, 255, 255, 0.85); 
+            color: #b91c1c; 
             border-top: 3px solid var(--primary); 
-            box-shadow: 0 -4px 15px rgba(229, 0, 0, 0.15);
+            box-shadow: 0 -6px 20px rgba(229, 0, 0, 0.12);
+            font-weight: 700;
         }
 
         .container {
             width: 100%;
             max-width: 1400px;
-            padding: 1.2rem;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 0 12px 12px 12px;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            border-radius: 0 20px 20px 20px;
             min-height: 75vh;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255,255,255,0.7);
         }
 
         /* Views */
@@ -124,70 +134,83 @@
         .table-responsive {
             width: 100%;
             overflow-x: auto;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.82rem; }
-        th { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
-        tr:hover { background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; }
+        th, td { padding: 0.75rem 0.9rem; text-align: left; border-bottom: 1px solid rgba(226, 232, 240, 0.7); font-size: 0.84rem; }
+        th { background: rgba(248, 250, 252, 0.8); color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.6px; }
+        tr:hover { background: rgba(255, 255, 255, 0.8); cursor: pointer; }
         tr:last-child td { border-bottom: none; }
 
-        .badge { padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-        .badge-new { background: rgba(59, 130, 246, 0.2); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.4); }
-        .badge-replied { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.4); }
-        .badge-sent { background: rgba(192, 132, 252, 0.2); color: var(--accent-purple); border: 1px solid rgba(192, 132, 252, 0.4); }
-        .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge { padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-new { background: rgba(59, 130, 246, 0.15); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.35); }
+        .badge-replied { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .badge-sent { background: rgba(139, 92, 246, 0.15); color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.35); }
+        .badge-confirmed { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); }
 
         .shop-card {
-            background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 24px rgba(31, 38, 135, 0.05);
+            padding: 1.3rem;
+            border-radius: 18px;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
         }
-        .shop-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(229, 0, 0, 0.2); background: rgba(255,255,255,0.06); }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+        .shop-card:hover { 
+            border-color: rgba(229, 0, 0, 0.4); 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 30px rgba(229, 0, 0, 0.12); 
+            background: rgba(255, 255, 255, 0.85); 
+        }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; }
 
         /* Form Inputs */
         input, select, textarea {
             width: 100%;
-            padding: 0.6rem 0.8rem;
-            background: rgba(11, 15, 25, 0.7);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            padding: 0.7rem 0.9rem;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            border-radius: 10px;
             color: var(--text-main);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             transition: all 0.25s ease;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.2);
+            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.15);
             background: #ffffff;
         }
 
         /* Modal */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             z-index: 1000; align-items: center; justify-content: center;
             padding: 1rem;
         }
         .modal-content {
-            background: #0f172a; border: 1px solid var(--border-color);
-            border-radius: 16px; padding: 2rem; width: 100%; max-width: 650px;
-            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            position: relative;
+            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            border-radius: 20px; padding: 2rem; width: 100%; max-width: 680px;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+            position: relative; color: var(--text-main);
         }
         .modal-close { position: absolute; right: 1.5rem; top: 1.5rem; cursor: pointer; font-size: 1.5rem; color: var(--text-muted); transition: 0.2s; }
         .modal-close:hover { color: var(--text-main); }
         
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-        .detail-item { background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .detail-item { background: rgba(255, 255, 255, 0.7); padding: 0.9rem; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.8); }
         .detail-item strong { color: var(--text-muted); font-size: 0.82rem; display: block; margin-bottom: 0.25rem; }
         .detail-item span.val { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
         
@@ -374,33 +397,41 @@
             </div>
 
             <div id="singleShopSection" style="display: none;">
-                <button onclick="backToShops()" style="background: #f3f4f6; margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: var(--text-main); border-radius: 8px; cursor: pointer; font-weight: 600;">&larr; Back to Shops Directory</button>
-                <h2 id="profileTitle" style="color: var(--text-main); margin-bottom: 1rem;">Shop Profile</h2>
+                <button onclick="backToShops()" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); margin-bottom: 1.2rem; border: 1px solid var(--border-color); padding: 0.6rem 1.2rem; color: var(--text-main); border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;">&larr; Back to Shops Directory</button>
+                <h2 id="profileTitle" style="color: var(--text-main); margin-bottom: 1rem; font-size: 1.3rem;">Shop Profile</h2>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Sale (MRP)</h3>
-                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-top: 0.2rem;" id="shopTotalMrp">Rs. 0.00</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total Sale (MRP)</h3>
+                        <p style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-top: 0.3rem;" id="shopTotalMrp">Rs. 0.00</p>
                     </div>
-                    <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <h3 style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Loans Issued</h3>
-                        <p style="font-size: 1.4rem; font-weight: 700; color: var(--info); margin-top: 0.2rem;" id="shopTotalLoan">Rs. 0.00</p>
+                    <div style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <h3 style="color: #3b82f6; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Total Loans Issued</h3>
+                        <p style="font-size: 1.5rem; font-weight: 800; color: #2563eb; margin-top: 0.3rem;" id="shopTotalLoan">Rs. 0.00</p>
                     </div>
-                    <div style="background: rgba(16, 185, 129, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
-                        <h3 style="color: var(--success); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Paid)</h3>
-                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--success); margin-top: 0.2rem;" id="shopTotalPaid">Rs. 0.00</p>
+                    <div style="background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(10px); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 4px 15px rgba(16,185,129,0.06);">
+                        <h3 style="color: #065f46; font-size: 0.75rem; text-transform: uppercase; font-weight: 800;">Settlement (Paid / Completed)</h3>
+                        <p style="font-size: 1.5rem; font-weight: 800; color: #059669; margin-top: 0.3rem;" id="shopTotalPaid">Rs. 0.00</p>
                     </div>
-                    <div style="background: rgba(245, 158, 11, 0.15); padding: 1rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.4);">
-                        <h3 style="color: var(--warning); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Settlement (Pending)</h3>
-                        <p style="font-size: 1.4rem; font-weight: 800; color: var(--warning); margin-top: 0.2rem;" id="shopTotalPending">Rs. 0.00</p>
+                    <div style="background: rgba(245, 158, 11, 0.15); backdrop-filter: blur(10px); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.35); box-shadow: 0 4px 15px rgba(245,158,11,0.06);">
+                        <h3 style="color: #92400e; font-size: 0.75rem; text-transform: uppercase; font-weight: 800;">Settlement (Pending)</h3>
+                        <p style="font-size: 1.5rem; font-weight: 800; color: #d97706; margin-top: 0.3rem;" id="shopTotalPending">Rs. 0.00</p>
                     </div>
                 </div>
 
-                <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 2rem 0; background: #f3f4f6; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 1.5rem 0; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8);">
                     <canvas id="shopChart"></canvas>
                 </div>
 
-                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Shop Submissions History</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem;">Shop Submissions History</h3>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <button class="filter-btn" id="singleShopFilterAll" onclick="setSingleShopFilter('All')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--primary); color: white;">All Entries</button>
+                        <button class="filter-btn" id="singleShopFilterPending" onclick="setSingleShopFilter('Pending')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">⏳ Pending</button>
+                        <button class="filter-btn" id="singleShopFilterPaid" onclick="setSingleShopFilter('Paid')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">✅ Paid</button>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -408,7 +439,7 @@
                                 <th>Date</th>
                                 <th>Customer & Device</th>
                                 <th>Stock Source</th>
-                                <th>Loan Amount</th>
+                                <th>Loan / Settlement</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -664,7 +695,7 @@
                     <form id="inventoryForm">
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
-                            <select id="invCategory" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                            <select id="invCategory" onchange="handleInvCategoryChange()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                                 <option value="Main Shop (Own Buy)" selected>🟢 Head Office Stock</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Stock</option>
                             </select>
@@ -695,7 +726,7 @@
                         </div>
 
                         <div style="margin-bottom: 1rem;">
-                            <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
+                            <label id="invPriceLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
                             <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                         </div>
                         
@@ -1534,6 +1565,18 @@
                 
                 const displayName = regInfo ? regInfo.name : shopEmail.split('@')[0].toUpperCase();
                 
+                let shopPaid = 0;
+                let shopPending = 0;
+                shopSales.forEach(s => {
+                    const st = parseFloat(s.settlement) || 0;
+                    const isPaid = (s.paymentStatus === 'Paid' || s.status === 'Payment Sent' || s.status === 'Confirmed' || s.status === 'Completed');
+                    if (isPaid) {
+                        shopPaid += st;
+                    } else {
+                        shopPending += st;
+                    }
+                });
+
                 // Calculate stock currently allocated to this branch
                 const branchStockCount = (allInventoryItems || []).filter(item => {
                     if (item.status !== 'Available') return false;
@@ -1559,15 +1602,15 @@
                     const safeLoc = (regInfo.location || '').replace(/'/g, "\\'");
                     actionsHTML = `
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; gap: 0.5rem; justify-content: center;">
-                            <button onclick="event.stopPropagation(); editShop('${regInfo.id}', '${safeName}', '${safeEmail}', '${safePhone}', '${safeLoc}')" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Edit</button>
-                            <button onclick="event.stopPropagation(); deleteShop('${regInfo.id}', '${safeName}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem;">Delete</button>
+                            <button onclick="event.stopPropagation(); editShop('${regInfo.id}', '${safeName}', '${safeEmail}', '${safePhone}', '${safeLoc}')" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">✏️ Edit</button>
+                            <button onclick="event.stopPropagation(); deleteShop('${regInfo.id}', '${safeName}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">🗑️ Delete</button>
                         </div>
                     `;
                 } else {
                     const safeEmail = (shopEmail || '').replace(/'/g, "\\'");
                     actionsHTML = `
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: center;">
-                            <button onclick="event.stopPropagation(); quickRegisterShop('${safeEmail}')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 0.3rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight:600;">➕ Complete / Edit Profile</button>
+                            <button onclick="event.stopPropagation(); quickRegisterShop('${safeEmail}')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 0.4rem 0.9rem; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight:700;">➕ Register Profile</button>
                         </div>
                     `;
                 }
@@ -1575,17 +1618,32 @@
                 const shopHoP = regInfo?.hoPercent ?? 4;
                 const shopOwnP = regInfo?.shopOwnPercent ?? 6;
                 card.innerHTML = `
-                    <h3 style="color: var(--text-main); margin-bottom: 0.4rem; font-size: 1.1rem;">${displayName}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.6rem;">${shopEmail}</p>
-                    ${regInfo && regInfo.phone ? `<p style="color: var(--accent-purple); font-size: 0.8rem;">📞 ${regInfo.phone}</p>` : ''}
-                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                        <span style="font-size: 0.78rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 5px;">HO: ${shopHoP}%</span>
-                        <span style="font-size: 0.78rem; font-weight: 700; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 3px 8px; border-radius: 5px;">Own: ${shopOwnP}%</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+                        <span style="font-size: 1.3rem;">🏪</span>
+                        <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; font-weight: 700;">${displayName}</h3>
                     </div>
-                    <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-color);">
-                        <p style="color: var(--success); font-weight: bold; font-size: 1.05rem;">Loans: Rs. ${totalLoan.toLocaleString()}</p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${shopSales.length} Total Submissions</p>
-                        <p style="font-size: 0.82rem; color: #3b82f6; font-weight: 600; margin-top: 0.4rem; background: rgba(59,130,246,0.1); padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-block;">📦 Allocated Stock: ${branchStockCount} Phones Available</p>
+                    <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.5rem;">${shopEmail}</p>
+                    ${regInfo && regInfo.phone ? `<p style="color: #7c3aed; font-size: 0.8rem; font-weight: 600;">📞 ${regInfo.phone}</p>` : ''}
+                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <span style="font-size: 0.76rem; font-weight: 700; color: #059669; background: rgba(16,185,129,0.15); padding: 3px 8px; border-radius: 6px;">HO: ${shopHoP}%</span>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: #2563eb; background: rgba(59,130,246,0.15); padding: 3px 8px; border-radius: 6px;">Own: ${shopOwnP}%</span>
+                    </div>
+                    <div style="margin-top: 0.8rem; padding: 0.8rem; background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 12px; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Loans Issued:</span>
+                            <span style="color: #2563eb; font-weight: 700; font-size: 0.88rem;">Rs. ${totalLoan.toLocaleString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Paid Settlements:</span>
+                            <span style="color: #059669; font-weight: 700; font-size: 0.88rem;">Rs. ${shopPaid.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(226, 232, 240, 0.8); padding-top: 0.35rem;">
+                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 600;">Pending Settlements:</span>
+                            <span style="color: #d97706; font-weight: 800; font-size: 0.88rem;">Rs. ${shopPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div style="margin-top: 0.5rem; text-align: center;">
+                            <span style="font-size: 0.78rem; color: #7c3aed; font-weight: 600; background: rgba(139, 92, 246, 0.12); padding: 0.2rem 0.6rem; border-radius: 6px;">📦 Stock: ${branchStockCount} Available</span>
+                        </div>
                     </div>
                     ${actionsHTML}
                 `;
@@ -1622,29 +1680,36 @@
             const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
             const phone = document.getElementById('newShopPhone').value.trim();
             const location = document.getElementById('newShopLocation').value.trim();
-            const password = document.getElementById('newShopPassword').value.trim();
-            const hoPercent = parseFloat(document.getElementById('newShopHoPercent').value) || 4;
-            const shopOwnPercent = parseFloat(document.getElementById('newShopOwnPercent').value) || 6;
+            const password = document.getElementById('newShopPassword').value;
+            const hoP = parseFloat(document.getElementById('newShopHoPercent').value) || 4;
+            const ownP = parseFloat(document.getElementById('newShopOwnPercent').value) || 6;
 
             try {
-                // 1. Create Firebase Auth user using secondary app so it doesn't log admin out
-                await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                await signOut(secondaryAuth); // clear secondary session
-
-                // 2. Save shop data to Firestore
-                await addDoc(collection(db, "registered_shops"), {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    location: location,
-                    password: password,
-                    hoPercent: hoPercent,
-                    shopOwnPercent: shopOwnPercent,
-                    timestamp: Date.now()
-                });
-
-                showToast(`Shop ${name} registered successfully!`, "success");
-                document.getElementById('addShopForm').reset();
+                const existing = registeredShopsList.find(r => r.email === email);
+                if (existing) {
+                    await updateDoc(doc(db, "shops", existing.id), {
+                        name: name,
+                        phone: phone,
+                        location: location,
+                        password: password || existing.password || '123456',
+                        hoPercent: hoP,
+                        shopOwnPercent: ownP,
+                        updatedAt: Date.now()
+                    });
+                    showToast("Shop profile updated successfully!", "success");
+                } else {
+                    await addDoc(collection(db, "shops"), {
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        location: location,
+                        password: password || '123456',
+                        hoPercent: hoP,
+                        shopOwnPercent: ownP,
+                        createdAt: Date.now()
+                    });
+                    showToast("Shop registered successfully!", "success");
+                }
                 closeAddShopModal();
             } catch(err) {
                 console.error("Shop registration failed:", err);
@@ -1655,10 +1720,16 @@
             }
         });
 
+        let currentSingleShopSales = [];
+        let currentSingleShopFilter = 'All';
+
         window.viewShopProfile = function(shopEmail, shopSales) {
             document.getElementById('shopListSection').style.display = 'none';
             document.getElementById('singleShopSection').style.display = 'block';
             document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
+
+            currentSingleShopSales = shopSales || [];
+            currentSingleShopFilter = 'All';
 
             let totalMrp = 0;
             let totalLoan = 0;
@@ -1666,14 +1737,15 @@
             let totalPending = 0;
 
             const salesByDate = {};
-            shopSales.forEach(s => {
+            currentSingleShopSales.forEach(s => {
                 const mrp = parseFloat(s.mrp) || 0;
                 const loan = parseFloat(s.loanAmount) || 0;
                 const set = parseFloat(s.settlement) || 0;
 
                 totalMrp += mrp;
                 totalLoan += loan;
-                if (s.paymentStatus === 'Paid') {
+                const isPaid = (s.paymentStatus === 'Paid' || s.status === 'Payment Sent' || s.status === 'Confirmed' || s.status === 'Completed');
+                if (isPaid) {
                     totalPaid += set;
                 } else {
                     totalPending += set;
@@ -1700,9 +1772,43 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
+            renderSingleShopHistoryTable();
+        };
+
+        window.setSingleShopFilter = function(filter) {
+            currentSingleShopFilter = filter;
+            ['All', 'Pending', 'Paid'].forEach(f => {
+                const btn = document.getElementById('singleShopFilter' + f);
+                if (btn) {
+                    if (f === filter) {
+                        btn.style.background = 'var(--primary)';
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = 'rgba(255,255,255,0.7)';
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                }
+            });
+            renderSingleShopHistoryTable();
+        };
+
+        function renderSingleShopHistoryTable() {
             const tbody = document.getElementById('singleShopTable');
             tbody.innerHTML = '';
-            shopSales.forEach(data => {
+
+            const filtered = currentSingleShopSales.filter(s => {
+                const isPaid = (s.paymentStatus === 'Paid' || s.status === 'Payment Sent' || s.status === 'Confirmed' || s.status === 'Completed');
+                if (currentSingleShopFilter === 'Pending' && isPaid) return false;
+                if (currentSingleShopFilter === 'Paid' && !isPaid) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching submissions for this filter.</td></tr>';
+                return;
+            }
+
+            filtered.forEach(data => {
                 const tr = document.createElement('tr');
                 tr.onclick = () => openDetailsModal(data);
                 const profShopEmail = (data.shopId || '').toLowerCase();
@@ -2284,11 +2390,14 @@
                     : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Sold</span>';
                 
                 let location = data.shop || '-';
-                let catLabel = data.category === 'Dialog Lesi Pay'
+                let isDialogLesi = (data.category === 'Dialog Lesi Pay');
+                let catLabel = isDialogLesi
                     ? '<span style="color: #3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
                     : '<span style="color: #10b981; font-weight:600;">🟢 Head Office Stock</span>';
                 
-                let costStr = data.buyPrice ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">Buy: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>` : '';
+                let costStr = data.buyPrice 
+                    ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">${isDialogLesi ? 'MRP' : 'Buy'}: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>` 
+                    : '';
 
                 tr.onclick = function() { selectInventoryRow(this); };
                 tr.style.cursor = "pointer";
@@ -2319,6 +2428,21 @@
                 `;
                 tbody.appendChild(tr);
             });
+        };
+
+        window.handleInvCategoryChange = function() {
+            const cat = document.getElementById('invCategory').value;
+            const isLesi = (cat === 'Dialog Lesi Pay');
+            const label = document.getElementById('invPriceLabel');
+            if (label) {
+                if (isLesi) {
+                    label.innerHTML = `Selling Price MRP (Rs.) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Dialog MRP Value)</span>`;
+                    document.getElementById('invBuyPrice').placeholder = "e.g. 56990.00";
+                } else {
+                    label.innerHTML = `Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span>`;
+                    document.getElementById('invBuyPrice').placeholder = "0.00";
+                }
+            }
         };
 
         window.deleteInventoryItem = async function(id, imei) {
@@ -2542,25 +2666,32 @@
                 card.onclick = () => viewStaffProfile(staff.originalName, staff.sales, staff.totalCount, staff.totalPaid, staff.totalPending);
                 
                 card.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; color: white;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start; gap: 0.9rem; margin-bottom: 1rem;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: bold; color: white; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
                             ${initial}
                         </div>
-                        <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; text-align: left;">${staff.originalName}</h3>
-                    </div>
-                    
-                    <div style="background: #f3f4f6; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="color: var(--text-muted); font-size: 0.85rem;">Activations:</span>
-                            <span style="color: var(--text-main); font-weight: bold;">${staff.totalCount} Phones</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: var(--text-muted); font-size: 0.85rem;">Pending Fee:</span>
-                            <span style="color: var(--warning); font-weight: bold;">Rs. ${staff.totalPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <div style="text-align: left;">
+                            <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; font-weight: 700;">${staff.originalName}</h3>
+                            <span style="font-size: 0.76rem; color: var(--text-muted);">Activator Staff</span>
                         </div>
                     </div>
                     
-                    <button class="action-btn" style="width: 100%; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: white;">View Profile Details</button>
+                    <div style="background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 12px; padding: 0.9rem; margin-bottom: 1rem; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.45rem;">
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">Total Activations:</span>
+                            <span style="color: var(--text-main); font-weight: 700; font-size: 0.88rem;">${staff.totalCount} Phones</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.45rem;">
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">Completed (Paid):</span>
+                            <span style="color: #059669; font-weight: 700; font-size: 0.88rem;">Rs. ${staff.totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(226, 232, 240, 0.8); padding-top: 0.45rem;">
+                            <span style="color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">Pending Fee:</span>
+                            <span style="color: #d97706; font-weight: 800; font-size: 0.88rem;">Rs. ${staff.totalPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn" style="width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; color: white; padding: 0.65rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);">View Payments & History ➔</button>
                 `;
                 grid.appendChild(card);
             });
