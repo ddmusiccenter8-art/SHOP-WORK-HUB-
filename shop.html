@@ -1286,37 +1286,59 @@
 
         // Chart Update Function
         function updateChart(labels, revenueData, maxLoan) {
-            const ctx = document.getElementById('salesChart');
-            if(!ctx) return;
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
             if (myChart) myChart.destroy();
+
+            const ctx = canvas.getContext('2d');
+            const redGrad = ctx.createLinearGradient(0, 0, 0, 240);
+            redGrad.addColorStop(0, 'rgba(229, 0, 0, 0.35)');
+            redGrad.addColorStop(1, 'rgba(229, 0, 0, 0.01)');
             
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels: labels.length > 0 ? labels : ['No Data'],
                     datasets: [
                         { 
                             label: 'Total Loan Amount (Rs.)', 
-                            data: revenueData, 
+                            data: revenueData.length > 0 ? revenueData : [0], 
                             borderColor: '#e50000', 
-                            backgroundColor: 'rgba(229, 0, 0, 0.15)', 
+                            backgroundColor: redGrad, 
                             fill: true, 
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointBackgroundColor: '#818cf8'
+                            tension: 0.38,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#b91c1c',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: ctx => ` Loans: Rs. ${(ctx.parsed.y || 0).toLocaleString()}`
+                            }
+                        }
+                    },
                     scales: {
                         y: { 
                             beginAtZero: true,
                             max: maxLoan > 0 ? maxLoan * 1.25 : 100000, 
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' }, 
-                            ticks: { color: '#9CA3AF' } 
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' }, 
+                            ticks: { 
+                                color: '#9CA3AF',
+                                callback: val => val >= 1000 ? 'Rs. ' + (val/1000).toFixed(0) + 'k' : 'Rs. ' + val
+                            } 
                         },
                         x: { grid: { display: false }, ticks: { color: '#9CA3AF' } }
                     }

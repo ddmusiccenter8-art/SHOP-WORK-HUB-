@@ -51,33 +51,47 @@
             overflow-x: hidden;
         }
 
-        /* Ambient Glass Glow Orbs */
+        /* Ambient Glass Glow Orbs with Floating Atmosphere */
         body::before {
             content: '';
             position: fixed;
-            top: -120px;
-            left: 10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, rgba(239, 68, 68, 0) 70%);
+            top: -100px;
+            left: 5%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.16) 0%, rgba(249, 115, 22, 0.08) 50%, rgba(239, 68, 68, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            filter: blur(50px);
+            filter: blur(60px);
+            animation: floatOrb1 18s ease-in-out infinite alternate;
         }
 
         body::after {
             content: '';
             position: fixed;
-            bottom: -150px;
-            right: 10%;
-            width: 550px;
-            height: 550px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0) 70%);
+            bottom: -120px;
+            right: 5%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(59, 130, 246, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            filter: blur(50px);
+            filter: blur(60px);
+            animation: floatOrb2 22s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatOrb1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.08); }
+            100% { transform: translate(-30px, 70px) scale(0.95); }
+        }
+
+        @keyframes floatOrb2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-70px, -50px) scale(1.1); }
+            100% { transform: translate(40px, -30px) scale(0.92); }
         }
 
         .header {
@@ -412,9 +426,10 @@
                 min-height: auto !important;
             }
 
-            /* 1-column layouts for form and table side-by-sides */
+            /* 1-column layouts for form and table side-by-sides & charts */
             #inventoryView > div, 
             #mainProfitView > div.grid-layout,
+            .analytics-chart-grid,
             .grid-layout {
                 grid-template-columns: 1fr !important;
                 gap: 1rem !important;
@@ -580,6 +595,38 @@
                         <span style="font-size: 1.2rem;">⏳</span>
                     </div>
                     <p style="font-size: 1.85rem; font-weight: 800; color: #b45309;" id="totalPendingVal">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Visual Analytics Glass Charts Section -->
+            <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 1.25rem; margin-bottom: 1.8rem;" class="analytics-chart-grid">
+                <!-- Loan Volume Trend Spline Area Chart -->
+                <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.3rem 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 6px;">
+                                📈 Loan Volume & Submissions Trend
+                            </h3>
+                            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Daily loan issuing activity overview</p>
+                        </div>
+                        <span style="font-size: 0.78rem; background: rgba(59, 130, 246, 0.12); color: #2563eb; padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.25);">Live Trend</span>
+                    </div>
+                    <div style="position: relative; height: 220px; width: 100%;">
+                        <canvas id="submissionsTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Settlements Status Donut Chart -->
+                <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.3rem 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05); display: flex; flex-direction: column;">
+                    <div style="margin-bottom: 0.6rem;">
+                        <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 6px;">
+                            🍩 Settlement Distribution
+                        </h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Paid vs Pending Settlements Ratio</p>
+                    </div>
+                    <div style="position: relative; height: 220px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="settlementDonutChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -758,6 +805,22 @@
                         </h3>
                         <p style="font-size: 2.8rem; font-weight: 900; color: #064e3b; margin: 0; text-shadow: 0 2px 10px rgba(255,255,255,0.5);" id="mainTotalNetProfit">Rs. 0.00</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Main Shop Profit & Revenue Analytics Glass Chart -->
+            <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.3rem 1.5rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05); margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 6px;">
+                            📊 Revenue, Cost & Net Profit Performance
+                        </h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Visual comparison of Total Sales (MRP) vs Buying Cost vs Net Profit</p>
+                    </div>
+                    <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.12); color: #059669; padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.25);">Profit Intelligence</span>
+                </div>
+                <div style="position: relative; height: 230px; width: 100%;">
+                    <canvas id="mainProfitChart"></canvas>
                 </div>
             </div>
 
@@ -1424,6 +1487,12 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             const targetView = document.getElementById(tabName + 'View');
             if (targetView) targetView.classList.add('active');
+
+            if (tabName === 'submissions' && typeof renderAllSubmissions === 'function') {
+                setTimeout(() => renderAllSubmissions(), 50);
+            } else if (tabName === 'mainProfit' && typeof renderMainShopProfitView === 'function') {
+                setTimeout(() => renderMainShopProfitView(), 50);
+            }
         };
 
         window.filterSubmissions = function(filter) {
@@ -1576,6 +1645,148 @@
             }
         }
 
+        // Visual Analytics Chart Instances
+        let submissionsTrendChart = null;
+        let settlementDonutChart = null;
+        let mainProfitChart = null;
+
+        function renderSubmissionsAnalyticsCharts(salesScope, paidAmt, pendingAmt, totalLoans) {
+            // 1. Group by Date
+            const dailyVolume = {};
+            const sorted = [...salesScope].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            
+            sorted.forEach(s => {
+                const d = s.date || 'Unknown';
+                const loan = parseFloat(s.loanAmount) || 0;
+                dailyVolume[d] = (dailyVolume[d] || 0) + loan;
+            });
+
+            const dates = Object.keys(dailyVolume);
+            const displayDates = dates.length > 14 ? dates.slice(-14) : dates;
+            const volumeData = displayDates.map(d => dailyVolume[d]);
+
+            // Trend Chart
+            const trendCtx = document.getElementById('submissionsTrendChart');
+            if (trendCtx) {
+                if (submissionsTrendChart) submissionsTrendChart.destroy();
+
+                const ctx = trendCtx.getContext('2d');
+                const blueGrad = ctx.createLinearGradient(0, 0, 0, 220);
+                blueGrad.addColorStop(0, 'rgba(59, 130, 246, 0.35)');
+                blueGrad.addColorStop(1, 'rgba(59, 130, 246, 0.01)');
+
+                submissionsTrendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: displayDates.length > 0 ? displayDates : ['No Data'],
+                        datasets: [
+                            {
+                                label: 'Loan Volume (Rs.)',
+                                data: volumeData.length > 0 ? volumeData : [0],
+                                borderColor: '#2563eb',
+                                backgroundColor: blueGrad,
+                                borderWidth: 2.5,
+                                fill: true,
+                                tension: 0.35,
+                                pointBackgroundColor: '#1d4ed8',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#e2e8f0',
+                                padding: 10,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ` Loan Volume: Rs. ${(ctx.parsed.y || 0).toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#64748b', font: { size: 10, weight: 600 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10 },
+                                    callback: val => val >= 1000 ? 'Rs. ' + (val/1000).toFixed(0) + 'k' : 'Rs. ' + val
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Doughnut Chart
+            const donutCtx = document.getElementById('settlementDonutChart');
+            if (donutCtx) {
+                if (settlementDonutChart) settlementDonutChart.destroy();
+                
+                const hasData = (paidAmt > 0 || pendingAmt > 0);
+                const dataValues = hasData ? [paidAmt, pendingAmt] : [1, 0];
+                const dataColors = hasData ? ['#10b981', '#f59e0b'] : ['rgba(203, 213, 225, 0.5)', 'transparent'];
+
+                settlementDonutChart = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Paid / Completed', 'Pending Settlement'],
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: dataColors,
+                            borderWidth: 3,
+                            borderColor: '#ffffff',
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    boxHeight: 12,
+                                    usePointStyle: true,
+                                    color: '#334155',
+                                    font: { size: 11, weight: 600 },
+                                    padding: 14
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                padding: 10,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        if (!hasData) return ' No data available';
+                                        return ` ${ctx.label}: Rs. ${(ctx.parsed || 0).toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         window.renderAllSubmissions = function() {
             const tbody = document.getElementById('allSubmissionsBody');
             tbody.innerHTML = '';
@@ -1611,6 +1822,9 @@
             document.getElementById('totalLoanVal').innerText = 'Rs. ' + overallLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('totalPaidVal').innerText = 'Rs. ' + overallPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('totalPendingVal').innerText = 'Rs. ' + overallPending.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Update live visual analytics charts
+            renderSubmissionsAnalyticsCharts(shopSalesScope, overallPaid, overallPending, overallLoan);
 
             // Update live summary badges
             const badgeSubmissions = document.getElementById('badgeShopSubmissions');
@@ -2012,13 +2226,53 @@
             const amounts = dates.map(d => salesByDate[d]);
 
             if (chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(document.getElementById('shopChart'), {
+            const shopCanvas = document.getElementById('shopChart');
+            const shopCtx = shopCanvas.getContext('2d');
+            const redGrad = shopCtx.createLinearGradient(0, 0, 0, 200);
+            redGrad.addColorStop(0, '#e50000');
+            redGrad.addColorStop(1, '#f87171');
+
+            chartInstance = new Chart(shopCanvas, {
                 type: 'bar',
                 data: {
-                    labels: dates,
-                    datasets: [{ label: 'Daily Loan Volume (Rs.)', data: amounts, backgroundColor: '#e50000', borderRadius: 6 }]
+                    labels: dates.length > 0 ? dates : ['No Sales Recorded'],
+                    datasets: [{
+                        label: 'Daily Loan Volume (Rs.)',
+                        data: amounts.length > 0 ? amounts : [0],
+                        backgroundColor: redGrad,
+                        borderRadius: 8,
+                        hoverBackgroundColor: '#b91c1c'
+                    }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: ctx => ` Daily Loans: Rs. ${(ctx.parsed.y || 0).toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { size: 10, weight: 600 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10 },
+                                callback: val => val >= 1000 ? 'Rs. ' + (val/1000).toFixed(0) + 'k' : 'Rs. ' + val
+                            }
+                        }
+                    }
+                }
             });
 
             renderSingleShopHistoryTable();
@@ -2498,6 +2752,121 @@
             renderMainShopProfitView();
         };
 
+        function renderMainProfitAnalyticsChart(sales) {
+            const chartEl = document.getElementById('mainProfitChart');
+            if (!chartEl) return;
+            if (mainProfitChart) mainProfitChart.destroy();
+
+            // Group sales by Date
+            const dateMap = {};
+            const sorted = [...sales].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+            sorted.forEach(s => {
+                const d = s.date || 'Unknown';
+                if (!dateMap[d]) {
+                    dateMap[d] = { mrp: 0, buy: 0, net: 0 };
+                }
+                const mrp = parseFloat(s.mrp) || 0;
+                const buy = parseFloat(s.buyPrice) || 0;
+                const lease = parseFloat(s.leaseFee) || 0;
+                const staff = parseFloat(s.staffFee) || 0;
+                const net = parseFloat(s.netProfit) || (mrp - buy - lease - staff);
+
+                dateMap[d].mrp += mrp;
+                dateMap[d].buy += buy;
+                dateMap[d].net += net;
+            });
+
+            const dates = Object.keys(dateMap);
+            const displayDates = dates.length > 12 ? dates.slice(-12) : dates;
+            const mrpData = displayDates.map(d => dateMap[d].mrp);
+            const buyData = displayDates.map(d => dateMap[d].buy);
+            const netData = displayDates.map(d => dateMap[d].net);
+
+            const ctx = chartEl.getContext('2d');
+            mainProfitChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: displayDates.length > 0 ? displayDates : ['No Sales Recorded'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Net Profit (Rs.)',
+                            data: netData.length > 0 ? netData : [0],
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#059669',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Sales Revenue MRP (Rs.)',
+                            data: mrpData.length > 0 ? mrpData : [0],
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            hoverBackgroundColor: '#2563eb',
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Phone Buy Cost (Rs.)',
+                            data: buyData.length > 0 ? buyData : [0],
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            hoverBackgroundColor: '#dc2626',
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                usePointStyle: true,
+                                color: '#334155',
+                                font: { size: 11, weight: 600 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 10,
+                            cornerRadius: 10,
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ` ${ctx.dataset.label}: Rs. ${(ctx.parsed.y || 0).toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { size: 10, weight: 600 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10 },
+                                callback: val => val >= 1000 ? 'Rs. ' + (val/1000).toFixed(0) + 'k' : 'Rs. ' + val
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         function renderMainShopProfitView() {
             const tbody = document.getElementById('mainShopTableBody');
             tbody.innerHTML = '';
@@ -2578,6 +2947,9 @@
             netProfitEl.innerText = 'Rs. ' + totalNetProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
             if (totalNetProfit < 0) netProfitEl.style.color = 'var(--danger)';
             else netProfitEl.style.color = 'var(--success)';
+
+            // Render visual analytics chart
+            renderMainProfitAnalyticsChart(filteredSales);
 
             // Calculate Dialog Lesi Pay (7% of MRP) Profit separately
             let totalDialogLesiPayProfit = 0;
