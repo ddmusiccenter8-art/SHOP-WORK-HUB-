@@ -796,20 +796,21 @@
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI & Model</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="text" id="mainSaleImei" placeholder="IMEI" style="flex: 1;">
-                                    <input type="text" id="mainSaleModel" placeholder="Model" style="flex: 1;">
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number & Model <span id="mainSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1.2;" oninput="handleSaleImeiLookup(this.value, 'HO')">
+                                    <button type="button" onclick="startScanner('mainSaleImei')" style="background: var(--info); color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
                                 </div>
+                                <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock or enter manually)" style="width: 100%;">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල)</label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.)</label>
                                 <input type="number" id="mainSaleMrp" step="0.01" placeholder="100000.00" oninput="calculateMainShopLiveProfit()">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Mobile Buy Price / Cost (අපේ මිලදී ගත් මිල)</label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Mobile Buy Price / Cost (අපේ මිලදී ගත් මිල රු.) <span style="font-size:0.75rem; color:var(--success); font-weight:normal;">(Auto-filled from inventory)</span></label>
                                 <input type="number" id="mainSaleBuyPrice" step="0.01" placeholder="80000.00" oninput="calculateMainShopLiveProfit()">
                             </div>
 
@@ -839,16 +840,16 @@
                         <!-- DIALOG LESI PAY SALE FIELDS -->
                         <div id="lesiPaySaleFields" style="display: none;">
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Model Name (දුරකථන මාදිලිය)</label>
-                                <input type="text" id="lpSaleModel" placeholder="e.g. Redmi 14C / Honor X5b">
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number <span id="lpSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1;" oninput="handleSaleImeiLookup(this.value, 'LP')">
+                                    <button type="button" onclick="startScanner('lpSaleImei')" style="background: var(--info); color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                </div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number</label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1;">
-                                    <button type="button" onclick="startScanner('lpSaleImei')" style="background: var(--info); color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600;">📷 Scan</button>
-                                </div>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Model Name (දුරකථන මාදිලිය)</label>
+                                <input type="text" id="lpSaleModel" placeholder="e.g. Redmi 14C / Honor X5b (Auto-filled from stock)">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -961,9 +962,15 @@
                             <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
                         </div>
 
-                        <div style="margin-bottom: 1rem;">
-                            <label id="invPriceLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span></label>
-                            <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                            <div>
+                                <label id="invPriceLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Cost)</span></label>
+                                <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            </div>
+                            <div>
+                                <label id="invMrpLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: normal;">(Retail MRP)</span></label>
+                                <input type="number" id="invMrpPrice" placeholder="0.00" step="0.01" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            </div>
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">
@@ -1207,9 +1214,15 @@
                     <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
                     <input type="text" id="editInvStorage" required style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
                 </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost Price (Rs.)</label>
-                    <input type="number" id="editInvBuyPrice" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Cost (Rs.)</label>
+                        <input type="number" id="editInvBuyPrice" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Selling MRP (Rs.)</label>
+                        <input type="number" id="editInvMrp" step="0.01" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px;">
+                    </div>
                 </div>
                 
                 <button type="submit" id="editInvSubmitBtn" style="width: 100%; background: var(--success); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Save Changes</button>
@@ -2228,6 +2241,79 @@
             }
         };
 
+        // Instant Auto-lookup when IMEI is entered or scanned
+        window.handleSaleImeiLookup = function(imei, mode) {
+            if (!imei) {
+                if (mode === 'HO') {
+                    const statusEl = document.getElementById('mainSaleStockStatus');
+                    if (statusEl) statusEl.innerHTML = '';
+                } else if (mode === 'LP') {
+                    const statusEl = document.getElementById('lpSaleStockStatus');
+                    if (statusEl) statusEl.innerHTML = '';
+                }
+                return;
+            }
+            const cleanImei = imei.trim();
+            if (cleanImei.length < 3) return;
+
+            // Search in loaded allInventoryItems
+            const found = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === cleanImei.toLowerCase());
+
+            if (mode === 'HO') {
+                const statusEl = document.getElementById('mainSaleStockStatus');
+                if (found) {
+                    if (found.model) {
+                        const modelInput = document.getElementById('mainSaleModel');
+                        if (modelInput) {
+                            modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
+                        }
+                    }
+                    if (found.buyPrice && parseFloat(found.buyPrice) > 0) {
+                        document.getElementById('mainSaleBuyPrice').value = found.buyPrice;
+                    }
+                    if (found.mrp && parseFloat(found.mrp) > 0) {
+                        const mrpInput = document.getElementById('mainSaleMrp');
+                        if (mrpInput && (!mrpInput.value || parseFloat(mrpInput.value) === 0)) {
+                            mrpInput.value = found.mrp;
+                        }
+                    }
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span style="color:#10b981; font-weight:700;">✅ Stock Found: ${found.model} (Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()})</span>`;
+                    }
+                    calculateMainShopLiveProfit();
+                    showToast(`✨ Stock Found: ${found.model} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()}`, "success");
+                } else {
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
+                    }
+                }
+            } else if (mode === 'LP') {
+                const statusEl = document.getElementById('lpSaleStockStatus');
+                if (found) {
+                    if (found.model) {
+                        const modelInput = document.getElementById('lpSaleModel');
+                        if (modelInput) {
+                            modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
+                        }
+                    }
+                    if (found.mrp && parseFloat(found.mrp) > 0) {
+                        document.getElementById('lpSaleMrp').value = found.mrp;
+                    } else if (found.buyPrice && parseFloat(found.buyPrice) > 0) {
+                        document.getElementById('lpSaleMrp').value = found.buyPrice;
+                    }
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} (MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()})</span>`;
+                    }
+                    calculateLesiPayLiveProfit();
+                    showToast(`✨ Stock Found: ${found.model} | MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()}`, "success");
+                } else {
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
+                    }
+                }
+            }
+        };
+
         window.calculateLesiPayLiveProfit = function() {
             const mrp = parseFloat(document.getElementById('lpSaleMrp').value) || 0;
             const dp = parseFloat(document.getElementById('lpSaleDp').value) || 0;
@@ -2631,9 +2717,17 @@
                     ? '<span style="color: #3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
                     : '<span style="color: #10b981; font-weight:600;">🟢 Head Office Stock</span>';
                 
-                let costStr = data.buyPrice 
-                    ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">${isDialogLesi ? 'MRP' : 'Buy'}: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>` 
-                    : '';
+                let costParts = [];
+                if (data.buyPrice && parseFloat(data.buyPrice) > 0) {
+                    costParts.push(`<span style="font-size:0.78rem; color:#ef4444; font-weight:600;">Cost: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>`);
+                }
+                if (data.mrp && parseFloat(data.mrp) > 0) {
+                    costParts.push(`<span style="font-size:0.78rem; color:#2563eb; font-weight:600;">MRP: Rs. ${parseFloat(data.mrp).toLocaleString()}</span>`);
+                } else if (isDialogLesi && data.buyPrice && costParts.length === 0) {
+                    costParts.push(`<span style="font-size:0.78rem; color:#2563eb; font-weight:600;">MRP: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>`);
+                }
+
+                let costStr = costParts.length > 0 ? `<br>${costParts.join(' | ')}` : '';
 
                 tr.onclick = function() { selectInventoryRow(this); };
                 tr.style.cursor = "pointer";
@@ -2651,7 +2745,7 @@
                     <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
                     <td>${badge}</td>
                     <td>
-                        <button onclick="event.stopPropagation(); openEditInventoryModal('${data.id}', '${data.imei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${data.buyPrice || ''}')" style="background: transparent; border: none; color: #f59e0b; cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Edit Stock">
+                        <button onclick="event.stopPropagation(); openEditInventoryModal('${data.id}', '${data.imei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${data.buyPrice || ''}', '${data.mrp || ''}')" style="background: transparent; border: none; color: #f59e0b; cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Edit Stock">
                             ✏️
                         </button>
                         <button onclick="event.stopPropagation(); openTransferModal('${data.id}', '${data.imei}', '${safeModel}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
@@ -2669,14 +2763,22 @@
         window.handleInvCategoryChange = function() {
             const cat = document.getElementById('invCategory').value;
             const isLesi = (cat === 'Dialog Lesi Pay');
-            const label = document.getElementById('invPriceLabel');
-            if (label) {
+            const costLabel = document.getElementById('invPriceLabel');
+            const mrpLabel = document.getElementById('invMrpLabel');
+            if (costLabel) {
                 if (isLesi) {
-                    label.innerHTML = `Selling Price MRP (Rs.) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Dialog MRP Value)</span>`;
-                    document.getElementById('invBuyPrice').placeholder = "e.g. 56990.00";
+                    costLabel.innerHTML = `Buy Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span>`;
                 } else {
-                    label.innerHTML = `Buy Price / Cost Price (Rs.) <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(Required for Head Office items)</span>`;
-                    document.getElementById('invBuyPrice').placeholder = "0.00";
+                    costLabel.innerHTML = `Buy Price / Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Cost)</span>`;
+                }
+            }
+            if (mrpLabel) {
+                if (isLesi) {
+                    mrpLabel.innerHTML = `Dialog Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: bold;">(Required)</span>`;
+                    document.getElementById('invMrpPrice').placeholder = "e.g. 56990.00";
+                } else {
+                    mrpLabel.innerHTML = `Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: normal;">(Retail MRP)</span>`;
+                    document.getElementById('invMrpPrice').placeholder = "0.00";
                 }
             }
         };
@@ -2771,6 +2873,7 @@
             addImeiFromInput();
 
             const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
+            const mrpPrice = parseFloat(document.getElementById('invMrpPrice').value) || 0;
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
             if (!model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
@@ -2787,6 +2890,7 @@
                         shop: shop,
                         category: category,
                         buyPrice: buyPrice,
+                        mrp: mrpPrice,
                         status: 'Available',
                         timestamp: Date.now()
                     });
@@ -2799,6 +2903,7 @@
                 renderScannedImeiChips();
                 document.getElementById('invImei').value = '';
                 document.getElementById('invBuyPrice').value = '';
+                document.getElementById('invMrpPrice').value = '';
                 document.getElementById('invImei').focus();
             } catch (err) {
                 console.error("Error adding inventory items:", err);
@@ -3157,6 +3262,11 @@
                             inputEl.value = decodedText;
                             const event = new Event('input', { bubbles: true });
                             inputEl.dispatchEvent(event);
+                            if (currentScannerInputId === 'mainSaleImei' && typeof handleSaleImeiLookup === 'function') {
+                                handleSaleImeiLookup(decodedText, 'HO');
+                            } else if (currentScannerInputId === 'lpSaleImei' && typeof handleSaleImeiLookup === 'function') {
+                                handleSaleImeiLookup(decodedText, 'LP');
+                            }
                         }
                     }
                     stopScanner();
@@ -3253,6 +3363,11 @@
                     inputEl.value = val;
                     const event = new Event('input', { bubbles: true });
                     inputEl.dispatchEvent(event);
+                    if (currentScannerInputId === 'mainSaleImei' && typeof handleSaleImeiLookup === 'function') {
+                        handleSaleImeiLookup(val, 'HO');
+                    } else if (currentScannerInputId === 'lpSaleImei' && typeof handleSaleImeiLookup === 'function') {
+                        handleSaleImeiLookup(val, 'LP');
+                    }
                 }
             }
             stopScanner();
@@ -3328,13 +3443,14 @@
             }
         };
         // Edit Inventory Logic
-        window.openEditInventoryModal = function(id, imei, model, storage, category, buyPrice) {
+        window.openEditInventoryModal = function(id, imei, model, storage, category, buyPrice, mrp) {
             document.getElementById('editInvId').value = id;
             document.getElementById('editInvImeiLabel').innerText = imei;
             document.getElementById('editInvModel').value = model;
             document.getElementById('editInvStorage').value = storage;
             document.getElementById('editInvCategory').value = category;
-            document.getElementById('editInvBuyPrice').value = buyPrice;
+            document.getElementById('editInvBuyPrice').value = buyPrice || '';
+            document.getElementById('editInvMrp').value = mrp || '';
             
             document.getElementById('editInventoryModal').style.display = 'flex';
         };
@@ -3354,6 +3470,7 @@
             const storage = document.getElementById('editInvStorage').value.trim();
             const category = document.getElementById('editInvCategory').value;
             const buyPrice = document.getElementById('editInvBuyPrice').value;
+            const mrp = document.getElementById('editInvMrp').value;
 
             try {
                 await updateDoc(doc(db, "inventory", id), {
@@ -3361,6 +3478,7 @@
                     storage: storage,
                     category: category,
                     buyPrice: buyPrice ? parseFloat(buyPrice) : null,
+                    mrp: mrp ? parseFloat(mrp) : null,
                     updatedAt: Date.now()
                 });
                 showToast("Inventory item updated successfully!", "success");
