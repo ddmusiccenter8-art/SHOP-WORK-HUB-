@@ -2036,9 +2036,23 @@
                 const saleShopReg = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === saleShopEmail);
                 const dynHoP = saleShopReg?.hoPercent ?? 4;
                 const dynOwnP = saleShopReg?.shopOwnPercent ?? 6;
-                let sourceHtml = data.stockSource === 'HO' 
-                    ? `<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (${dynHoP}% Profit)</span>` 
-                    : `<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (${dynOwnP}% Profit)</span>`;
+                const isCash = (data.saleType === 'Cash Sale' || data.status === 'Cash Payment Pending');
+
+                let sourceHtml = '';
+                let amountsHtml = '';
+
+                if (isCash) {
+                    const cPrice = parseFloat(data.cashSalePrice || data.mrp || 0);
+                    const cComm = parseFloat(data.shopCommission || 0);
+                    const cDue = parseFloat(data.headOfficeDue || data.settlement || (cPrice - cComm));
+                    sourceHtml = `<span style="background:rgba(245,158,11,0.15); color:#d97706; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:0.72rem; padding:1px 5px; border-radius:4px;">💰 Cash Sale (Comm: Rs. ${cComm.toLocaleString()})</span>`;
+                    amountsHtml = `Sold: Rs. ${cPrice.toLocaleString()}<br><strong style="color:#047857; font-size:0.88rem;">HO Due: Rs. ${cDue.toLocaleString()}</strong>`;
+                } else {
+                    sourceHtml = data.stockSource === 'HO' 
+                        ? `<span style="color:var(--success); font-size:0.78rem; font-weight:600;">HO Stock (${dynHoP}% Profit)</span>` 
+                        : `<span style="color:var(--text-muted); font-size:0.78rem;">Shop Stock (${dynOwnP}% Profit)</span>`;
+                    amountsHtml = `L: Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}<br><span style="color:var(--warning)">S: Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span>`;
+                }
                 
                 const shopName = data.shopId ? data.shopId.split('@')[0].toUpperCase() : 'UNKNOWN';
                 
@@ -2046,7 +2060,7 @@
                     <td>${data.date || '-'}</td>
                     <td style="color: var(--accent-purple); font-weight: 600;">${shopName}</td>
                     <td><strong>${data.name || '-'}</strong><br><span style="color:var(--text-muted)">${data.model || '-'}</span><br>${sourceHtml}</td>
-                    <td>L: Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}<br><span style="color:var(--warning)">S: Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></td>
+                    <td>${amountsHtml}</td>
                     <td>${statusHtml}</td>
                 `;
                 tbody.appendChild(tr);
@@ -2058,6 +2072,7 @@
             if (status === 'Admin Replied') return '<span class="badge badge-replied">Replied</span>';
             if (status === 'Payment Sent') return '<span class="badge badge-sent">Pay Sent</span>';
             if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
+            if (status === 'Cash Payment Pending') return '<span class="badge" style="background:rgba(245,158,11,0.18); color:#d97706; border:1px solid rgba(245,158,11,0.4); font-weight:800;">⏳ Cash Due</span>';
             if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">Completed ✅</span>';
             return `<span class="badge">${status}</span>`;
         }
@@ -2836,34 +2851,66 @@
             const detShopReg = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === detShopEmail);
             const dHoP = detShopReg?.hoPercent ?? 4;
             const dOwnP = detShopReg?.shopOwnPercent ?? 6;
+            const isCash = (data.saleType === 'Cash Sale' || data.status === 'Cash Payment Pending');
+
+            let customDetailsHtml = '';
+
+            if (isCash) {
+                const cPrice = parseFloat(data.cashSalePrice || data.mrp || 0);
+                const cComm = parseFloat(data.shopCommission || 0);
+                const cDue = parseFloat(data.headOfficeDue || data.settlement || (cPrice - cComm));
+
+                customDetailsHtml = `
+                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(16,185,129,0.1) 100%); border: 1.5px solid rgba(245,158,11,0.35); border-radius: 12px; padding: 1rem; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-weight: 800; color: #b45309; font-size: 0.95rem;">💰 SUB-SHOP DIRECT CASH SALE</span>
+                            <span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;">CASH SALE</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem;">
+                            <div>Total Cash Sale Price: <strong>Rs. ${cPrice.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></div>
+                            <div style="color: #6d28d9;">Shop Retained Commission: <strong>Rs. ${cComm.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></div>
+                        </div>
+                        <div style="border-top: 1px dashed rgba(245,158,11,0.4); margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 800; color: #065f46; font-size: 0.95rem;">🏦 Head Office Due (අපට ලැබිය යුතු මුදල):</span>
+                            <strong style="color: #047857; font-size: 1.25rem; font-weight: 900;">Rs. ${cDue.toLocaleString(undefined, {minimumFractionDigits:2})}</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
             let sourceHtml = data.stockSource === 'HO' 
                 ? `<span style="color:var(--success); font-weight:600;">Head Office Stock (${dHoP}% Profit Settlement)</span>` 
                 : `<span style="color:var(--text-muted);">Shop Own Stock (${dOwnP}% Profit Settlement)</span>`;
             
             content.innerHTML = `
+                ${customDetailsHtml}
                 <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
                 <div class="detail-item"><strong>Shop:</strong> <span class="val">${data.shopId || '-'}</span></div>
                 <div class="detail-item"><strong>Customer Name:</strong> <span class="val">${data.name || '-'}</span></div>
-                <div class="detail-item"><strong>Customer NIC:</strong> <span class="val">${data.nic || '-'}</span></div>
+                ${!isCash ? `<div class="detail-item"><strong>Customer NIC:</strong> <span class="val">${data.nic || '-'}</span></div>` : ''}
                 <div class="detail-item"><strong>Phone Model & Storage:</strong> <span class="val">${data.model || '-'} ${data.storage ? ' ('+data.storage+')' : ''}</span></div>
                 <div class="detail-item"><strong>IMEI Number:</strong> <span class="val">${data.imei || '-'}</span></div>
-                <div class="detail-item"><strong>Stock Source:</strong> <span class="val">${sourceHtml}</span></div>
-                <div class="detail-item"><strong>SP Number:</strong> <span class="val">${data.spNumber || '-'}</span></div>
-                <div class="detail-item"><strong>MRP Price:</strong> <span class="val">Rs. ${parseFloat(data.mrp || 0).toLocaleString()}</span></div>
-                <div class="detail-item"><strong>Down Payment:</strong> <span class="val">Rs. ${parseFloat(data.downPayment || 0).toLocaleString()}</span></div>
-                <div class="detail-item"><strong>Document Charge:</strong> <span class="val">Rs. ${parseFloat(data.document || 0).toLocaleString()}</span></div>
-                <div class="detail-item"><strong>Loan Amount:</strong> <span class="val" style="color:var(--success); font-weight:bold;">Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}</span></div>
-                <div class="detail-item"><strong>Settlement Amount:</strong> <span class="val" style="color:var(--warning); font-weight:bold;">Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></div>
+                ${!isCash ? `
+                    <div class="detail-item"><strong>Stock Source:</strong> <span class="val">${sourceHtml}</span></div>
+                    <div class="detail-item"><strong>SP Number:</strong> <span class="val">${data.spNumber || '-'}</span></div>
+                    <div class="detail-item"><strong>MRP Price:</strong> <span class="val">Rs. ${parseFloat(data.mrp || 0).toLocaleString()}</span></div>
+                    <div class="detail-item"><strong>Down Payment:</strong> <span class="val">Rs. ${parseFloat(data.downPayment || 0).toLocaleString()}</span></div>
+                    <div class="detail-item"><strong>Document Charge:</strong> <span class="val">Rs. ${parseFloat(data.document || 0).toLocaleString()}</span></div>
+                    <div class="detail-item"><strong>Loan Amount:</strong> <span class="val" style="color:var(--success); font-weight:bold;">Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}</span></div>
+                    <div class="detail-item"><strong>Settlement Amount:</strong> <span class="val" style="color:var(--warning); font-weight:bold;">Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></div>
+                ` : ''}
                 <div class="detail-item"><strong>Current Status:</strong> <span class="val">${getStatusBadge(data.status)}</span></div>
             `;
             
             document.getElementById('replyText').value = data.adminReply || '';
             document.getElementById('fintrexPaymentText').value = data.fintrexPayment || '';
-            document.getElementById('paymentStatusSelect').value = data.paymentStatus === 'Paid' ? 'Paid' : 'Pending';
+            document.getElementById('paymentStatusSelect').value = (data.paymentStatus === 'Paid' || data.status === 'Completed') ? 'Paid' : 'Pending';
             
             const completeBtn = document.getElementById('completeProcessBtn');
-            if (data.status === 'Confirmed') {
+            if (data.status === 'Confirmed' || data.status === 'Cash Payment Pending' || isCash) {
                 completeBtn.style.display = 'block';
+                completeBtn.innerText = isCash ? '💵 Payment Received & Complete File ✅' : 'Complete Process ✅';
+                completeBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
             } else {
                 completeBtn.style.display = 'none';
             }
@@ -2923,15 +2970,35 @@
             if (!currentModalDocId) return;
             const btn = document.getElementById('completeProcessBtn');
             btn.innerText = 'Completing...';
+            btn.disabled = true;
+
             try {
-                await updateDoc(doc(db, "sales", currentModalDocId), { status: 'Completed', paymentStatus: 'Paid' });
-                showToast("Process marked as completed!", "success");
+                const currentData = allSales.find(s => s.id === currentModalDocId);
+                await updateDoc(doc(db, "sales", currentModalDocId), { 
+                    status: 'Completed', 
+                    paymentStatus: 'Paid',
+                    completedAt: Date.now()
+                });
+
+                if (currentData && currentData.inventoryDocId) {
+                    try {
+                        await updateDoc(doc(db, "inventory", currentData.inventoryDocId), {
+                            status: 'Cash Sold',
+                            completedAt: Date.now()
+                        });
+                    } catch(invErr) {
+                        console.error("Inventory doc update error:", invErr);
+                    }
+                }
+
+                showToast("Payment confirmed! File marked as Completed.", "success");
                 closeModal();
             } catch (e) {
                 console.error(e);
                 showToast("Error completing process: " + e.message, "error");
             } finally {
                 btn.innerText = 'Complete Process ✅';
+                btn.disabled = false;
             }
         });
 

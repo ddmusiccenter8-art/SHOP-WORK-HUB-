@@ -463,26 +463,22 @@
             <h2>New Entry <span class="lang-si">(නව දත්ත ඇතුලත් කිරීම)</span></h2>
             
             <form id="salesForm">
+                <!-- Sale Mode Selector -->
+                <div class="form-group" style="margin-bottom: 1.1rem; background: rgba(59, 130, 246, 0.08); padding: 0.8rem; border-radius: 12px; border: 1.5px solid rgba(59, 130, 246, 0.3);">
+                    <label for="shopSaleType" style="font-weight: 800; color: #1e3a8a; display: flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+                        📌 Sale Process Type (විකුණුම් ආකාරය):
+                    </label>
+                    <select id="shopSaleType" onchange="handleShopSaleTypeChange()" style="width: 100%; background: #ffffff; border: 1px solid rgba(59, 130, 246, 0.4); color: var(--text-main); padding: 0.75rem; border-radius: 8px; font-weight: 700; font-size: 0.92rem; cursor: pointer;">
+                        <option value="Loan" selected>📱 Loan / Leasing Submission (ණය ඉල්ලුම්පතක් හරහා)</option>
+                        <option value="Cash">💰 Direct Cash Sale of HO Stock (මුදලට විකිණීම)</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="date">Date <span class="lang-si">(දිනය)</span></label>
                     <input type="date" id="date" required>
                 </div>
-                
-                <div class="form-group">
-                    <label for="spNumber">SP Number <span class="lang-si">(SP අංකය)</span></label>
-                    <input type="text" id="spNumber" placeholder="e.g. SP-1024" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="nic">Customer NIC <span class="lang-si">(ජා. හැ. අංකය)</span></label>
-                    <input type="text" id="nic" placeholder="e.g. 199512345678 or 951234567V" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="name">Customer Name <span class="lang-si">(නම)</span></label>
-                    <input type="text" id="name" placeholder="e.g. A.B. Perera" required>
-                </div>
-                
+
                 <div class="form-group">
                     <label for="imei">IMEI Number <span class="lang-si">(IMEI අංකය)</span></label>
                     <div style="display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 0.5rem;">
@@ -503,28 +499,70 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="mrp">MRP <span class="lang-si">(උපරිම සිල්ලර මිල)</span></label>
-                    <input type="number" id="mrp" placeholder="0.00" step="0.01" required>
+                    <label for="name">Customer Name / Contact <span class="lang-si">(පාරිභෝගික නම / දුරකථන අංකය)</span></label>
+                    <input type="text" id="name" placeholder="e.g. A.B. Perera / 0771234567" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="downPayment">Down Payment <span class="lang-si">(මූලික ගෙවීම)</span></label>
-                    <input type="number" id="downPayment" placeholder="0.00" step="0.01" required>
+                <!-- 1. Loan Specific Fields -->
+                <div id="shopLoanFieldsContainer">
+                    <div class="form-group">
+                        <label for="spNumber">SP Number <span class="lang-si">(SP අංකය)</span></label>
+                        <input type="text" id="spNumber" placeholder="e.g. SP-1024">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nic">Customer NIC <span class="lang-si">(ජා. හැ. අංකය)</span></label>
+                        <input type="text" id="nic" placeholder="e.g. 199512345678 or 951234567V">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mrp">MRP <span class="lang-si">(උපරිම සිල්ලර මිල)</span></label>
+                        <input type="number" id="mrp" placeholder="0.00" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="downPayment">Down Payment <span class="lang-si">(මූලික ගෙවීම)</span></label>
+                        <input type="number" id="downPayment" placeholder="0.00" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="document">Document Fee <span class="lang-si">(ලේඛන ගාස්තුව)</span></label>
+                        <input type="number" id="document" placeholder="0.00" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loanAmount">Loan Amount <span class="lang-si">(ණය මුදල)</span></label>
+                        <input type="number" id="loanAmount" placeholder="0.00" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settlement">Settlement <span class="lang-si">(ගෙවීම)</span></label>
+                        <input type="number" id="settlement" placeholder="0.00" step="0.01" readonly style="background: #f3f4f6; font-weight: bold; color: var(--warning);">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="document">Document Fee <span class="lang-si">(ලේඛන ගාස්තුව)</span></label>
-                    <input type="number" id="document" placeholder="0.00" step="0.01">
-                </div>
+                <!-- 2. Direct Cash Sale Specific Fields -->
+                <div id="shopCashFieldsContainer" style="display: none;">
+                    <div class="form-group">
+                        <label for="shopCashSellingPrice">Actual Cash Sale Price (රු. විකුණුම් මිල) *</label>
+                        <input type="number" id="shopCashSellingPrice" oninput="calculateShopCashSaleDue()" placeholder="0.00" step="0.01" style="font-weight: 700; font-size: 1.05rem;">
+                    </div>
 
-                <div class="form-group">
-                    <label for="loanAmount">Loan Amount <span class="lang-si">(ණය මුදල)</span></label>
-                    <input type="number" id="loanAmount" placeholder="0.00" step="0.01" required>
-                </div>
+                    <div class="form-group">
+                        <label for="shopCashCommission">My Earned Commission (මා ලබාගන්නා කොමිස් මුදල) (රු.) *</label>
+                        <input type="number" id="shopCashCommission" oninput="calculateShopCashSaleDue()" placeholder="e.g. 1500" step="0.01" style="color: #6d28d9; font-weight: 700; font-size: 1.05rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">ඔබට ලැබෙන කොමිස් මුදල මෙහි Type කරන්න (Manual Edit).</span>
+                    </div>
 
-                <div class="form-group">
-                    <label for="settlement">Settlement <span class="lang-si">(ගෙවීම)</span></label>
-                    <input type="number" id="settlement" placeholder="0.00" step="0.01" readonly style="background: #f3f4f6; font-weight: bold; color: var(--warning);">
+                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.85rem; font-weight: 800; color: #065f46;">🏦 Amount to Pay Head Office (Head Office එකට ගෙවිය යුතු මුදල):</span>
+                            <strong id="shopLiveHeadOfficeDue" style="font-size: 1.25rem; font-weight: 900; color: #047857;">Rs. 0.00</strong>
+                        </div>
+                        <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;">
+                            (Cash Sale Price - My Commission = Amount to Head Office)
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">Submit Data</button>
@@ -970,6 +1008,62 @@
         const loanAmountInput = document.getElementById('loanAmount');
         const settlementInput = document.getElementById('settlement');
 
+        window.handleShopSaleTypeChange = function() {
+            const saleType = document.getElementById('shopSaleType').value;
+            const loanBox = document.getElementById('shopLoanFieldsContainer');
+            const cashBox = document.getElementById('shopCashFieldsContainer');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (saleType === 'Cash') {
+                loanBox.style.display = 'none';
+                cashBox.style.display = 'block';
+                submitBtn.innerText = '💰 Submit Direct Cash Sale (මුදල් විකිණීම ඇතුළත් කරන්න)';
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+                // Auto populate cash price from MRP if available
+                const mrpVal = parseFloat(mrpInput.value) || 0;
+                if (mrpVal > 0) {
+                    if (!document.getElementById('shopCashSellingPrice').value) {
+                        document.getElementById('shopCashSellingPrice').value = mrpVal;
+                    }
+                    if (!document.getElementById('shopCashCommission').value) {
+                        document.getElementById('shopCashCommission').value = Math.round(mrpVal * (myHoPercent / 100)) || 1500;
+                    }
+                }
+                calculateShopCashSaleDue();
+            } else {
+                loanBox.style.display = 'block';
+                cashBox.style.display = 'none';
+                submitBtn.innerText = 'Submit Loan Application';
+                submitBtn.style.background = 'var(--primary)';
+                calculateSettlement();
+            }
+        };
+
+        window.calculateShopCashSaleDue = function() {
+            const price = parseFloat(document.getElementById('shopCashSellingPrice').value) || 0;
+            const comm = parseFloat(document.getElementById('shopCashCommission').value) || 0;
+            const due = Math.max(0, price - comm);
+            const dueEl = document.getElementById('shopLiveHeadOfficeDue');
+            if (dueEl) {
+                dueEl.innerText = 'Rs. ' + due.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+        };
+
+        window.fillFormWithStock = function(imei, mode = 'Cash') {
+            switchTab('newEntry');
+            const typeSelect = document.getElementById('shopSaleType');
+            if (typeSelect) {
+                typeSelect.value = mode;
+                handleShopSaleTypeChange();
+            }
+            if (imeiInput) {
+                imeiInput.value = imei;
+                imeiInput.dispatchEvent(new Event('input'));
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
         // Auto calculate Loan Amount when MRP or DownPayment change
         mrpInput.addEventListener('input', () => {
             const mrp = parseFloat(mrpInput.value) || 0;
@@ -978,6 +1072,12 @@
                 loanAmountInput.value = Math.max(0, mrp - dp).toFixed(2);
             }
             calculateSettlement();
+            if (document.getElementById('shopSaleType').value === 'Cash') {
+                if (!document.getElementById('shopCashSellingPrice').value) {
+                    document.getElementById('shopCashSellingPrice').value = mrp;
+                }
+                calculateShopCashSaleDue();
+            }
         });
 
         downPaymentInput.addEventListener('input', () => {
@@ -1003,7 +1103,7 @@
             }
             
             try {
-                const q = query(collection(db, "inventory"), where("imei", "==", val), where("status", "==", "Available"));
+                const q = query(collection(db, "inventory"), where("imei", "==", val), where("status", "in", ["Available", "Transferred"]));
                 const snapshot = await getDocs(q);
                 
                 if (!snapshot.empty) {
@@ -1013,6 +1113,16 @@
                     imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
                     if (data.model) modelInput.value = data.model;
                     if (data.storage) storageInput.value = data.storage;
+                    if (data.mrp) {
+                        mrpInput.value = data.mrp;
+                        if (document.getElementById('shopSaleType').value === 'Cash') {
+                            document.getElementById('shopCashSellingPrice').value = data.mrp;
+                            if (!document.getElementById('shopCashCommission').value) {
+                                document.getElementById('shopCashCommission').value = Math.round(parseFloat(data.mrp) * (myHoPercent / 100)) || 1500;
+                            }
+                            calculateShopCashSaleDue();
+                        }
+                    }
                     
                     currentStockSource = 'HO';
                     matchedInventoryDocId = invDoc.id;
@@ -1056,61 +1166,117 @@
         const salesForm = document.getElementById('salesForm');
         const submitBtn = document.getElementById('submitBtn');
 
-        salesForm.addEventListener('submit', (e) => {
+        salesForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
 
+            const saleType = document.getElementById('shopSaleType').value;
             submitBtn.disabled = true;
             submitBtn.innerText = 'Submitting Data...';
 
-            const payload = {
-                shopId: currentUser.email,
-                date: document.getElementById('date').value,
-                spNumber: document.getElementById('spNumber').value.trim(),
-                nic: document.getElementById('nic').value.trim(),
-                name: document.getElementById('name').value.trim(),
-                imei: document.getElementById('imei').value.trim(),
-                model: document.getElementById('model').value.trim(),
-                storage: document.getElementById('storage').value.trim(),
-                mrp: parseFloat(document.getElementById('mrp').value) || 0,
-                downPayment: parseFloat(document.getElementById('downPayment').value) || 0,
-                document: parseFloat(document.getElementById('document').value) || 0,
-                loanAmount: parseFloat(document.getElementById('loanAmount').value) || 0,
-                settlement: parseFloat(document.getElementById('settlement').value) || 0,
-                stockSource: currentStockSource,
-                inventoryDocId: matchedInventoryDocId,
-                status: 'New',
-                paymentStatus: 'Pending',
-                timestamp: Date.now()
-            };
+            try {
+                let payload = {};
 
-            addDoc(collection(db, "sales"), payload).then(async (docRef) => {
-                showToast("Sales entry submitted successfully!", "success");
-                salesForm.reset();
-                document.getElementById('date').valueAsDate = new Date();
-                document.getElementById('imeiStatus').innerText = '';
-                currentStockSource = 'Shop';
-                matchedInventoryDocId = null;
+                if (saleType === 'Cash') {
+                    const cashPrice = parseFloat(document.getElementById('shopCashSellingPrice').value) || 0;
+                    const comm = parseFloat(document.getElementById('shopCashCommission').value) || 0;
+                    const due = Math.max(0, cashPrice - comm);
 
+                    if (cashPrice <= 0) {
+                        showToast("Please enter a valid Cash Selling Price", "error");
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = '💰 Submit Direct Cash Sale (මුදල් විකිණීම ඇතුළත් කරන්න)';
+                        return;
+                    }
+
+                    payload = {
+                        saleType: 'Cash Sale',
+                        shopId: currentUser.email,
+                        date: document.getElementById('date').value,
+                        name: document.getElementById('name').value.trim(),
+                        imei: document.getElementById('imei').value.trim(),
+                        model: document.getElementById('model').value.trim(),
+                        storage: document.getElementById('storage').value.trim(),
+                        mrp: parseFloat(document.getElementById('mrp').value) || cashPrice,
+                        cashSalePrice: cashPrice,
+                        shopCommission: comm,
+                        headOfficeDue: due,
+                        settlement: due,
+                        loanAmount: cashPrice,
+                        stockSource: currentStockSource,
+                        inventoryDocId: matchedInventoryDocId,
+                        status: 'Cash Payment Pending',
+                        paymentStatus: 'Pending',
+                        timestamp: Date.now()
+                    };
+                } else {
+                    payload = {
+                        saleType: 'Loan',
+                        shopId: currentUser.email,
+                        date: document.getElementById('date').value,
+                        spNumber: document.getElementById('spNumber').value.trim(),
+                        nic: document.getElementById('nic').value.trim(),
+                        name: document.getElementById('name').value.trim(),
+                        imei: document.getElementById('imei').value.trim(),
+                        model: document.getElementById('model').value.trim(),
+                        storage: document.getElementById('storage').value.trim(),
+                        mrp: parseFloat(document.getElementById('mrp').value) || 0,
+                        downPayment: parseFloat(document.getElementById('downPayment').value) || 0,
+                        document: parseFloat(document.getElementById('document').value) || 0,
+                        loanAmount: parseFloat(document.getElementById('loanAmount').value) || 0,
+                        settlement: parseFloat(document.getElementById('settlement').value) || 0,
+                        stockSource: currentStockSource,
+                        inventoryDocId: matchedInventoryDocId,
+                        status: 'New',
+                        paymentStatus: 'Pending',
+                        timestamp: Date.now()
+                    };
+                }
+
+                const docRef = await addDoc(collection(db, "sales"), payload);
+                
                 if (payload.inventoryDocId) {
                     try {
-                        await updateDoc(doc(db, "inventory", payload.inventoryDocId), {
-                            status: 'Sold',
+                        const invStatus = (saleType === 'Cash') ? 'Cash Sold (Pending HO Payment)' : 'Sold';
+                        const invUpdate = {
+                            status: invStatus,
                             soldAt: Date.now(),
                             soldBy: currentUser.email,
                             salesDocId: docRef.id
-                        });
+                        };
+                        if (saleType === 'Cash') {
+                            invUpdate.cashSaleDetails = {
+                                cashSalePrice: payload.cashSalePrice,
+                                shopCommission: payload.shopCommission,
+                                headOfficeDue: payload.headOfficeDue,
+                                custName: payload.name,
+                                date: payload.date,
+                                soldByShop: currentUser.email,
+                                salesDocId: docRef.id,
+                                timestamp: Date.now()
+                            };
+                        }
+                        await updateDoc(doc(db, "inventory", payload.inventoryDocId), invUpdate);
                     } catch (invErr) {
-                        console.error("Error marking inventory as sold:", invErr);
+                        console.error("Error updating inventory status:", invErr);
                     }
                 }
-            }).catch(e => {
+
+                showToast(saleType === 'Cash' ? "Direct Cash Sale submitted! Status: Cash Payment Pending" : "Loan application submitted successfully!", "success");
+                salesForm.reset();
+                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('imeiStatus').innerText = '';
+                document.getElementById('shopLiveHeadOfficeDue').innerText = 'Rs. 0.00';
+                currentStockSource = 'Shop';
+                matchedInventoryDocId = null;
+                handleShopSaleTypeChange();
+            } catch (e) {
                 console.error("Submission error:", e);
                 showToast("Submission failed: " + e.message, "error");
-            }).finally(() => {
+            } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Submit Data';
-            });
+                handleShopSaleTypeChange();
+            }
         });
 
         // Filter & Search Functionality for Shop Sales
@@ -1134,12 +1300,19 @@
             let totalPending = 0;
 
             allShopSales.forEach(data => {
-                const loan = parseFloat(data.loanAmount) || 0;
-                const setl = parseFloat(data.settlement) || 0;
+                const isCash = (data.saleType === 'Cash Sale' || data.status === 'Cash Payment Pending');
+                const loan = parseFloat(data.loanAmount || data.cashSalePrice) || 0;
+                const setl = parseFloat(data.settlement || data.headOfficeDue) || 0;
                 const mrp = parseFloat(data.mrp) || loan || 0;
                 const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
-                const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
-                const profit = mrp * profitRate;
+                
+                let profit = 0;
+                if (isCash) {
+                    profit = parseFloat(data.shopCommission) || 0;
+                } else {
+                    const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
+                    profit = mrp * profitRate;
+                }
 
                 totalLoan += loan;
                 totalProfit += profit;
@@ -1189,37 +1362,73 @@
             filtered.forEach(data => {
                 const tr = document.createElement('tr');
                 const id = data.id;
-                
-                const mrp = parseFloat(data.mrp) || parseFloat(data.loanAmount) || 0;
-                const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
-                const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
-                const profitAmount = mrp * profitRate;
-                const profitBadge = isHO
-                    ? `<span style="color:#10b981; font-size:0.78rem; font-weight:600; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">Profit (${myHoPercent}% HO): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`
-                    : `<span style="color:#3b82f6; font-size:0.78rem; font-weight:600; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">Profit (${myShopOwnPercent}% Own): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`;
+                const isCash = (data.saleType === 'Cash Sale' || data.status === 'Cash Payment Pending');
 
+                let titleHtml = '';
+                let amountsHtml = '';
                 let statusHtml = '';
-                let paymentNote = data.paymentStatus === 'Paid' 
-                    ? '<span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✓</span>' 
-                    : '<span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending</span>';
 
-                if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
-                else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
-                else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.fintrexPayment || '')}')">Payment Sent - Confirm</span>`;
-                else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed by Shop</span>';
-                else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">? Completed</span>';
+                if (isCash) {
+                    const cashPrice = parseFloat(data.cashSalePrice || data.mrp || 0);
+                    const comm = parseFloat(data.shopCommission || 0);
+                    const hoDue = parseFloat(data.headOfficeDue || data.settlement || (cashPrice - comm));
 
-                tr.innerHTML = `
-                    <td>${data.date || '-'}</td>
-                    <td>
+                    titleHtml = `
+                        <div style="display:inline-flex; align-items:center; gap:4px; margin-bottom:2px;">
+                            <span style="background:rgba(245,158,11,0.15); color:#d97706; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:0.72rem; padding:1px 6px; border-radius:4px;">💰 DIRECT CASH SALE</span>
+                        </div><br>
+                        <strong>${data.model || '-'}</strong> <span style="font-size:0.8rem; color:var(--text-muted);">${data.storage ? '('+data.storage+')' : ''}</span><br>
+                        <span style="color:var(--text-muted); font-size:0.8rem;">Cust: ${data.name || '-'} | IMEI: ${data.imei || '-'}</span><br>
+                        <span style="color:#6d28d9; font-size:0.78rem; font-weight:700; background:rgba(109,40,217,0.08); padding:2px 6px; border-radius:4px;">My Profit/Comm: Rs. ${comm.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                    `;
+
+                    amountsHtml = `
+                        Sold Price: <strong>Rs. ${cashPrice.toLocaleString()}</strong><br>
+                        <strong style="color:#047857; font-size:0.88rem;">Due to HO: Rs. ${hoDue.toLocaleString()}</strong>
+                    `;
+
+                    if (data.status === 'Cash Payment Pending') {
+                        statusHtml = `<span class="badge" style="background:rgba(245,158,11,0.18); color:#d97706; border:1px solid rgba(245,158,11,0.4); font-weight:800;">⏳ Cash Payment Pending</span>`;
+                    } else if (data.status === 'Completed' || data.paymentStatus === 'Paid') {
+                        statusHtml = `<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.25); color:#059669; font-weight:800;">✅ Completed / Payment Received</span>`;
+                    } else {
+                        statusHtml = `<span class="badge badge-replied">${data.status}</span>`;
+                    }
+                } else {
+                    const mrp = parseFloat(data.mrp) || parseFloat(data.loanAmount) || 0;
+                    const isHO = (data.stockSource === 'HO' || data.stockSource === 'Head Office');
+                    const profitRate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
+                    const profitAmount = mrp * profitRate;
+                    const profitBadge = isHO
+                        ? `<span style="color:#10b981; font-size:0.78rem; font-weight:600; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">Profit (${myHoPercent}% HO): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`
+                        : `<span style="color:#3b82f6; font-size:0.78rem; font-weight:600; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">Profit (${myShopOwnPercent}% Own): Rs. ${profitAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>`;
+
+                    let paymentNote = data.paymentStatus === 'Paid' 
+                        ? '<span style="color:var(--success); font-size:0.78rem; font-weight:bold;">Paid ✓</span>' 
+                        : '<span style="color:var(--warning); font-size:0.78rem; font-weight:bold;">Pending</span>';
+
+                    if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
+                    else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
+                    else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.fintrexPayment || '')}')">Payment Sent - Confirm</span>`;
+                    else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed by Shop</span>';
+                    else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">✅ Completed</span>';
+
+                    titleHtml = `
                         <strong>${data.spNumber || '-'}</strong><br>
                         <span style="color: var(--text-muted)">${data.model || '-'} (${data.name || ''})</span><br>
                         ${profitBadge}
-                    </td>
-                    <td>
+                    `;
+
+                    amountsHtml = `
                         Loan: Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}<br>
                         Setl: Rs. ${parseFloat(data.settlement || 0).toLocaleString()} <span style="font-size:0.75rem;">(${paymentNote})</span>
-                    </td>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td>${data.date || '-'}</td>
+                    <td>${titleHtml}</td>
+                    <td>${amountsHtml}</td>
                     <td>${statusHtml}</td>
                 `;
                 tbody.appendChild(tr);
@@ -1568,9 +1777,17 @@
                         actionHTML = '<span style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">📍 At Head Office</span>';
                     } else {
                         actionHTML = `
-                            <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.78rem; font-weight: 600; white-space: nowrap;" title="Return unsold stock to Main Shop">
-                                🔄 Return to Main
-                            </button>
+                            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                <button onclick="fillFormWithStock('${data.imei}', 'Cash')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(16,185,129,0.25);">
+                                    💰 Cash Sale
+                                </button>
+                                <button onclick="fillFormWithStock('${data.imei}', 'Loan')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #2563eb; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700;">
+                                    📱 Loan
+                                </button>
+                                <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;" title="Return unsold stock to Main Shop">
+                                    🔄 Return
+                                </button>
+                            </div>
                         `;
                     }
 
