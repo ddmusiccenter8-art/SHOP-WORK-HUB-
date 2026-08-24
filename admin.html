@@ -706,28 +706,99 @@
                     <canvas id="shopChart"></canvas>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                    <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem;">Shop Submissions History</h3>
-                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                        <button class="filter-btn" id="singleShopFilterAll" onclick="setSingleShopFilter('All')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--primary); color: white;">All Entries</button>
-                        <button class="filter-btn" id="singleShopFilterPending" onclick="setSingleShopFilter('Pending')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">⏳ Pending</button>
-                        <button class="filter-btn" id="singleShopFilterPaid" onclick="setSingleShopFilter('Paid')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">✅ Paid</button>
+                <!-- Sub-Tabs Navigation for Sub Shop (Submissions vs Head Office Inventory) -->
+                <div style="display: flex; gap: 0.8rem; margin: 1.5rem 0 1.2rem 0; border-bottom: 2px solid rgba(226, 232, 240, 0.8); padding-bottom: 0.6rem; flex-wrap: wrap;">
+                    <button id="shopTabBtnSubmissions" onclick="switchShopSubTab('submissions')" style="background: var(--primary); color: white; border: none; padding: 0.65rem 1.4rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(229,0,0,0.2); transition: all 0.2s;">
+                        📑 Submissions & Sales History (<span id="shopSubmissionsTabCount">0</span>)
+                    </button>
+                    <button id="shopTabBtnInventory" onclick="switchShopSubTab('inventory')" style="background: rgba(255,255,255,0.7); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.65rem 1.4rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                        📦 Head Office Allocated Inventory (<span id="shopInventoryTabCount">0</span>)
+                    </button>
+                </div>
+
+                <!-- 1. Submissions Content Section -->
+                <div id="shopSubmissionsContent">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem;">Shop Submissions History</h3>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <button class="filter-btn" id="singleShopFilterAll" onclick="setSingleShopFilter('All')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--primary); color: white;">All Entries</button>
+                            <button class="filter-btn" id="singleShopFilterPending" onclick="setSingleShopFilter('Pending')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">⏳ Pending</button>
+                            <button class="filter-btn" id="singleShopFilterPaid" onclick="setSingleShopFilter('Paid')" style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">✅ Paid</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer & Device</th>
+                                    <th>Stock Source</th>
+                                    <th>Loan / Settlement</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="singleShopTable"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Customer & Device</th>
-                                <th>Stock Source</th>
-                                <th>Loan / Settlement</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="singleShopTable"></tbody>
-                    </table>
+                <!-- 2. Head Office Allocated Inventory Content Section -->
+                <div id="shopInventoryContent" style="display: none;">
+                    <!-- Allocated Stock Financial Summary Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
+                        <div style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1.1rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h4 style="color: #059669; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Available Stock in Shop</h4>
+                            <p style="font-size: 1.45rem; font-weight: 800; color: #065f46; margin-top: 0.2rem;" id="shopAllocatedAvailableCount">0 Phones</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);" id="shopAllocatedAvailableVal">MRP: Rs. 0.00</span>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1.1rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h4 style="color: #d97706; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Direct Cash Sold</h4>
+                            <p style="font-size: 1.45rem; font-weight: 800; color: #92400e; margin-top: 0.2rem;" id="shopAllocatedCashSoldCount">0 Phones</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);" id="shopAllocatedCashSoldVal">Total: Rs. 0.00</span>
+                        </div>
+                        <div style="background: rgba(139, 92, 246, 0.12); backdrop-filter: blur(10px); padding: 1.1rem; border-radius: 16px; border: 1px solid rgba(139, 92, 246, 0.35); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.06);">
+                            <h4 style="color: #6d28d9; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Sub-Shop Commission Taken</h4>
+                            <p style="font-size: 1.45rem; font-weight: 800; color: #5b21b6; margin-top: 0.2rem;" id="shopAllocatedCommissionTotal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Shop's Retained Earnings</span>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(10px); padding: 1.1rem; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);">
+                            <h4 style="color: #065f46; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Due to Head Office (අපේ මුදල)</h4>
+                            <p style="font-size: 1.5rem; font-weight: 900; color: #047857; margin-top: 0.2rem;" id="shopAllocatedHeadOfficeDueTotal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);" id="shopAllocatedHeadOfficeProfit">Profit: Rs. 0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Table Header and Filters -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem; display: flex; align-items: center; gap: 6px;">
+                            📦 Allocated Phones Stock List
+                        </h3>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <button class="filter-btn" id="shopInvFilterAll" onclick="setShopInvFilter('All')" style="padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: var(--primary); color: white;">All Stock</button>
+                            <button class="filter-btn" id="shopInvFilterAvailable" onclick="setShopInvFilter('Available')" style="padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">🟢 In Shop</button>
+                            <button class="filter-btn" id="shopInvFilterCashSold" onclick="setShopInvFilter('CashSold')" style="padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">💰 Cash Sold</button>
+                            <button class="filter-btn" id="shopInvFilterLoanSold" onclick="setShopInvFilter('LoanSold')" style="padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); background: rgba(255,255,255,0.7); color: var(--text-muted);">📱 Loan Sold</button>
+                        </div>
+                    </div>
+
+                    <!-- Allocated Inventory Table -->
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phone & IMEI</th>
+                                    <th>Category & Cost</th>
+                                    <th>Status</th>
+                                    <th>Cash Sale & Commission</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shopAllocatedInventoryTable">
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No inventory allocated to this shop yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1306,6 +1377,82 @@
             </div>
             
             <button id="confirmTransferBtn" class="action-btn" style="width: 100%; background: var(--primary);">Confirm Transfer</button>
+        </div>
+    </div>
+
+    <!-- Record Direct Cash Sale Modal -->
+    <div id="recordCashSaleModal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <span class="modal-close" onclick="closeCashSaleModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.8rem;">
+                <span style="font-size: 1.5rem;">💰</span>
+                <h2 style="margin: 0; color: var(--text-main); font-size: 1.25rem;">Record Direct Cash Sale</h2>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.84rem; margin-bottom: 1.2rem;">
+                හෙඩ් ඔෆිස් තොගය මෙම අලෙවිසැල විසින් Cash විකිණීමේදී අදාළ විස්තර සහ කොමිස් මුදල ඇතුළත් කරන්න.
+            </p>
+
+            <form id="recordCashSaleForm">
+                <input type="hidden" id="cashSaleInvId">
+                
+                <!-- Phone Info Banner -->
+                <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-weight: 800; color: #1e3a8a; font-size: 0.95rem;" id="cashSalePhoneModel">Model: ...</span>
+                        <span style="font-size: 0.78rem; background: rgba(59, 130, 246, 0.15); color: #2563eb; padding: 2px 8px; border-radius: 6px; font-weight: 700;" id="cashSaleCategoryLabel">HO Stock</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: #475569; display: flex; justify-content: space-between;">
+                        <span>IMEI: <strong id="cashSalePhoneImei">...</strong></span>
+                        <span>Our Buy Cost: <strong id="cashSalePhoneBuyCost" style="color:#dc2626;">Rs. 0.00</strong></span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 0.9rem;">
+                    <div>
+                        <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">Cash Selling Price (Rs.) *</label>
+                        <input type="number" id="cashSalePriceInput" oninput="calculateCashSaleBreakdown()" required step="any" placeholder="Selling Price" style="font-weight: 700;">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">Sub-Shop Commission (Rs.) *</label>
+                        <input type="number" id="cashSaleCommissionInput" oninput="calculateCashSaleBreakdown()" required step="any" placeholder="Shop Commission (e.g. 1500)" style="font-weight: 700; color: #6d28d9;">
+                    </div>
+                </div>
+
+                <!-- Live Auto Calculated Breakdown Card -->
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1.1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.85rem;">
+                        <span style="color: var(--text-muted);">Total Cash Collected:</span>
+                        <strong id="liveCashCollected" style="color: var(--text-main);">Rs. 0.00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.85rem;">
+                        <span style="color: #6d28d9;">- Sub-Shop Retains (Commission):</span>
+                        <strong id="liveShopCommission" style="color: #6d28d9;">- Rs. 0.00</strong>
+                    </div>
+                    <div style="border-top: 1px dashed rgba(16, 185, 129, 0.4); margin: 0.5rem 0; padding-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #065f46; font-weight: 800; font-size: 0.95rem;">🏦 Head Office Amount (අපට ලැබිය යුතු මුදල):</span>
+                        <strong id="liveHeadOfficeDue" style="color: #047857; font-size: 1.2rem; font-weight: 900;">Rs. 0.00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.3rem; font-size: 0.82rem;">
+                        <span style="color: var(--text-muted);">💎 Head Office Net Profit (අපේ ලාභය):</span>
+                        <strong id="liveHeadOfficeProfit" style="color: #059669; font-weight: 800;">Rs. 0.00</strong>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 1.2rem;">
+                    <div>
+                        <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Customer / Buyer Info</label>
+                        <input type="text" id="cashSaleCustomerInput" placeholder="Name or Contact No.">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Sale Date</label>
+                        <input type="date" id="cashSaleDateInput" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="cashSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.95rem; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    💾 Complete & Save Cash Sale
+                </button>
+            </form>
         </div>
     </div>
 
@@ -2183,10 +2330,347 @@
             }
         });
 
+        let currentViewingShopEmail = '';
         let currentSingleShopSales = [];
         let currentSingleShopFilter = 'All';
+        let currentShopSubTab = 'submissions';
+        let currentShopInvFilter = 'All';
+        let currentEditingCashSaleItem = null;
+
+        window.switchShopSubTab = function(tab) {
+            currentShopSubTab = tab;
+            const subBtn = document.getElementById('shopTabBtnSubmissions');
+            const invBtn = document.getElementById('shopTabBtnInventory');
+            const subContent = document.getElementById('shopSubmissionsContent');
+            const invContent = document.getElementById('shopInventoryContent');
+
+            if (tab === 'submissions') {
+                if (subBtn) {
+                    subBtn.style.background = 'var(--primary)';
+                    subBtn.style.color = 'white';
+                    subBtn.style.boxShadow = '0 4px 12px rgba(229,0,0,0.2)';
+                }
+                if (invBtn) {
+                    invBtn.style.background = 'rgba(255,255,255,0.7)';
+                    invBtn.style.color = 'var(--text-muted)';
+                    invBtn.style.boxShadow = 'none';
+                }
+                if (subContent) subContent.style.display = 'block';
+                if (invContent) invContent.style.display = 'none';
+                renderSingleShopHistoryTable();
+            } else {
+                if (invBtn) {
+                    invBtn.style.background = 'var(--primary)';
+                    invBtn.style.color = 'white';
+                    invBtn.style.boxShadow = '0 4px 12px rgba(229,0,0,0.2)';
+                }
+                if (subBtn) {
+                    subBtn.style.background = 'rgba(255,255,255,0.7)';
+                    subBtn.style.color = 'var(--text-muted)';
+                    subBtn.style.boxShadow = 'none';
+                }
+                if (subContent) subContent.style.display = 'none';
+                if (invContent) invContent.style.display = 'block';
+                renderShopAllocatedInventory();
+            }
+        };
+
+        window.setShopInvFilter = function(filter) {
+            currentShopInvFilter = filter;
+            ['All', 'Available', 'CashSold', 'LoanSold'].forEach(f => {
+                const btn = document.getElementById('shopInvFilter' + f);
+                if (btn) {
+                    if (f === filter) {
+                        btn.style.background = 'var(--primary)';
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = 'rgba(255,255,255,0.7)';
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                }
+            });
+            renderShopAllocatedInventory();
+        };
+
+        function getShopAllocatedInventory(shopEmail) {
+            const regInfo = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === (shopEmail || '').toLowerCase());
+            return (allInventoryItems || []).filter(item => {
+                const itemShop = (item.shop || '').toLowerCase().trim();
+                const sName = (regInfo?.name || '').toLowerCase().trim();
+                const sLoc = (regInfo?.location || '').toLowerCase().trim();
+                const sEmail = (shopEmail || '').toLowerCase().trim();
+                const sPrefix = sEmail.split('@')[0].toLowerCase().trim();
+
+                return (sName && (itemShop === sName || itemShop.includes(sName))) ||
+                       (sLoc && (itemShop === sLoc || itemShop.includes(sLoc))) ||
+                       (itemShop === sEmail || itemShop === sPrefix) ||
+                       (sEmail.includes('spm') && itemShop.includes('pulasthigama'));
+            });
+        }
+
+        window.renderShopAllocatedInventory = function() {
+            const tbody = document.getElementById('shopAllocatedInventoryTable');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const allocatedItems = getShopAllocatedInventory(currentViewingShopEmail);
+
+            // Update sub-tab counts
+            const invTabCountEl = document.getElementById('shopInventoryTabCount');
+            if (invTabCountEl) invTabCountEl.innerText = allocatedItems.length.toString();
+
+            let availCount = 0;
+            let availMrpVal = 0;
+            let cashSoldCount = 0;
+            let cashSoldTotal = 0;
+            let commissionTotal = 0;
+            let headOfficeDueTotal = 0;
+            let headOfficeProfitTotal = 0;
+
+            allocatedItems.forEach(item => {
+                const mrp = parseFloat(item.mrp) || 0;
+                const buy = parseFloat(item.buyPrice) || 0;
+                const isCashSold = (item.status === 'Cash Sold' || (item.cashSaleDetails && item.cashSaleDetails.cashSalePrice));
+
+                if (item.status === 'Available') {
+                    availCount++;
+                    availMrpVal += mrp;
+                } else if (isCashSold) {
+                    cashSoldCount++;
+                    const cPrice = parseFloat(item.cashSaleDetails?.cashSalePrice || mrp) || 0;
+                    const cComm = parseFloat(item.cashSaleDetails?.shopCommission || 0) || 0;
+                    const cDue = parseFloat(item.cashSaleDetails?.headOfficeDue || (cPrice - cComm)) || 0;
+                    const cProfit = parseFloat(item.cashSaleDetails?.headOfficeProfit || (cDue - buy)) || 0;
+
+                    cashSoldTotal += cPrice;
+                    commissionTotal += cComm;
+                    headOfficeDueTotal += cDue;
+                    headOfficeProfitTotal += cProfit;
+                }
+            });
+
+            // Update KPI cards
+            const elAvailCount = document.getElementById('shopAllocatedAvailableCount');
+            const elAvailVal = document.getElementById('shopAllocatedAvailableVal');
+            const elCashCount = document.getElementById('shopAllocatedCashSoldCount');
+            const elCashVal = document.getElementById('shopAllocatedCashSoldVal');
+            const elCommTot = document.getElementById('shopAllocatedCommissionTotal');
+            const elHoDue = document.getElementById('shopAllocatedHeadOfficeDueTotal');
+            const elHoProf = document.getElementById('shopAllocatedHeadOfficeProfit');
+
+            if (elAvailCount) elAvailCount.innerText = `${availCount} Phones`;
+            if (elAvailVal) elAvailVal.innerText = `MRP: Rs. ${availMrpVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (elCashCount) elCashCount.innerText = `${cashSoldCount} Phones`;
+            if (elCashVal) elCashVal.innerText = `Total: Rs. ${cashSoldTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (elCommTot) elCommTot.innerText = `Rs. ${commissionTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (elHoDue) elHoDue.innerText = `Rs. ${headOfficeDueTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (elHoProf) elHoProf.innerText = `Net Profit: Rs. ${headOfficeProfitTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            // Filter items
+            const filteredItems = allocatedItems.filter(item => {
+                const isCash = (item.status === 'Cash Sold' || (item.cashSaleDetails && item.cashSaleDetails.cashSalePrice));
+                if (currentShopInvFilter === 'Available' && item.status !== 'Available') return false;
+                if (currentShopInvFilter === 'CashSold' && !isCash) return false;
+                if (currentShopInvFilter === 'LoanSold' && (item.status !== 'Sold' || isCash)) return false;
+                return true;
+            });
+
+            if (filteredItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No inventory records matching this filter.</td></tr>';
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const tr = document.createElement('tr');
+                const isCashSold = (item.status === 'Cash Sold' || (item.cashSaleDetails && item.cashSaleDetails.cashSalePrice));
+                
+                // Status HTML
+                let statusHtml = '';
+                if (item.status === 'Available') {
+                    statusHtml = `<span class="badge" style="background:rgba(16,185,129,0.15); color:#059669; border:1px solid rgba(16,185,129,0.35); font-weight:700;">🟢 In Shop</span>`;
+                } else if (isCashSold) {
+                    statusHtml = `<span class="badge" style="background:rgba(245,158,11,0.15); color:#d97706; border:1px solid rgba(245,158,11,0.35); font-weight:700;">💰 Direct Cash Sold</span>`;
+                } else {
+                    statusHtml = `<span class="badge" style="background:rgba(59,130,246,0.15); color:#2563eb; border:1px solid rgba(59,130,246,0.35); font-weight:700;">📱 Sold (Loan / Leasing)</span>`;
+                }
+
+                // Pricing HTML
+                const costVal = item.buyPrice ? `Cost: <span style="color:#dc2626; font-weight:700;">Rs. ${parseFloat(item.buyPrice).toLocaleString()}</span>` : '';
+                const mrpVal = item.mrp ? `MRP: <span style="color:#2563eb; font-weight:700;">Rs. ${parseFloat(item.mrp).toLocaleString()}</span>` : '';
+                const catLabel = item.category === 'Dialog Lesi Pay' ? '📱 Dialog Lesi Pay' : '🏢 Head Office Stock';
+
+                // Cash Sale Details HTML
+                let cashDetailsHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">-</span>';
+                if (isCashSold && item.cashSaleDetails) {
+                    const cs = item.cashSaleDetails;
+                    cashDetailsHtml = `
+                        <div style="font-size:0.82rem; line-height: 1.35;">
+                            <div>Sold: <strong>Rs. ${(cs.cashSalePrice || 0).toLocaleString()}</strong></div>
+                            <div style="color:#6d28d9;">Shop Comm: <strong>Rs. ${(cs.shopCommission || 0).toLocaleString()}</strong></div>
+                            <div style="color:#059669; font-weight:800; margin-top:2px;">Due to HO: Rs. ${(cs.headOfficeDue || 0).toLocaleString()}</div>
+                            ${cs.custName ? `<div style="font-size:0.74rem; color:var(--text-muted);">Buyer: ${cs.custName}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                // Action HTML
+                let actionHtml = '';
+                if (item.status === 'Available') {
+                    actionHtml = `
+                        <button onclick="openRecordCashSaleModal('${item.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.45rem 0.9rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; box-shadow: 0 2px 8px rgba(16,185,129,0.25); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                            💰 Record Cash Sale
+                        </button>
+                    `;
+                } else if (isCashSold) {
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            <button onclick="openRecordCashSaleModal('${item.id}')" style="background: rgba(59,130,246,0.15); color: #2563eb; border: 1px solid rgba(59,130,246,0.35); padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.75rem;">✏️ Edit</button>
+                            <button onclick="revertCashSale('${item.id}')" style="background: rgba(239,68,68,0.12); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); padding: 0.35rem 0.7rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.75rem;">↩️ Revert</button>
+                        </div>
+                    `;
+                } else {
+                    actionHtml = `<span style="color:var(--text-muted); font-size:0.78rem;">Completed</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <strong style="color:var(--text-main); font-size:0.9rem;">${item.model || 'Unknown Model'}</strong> ${item.storage ? `<span style="font-size:0.8rem; color:var(--text-muted);">(${item.storage})</span>` : ''}
+                        <br><span style="font-family: monospace; font-size: 0.78rem; color: #475569; background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px;">IMEI: ${item.imei || '-'}</span>
+                    </td>
+                    <td>
+                        <span style="font-size:0.78rem; color:var(--text-muted); font-weight:600;">${catLabel}</span>
+                        <br><span style="font-size:0.8rem;">${costVal}</span> | <span style="font-size:0.8rem;">${mrpVal}</span>
+                    </td>
+                    <td>${statusHtml}</td>
+                    <td>${cashDetailsHtml}</td>
+                    <td>${actionHtml}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.openRecordCashSaleModal = function(invId) {
+            const item = (allInventoryItems || []).find(i => i.id === invId);
+            if (!item) {
+                showToast("Item not found in inventory", "error");
+                return;
+            }
+
+            currentEditingCashSaleItem = item;
+            document.getElementById('cashSaleInvId').value = invId;
+            document.getElementById('cashSalePhoneModel').innerText = (item.model || '') + (item.storage ? ` (${item.storage})` : '');
+            document.getElementById('cashSaleCategoryLabel').innerText = item.category === 'Dialog Lesi Pay' ? '📱 Dialog Lesi Pay' : '🏢 Head Office Stock';
+            document.getElementById('cashSalePhoneImei').innerText = item.imei || '-';
+            
+            const buyCost = parseFloat(item.buyPrice) || 0;
+            document.getElementById('cashSalePhoneBuyCost').innerText = 'Rs. ' + buyCost.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            if (item.cashSaleDetails) {
+                document.getElementById('cashSalePriceInput').value = item.cashSaleDetails.cashSalePrice || item.mrp || '';
+                document.getElementById('cashSaleCommissionInput').value = item.cashSaleDetails.shopCommission ?? '';
+                document.getElementById('cashSaleCustomerInput').value = item.cashSaleDetails.custName || '';
+                document.getElementById('cashSaleDateInput').value = item.cashSaleDetails.date || new Date().toISOString().slice(0, 10);
+            } else {
+                document.getElementById('cashSalePriceInput').value = item.mrp || '';
+                document.getElementById('cashSaleCommissionInput').value = '';
+                document.getElementById('cashSaleCustomerInput').value = '';
+                document.getElementById('cashSaleDateInput').value = new Date().toISOString().slice(0, 10);
+            }
+
+            calculateCashSaleBreakdown();
+            document.getElementById('recordCashSaleModal').style.display = 'flex';
+        };
+
+        window.closeCashSaleModal = function() {
+            document.getElementById('recordCashSaleModal').style.display = 'none';
+            currentEditingCashSaleItem = null;
+        };
+
+        window.calculateCashSaleBreakdown = function() {
+            const price = parseFloat(document.getElementById('cashSalePriceInput').value) || 0;
+            const comm = parseFloat(document.getElementById('cashSaleCommissionInput').value) || 0;
+            const buyCost = currentEditingCashSaleItem ? (parseFloat(currentEditingCashSaleItem.buyPrice) || 0) : 0;
+
+            const hoDue = Math.max(0, price - comm);
+            const hoProfit = hoDue - buyCost;
+
+            document.getElementById('liveCashCollected').innerText = 'Rs. ' + price.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('liveShopCommission').innerText = '- Rs. ' + comm.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('liveHeadOfficeDue').innerText = 'Rs. ' + hoDue.toLocaleString(undefined, {minimumFractionDigits: 2});
+            
+            const profEl = document.getElementById('liveHeadOfficeProfit');
+            if (profEl) {
+                profEl.innerText = (hoProfit >= 0 ? '+' : '') + 'Rs. ' + hoProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+                profEl.style.color = hoProfit >= 0 ? '#059669' : '#dc2626';
+            }
+        };
+
+        document.getElementById('recordCashSaleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('cashSaleSubmitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving Cash Sale...';
+
+            const invId = document.getElementById('cashSaleInvId').value;
+            const price = parseFloat(document.getElementById('cashSalePriceInput').value) || 0;
+            const comm = parseFloat(document.getElementById('cashSaleCommissionInput').value) || 0;
+            const cust = document.getElementById('cashSaleCustomerInput').value.trim();
+            const sDate = document.getElementById('cashSaleDateInput').value || new Date().toISOString().slice(0, 10);
+            const buyCost = currentEditingCashSaleItem ? (parseFloat(currentEditingCashSaleItem.buyPrice) || 0) : 0;
+
+            const hoDue = Math.max(0, price - comm);
+            const hoProfit = hoDue - buyCost;
+
+            try {
+                const cashDetails = {
+                    cashSalePrice: price,
+                    shopCommission: comm,
+                    headOfficeDue: hoDue,
+                    headOfficeProfit: hoProfit,
+                    custName: cust,
+                    date: sDate,
+                    soldByShop: currentViewingShopEmail,
+                    timestamp: Date.now()
+                };
+
+                await updateDoc(doc(db, "inventory", invId), {
+                    status: 'Cash Sold',
+                    cashSaleDetails: cashDetails,
+                    updatedAt: Date.now()
+                });
+
+                showToast("Direct Cash Sale recorded successfully!", "success");
+                closeCashSaleModal();
+                renderShopAllocatedInventory();
+            } catch (err) {
+                console.error("Failed to record cash sale:", err);
+                showToast("Error saving cash sale: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '💾 Complete & Save Cash Sale';
+            }
+        });
+
+        window.revertCashSale = async function(invId) {
+            if (!confirm("Are you sure you want to revert this Cash Sale and return the phone to Available stock?")) return;
+
+            try {
+                await updateDoc(doc(db, "inventory", invId), {
+                    status: 'Available',
+                    cashSaleDetails: null,
+                    updatedAt: Date.now()
+                });
+                showToast("Stock item returned to Available status.", "success");
+                renderShopAllocatedInventory();
+            } catch (err) {
+                console.error("Revert error:", err);
+                showToast("Failed to revert cash sale: " + err.message, "error");
+            }
+        };
 
         window.viewShopProfile = function(shopEmail, shopSales) {
+            currentViewingShopEmail = shopEmail;
             document.getElementById('shopListSection').style.display = 'none';
             document.getElementById('singleShopSection').style.display = 'block';
             document.getElementById('profileTitle').innerText = shopEmail.toUpperCase() + ' Profile & History';
@@ -2221,6 +2705,13 @@
             document.getElementById('shopTotalLoan').innerText = 'Rs. ' + totalLoan.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('shopTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('shopTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            // Update sub-tab badge counts
+            const subCountEl = document.getElementById('shopSubmissionsTabCount');
+            if (subCountEl) subCountEl.innerText = currentSingleShopSales.length.toString();
+            const allocated = getShopAllocatedInventory(shopEmail);
+            const invCountEl = document.getElementById('shopInventoryTabCount');
+            if (invCountEl) invCountEl.innerText = allocated.length.toString();
 
             const dates = Object.keys(salesByDate).sort();
             const amounts = dates.map(d => salesByDate[d]);
@@ -2275,7 +2766,7 @@
                 }
             });
 
-            renderSingleShopHistoryTable();
+            switchShopSubTab('submissions');
         };
 
         window.setSingleShopFilter = function(filter) {
@@ -2334,6 +2825,7 @@
         window.backToShops = function() {
             document.getElementById('singleShopSection').style.display = 'none';
             document.getElementById('shopListSection').style.display = 'block';
+            currentViewingShopEmail = '';
         };
 
         // Details Modal
@@ -3044,6 +3536,9 @@
                 renderShopDirectory();
                 filterInventoryTable();
                 renderAllSubmissions();
+                if (typeof renderShopAllocatedInventory === 'function' && currentViewingShopEmail) {
+                    renderShopAllocatedInventory();
+                }
             }, (err) => {
                 console.error("Inventory error:", err);
             });
