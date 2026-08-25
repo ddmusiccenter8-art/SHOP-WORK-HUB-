@@ -666,15 +666,28 @@
             <span id="stockBadgeCount" style="background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem;">Checking Stock...</span>
         </div>
 
-        <div style="margin-bottom: 1.5rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+        <div style="margin-bottom: 1.2rem; background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06);">
             <label style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: block;">Select Your Branch / Location <span style="color:var(--info); font-size:0.75rem;">(ශාඛාව තෝරන්න)</span></label>
-            <div style="display: flex; gap: 1rem; align-items: stretch; flex-wrap: wrap;">
-                <select id="myBranchName" onchange="loadMyStock(true)" style="max-width: 420px; flex: 1; margin: 0; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; font-weight:600; font-size: 0.95rem;">
+            <div style="display: flex; gap: 0.8rem; align-items: stretch; flex-wrap: wrap; margin-bottom: 0.8rem;">
+                <select id="myBranchName" onchange="loadMyStock(true)" style="max-width: 420px; flex: 1; margin: 0; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem; border-radius: 10px; font-weight:600; font-size: 0.95rem;">
                     <option value="">-- Choose Your Branch --</option>
                 </select>
-                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.8rem;" onclick="loadMyStock(true)">View Stock</button>
+                <button class="submit-btn" style="width: auto; margin-top: 0; padding: 0 1.5rem;" onclick="loadMyStock(true)">View Stock</button>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.6rem;">Phones transferred to your branch from Head Office (Shop receives 4% profit settlement when sold).</p>
+            
+            <!-- Quick Filter by Model & Search for Sub-Shop -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; align-items: center; background: rgba(59, 130, 246, 0.05); padding: 0.6rem 0.8rem; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.15);">
+                <div>
+                    <label style="display:block; font-size:0.72rem; color: #2563eb; font-weight:700; margin-bottom:2px;">📱 Filter Model</label>
+                    <select id="myStockFilterModel" onchange="renderFilteredMyStock()" style="width:100%; background:#fff; border:1px solid rgba(59,130,246,0.3); color:#1e3a8a; padding:0.45rem; border-radius:6px; font-size:0.8rem; font-weight:600;">
+                        <option value="ALL">All Models</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.72rem; color: var(--text-muted); font-weight:700; margin-bottom:2px;">🔍 Search Stock</label>
+                    <input type="text" id="myStockSearchInput" oninput="renderFilteredMyStock()" placeholder="IMEI, Model, Storage..." style="width:100%; background:#fff; border:1px solid var(--border-color); color:var(--text-main); padding:0.45rem; border-radius:6px; font-size:0.8rem;">
+                </div>
+            </div>
         </div>
 
         <div class="table-container">
@@ -1765,8 +1778,6 @@
             const q = query(collection(db, "inventory"), where("status", "==", "Available"));
 
             myStockUnsubscribe = onSnapshot(q, (snapshot) => {
-                tbody.innerHTML = '';
-
                 const selBranchLow = selectedBranch.toLowerCase();
                 const myEmail = (currentUser?.email || '').toLowerCase().trim();
                 const myPrefix = myEmail.split('@')[0].toLowerCase().trim();
@@ -1775,7 +1786,7 @@
 
                 const isHeadOfficeSelected = selBranchLow === 'head office' || selBranchLow === 'main shop' || selBranchLow.includes('head office') || selBranchLow.includes('main shop');
 
-                const allocatedItems = [];
+                window.currentShopAllocatedItems = [];
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
@@ -1807,61 +1818,108 @@
                     }
 
                     if (isMatch) {
-                        allocatedItems.push({ id: docId, isHeadOffice: isItemHeadOffice, ...data });
+                        window.currentShopAllocatedItems.push({ id: docId, isHeadOffice: isItemHeadOffice, ...data });
                     }
                 });
 
-                if (allocatedItems.length === 0) {
-                    stockBadge.innerText = '0 Stock Items';
-                    stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-                    stockBadge.style.color = 'var(--danger)';
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No available stock allocated for this selection right now.</td></tr>';
-                    return;
-                }
-
-                stockBadge.innerText = `${allocatedItems.length} Stock Available`;
-                stockBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-                stockBadge.style.color = 'var(--success)';
-
-                allocatedItems.forEach(data => {
-                    const tr = document.createElement('tr');
-                    const catBadge = data.category === 'Dialog Lesi Pay'
-                        ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
-                        : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">🟢 Head Office Stock</span>';
-                    
-                    const displayBranch = data.isHeadOffice ? '🏢 HEAD OFFICE' : (data.shop || selectedBranch || '-');
-
-                    let actionHTML = '';
-                    if (data.isHeadOffice) {
-                        actionHTML = '<span style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">📍 At Head Office</span>';
-                    } else {
-                        actionHTML = `
-                            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                <button onclick="fillFormWithStock('${data.imei}', 'Cash')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(16,185,129,0.25);">
-                                    💰 Cash Sale
-                                </button>
-                                <button onclick="fillFormWithStock('${data.imei}', 'Loan')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #2563eb; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700;">
-                                    📱 Loan
-                                </button>
-                                <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;" title="Return unsold stock to Main Shop">
-                                    🔄 Return
-                                </button>
-                            </div>
-                        `;
-                    }
-
-                    tr.innerHTML = `
-                        <td><strong>${data.imei || '-'}</strong></td>
-                        <td>${data.model || '-'} ${data.storage ? '- ' + data.storage : ''}<br>${catBadge}</td>
-                        <td><span style="color: ${data.isHeadOffice ? 'var(--primary)' : 'var(--accent-purple)'}; font-weight: 600;">${displayBranch}</span></td>
-                        <td><span class="badge badge-confirmed">Available</span></td>
-                        <td>${actionHTML}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                updateMyStockModelFilterDropdown();
+                renderFilteredMyStock();
             }, error => {
                 console.error("Stock fetch error:", error);
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--warning);">Error fetching stock: ' + error.message + '</td></tr>';
+            });
+        };
+
+        function updateMyStockModelFilterDropdown() {
+            const select = document.getElementById('myStockFilterModel');
+            if (!select) return;
+            const items = window.currentShopAllocatedItems || [];
+            const models = new Set();
+            items.forEach(i => { if (i.model) models.add(i.model.trim()); });
+            
+            const curVal = select.value;
+            let html = '<option value="ALL">All Models (' + items.length + ')</option>';
+            Array.from(models).sort().forEach(m => {
+                const count = items.filter(i => (i.model || '').trim() === m).length;
+                html += `<option value="${m}">${m} (${count})</option>`;
+            });
+            select.innerHTML = html;
+            if (Array.from(models).includes(curVal) || curVal === 'ALL') {
+                select.value = curVal;
+            }
+        }
+
+        window.renderFilteredMyStock = function() {
+            const tbody = document.getElementById('myStockBody');
+            const stockBadge = document.getElementById('stockBadgeCount');
+            const modelFilter = document.getElementById('myStockFilterModel')?.value || 'ALL';
+            const searchVal = (document.getElementById('myStockSearchInput')?.value || '').toLowerCase().trim();
+            const selectedBranch = document.getElementById('myBranchName').value;
+
+            if (!tbody || !stockBadge) return;
+            tbody.innerHTML = '';
+
+            let items = window.currentShopAllocatedItems || [];
+
+            if (modelFilter !== 'ALL') {
+                items = items.filter(i => (i.model || '').toLowerCase().trim().includes(modelFilter.toLowerCase().trim()));
+            }
+
+            if (searchVal) {
+                items = items.filter(i => 
+                    (i.imei || '').toLowerCase().includes(searchVal) ||
+                    (i.model || '').toLowerCase().includes(searchVal) ||
+                    (i.storage || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (items.length === 0) {
+                stockBadge.innerText = '0 Stock Items';
+                stockBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                stockBadge.style.color = 'var(--danger)';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching stock found.</td></tr>';
+                return;
+            }
+
+            stockBadge.innerText = `${items.length} Stock Available`;
+            stockBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            stockBadge.style.color = 'var(--success)';
+
+            items.forEach(data => {
+                const tr = document.createElement('tr');
+                const catBadge = data.category === 'Dialog Lesi Pay'
+                    ? '<span style="font-size:0.75rem; color:#3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
+                    : '<span style="font-size:0.75rem; color:#10b981; font-weight:600;">🟢 Head Office Stock</span>';
+                
+                const displayBranch = data.isHeadOffice ? '🏢 HEAD OFFICE' : (data.shop || selectedBranch || '-');
+
+                let actionHTML = '';
+                if (data.isHeadOffice) {
+                    actionHTML = '<span style="color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">📍 At Head Office</span>';
+                } else {
+                    actionHTML = `
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            <button onclick="fillFormWithStock('${data.imei}', 'Cash')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(16,185,129,0.25);">
+                                💰 Cash Sale
+                            </button>
+                            <button onclick="fillFormWithStock('${data.imei}', 'Loan')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #2563eb; padding: 0.35rem 0.65rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 700;">
+                                📱 Loan
+                            </button>
+                            <button onclick="returnStockToMain('${data.id}', '${data.imei}')" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: var(--danger); padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;" title="Return unsold stock to Main Shop">
+                                🔄 Return
+                            </button>
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${data.imei || '-'}</strong></td>
+                    <td><strong>${data.model || '-'}</strong> - <span style="color:#7c3aed; font-weight:600;">${data.storage || '-'}</span><br>${catBadge}</td>
+                    <td><span style="color: ${data.isHeadOffice ? 'var(--primary)' : 'var(--accent-purple)'}; font-weight: 600;">${displayBranch}</span></td>
+                    <td><span class="badge badge-confirmed">Available</span></td>
+                    <td>${actionHTML}</td>
+                `;
+                tbody.appendChild(tr);
             });
         };
 

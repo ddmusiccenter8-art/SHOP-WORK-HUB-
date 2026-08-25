@@ -1117,12 +1117,14 @@
                         
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Model Name</label>
-                            <input type="text" id="invModel" required placeholder="e.g. Samsung Galaxy A14" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            <input type="text" id="invModel" list="invModelDatalist" required placeholder="e.g. OPPO A6X, Samsung A14..." style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            <datalist id="invModelDatalist"></datalist>
                         </div>
                         
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
-                            <input type="text" id="invStorage" required placeholder="e.g. 128GB" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            <input type="text" id="invStorage" list="invStorageDatalist" required placeholder="e.g. 4+128GB, 8+256GB..." style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            <datalist id="invStorageDatalist"></datalist>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
@@ -1148,18 +1150,48 @@
 
                 <!-- Inventory List -->
                 <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0;">Current Stock List</h2>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <select id="stockFilterCategory" onchange="filterInventoryTable()" style="width: auto; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.82rem;">
-                                <option value="ALL">All Stock Categories</option>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.6rem;">
+                        <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <span>📦</span> Current Stock List
+                        </h2>
+                        <span id="stockCountBadge" style="font-size: 0.85rem; font-weight: 700; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.35rem 0.9rem; border-radius: 999px; color: #059669;">0 Items</span>
+                    </div>
+
+                    <!-- Enhanced Stock Filter Toolbar with Model & Storage Dropdowns -->
+                    <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(203, 213, 225, 0.85); border-radius: 14px; padding: 0.85rem; margin-bottom: 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0.6rem; align-items: flex-end;">
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 3px;">Category</label>
+                            <select id="stockFilterCategory" onchange="filterInventoryTable()" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;">
+                                <option value="ALL">All Categories</option>
                                 <option value="Main Shop (Own Buy)">🟢 Head Office Stock</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
                             </select>
-                            <input type="text" id="stockSearchInput" oninput="filterInventoryTable()" placeholder="Search IMEI or Model..." style="width: 180px; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.82rem;">
-                            <span id="stockCountBadge" style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 0.3rem 0.8rem; border-radius: 999px; color: var(--text-muted);">0 Items</span>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; color: #2563eb; font-weight: 700; margin-bottom: 3px;">📱 Phone Model</label>
+                            <select id="stockFilterModel" onchange="filterInventoryTable()" style="width: 100%; background: #ffffff; border: 1px solid rgba(59, 130, 246, 0.4); color: #1e3a8a; padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700;">
+                                <option value="ALL">All Phone Models</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; color: #7c3aed; font-weight: 700; margin-bottom: 3px;">💾 Storage Capacity</label>
+                            <select id="stockFilterStorage" onchange="filterInventoryTable()" style="width: 100%; background: #ffffff; border: 1px solid rgba(124, 58, 237, 0.3); color: #5b21b6; padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;">
+                                <option value="ALL">All Storages</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 3px;">🔍 Search</label>
+                            <input type="text" id="stockSearchInput" oninput="filterInventoryTable()" placeholder="IMEI, Model, Storage..." style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem;">
+                        </div>
+                        <div>
+                            <button type="button" onclick="clearStockFilters()" style="width: 100%; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; padding: 0.52rem 0.6rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">↺ Reset</button>
                         </div>
                     </div>
+
+                    <!-- Quick Model Breakdown Badges / Filter Pills -->
+                    <div id="stockModelPillsContainer" style="display: flex; gap: 0.45rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 0.8rem; -webkit-overflow-scrolling: touch;">
+                    </div>
+
                     <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
                         <table>
                             <thead>
@@ -3676,6 +3708,7 @@
 
                 updateShopDatalists();
                 renderShopDirectory();
+                updateStockModelFilterDropdowns();
                 filterInventoryTable();
                 renderAllSubmissions();
                 if (typeof renderShopAllocatedInventory === 'function' && currentViewingShopEmail) {
@@ -3686,30 +3719,158 @@
             });
         }
 
+        function updateStockModelFilterDropdowns() {
+            const modelSelect = document.getElementById('stockFilterModel');
+            const storageSelect = document.getElementById('stockFilterStorage');
+            const modelDatalist = document.getElementById('invModelDatalist');
+            const storageDatalist = document.getElementById('invStorageDatalist');
+            const pillsContainer = document.getElementById('stockModelPillsContainer');
+
+            if (!allInventoryItems || allInventoryItems.length === 0) return;
+
+            const modelCounts = {};
+            const storageCounts = {};
+            const uniqueModels = new Set();
+            const uniqueStorages = new Set();
+
+            allInventoryItems.forEach(item => {
+                if (item.model) {
+                    const m = item.model.trim();
+                    uniqueModels.add(m);
+                    modelCounts[m] = (modelCounts[m] || 0) + 1;
+                }
+                if (item.storage) {
+                    const s = item.storage.trim();
+                    uniqueStorages.add(s);
+                    storageCounts[s] = (storageCounts[s] || 0) + 1;
+                }
+            });
+
+            // Populate Model Dropdown
+            if (modelSelect) {
+                const currentVal = modelSelect.value;
+                let html = '<option value="ALL">📱 All Phone Models (' + allInventoryItems.length + ')</option>';
+                Array.from(uniqueModels).sort().forEach(m => {
+                    const count = modelCounts[m] || 0;
+                    html += `<option value="${m}">${m} (${count})</option>`;
+                });
+                modelSelect.innerHTML = html;
+                if (Array.from(uniqueModels).includes(currentVal) || currentVal === 'ALL') {
+                    modelSelect.value = currentVal;
+                }
+            }
+
+            // Populate Storage Dropdown
+            if (storageSelect) {
+                const currentVal = storageSelect.value;
+                let html = '<option value="ALL">💾 All Storages</option>';
+                Array.from(uniqueStorages).sort().forEach(s => {
+                    const count = storageCounts[s] || 0;
+                    html += `<option value="${s}">${s} (${count})</option>`;
+                });
+                storageSelect.innerHTML = html;
+                if (Array.from(uniqueStorages).includes(currentVal) || currentVal === 'ALL') {
+                    storageSelect.value = currentVal;
+                }
+            }
+
+            // Datalists for Add Inventory Form
+            if (modelDatalist) {
+                modelDatalist.innerHTML = Array.from(uniqueModels).map(m => `<option value="${m}"></option>`).join('');
+            }
+            if (storageDatalist) {
+                const defaultStorages = ['4+64 GB', '4+128 GB', '6+128 GB', '8+128 GB', '8+256 GB', '12+256 GB', '512 GB'];
+                defaultStorages.forEach(s => uniqueStorages.add(s));
+                storageDatalist.innerHTML = Array.from(uniqueStorages).map(s => `<option value="${s}"></option>`).join('');
+            }
+
+            // Render Quick Filter Pills Strip
+            if (pillsContainer) {
+                const currentModelVal = modelSelect ? modelSelect.value : 'ALL';
+                let pillsHTML = `
+                    <button type="button" onclick="quickFilterByModel('ALL')" style="flex-shrink: 0; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(59,130,246,0.3); background: ${currentModelVal === 'ALL' ? '#2563eb' : '#ffffff'}; color: ${currentModelVal === 'ALL' ? '#ffffff' : '#2563eb'}; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                        All Models (${allInventoryItems.length})
+                    </button>
+                `;
+                Array.from(uniqueModels).sort().forEach(m => {
+                    const count = modelCounts[m] || 0;
+                    const isSelected = (currentModelVal === m);
+                    const safeM = m.replace(/'/g, "\\'");
+                    pillsHTML += `
+                        <button type="button" onclick="quickFilterByModel('${safeM}')" style="flex-shrink: 0; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(59,130,246,0.3); background: ${isSelected ? '#2563eb' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#1e3a8a'}; white-space: nowrap; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                            📱 ${m} (${count})
+                        </button>
+                    `;
+                });
+                pillsContainer.innerHTML = pillsHTML;
+            }
+        }
+
+        window.quickFilterByModel = function(modelName) {
+            const modelSelect = document.getElementById('stockFilterModel');
+            if (modelSelect) {
+                modelSelect.value = modelName;
+            }
+            filterInventoryTable();
+            updateStockModelFilterDropdowns();
+        };
+
+        window.clearStockFilters = function() {
+            if (document.getElementById('stockFilterCategory')) document.getElementById('stockFilterCategory').value = 'ALL';
+            if (document.getElementById('stockFilterModel')) document.getElementById('stockFilterModel').value = 'ALL';
+            if (document.getElementById('stockFilterStorage')) document.getElementById('stockFilterStorage').value = 'ALL';
+            if (document.getElementById('stockSearchInput')) document.getElementById('stockSearchInput').value = '';
+            filterInventoryTable();
+            updateStockModelFilterDropdowns();
+        };
+
         window.filterInventoryTable = function() {
             const tbody = document.getElementById('inventoryTableBody');
             const stockBadge = document.getElementById('stockCountBadge');
             const filterCat = document.getElementById('stockFilterCategory') ? document.getElementById('stockFilterCategory').value : 'ALL';
+            const filterModel = document.getElementById('stockFilterModel') ? document.getElementById('stockFilterModel').value : 'ALL';
+            const filterStorage = document.getElementById('stockFilterStorage') ? document.getElementById('stockFilterStorage').value : 'ALL';
+            const searchInput = (document.getElementById('stockSearchInput')?.value || '').toLowerCase().trim();
             
             tbody.innerHTML = '';
 
             let filtered = allInventoryItems;
+
             if (filterCat !== 'ALL') {
-                filtered = allInventoryItems.filter(item => (item.category || 'Main Shop (Own Buy)') === filterCat);
+                filtered = filtered.filter(item => (item.category || 'Main Shop (Own Buy)') === filterCat);
             }
 
-            const searchInput = (document.getElementById('stockSearchInput')?.value || '').toLowerCase();
+            if (filterModel !== 'ALL') {
+                filtered = filtered.filter(item => {
+                    const m = (item.model || '').toLowerCase().trim();
+                    const target = filterModel.toLowerCase().trim();
+                    return m === target || m.includes(target);
+                });
+            }
+
+            if (filterStorage !== 'ALL') {
+                filtered = filtered.filter(item => {
+                    const s = (item.storage || '').toLowerCase().trim();
+                    const target = filterStorage.toLowerCase().trim();
+                    return s === target || s.includes(target);
+                });
+            }
+
             if (searchInput) {
                 filtered = filtered.filter(item => 
                     (item.imei || '').toLowerCase().includes(searchInput) || 
-                    (item.model || '').toLowerCase().includes(searchInput)
+                    (item.model || '').toLowerCase().includes(searchInput) ||
+                    (item.storage || '').toLowerCase().includes(searchInput) ||
+                    (item.shop || '').toLowerCase().includes(searchInput)
                 );
             }
 
-            stockBadge.innerText = `${filtered.length} Items`;
+            if (stockBadge) {
+                stockBadge.innerText = `${filtered.length} Items`;
+            }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items matching filter.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items matching selected Model / Storage filter.</td></tr>';
                 return;
             }
 
@@ -3718,7 +3879,7 @@
                 
                 let badge = data.status === 'Available' 
                     ? '<span class="badge badge-confirmed">Available</span>' 
-                    : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Sold</span>';
+                    : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">' + (data.status || 'Sold') + '</span>';
                 
                 let location = data.shop || '-';
                 let isDialogLesi = (data.category === 'Dialog Lesi Pay');
@@ -3749,9 +3910,9 @@
 
                 tr.innerHTML = `
                     <td><strong>${data.imei}</strong></td>
-                    <td>${data.model} - ${data.storage}</td>
+                    <td><strong>${data.model || '-'}</strong> - <span style="color:#7c3aed; font-weight:600;">${data.storage || '-'}</span></td>
                     <td>${catLabel}${costStr}</td>
-                    <td><span style="color: var(--accent-purple); font-weight: 500;">${location}</span></td>
+                    <td><span style="color: var(--accent-purple); font-weight: 600;">${location}</span></td>
                     <td>${badge}</td>
                     <td>
                         <button onclick="event.stopPropagation(); openEditInventoryModal('${data.id}', '${data.imei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${data.buyPrice || ''}', '${data.mrp || ''}')" style="background: transparent; border: none; color: #f59e0b; cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Edit Stock">
