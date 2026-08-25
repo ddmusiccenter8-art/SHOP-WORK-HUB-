@@ -1171,8 +1171,9 @@
     <div id="addShopModal" class="modal">
         <div class="modal-content" style="max-width: 480px;">
             <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
-            <h2 style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
+            <h2 id="addShopModalTitle" style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
             <form id="addShopForm">
+                <input type="hidden" id="editingShopDocId" value="">
                 <div style="margin-bottom: 1rem;">
                     <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop / Branch Name</label>
                     <input type="text" id="newShopName" placeholder="e.g. PULASTHIGAMA POLONNARUWA" required>
@@ -2277,17 +2278,30 @@
         }
 
         window.quickRegisterShop = function(email) {
+            document.getElementById('addShopForm').reset();
+            document.getElementById('editingShopDocId').value = '';
+            document.getElementById('addShopModalTitle').innerText = 'Register Shop Profile';
             document.getElementById('newShopEmail').value = email;
+            document.getElementById('newShopEmail').readOnly = false;
             document.getElementById('newShopName').value = email.split('@')[0].toUpperCase();
             document.getElementById('newShopPhone').value = '';
             document.getElementById('newShopLocation').value = '';
-            document.getElementById('newShopPassword').value = '';
+            document.getElementById('newShopPassword').value = '1234';
             document.getElementById('newShopHoPercent').value = '4';
             document.getElementById('newShopOwnPercent').value = '6';
+            document.getElementById('saveShopBtn').innerText = 'Register Shop';
             document.getElementById('addShopModal').style.display = 'flex';
         };
 
         window.openAddShopModal = function() {
+            document.getElementById('addShopForm').reset();
+            document.getElementById('editingShopDocId').value = '';
+            document.getElementById('addShopModalTitle').innerText = 'Register New Shop / Branch';
+            document.getElementById('newShopEmail').readOnly = false;
+            document.getElementById('newShopPassword').value = '1234';
+            document.getElementById('newShopHoPercent').value = '4';
+            document.getElementById('newShopOwnPercent').value = '6';
+            document.getElementById('saveShopBtn').innerText = 'Register Shop';
             document.getElementById('addShopModal').style.display = 'flex';
         };
 
@@ -2299,36 +2313,38 @@
             e.preventDefault();
             const btn = document.getElementById('saveShopBtn');
             btn.disabled = true;
-            btn.innerText = 'Registering...';
+            btn.innerText = 'Saving...';
 
+            const editId = document.getElementById('editingShopDocId')?.value || '';
             const name = document.getElementById('newShopName').value.trim();
             const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
             const phone = document.getElementById('newShopPhone').value.trim();
             const location = document.getElementById('newShopLocation').value.trim();
-            const password = document.getElementById('newShopPassword').value;
+            const password = document.getElementById('newShopPassword').value || '1234';
             const hoP = parseFloat(document.getElementById('newShopHoPercent').value) || 4;
             const ownP = parseFloat(document.getElementById('newShopOwnPercent').value) || 6;
 
             try {
-                const existing = registeredShopsList.find(r => r.email === email);
-                if (existing) {
-                    await updateDoc(doc(db, "shops", existing.id), {
+                const targetId = editId || (registeredShopsList.find(r => (r.email || '').toLowerCase() === email)?.id);
+                if (targetId) {
+                    await updateDoc(doc(db, "registered_shops", targetId), {
                         name: name,
+                        email: email,
                         phone: phone,
                         location: location,
-                        password: password || existing.password || '123456',
+                        password: password,
                         hoPercent: hoP,
                         shopOwnPercent: ownP,
                         updatedAt: Date.now()
                     });
                     showToast("Shop profile updated successfully!", "success");
                 } else {
-                    await addDoc(collection(db, "shops"), {
+                    await addDoc(collection(db, "registered_shops"), {
                         name: name,
                         email: email,
                         phone: phone,
                         location: location,
-                        password: password || '123456',
+                        password: password,
                         hoPercent: hoP,
                         shopOwnPercent: ownP,
                         createdAt: Date.now()
@@ -4345,36 +4361,21 @@
             }
         };
 
-        window.editShop = async function(shopId, name, email, phone, location) {
-            const pwd = prompt(`Enter admin password to edit ${name}:`);
-            if (pwd !== '1234') {
-                if (pwd !== null) showToast("Incorrect password!", "error");
-                return;
-            }
+        window.editShop = function(shopId, name, email, phone, location) {
             const regData = (registeredShopsList || []).find(r => r.id === shopId);
-            const newName = prompt("Edit Shop Name:", name);
-            if(newName === null) return;
-            const newPhone = prompt("Edit Phone:", phone);
-            if(newPhone === null) return;
-            const newLoc = prompt("Edit Location:", location);
-            if(newLoc === null) return;
-            const newHoP = prompt("HO Stock Profit % (Head Office stock):", regData?.hoPercent ?? 4);
-            if(newHoP === null) return;
-            const newOwnP = prompt("Shop Own Stock Profit %:", regData?.shopOwnPercent ?? 6);
-            if(newOwnP === null) return;
-
-            try {
-                await updateDoc(doc(db, "registered_shops", shopId), {
-                    name: newName,
-                    phone: newPhone,
-                    location: newLoc,
-                    hoPercent: parseFloat(newHoP) || 4,
-                    shopOwnPercent: parseFloat(newOwnP) || 6
-                });
-                showToast("Shop updated successfully!", "success");
-            } catch(e) {
-                showToast("Failed to update shop", "error");
-            }
+            document.getElementById('addShopForm').reset();
+            document.getElementById('editingShopDocId').value = shopId;
+            document.getElementById('addShopModalTitle').innerText = 'Edit Shop Profile - ' + name;
+            document.getElementById('newShopName').value = name || '';
+            document.getElementById('newShopEmail').value = email || '';
+            document.getElementById('newShopEmail').readOnly = true;
+            document.getElementById('newShopPhone').value = phone || '';
+            document.getElementById('newShopLocation').value = location || '';
+            document.getElementById('newShopPassword').value = regData?.password || '1234';
+            document.getElementById('newShopHoPercent').value = regData?.hoPercent ?? 4;
+            document.getElementById('newShopOwnPercent').value = regData?.shopOwnPercent ?? 6;
+            document.getElementById('saveShopBtn').innerText = 'Save Changes';
+            document.getElementById('addShopModal').style.display = 'flex';
         };
         // Edit Inventory Logic
         window.openEditInventoryModal = function(id, imei, model, storage, category, buyPrice, mrp) {
