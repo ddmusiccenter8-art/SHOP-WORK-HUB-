@@ -357,8 +357,54 @@
         }
 
         /* ========================================================= */
-        /* COMPREHENSIVE MOBILE & SMARTPHONE RESPONSIVE STYLES       */
+        /* COMPREHENSIVE RESPONSIVE DESIGN (PC & MOBILE AUTO-ADAPT) */
         /* ========================================================= */
+
+        html {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        /* Fluid Split Grids (Side-by-side on PC, 1-Column stack on Mobile) */
+        .responsive-split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.75fr;
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            align-items: start;
+        }
+
+        .responsive-split-grid > div {
+            min-width: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Stock Filter Toolbar */
+        .stock-filter-toolbar {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(203, 213, 225, 0.85);
+            border-radius: 14px;
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.6rem;
+            align-items: flex-end;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
 
         @media (max-width: 1024px) {
             body {
@@ -369,29 +415,60 @@
             }
         }
 
+        /* Tablet & Mobile Screens */
+        @media (max-width: 960px) {
+            .responsive-split-grid,
+            .grid-layout,
+            .analytics-chart-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                gap: 1.1rem !important;
+            }
+
+            .responsive-split-grid > div,
+            .grid-layout > div,
+            .analytics-chart-grid > div {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+        }
+
+        /* Smartphones & Mobile Devices */
         @media (max-width: 768px) {
             body {
-                padding: 0.6rem 0.5rem 2rem 0.5rem;
+                padding: 0.45rem 0.35rem 2.5rem 0.35rem !important;
+                width: 100% !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
             }
 
             .header {
                 flex-direction: column !important;
-                gap: 0.75rem !important;
-                padding: 0.85rem 1rem !important;
-                border-radius: 16px !important;
-                margin-bottom: 0.75rem !important;
+                gap: 0.6rem !important;
+                padding: 0.75rem 0.85rem !important;
+                border-radius: 14px !important;
+                margin-bottom: 0.5rem !important;
                 align-items: stretch !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
 
             .header h1 {
-                font-size: 1.15rem !important;
+                font-size: 1.05rem !important;
                 justify-content: center !important;
                 text-align: center !important;
             }
 
             .header > div {
+                display: flex !important;
                 justify-content: space-between !important;
+                align-items: center !important;
                 width: 100% !important;
+                gap: 6px !important;
+                flex-wrap: wrap !important;
             }
 
             /* Horizontal swipeable tab bar for native mobile app feel */
@@ -402,10 +479,11 @@
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch !important;
                 scrollbar-width: none !important;
-                gap: 0.45rem !important;
-                padding: 0.2rem 0.2rem 0.6rem 0.2rem !important;
-                margin-bottom: 0.2rem !important;
+                gap: 0.35rem !important;
+                padding: 0 0 0.4rem 0 !important;
+                margin-bottom: 0.1rem !important;
                 width: 100% !important;
+                max-width: 100% !important;
             }
             .tabs::-webkit-scrollbar {
                 display: none !important;
@@ -414,95 +492,123 @@
             .tab {
                 white-space: nowrap !important;
                 flex-shrink: 0 !important;
-                padding: 0.6rem 0.95rem !important;
-                font-size: 0.82rem !important;
-                border-radius: 12px !important;
+                padding: 0.55rem 0.85rem !important;
+                font-size: 0.8rem !important;
+                border-radius: 10px 10px 0 0 !important;
                 border: 1px solid rgba(255, 255, 255, 0.75) !important;
+                border-bottom: none !important;
             }
 
             .container {
-                padding: 0.85rem 0.7rem !important;
-                border-radius: 18px !important;
+                padding: 0.85rem 0.55rem !important;
+                border-radius: 16px !important;
                 min-height: auto !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
             }
 
-            /* 1-column layouts for form and table side-by-sides & charts */
-            #inventoryView > div, 
-            #mainProfitView > div.grid-layout,
-            .analytics-chart-grid,
-            .grid-layout {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
+            /* Form Card inside Container */
+            .responsive-split-grid > div:first-child,
+            .grid-layout > div:first-child {
+                padding: 1.1rem 0.85rem !important;
+                border-radius: 14px !important;
             }
 
-            /* Responsive KPI cards */
-            .shop-grid {
-                grid-template-columns: 1fr !important;
-                gap: 0.9rem !important;
+            /* Filter toolbar on Mobile */
+            .stock-filter-toolbar {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.45rem !important;
+                padding: 0.65rem !important;
             }
 
-            /* Mobile inputs - 16px font size prevents iOS auto-zoom */
+            .stock-filter-toolbar > div:last-child {
+                grid-column: 1 / -1 !important;
+            }
+
+            /* Mobile inputs & selects */
             input, select, textarea {
-                font-size: 16px !important;
-                padding: 0.7rem 0.85rem !important;
+                font-size: 15px !important;
+                padding: 0.7rem 0.75rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
             }
 
             /* Tables with smooth horizontal touch scroll */
             .table-responsive {
                 border-radius: 12px !important;
-                margin-top: 0.5rem !important;
+                margin-top: 0.4rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch !important;
+                display: block !important;
             }
+
+            .table-responsive table {
+                width: 100% !important;
+                min-width: 520px !important;
+            }
+
             th, td {
-                padding: 0.65rem 0.6rem !important;
-                font-size: 0.8rem !important;
+                padding: 0.6rem 0.55rem !important;
+                font-size: 0.78rem !important;
                 white-space: nowrap !important;
             }
 
             /* Modals for Mobile Phones */
             .modal {
-                padding: 0.4rem !important;
+                padding: 0.35rem !important;
             }
             .modal-content {
                 width: 96% !important;
                 max-height: 92vh !important;
-                padding: 1.25rem 1rem !important;
-                border-radius: 18px !important;
+                padding: 1.2rem 0.9rem !important;
+                border-radius: 16px !important;
             }
             .detail-grid {
                 grid-template-columns: 1fr !important;
-                gap: 0.6rem !important;
-                margin: 1rem 0 !important;
+                gap: 0.55rem !important;
+                margin: 0.85rem 0 !important;
             }
             .modal-close {
-                top: 1rem !important;
-                right: 1rem !important;
-                font-size: 1.6rem !important;
+                top: 0.8rem !important;
+                right: 0.8rem !important;
+                font-size: 1.5rem !important;
             }
 
             /* Submissions Filter & Search bar on Mobile */
             .filter-btn, .staff-filter-btn {
-                padding: 0.45rem 0.85rem !important;
-                font-size: 0.8rem !important;
+                padding: 0.45rem 0.75rem !important;
+                font-size: 0.78rem !important;
                 flex-shrink: 0 !important;
+            }
+
+            #adminShopFilterSelect {
+                min-width: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
         }
 
         @media (max-width: 480px) {
             body {
-                padding: 0.4rem 0.35rem 2rem 0.35rem !important;
+                padding: 0.35rem 0.25rem 2rem 0.25rem !important;
             }
             .header {
-                padding: 0.75rem 0.8rem !important;
+                padding: 0.65rem 0.7rem !important;
             }
             .header h1 {
-                font-size: 1.05rem !important;
+                font-size: 0.98rem !important;
             }
             .container {
-                padding: 0.75rem 0.5rem !important;
+                padding: 0.75rem 0.45rem !important;
             }
-            #adminShopFilterSelect {
-                min-width: 100% !important;
+            .stock-filter-toolbar {
+                grid-template-columns: 1fr !important;
             }
         }
 
@@ -588,7 +694,7 @@
                     <label for="adminShopFilterSelect" style="font-weight: 700; color: var(--text-main); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
                         🏪 Select Shop / Branch:
                     </label>
-                    <select id="adminShopFilterSelect" onchange="renderAllSubmissions()" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); font-weight: 700; padding: 0.6rem 1.1rem; border-radius: 12px; font-size: 0.95rem; outline: none; cursor: pointer; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                    <select id="adminShopFilterSelect" onchange="renderAllSubmissions()" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); font-weight: 700; padding: 0.6rem 1.1rem; border-radius: 12px; font-size: 0.95rem; outline: none; cursor: pointer; width: 100%; max-width: 340px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                         <option value="ALL">🏢 All Shops (Combined Overview)</option>
                     </select>
                 </div>
@@ -603,7 +709,7 @@
             </div>
 
             <!-- Stats Summary Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem; margin-bottom: 2rem;">
                 <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.4rem; border-radius: 18px; border: 1px solid rgba(59, 130, 246, 0.25); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.07); transition: transform 0.25s ease;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
                         <h3 style="color: #3b82f6; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Total Loans Issued</h3>
@@ -668,7 +774,7 @@
                 </div>
                 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; width: 100%; max-width: 480px;">
-                    <input type="text" id="adminSearchInput" placeholder="🔍 Search IMEI, SP, NIC, Shop..." onkeyup="renderAllSubmissions()" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); padding: 0.65rem 1.1rem; border-radius: 12px; flex: 1; min-width: 200px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <input type="text" id="adminSearchInput" placeholder="🔍 Search IMEI, SP, NIC, Shop..." onkeyup="renderAllSubmissions()" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); padding: 0.65rem 1.1rem; border-radius: 12px; flex: 1; min-width: 0; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                     <button onclick="exportToCSV()" style="background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(16, 185, 129, 0.4); color: #059669; padding: 0.65rem 1.2rem; border-radius: 12px; cursor: pointer; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); transition: transform 0.2s;">
                         📥 Export CSV
                     </button>
@@ -925,7 +1031,7 @@
             </div>
 
             <!-- Form and History Grid -->
-            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.2rem;">
+            <div class="responsive-split-grid">
                 <!-- Main Shop Direct Sales Entry Form -->
                 <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
                     <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: var(--text-main);">Main Shop Direct Sale Entry</h2>
@@ -953,16 +1059,16 @@
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Customer Name & NIC</label>
                                 <div style="display: flex; gap: 0.5rem;">
-                                    <input type="text" id="mainSaleCustName" placeholder="Name" style="flex: 1;">
-                                    <input type="text" id="mainSaleCustNic" placeholder="NIC" style="flex: 1;">
+                                    <input type="text" id="mainSaleCustName" placeholder="Name" style="flex: 1; min-width: 0;">
+                                    <input type="text" id="mainSaleCustNic" placeholder="NIC" style="flex: 1; min-width: 0;">
                                 </div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number & Model <span id="mainSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1.2;" oninput="handleSaleImeiLookup(this.value, 'HO')">
-                                    <button type="button" onclick="startScanner('mainSaleImei')" style="background: var(--info); color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
+                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'HO')">
+                                    <button type="button" onclick="startScanner('mainSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
                                 </div>
                                 <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock or enter manually)" style="width: 100%;">
                             </div>
@@ -1004,9 +1110,9 @@
                         <div id="lesiPaySaleFields" style="display: none;">
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number <span id="lpSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1;" oninput="handleSaleImeiLookup(this.value, 'LP')">
-                                    <button type="button" onclick="startScanner('lpSaleImei')" style="background: var(--info); color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 600; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
+                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'LP')">
+                                    <button type="button" onclick="startScanner('lpSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
                                 </div>
                             </div>
 
@@ -1062,7 +1168,7 @@
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                         <h2 style="font-size: 1.15rem; color: var(--text-main);">Main Shop Direct Sales History</h2>
-                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 250px;" oninput="renderMainShopProfitView()">
+                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 100%; max-width: 250px;" oninput="renderMainShopProfitView()">
                     </div>
                     <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
                         <table>
@@ -1088,7 +1194,7 @@
 
         <!-- Inventory Manager View -->
         <div id="inventoryView" class="view">
-            <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 1.2rem;">
+            <div class="responsive-split-grid">
                 <!-- Add Inventory Form -->
                 <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.6rem; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.04); height: fit-content;">
                     <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 700;">Add Head Office Stock</h2>
@@ -1103,10 +1209,10 @@
 
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">IMEI Number(s) <span style="font-size: 0.75rem; color: var(--info); font-weight: normal;">(Type or scan IMEI - press Enter or click + to add)</span></label>
-                            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                                <input type="text" id="invImei" placeholder="Type or scan IMEI here..." onkeydown="handleImeiInputKeydown(event)" onpaste="handleImeiPaste(event)" style="flex: 1; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px; min-width: 0;">
-                                <button type="button" onclick="startScanner('invImei')" style="background: var(--info); color: white; border: none; padding: 0.8rem 1.1rem; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 600; box-shadow: 0 4px 12px rgba(59,130,246,0.25);">📷 Scan</button>
-                                <button type="button" onclick="addImeiFromInput()" style="background: #10b981; color: white; border: none; padding: 0.8rem 0.9rem; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(16,185,129,0.25);" title="Add IMEI to List">+</button>
+                            <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
+                                <input type="text" id="invImei" placeholder="Type or scan IMEI here..." onkeydown="handleImeiInputKeydown(event)" onpaste="handleImeiPaste(event)" style="flex: 1; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px; min-width: 0; width: 100%;">
+                                <button type="button" onclick="startScanner('invImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 4px 12px rgba(59,130,246,0.25);">📷 Scan</button>
+                                <button type="button" onclick="addImeiFromInput()" style="flex-shrink: 0; background: #10b981; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(16,185,129,0.25);" title="Add IMEI to List">+</button>
                             </div>
                             
                             <!-- Dedicated Container for Scanned/Added IMEIs below -->
@@ -1158,7 +1264,7 @@
                     </div>
 
                     <!-- Enhanced Stock Filter Toolbar with Model & Storage Dropdowns -->
-                    <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(203, 213, 225, 0.85); border-radius: 14px; padding: 0.85rem; margin-bottom: 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0.6rem; align-items: flex-end;">
+                    <div class="stock-filter-toolbar">
                         <div>
                             <label style="display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 3px;">Category</label>
                             <select id="stockFilterCategory" onchange="filterInventoryTable()" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;">
