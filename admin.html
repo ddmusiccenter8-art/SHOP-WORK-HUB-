@@ -640,6 +640,35 @@
             color: #ffffff !important;
             border-color: #2563eb !important;
         }
+
+        /* Quick Activator Staff Pills */
+        .staff-quick-pill {
+            background: rgba(241, 245, 249, 0.9);
+            border: 1px solid #cbd5e1;
+            color: var(--text-main);
+            padding: 0.32rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .staff-quick-pill:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+            transform: translateY(-1px);
+        }
+        .staff-quick-pill.active {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff !important;
+            border-color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
     </style>
 </head>
 <body style="display: none;">
@@ -1090,8 +1119,21 @@
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Staff Name (ඇක්ටිව් කළ අයගේ නම)</label>
-                                <input type="text" id="mainSaleStaffName" list="activatorDatalist" placeholder="Type or select staff name..." autocomplete="off">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Staff Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                                    <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
+                                </div>
+                                
+                                <!-- Dropdown Selector -->
+                                <select id="mainSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'HO')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem;">
+                                    <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
+                                </select>
+
+                                <!-- Quick 1-Click Pill Buttons -->
+                                <div id="mainStaffPills" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.45rem;"></div>
+
+                                <!-- Autocomplete Input for Custom Names -->
+                                <input type="text" id="mainSaleStaffName" list="activatorDatalist" placeholder="Or type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'HO')" style="width: 100%;">
                             </div>
 
                             <div style="margin-bottom: 1.2rem;">
@@ -1132,8 +1174,21 @@
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Name (ඇක්ටිව් කළ අයගේ නම)</label>
-                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Type or select staff name..." autocomplete="off">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                                    <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
+                                </div>
+
+                                <!-- Dropdown Selector -->
+                                <select id="lpSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'LP')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem;">
+                                    <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
+                                </select>
+
+                                <!-- Quick 1-Click Pill Buttons -->
+                                <div id="lpStaffPills" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.45rem;"></div>
+
+                                <!-- Autocomplete Input for Custom Names -->
+                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Or type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'LP')" style="width: 100%;">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -1157,6 +1212,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <datalist id="activatorDatalist"></datalist>
 
                         <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
                             Add Main Shop Sale Entry
@@ -3243,10 +3300,8 @@
                     allMainShopSales.push(data);
                 });
 
-                // Auto update Staff Autocomplete Datalist
-                const staffSet = new Set();
-                allMainShopSales.forEach(s => { if (s.staffName) staffSet.add(s.staffName.trim()) });
-                updateActivatorDatalist(Array.from(staffSet));
+                // Auto update Staff Autocomplete Datalist, Dropdown & Pills
+                updateActivatorDatalist();
 
                 renderMainShopProfitView();
                 renderStaffProfiles(); // Re-render staff profiles when data changes
@@ -3385,7 +3440,8 @@
                     const imei = document.getElementById('lpSaleImei').value.trim();
                     const mrp = parseFloat(document.getElementById('lpSaleMrp').value) || 0;
                     const dp = parseFloat(document.getElementById('lpSaleDp').value) || 0;
-                    const activator = document.getElementById('lpSaleActivator').value.trim();
+                    const rawActivator = document.getElementById('lpSaleActivator').value.trim();
+                    const activator = normalizeStaffName(rawActivator);
                     const comm = parseFloat(document.getElementById('lpSaleComm').value) || 0;
 
                     if (!model || !imei || !mrp || !activator) {
@@ -3421,20 +3477,19 @@
                     };
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
-                    showToast("Dialog Lesi Pay sale entry added!", "success");
                     saveActivatorStaffName(activator);
-                    document.getElementById('mainSaleForm').reset();
-                    document.getElementById('mainSaleType').value = 'Dialog Lesi Pay';
-                    toggleMainSaleFormType();
-                    document.getElementById('mainSaleDate').valueAsDate = new Date();
-                    calculateLesiPayLiveProfit();
+                    
+                    // Instant Form Reset & Auto-Refresh for Next Entry
+                    resetMainSaleFormForNextEntry('Dialog Lesi Pay', activator);
+                    showToast("✨ Dialog Lesi Pay sale added! Ready for next phone.", "success");
                 } else {
                     const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
                     const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
                     const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
                     const leaseFee = mrp * (leasePct / 100);
                     const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
-                    const staffName = document.getElementById('mainSaleStaffName').value.trim();
+                    const rawStaffName = document.getElementById('mainSaleStaffName').value.trim();
+                    const staffName = normalizeStaffName(rawStaffName);
                     const netProfit = mrp - buyPrice - leaseFee - staffFee;
 
                     const payload = {
@@ -3457,13 +3512,11 @@
                     };
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
-                    showToast("Main shop sale entry added!", "success");
                     saveActivatorStaffName(staffName);
-                    document.getElementById('mainSaleForm').reset();
-                    document.getElementById('mainSaleDate').valueAsDate = new Date();
-                    document.getElementById('mainSaleLeasePercent').value = "2.0";
-                    document.getElementById('mainSaleStaffFee').value = "500";
-                    calculateMainShopLiveProfit();
+
+                    // Instant Form Reset & Auto-Refresh for Next Entry
+                    resetMainSaleFormForNextEntry('Head Office Direct Sale', staffName);
+                    showToast("✨ Main shop sale added! Ready for next phone.", "success");
                 }
             } catch (err) {
                 console.error("Error saving sale:", err);
@@ -3474,35 +3527,280 @@
             }
         });
 
-        // Activator Staff Auto-Complete
+        // Activator Staff Management & Fast Auto-Complete
+        function normalizeStaffName(name) {
+            if (!name) return '';
+            return name.trim().replace(/\s+/g, ' ').toUpperCase();
+        }
+
+        function getKnownStaffList() {
+            const staffMap = new Map();
+            
+            // 1. From allMainShopSales history
+            (allMainShopSales || []).forEach(s => {
+                const raw = (s.staffName || '').trim();
+                if (raw) {
+                    const key = raw.toLowerCase().replace(/\s+/g, ' ');
+                    if (!staffMap.has(key)) {
+                        staffMap.set(key, raw.toUpperCase());
+                    }
+                }
+            });
+
+            // 2. From localStorage saved list
+            try {
+                const saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+                saved.forEach(name => {
+                    const raw = (name || '').trim();
+                    if (raw) {
+                        const key = raw.toLowerCase().replace(/\s+/g, ' ');
+                        if (!staffMap.has(key)) {
+                            staffMap.set(key, raw.toUpperCase());
+                        }
+                    }
+                });
+            } catch(e) {}
+
+            // 3. Fallback defaults if none exist
+            if (staffMap.size === 0) {
+                ['S THANUSAN', 'SAMEER'].forEach(n => {
+                    staffMap.set(n.toLowerCase(), n);
+                });
+            }
+
+            return Array.from(staffMap.values()).sort();
+        }
+
         function saveActivatorStaffName(name) {
             if (!name) return;
-            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
-            if (!saved.includes(name)) {
-                saved.push(name);
+            const formatted = normalizeStaffName(name);
+            if (!formatted) return;
+
+            let saved = [];
+            try {
+                saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
+            } catch(e) {}
+
+            if (!saved.includes(formatted)) {
+                saved.push(formatted);
                 localStorage.setItem('activatorStaffNames', JSON.stringify(saved));
-                updateActivatorDatalist(saved);
             }
+            localStorage.setItem('lastActiveStaffName', formatted);
+            updateActivatorDatalist();
         }
 
         function loadActivatorStaffDatalist() {
-            let saved = JSON.parse(localStorage.getItem('activatorStaffNames') || '[]');
-            updateActivatorDatalist(saved);
+            updateActivatorDatalist();
         }
 
-        function updateActivatorDatalist(namesArray) {
-            const datalist = document.getElementById('activatorDatalist');
-            if (!datalist) return;
-            const uniqueNames = new Set(namesArray);
-            datalist.innerHTML = '';
-            uniqueNames.forEach(n => {
-                if (n) {
-                    const opt = document.createElement('option');
-                    opt.value = n;
-                    datalist.appendChild(opt);
+        window.selectStaffQuick = function(name) {
+            const formatted = normalizeStaffName(name);
+            if (!formatted) return;
+            localStorage.setItem('lastActiveStaffName', formatted);
+
+            const hoInput = document.getElementById('mainSaleStaffName');
+            const lpInput = document.getElementById('lpSaleActivator');
+            const hoSel = document.getElementById('mainSaleStaffSelect');
+            const lpSel = document.getElementById('lpSaleStaffSelect');
+
+            if (hoInput) hoInput.value = formatted;
+            if (lpInput) lpInput.value = formatted;
+            if (hoSel) hoSel.value = formatted;
+            if (lpSel) lpSel.value = formatted;
+
+            highlightActiveStaffPill(formatted);
+        };
+
+        window.handleStaffSelectChange = function(val, mode) {
+            if (!val) {
+                if (mode === 'HO') {
+                    const input = document.getElementById('mainSaleStaffName');
+                    if (input) input.value = '';
+                } else {
+                    const input = document.getElementById('lpSaleActivator');
+                    if (input) input.value = '';
+                }
+                highlightActiveStaffPill('');
+                return;
+            }
+            if (val === '__custom__') {
+                if (mode === 'HO') {
+                    const input = document.getElementById('mainSaleStaffName');
+                    if (input) { input.value = ''; input.focus(); }
+                } else {
+                    const input = document.getElementById('lpSaleActivator');
+                    if (input) { input.value = ''; input.focus(); }
+                }
+                highlightActiveStaffPill('');
+                return;
+            }
+            selectStaffQuick(val);
+        };
+
+        window.handleStaffInput = function(val, mode) {
+            const formatted = normalizeStaffName(val);
+            if (formatted) {
+                localStorage.setItem('lastActiveStaffName', formatted);
+                const hoSel = document.getElementById('mainSaleStaffSelect');
+                const lpSel = document.getElementById('lpSaleStaffSelect');
+                if (hoSel) {
+                    const exists = Array.from(hoSel.options).some(o => o.value === formatted);
+                    hoSel.value = exists ? formatted : '';
+                }
+                if (lpSel) {
+                    const exists = Array.from(lpSel.options).some(o => o.value === formatted);
+                    lpSel.value = exists ? formatted : '';
+                }
+                highlightActiveStaffPill(formatted);
+            }
+        };
+
+        function highlightActiveStaffPill(activeName) {
+            const clean = (activeName || '').trim().toUpperCase();
+            document.querySelectorAll('.staff-quick-pill').forEach(btn => {
+                if (btn.dataset.staffName === clean) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
                 }
             });
         }
+
+        function updateActivatorDatalist(namesArray) {
+            const staffList = (namesArray && namesArray.length > 0) ? namesArray.map(normalizeStaffName) : getKnownStaffList();
+
+            // 1. Update Datalist
+            const datalist = document.getElementById('activatorDatalist');
+            if (datalist) {
+                datalist.innerHTML = '';
+                staffList.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    datalist.appendChild(opt);
+                });
+            }
+
+            // 2. Update Select Dropdowns
+            ['mainSaleStaffSelect', 'lpSaleStaffSelect'].forEach(selId => {
+                const sel = document.getElementById(selId);
+                if (sel) {
+                    const currentVal = sel.value;
+                    sel.innerHTML = '<option value="">-- Choose Activator Staff (තෝරන්න) --</option>';
+                    staffList.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.textContent = `👤 ${name}`;
+                        sel.appendChild(opt);
+                    });
+                    const optCustom = document.createElement('option');
+                    optCustom.value = '__custom__';
+                    optCustom.textContent = '✏️ + Type New Staff Name...';
+                    sel.appendChild(optCustom);
+
+                    if (currentVal && staffList.includes(currentVal)) {
+                        sel.value = currentVal;
+                    }
+                }
+            });
+
+            // 3. Update Quick Pill Bars
+            ['mainStaffPills', 'lpStaffPills'].forEach(pillContainerId => {
+                const container = document.getElementById(pillContainerId);
+                if (container) {
+                    container.innerHTML = '';
+                    staffList.forEach(name => {
+                        const pill = document.createElement('button');
+                        pill.type = 'button';
+                        pill.className = 'staff-quick-pill';
+                        pill.dataset.staffName = name;
+                        pill.innerHTML = `<span>👤</span> ${name}`;
+                        pill.onclick = () => selectStaffQuick(name);
+                        container.appendChild(pill);
+                    });
+                }
+            });
+
+            // 4. Auto-fill with last active staff name if empty
+            const lastStaff = localStorage.getItem('lastActiveStaffName') || staffList[0] || '';
+            if (lastStaff) {
+                const hoInput = document.getElementById('mainSaleStaffName');
+                const lpInput = document.getElementById('lpSaleActivator');
+                if (hoInput && !hoInput.value) {
+                    hoInput.value = lastStaff;
+                    const hoSel = document.getElementById('mainSaleStaffSelect');
+                    if (hoSel) hoSel.value = lastStaff;
+                }
+                if (lpInput && !lpInput.value) {
+                    lpInput.value = lastStaff;
+                    const lpSel = document.getElementById('lpSaleStaffSelect');
+                    if (lpSel) lpSel.value = lastStaff;
+                }
+                highlightActiveStaffPill(lastStaff);
+            }
+        }
+
+        // Dedicated Form Auto-Refresh & Reset for Next Consecutive Sale
+        window.resetMainSaleFormForNextEntry = function(saleType, keepStaffName) {
+            const isLesi = (saleType === 'Dialog Lesi Pay');
+
+            // Reset Direct Sale inputs
+            const hoImei = document.getElementById('mainSaleImei');
+            if (hoImei) hoImei.value = '';
+            const hoModel = document.getElementById('mainSaleModel');
+            if (hoModel) hoModel.value = '';
+            const hoMrp = document.getElementById('mainSaleMrp');
+            if (hoMrp) hoMrp.value = '';
+            const hoBuy = document.getElementById('mainSaleBuyPrice');
+            if (hoBuy) hoBuy.value = '';
+            const hoCust = document.getElementById('mainSaleCustName');
+            if (hoCust) hoCust.value = '';
+            const hoNic = document.getElementById('mainSaleCustNic');
+            if (hoNic) hoNic.value = '';
+            const hoSp = document.getElementById('mainSaleSp');
+            if (hoSp) hoSp.value = '';
+            const hoLease = document.getElementById('mainSaleLeasePercent');
+            if (hoLease) hoLease.value = '2.0';
+            const hoFee = document.getElementById('mainSaleStaffFee');
+            if (hoFee) hoFee.value = '500';
+
+            // Reset Dialog Lesi Pay inputs
+            const lpImei = document.getElementById('lpSaleImei');
+            if (lpImei) lpImei.value = '';
+            const lpModel = document.getElementById('lpSaleModel');
+            if (lpModel) lpModel.value = '';
+            const lpMrp = document.getElementById('lpSaleMrp');
+            if (lpMrp) lpMrp.value = '';
+            const lpDp = document.getElementById('lpSaleDp');
+            if (lpDp) lpDp.value = '';
+            const lpComm = document.getElementById('lpSaleComm');
+            if (lpComm) lpComm.value = '500';
+
+            // Clear stock status indicators
+            const hoStatus = document.getElementById('mainSaleStockStatus');
+            if (hoStatus) hoStatus.innerHTML = '';
+            const lpStatus = document.getElementById('lpSaleStockStatus');
+            if (lpStatus) lpStatus.innerHTML = '';
+
+            // Retain the Activator Staff Name & Active Pill
+            if (keepStaffName) {
+                selectStaffQuick(keepStaffName);
+            }
+
+            // Recalculate and reset live profit displays
+            if (isLesi) {
+                calculateLesiPayLiveProfit();
+                setTimeout(() => {
+                    const el = document.getElementById('lpSaleImei');
+                    if (el) el.focus();
+                }, 80);
+            } else {
+                calculateMainShopLiveProfit();
+                setTimeout(() => {
+                    const el = document.getElementById('mainSaleImei');
+                    if (el) el.focus();
+                }, 80);
+            }
+        };
 
         // Date Range Filtering for Main Shop
         window.handleMainProfitDateSelection = function(val) {
@@ -4240,9 +4538,10 @@
             const staffMap = {};
             
             allMainShopSales.forEach(s => {
-                const name = (s.staffName || '').trim();
-                if (!name) return;
+                const rawName = (s.staffName || '').trim();
+                if (!rawName) return;
                 
+                const name = normalizeStaffName(rawName);
                 const lowerName = name.toLowerCase();
                 if (!staffMap[lowerName]) {
                     staffMap[lowerName] = {
