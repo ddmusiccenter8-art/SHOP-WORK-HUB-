@@ -669,6 +669,86 @@
             border-color: #1d4ed8;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
         }
+
+        /* Grouped Model Inventory & Multi-Batch Styling */
+        .stock-view-switcher {
+            display: inline-flex;
+            background: rgba(226, 232, 240, 0.8);
+            padding: 3px;
+            border-radius: 10px;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            gap: 2px;
+        }
+        .stock-view-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.38rem 0.75rem;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .stock-view-btn.active {
+            background: #ffffff;
+            color: #1e293b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .model-stock-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 16px;
+            padding: 1.1rem 1.25rem;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .model-stock-card:hover {
+            border-color: rgba(59, 130, 246, 0.45);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .batch-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .imei-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 0.32rem 0.65rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1e293b;
+            transition: all 0.15s ease;
+        }
+        .imei-badge-pill:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .imei-badge-pill.sold {
+            opacity: 0.55;
+            background: #f1f5f9;
+            text-decoration: line-through;
+        }
     </style>
 </head>
 <body style="display: none;">
@@ -1098,6 +1178,7 @@
                                 <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
                                     <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'HO')">
                                     <button type="button" onclick="startScanner('mainSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                    <button type="button" onclick="openSaleStockPicker('HO')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
                                 </div>
                                 <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock or enter manually)" style="width: 100%;">
                             </div>
@@ -1155,6 +1236,7 @@
                                 <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
                                     <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'LP')">
                                     <button type="button" onclick="startScanner('lpSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                    <button type="button" onclick="openSaleStockPicker('LP')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
                                 </div>
                             </div>
 
@@ -1314,10 +1396,22 @@
                 <!-- Inventory List -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.6rem;">
-                        <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                            <span>📦</span> Current Stock List
-                        </h2>
-                        <span id="stockCountBadge" style="font-size: 0.85rem; font-weight: 700; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.35rem 0.9rem; border-radius: 999px; color: #059669;">0 Items</span>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                <span>📦</span> Current Stock List
+                            </h2>
+                            <span id="stockCountBadge" style="font-size: 0.85rem; font-weight: 700; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.35rem 0.9rem; border-radius: 999px; color: #059669;">0 Items</span>
+                        </div>
+                        
+                        <!-- View Mode Switcher (Grouped Models Catalog vs Flat IMEI Table) -->
+                        <div class="stock-view-switcher">
+                            <button type="button" id="stockViewGroupedBtn" class="stock-view-btn active" onclick="switchStockViewMode('grouped')" title="Grouped by Model & Storage (Catalog View)">
+                                <span>📦</span> Grouped Models
+                            </button>
+                            <button type="button" id="stockViewFlatBtn" class="stock-view-btn" onclick="switchStockViewMode('flat')" title="All Individual IMEI Rows Table">
+                                <span>📋</span> Flat Table
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Enhanced Stock Filter Toolbar with Model & Storage Dropdowns -->
@@ -1355,7 +1449,13 @@
                     <div id="stockModelPillsContainer" style="display: flex; gap: 0.45rem; overflow-x: auto; padding-bottom: 0.6rem; margin-bottom: 0.8rem; -webkit-overflow-scrolling: touch;">
                     </div>
 
-                    <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+                    <!-- GROUPED CATALOG VIEW (Cards grouped by Model & Storage with Multi-Batches) -->
+                    <div id="inventoryGroupedContainer" style="max-height: 540px; overflow-y: auto; padding-right: 2px;">
+                        <!-- Dynamic Grouped Model Cards rendered here -->
+                    </div>
+
+                    <!-- FLAT IMEI TABLE VIEW (Individual Rows) -->
+                    <div id="inventoryTableContainer" class="table-responsive" style="max-height: 520px; overflow-y: auto; display: none;">
                         <table>
                             <thead>
                                 <tr>
@@ -1708,6 +1808,99 @@
                     💾 Complete & Save Cash Sale
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Stock Batches & IMEIs Detailed Modal -->
+    <div id="stockBatchModal" class="modal">
+        <div class="modal-content" style="max-width: 860px; width: 95vw; max-height: 92vh; overflow-y: auto; padding: 1.6rem; border-radius: 20px;">
+            <span class="modal-close" onclick="closeStockBatchModal()">&times;</span>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h2 id="batchModalModelTitle" style="font-size: 1.35rem; color: var(--text-main); margin: 0; font-weight: 800;">Model Name</h2>
+                        <span id="batchModalStorageBadge" style="background: rgba(124, 58, 237, 0.15); color: #6d28d9; border: 1px solid rgba(124, 58, 237, 0.35); font-weight: 800; font-size: 0.82rem; padding: 2px 12px; border-radius: 999px;">Storage</span>
+                        <span id="batchModalCategoryBadge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.78rem; padding: 2px 10px; border-radius: 999px;">Category</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; margin-bottom: 0;">
+                        තෝරාගත් Model එකේ මිලදී ගත් Batches සහ අදාළ IMEI අංක ලැයිස්තුව
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span id="batchModalAvailableBadge" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #059669; font-weight: 800; font-size: 0.9rem; padding: 0.4rem 1rem; border-radius: 999px;">0 Available</span>
+                    <button type="button" id="batchModalAddMoreBtn" style="background: linear-gradient(135deg, var(--primary) 0%, #cc0000 100%); color: white; border: none; padding: 0.45rem 0.95rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 12px rgba(229,0,0,0.25);">
+                        ➕ Add More Stock / Batch
+                    </button>
+                </div>
+            </div>
+
+            <!-- Batches Container -->
+            <div id="batchModalBatchesList">
+                <!-- Dynamically rendered batch sections with IMEI chips -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Batch Price Modal -->
+    <div id="editBatchPriceModal" class="modal">
+        <div class="modal-content" style="max-width: 440px; padding: 1.5rem; border-radius: 18px;">
+            <span class="modal-close" onclick="closeEditBatchPriceModal()">&times;</span>
+            <h2 style="font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.4rem; font-weight: 800;">✏️ Update Batch Prices</h2>
+            <p id="editBatchPriceSubtitle" style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1.2rem;">Model & Batch Info...</p>
+
+            <form id="editBatchPriceForm">
+                <input type="hidden" id="editBatchModelVal">
+                <input type="hidden" id="editBatchStorageVal">
+                <input type="hidden" id="editBatchOldBuyVal">
+                <input type="hidden" id="editBatchOldMrpVal">
+                <input type="hidden" id="editBatchCatVal">
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Buy Price / Cost (අපේ මිලදී ගත් මිල රු.)</label>
+                    <input type="number" id="editBatchNewBuyPrice" step="0.01" required style="width: 100%; font-weight: 700;">
+                </div>
+
+                <div style="margin-bottom: 1.3rem;">
+                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Selling MRP (විකුණුම් මිල රු.)</label>
+                    <input type="number" id="editBatchNewMrpPrice" step="0.01" required style="width: 100%; font-weight: 700;">
+                </div>
+
+                <p style="font-size: 0.78rem; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 0.6rem; border-radius: 8px; margin-bottom: 1.2rem;">
+                    ⚠️ මෙම Batch එකෙහි ඇති සියලුම Available දුරකථන වල මිල ගණන් එකවර Update වේ.
+                </p>
+
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="closeEditBatchPriceModal()" style="flex: 1; background: #f1f5f9; border: 1px solid #cbd5e1; color: var(--text-main); padding: 0.75rem; border-radius: 10px; font-weight: 600; cursor: pointer;">Cancel</button>
+                    <button type="submit" id="editBatchPriceSubmitBtn" style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.75rem; border-radius: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">Save Batch Prices</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sales Form Available Stock Quick Picker Modal -->
+    <div id="saleStockPickerModal" class="modal">
+        <div class="modal-content" style="max-width: 780px; width: 95vw; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 20px;">
+            <span class="modal-close" onclick="closeSaleStockPicker()">&times;</span>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">📦</span>
+                    <div>
+                        <h2 style="font-size: 1.25rem; color: var(--text-main); margin: 0; font-weight: 800;">Pick Phone from Available Stock</h2>
+                        <span id="saleStockPickerTargetLabel" style="font-size: 0.78rem; color: #2563eb; font-weight: 600;">For Head Office Direct Sale</span>
+                    </div>
+                </div>
+                <input type="text" id="saleStockPickerSearch" oninput="renderSaleStockPickerList()" placeholder="🔍 Quick search model, storage, IMEI..." style="max-width: 260px; padding: 0.5rem 0.8rem; font-size: 0.82rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            </div>
+
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1rem;">
+                විකිණීමට අවශ්‍ය දුරකථනය සහ අදාළ Batch එකෙහි IMEI අංකය තෝරන්න. මිල ගණන් (Cost & MRP) ස්වයංක්‍රීයව Form එකට ඇතුළත් වේ.
+            </p>
+
+            <div id="saleStockPickerList" style="max-height: 520px; overflow-y: auto;">
+                <!-- Dynamically rendered models with batches & selectable IMEIs -->
+            </div>
         </div>
     </div>
 
@@ -3349,20 +3542,20 @@
                             modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
                         }
                     }
-                    if (found.buyPrice && parseFloat(found.buyPrice) > 0) {
+                    if (found.buyPrice !== undefined && found.buyPrice !== null && found.buyPrice !== '') {
                         document.getElementById('mainSaleBuyPrice').value = found.buyPrice;
                     }
                     if (found.mrp && parseFloat(found.mrp) > 0) {
                         const mrpInput = document.getElementById('mainSaleMrp');
-                        if (mrpInput && (!mrpInput.value || parseFloat(mrpInput.value) === 0)) {
+                        if (mrpInput) {
                             mrpInput.value = found.mrp;
                         }
                     }
                     if (statusEl) {
-                        statusEl.innerHTML = `<span style="color:#10b981; font-weight:700;">✅ Stock Found: ${found.model} (Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()})</span>`;
+                        statusEl.innerHTML = `<span style="color:#10b981; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()} | MRP: Rs. ${parseFloat(found.mrp || 0).toLocaleString()}</span>`;
                     }
                     calculateMainShopLiveProfit();
-                    showToast(`✨ Stock Found: ${found.model} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()}`, "success");
+                    showToast(`✨ Stock Found: ${found.model} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()} | MRP: Rs. ${parseFloat(found.mrp || 0).toLocaleString()}`, "success");
                 } else {
                     if (statusEl) {
                         statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
@@ -3383,7 +3576,7 @@
                         document.getElementById('lpSaleMrp').value = found.buyPrice;
                     }
                     if (statusEl) {
-                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} (MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()})</span>`;
+                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()}</span>`;
                     }
                     calculateLesiPayLiveProfit();
                     showToast(`✨ Stock Found: ${found.model} | MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()}`, "success");
@@ -4228,17 +4421,48 @@
             updateStockModelFilterDropdowns();
         };
 
+        // Inventory View Mode (Grouped Catalog vs Flat IMEI Table)
+        let currentInventoryViewMode = localStorage.getItem('inventoryViewMode') || 'grouped';
+
+        window.switchStockViewMode = function(mode) {
+            currentInventoryViewMode = mode;
+            localStorage.setItem('inventoryViewMode', mode);
+
+            const grpBtn = document.getElementById('stockViewGroupedBtn');
+            const flatBtn = document.getElementById('stockViewFlatBtn');
+            const grpContainer = document.getElementById('inventoryGroupedContainer');
+            const tableContainer = document.getElementById('inventoryTableContainer');
+
+            if (mode === 'grouped') {
+                if (grpBtn) grpBtn.classList.add('active');
+                if (flatBtn) flatBtn.classList.remove('active');
+                if (grpContainer) grpContainer.style.display = 'block';
+                if (tableContainer) tableContainer.style.display = 'none';
+            } else {
+                if (grpBtn) grpBtn.classList.remove('active');
+                if (flatBtn) flatBtn.classList.add('active');
+                if (grpContainer) grpContainer.style.display = 'none';
+                if (tableContainer) tableContainer.style.display = 'block';
+            }
+            filterInventoryTable();
+        };
+
+        window.currentModelGroupsMap = new Map();
+
         window.filterInventoryTable = function() {
             const tbody = document.getElementById('inventoryTableBody');
+            const grpContainer = document.getElementById('inventoryGroupedContainer');
+            const tableContainer = document.getElementById('inventoryTableContainer');
             const stockBadge = document.getElementById('stockCountBadge');
             const filterCat = document.getElementById('stockFilterCategory') ? document.getElementById('stockFilterCategory').value : 'ALL';
             const filterModel = document.getElementById('stockFilterModel') ? document.getElementById('stockFilterModel').value : 'ALL';
             const filterStorage = document.getElementById('stockFilterStorage') ? document.getElementById('stockFilterStorage').value : 'ALL';
             const searchInput = (document.getElementById('stockSearchInput')?.value || '').toLowerCase().trim();
             
-            tbody.innerHTML = '';
+            if (tbody) tbody.innerHTML = '';
+            if (grpContainer) grpContainer.innerHTML = '';
 
-            let filtered = allInventoryItems;
+            let filtered = allInventoryItems || [];
 
             if (filterCat !== 'ALL') {
                 filtered = filtered.filter(item => (item.category || 'Main Shop (Own Buy)') === filterCat);
@@ -4269,16 +4493,211 @@
                 );
             }
 
+            // Calculate unique models count
+            const uniqueModelKeys = new Set(filtered.map(i => ((i.model || '') + '___' + (i.storage || '')).toLowerCase()));
             if (stockBadge) {
-                stockBadge.innerText = `${filtered.length} Items`;
+                stockBadge.innerText = `${filtered.length} Items (${uniqueModelKeys.size} Models)`;
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items matching selected Model / Storage filter.</td></tr>';
+                const emptyMsg = '<div style="text-align:center; color: var(--text-muted); padding: 2.5rem; background: rgba(255,255,255,0.4); border-radius: 14px; border: 1px dashed rgba(203,213,225,0.8);">No inventory stock items matching selected Model / Storage filter.</div>';
+                if (grpContainer) grpContainer.innerHTML = emptyMsg;
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No inventory stock items matching selected Model / Storage filter.</td></tr>';
                 return;
             }
 
-            filtered.forEach((data) => {
+            // Sync View Container Display based on view mode
+            const grpBtn = document.getElementById('stockViewGroupedBtn');
+            const flatBtn = document.getElementById('stockViewFlatBtn');
+            if (currentInventoryViewMode === 'grouped') {
+                if (grpBtn) grpBtn.classList.add('active');
+                if (flatBtn) flatBtn.classList.remove('active');
+                if (grpContainer) grpContainer.style.display = 'block';
+                if (tableContainer) tableContainer.style.display = 'none';
+                renderGroupedInventory(filtered);
+            } else {
+                if (grpBtn) grpBtn.classList.remove('active');
+                if (flatBtn) flatBtn.classList.add('active');
+                if (grpContainer) grpContainer.style.display = 'none';
+                if (tableContainer) tableContainer.style.display = 'block';
+                renderFlatInventoryTable(filtered);
+            }
+        };
+
+        // Render Grouped Models Catalog View
+        function renderGroupedInventory(filteredItems) {
+            const grpContainer = document.getElementById('inventoryGroupedContainer');
+            if (!grpContainer) return;
+            grpContainer.innerHTML = '';
+
+            const modelGroupsMap = new Map();
+
+            filteredItems.forEach(item => {
+                const rawModel = (item.model || 'Unknown Model').trim();
+                const rawStorage = (item.storage || 'Standard').trim();
+                const groupKey = (rawModel + '___' + rawStorage).toLowerCase();
+
+                if (!modelGroupsMap.has(groupKey)) {
+                    modelGroupsMap.set(groupKey, {
+                        key: groupKey,
+                        model: rawModel,
+                        storage: rawStorage,
+                        category: item.category || 'Main Shop (Own Buy)',
+                        items: [],
+                        availableItems: [],
+                        soldItems: []
+                    });
+                }
+
+                const grp = modelGroupsMap.get(groupKey);
+                grp.items.push(item);
+                if (item.status === 'Available') {
+                    grp.availableItems.push(item);
+                } else {
+                    grp.soldItems.push(item);
+                }
+            });
+
+            window.currentModelGroupsMap = modelGroupsMap;
+
+            // Sort groups by available stock count descending
+            const sortedGroups = Array.from(modelGroupsMap.values()).sort((a, b) => b.availableItems.length - a.availableItems.length);
+
+            sortedGroups.forEach(grp => {
+                // Group items inside this model into Batches based on distinct (buyPrice + '_' + mrp + '_' + category)
+                const batchMap = new Map();
+                grp.items.forEach(item => {
+                    const buyPrice = parseFloat(item.buyPrice || 0);
+                    const mrp = parseFloat(item.mrp || 0);
+                    const cat = item.category || 'Main Shop (Own Buy)';
+                    const bKey = `${buyPrice}_${mrp}_${cat}`;
+
+                    if (!batchMap.has(bKey)) {
+                        batchMap.set(bKey, {
+                            batchKey: bKey,
+                            buyPrice: buyPrice,
+                            mrp: mrp,
+                            category: cat,
+                            items: [],
+                            availableCount: 0,
+                            soldCount: 0,
+                            locations: new Set(),
+                            earliestDate: item.timestamp ? new Date(item.timestamp).toLocaleDateString() : ''
+                        });
+                    }
+
+                    const b = batchMap.get(bKey);
+                    b.items.push(item);
+                    if (item.status === 'Available') {
+                        b.availableCount++;
+                    } else {
+                        b.soldCount++;
+                    }
+                    if (item.shop) b.locations.add(item.shop.trim());
+                });
+
+                const batches = Array.from(batchMap.values());
+                grp.batches = batches;
+                grp.availableCount = grp.availableItems.length;
+                grp.soldCount = grp.soldItems.length;
+                grp.totalCount = grp.items.length;
+
+                // Determine Cost & MRP range
+                const availableCosts = Array.from(new Set(grp.availableItems.map(i => parseFloat(i.buyPrice || 0)).filter(p => p > 0))).sort((a, b) => a - b);
+                const availableMrps = Array.from(new Set(grp.availableItems.map(i => parseFloat(i.mrp || 0)).filter(p => p > 0))).sort((a, b) => a - b);
+
+                let costLabel = '';
+                if (availableCosts.length === 1) {
+                    costLabel = `Cost: Rs. ${availableCosts[0].toLocaleString()}`;
+                } else if (availableCosts.length > 1) {
+                    costLabel = `Cost: Rs. ${availableCosts[0].toLocaleString()} - Rs. ${availableCosts[availableCosts.length - 1].toLocaleString()}`;
+                } else {
+                    costLabel = 'Cost: -';
+                }
+
+                let mrpLabel = '';
+                if (availableMrps.length === 1) {
+                    mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()}`;
+                } else if (availableMrps.length > 1) {
+                    mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()} - Rs. ${availableMrps[availableMrps.length - 1].toLocaleString()}`;
+                } else {
+                    mrpLabel = 'MRP: -';
+                }
+
+                // Locations list
+                const locationList = Array.from(new Set(grp.items.map(i => i.shop || 'MAIN SHOP'))).slice(0, 3);
+                const locationStr = locationList.join(', ') + (locationList.length > 3 ? '...' : '');
+
+                const isDialogLesi = (grp.category === 'Dialog Lesi Pay');
+                const safeModelKey = grp.key.replace(/'/g, "\\'");
+                const safeModel = grp.model.replace(/'/g, "\\'");
+                const safeStorage = grp.storage.replace(/'/g, "\\'");
+                const safeCat = grp.category.replace(/'/g, "\\'");
+
+                const card = document.createElement('div');
+                card.className = 'model-stock-card';
+                card.onclick = function() { openModelBatchModal(grp.key); };
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.65rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">
+                                    📱 ${grp.model}
+                                </h3>
+                                <span style="background: rgba(124, 58, 237, 0.12); color: #6d28d9; border: 1px solid rgba(124, 58, 237, 0.3); font-weight: 800; font-size: 0.78rem; padding: 2px 10px; border-radius: 999px;">
+                                    💾 ${grp.storage}
+                                </span>
+                                ${isDialogLesi ? '<span style="background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 700; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">Dialog Lesi Pay</span>' : '<span style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">Head Office Stock</span>'}
+                                ${batches.length > 1 ? '<span style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 800; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">⚡ ' + batches.length + ' Batches</span>' : ''}
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 0.45rem; flex-wrap: wrap; font-size: 0.85rem;">
+                                <span style="color: #ef4444; font-weight: 700;">${costLabel}</span>
+                                <span style="color: #cbd5e1;">|</span>
+                                <span style="color: #2563eb; font-weight: 700;">${mrpLabel}</span>
+                                <span style="color: #cbd5e1;">|</span>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">📍 ${locationStr}</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="text-align: right;">
+                                <span style="display: inline-block; background: ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}; border: 1px solid ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}; color: ${grp.availableCount > 0 ? '#059669' : '#dc2626'}; font-weight: 800; font-size: 0.92rem; padding: 0.32rem 0.85rem; border-radius: 999px;">
+                                    ${grp.availableCount} Available
+                                </span>
+                                ${grp.soldCount > 0 ? `<span style="display: block; font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">(${grp.soldCount} Sold / Out)</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Strip -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(226, 232, 240, 0.9); padding-top: 0.65rem; margin-top: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">
+                            📂 Click to view all ${grp.availableCount} IMEIs & Batches ➔
+                        </span>
+                        <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
+                            <button type="button" onclick="quickAddBatchToModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Add new batch for this phone model">
+                                ➕ Add New Batch
+                            </button>
+                            <button type="button" onclick="openModelBatchModal('${safeModelKey}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.85rem; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.3);">
+                                👁️ View IMEIs (${grp.availableCount})
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                grpContainer.appendChild(card);
+            });
+        }
+
+        // Render Flat Table View (Classic view for individual IMEI inspection)
+        function renderFlatInventoryTable(filteredItems) {
+            const tbody = document.getElementById('inventoryTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            filteredItems.forEach((data) => {
                 const tr = document.createElement('tr');
                 
                 let badge = data.status === 'Available' 
@@ -4307,7 +4726,6 @@
                 tr.style.cursor = "pointer";
                 tr.classList.add("inventory-row");
                 
-                // Escape quotes for safely passing to the openEdit function
                 const safeModel = (data.model || '').replace(/'/g, "\\'");
                 const safeStorage = (data.storage || '').replace(/'/g, "\\'");
                 const safeCategory = (data.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
@@ -4332,6 +4750,349 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // Open Model Batch & IMEI Explorer Modal
+        window.openModelBatchModal = function(groupKey) {
+            const grp = window.currentModelGroupsMap ? window.currentModelGroupsMap.get(groupKey) : null;
+            if (!grp) return;
+
+            document.getElementById('batchModalModelTitle').innerText = grp.model;
+            document.getElementById('batchModalStorageBadge').innerText = '💾 ' + grp.storage;
+            document.getElementById('batchModalCategoryBadge').innerText = grp.category;
+            document.getElementById('batchModalAvailableBadge').innerText = `${grp.availableCount} Available (${grp.soldCount} Sold)`;
+
+            const addBtn = document.getElementById('batchModalAddMoreBtn');
+            if (addBtn) {
+                const safeM = grp.model.replace(/'/g, "\\'");
+                const safeS = grp.storage.replace(/'/g, "\\'");
+                const safeC = grp.category.replace(/'/g, "\\'");
+                addBtn.onclick = function() {
+                    quickAddBatchToModel(safeM, safeS, safeC);
+                };
+            }
+
+            const batchesContainer = document.getElementById('batchModalBatchesList');
+            batchesContainer.innerHTML = '';
+
+            const safeModel = grp.model.replace(/'/g, "\\'");
+            const safeStorage = grp.storage.replace(/'/g, "\\'");
+            const safeCategory = grp.category.replace(/'/g, "\\'");
+
+            grp.batches.forEach((b, bIdx) => {
+                const batchCard = document.createElement('div');
+                batchCard.className = 'batch-card';
+
+                const buyStr = b.buyPrice > 0 ? `Rs. ${b.buyPrice.toLocaleString()}` : '-';
+                const mrpStr = b.mrp > 0 ? `Rs. ${b.mrp.toLocaleString()}` : '-';
+                const locStr = Array.from(b.locations).join(', ') || 'MAIN SHOP';
+
+                let imeiChipsHtml = '';
+                b.items.forEach(item => {
+                    const isAvail = (item.status === 'Available');
+                    const safeImei = (item.imei || '').replace(/'/g, "\\'");
+                    imeiChipsHtml += `
+                        <div class="imei-badge-pill ${!isAvail ? 'sold' : ''}">
+                            <span>${item.imei}</span>
+                            <span style="font-size:0.68rem; padding:1px 6px; border-radius:4px; ${isAvail ? 'background:#dcfce7; color:#15803d; font-weight:700;' : 'background:#f1f5f9; color:#94a3b8;'}">${item.status || 'Available'}</span>
+                            <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
+                            <button type="button" onclick="openTransferModal('${item.id}', '${safeImei}', '${safeModel}')" style="background:none; border:none; cursor:pointer; padding:0; color:#2563eb; font-size:0.85rem;" title="Transfer Stock">🔄</button>
+                            <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background:none; border:none; cursor:pointer; padding:0; color:#f59e0b; font-size:0.85rem;" title="Edit Item">✏️</button>
+                            <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; color:#ef4444; font-size:0.85rem;" title="Delete Item">🗑️</button>
+                        </div>
+                    `;
+                });
+
+                batchCard.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); padding-bottom: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-weight: 800; font-size: 0.95rem; color: #1e293b;">📦 Batch #${bIdx + 1}</span>
+                            <span style="font-size: 0.76rem; background: rgba(59,130,246,0.1); color: #2563eb; padding: 2px 8px; border-radius: 999px; font-weight: 700;">${b.category}</span>
+                            <span style="font-size: 0.76rem; color: var(--text-muted);">📍 ${locStr}</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669;">${b.availableCount} Available (${b.soldCount} Sold)</span>
+                            <button type="button" onclick="openEditBatchPriceModal('${safeModel}', '${safeStorage}', '${b.buyPrice}', '${b.mrp}', '${safeCategory}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;" title="Update prices for this entire batch">
+                                ✏️ Edit Batch Price
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-bottom: 0.8rem; font-size: 0.85rem; flex-wrap: wrap;">
+                        <div style="background: rgba(239, 68, 68, 0.08); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <span style="color: var(--text-muted); font-size: 0.75rem;">Buy Cost (අපේ මිල):</span> <strong style="color: #dc2626;">${buyStr}</strong>
+                        </div>
+                        <div style="background: rgba(37, 99, 235, 0.08); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2);">
+                            <span style="color: var(--text-muted); font-size: 0.75rem;">Selling MRP (විකුණුම් මිල):</span> <strong style="color: #2563eb;">${mrpStr}</strong>
+                        </div>
+                    </div>
+
+                    <!-- IMEIs Pills in this Batch -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 220px; overflow-y: auto;">
+                        ${imeiChipsHtml}
+                    </div>
+                `;
+
+                batchesContainer.appendChild(batchCard);
+            });
+
+            document.getElementById('stockBatchModal').style.display = 'flex';
+        };
+
+        window.closeStockBatchModal = function() {
+            document.getElementById('stockBatchModal').style.display = 'none';
+        };
+
+        // Quick Add New Batch to Existing Model
+        window.quickAddBatchToModel = function(model, storage, category) {
+            if (document.getElementById('invModel')) document.getElementById('invModel').value = model;
+            if (document.getElementById('invStorage')) document.getElementById('invStorage').value = storage;
+            if (document.getElementById('invCategory') && category) document.getElementById('invCategory').value = category;
+
+            closeStockBatchModal();
+
+            const formEl = document.getElementById('inventoryForm');
+            if (formEl) {
+                formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            const imeiInput = document.getElementById('invImei');
+            if (imeiInput) imeiInput.focus();
+
+            showToast(`✨ Ready to add stock for ${model} (${storage})! Enter new Buy Cost & MRP if changed.`, "info");
+        };
+
+        // Copy IMEI Helper
+        window.copyImeiToClipboard = function(imei) {
+            if (!imei) return;
+            navigator.clipboard.writeText(imei).then(() => {
+                showToast(`📋 Copied IMEI: ${imei}`, "success");
+            }).catch(() => {
+                const temp = document.createElement('input');
+                temp.value = imei;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showToast(`📋 Copied IMEI: ${imei}`, "success");
+            });
+        };
+
+        // Edit Entire Batch Price Modal Helpers
+        window.openEditBatchPriceModal = function(model, storage, oldBuy, oldMrp, category) {
+            document.getElementById('editBatchModelVal').value = model;
+            document.getElementById('editBatchStorageVal').value = storage;
+            document.getElementById('editBatchOldBuyVal').value = oldBuy;
+            document.getElementById('editBatchOldMrpVal').value = oldMrp;
+            document.getElementById('editBatchCatVal').value = category;
+
+            document.getElementById('editBatchPriceSubtitle').innerText = `${model} (${storage}) | Current Cost: Rs. ${parseFloat(oldBuy || 0).toLocaleString()} | Current MRP: Rs. ${parseFloat(oldMrp || 0).toLocaleString()}`;
+            document.getElementById('editBatchNewBuyPrice').value = oldBuy || '';
+            document.getElementById('editBatchNewMrpPrice').value = oldMrp || '';
+
+            document.getElementById('editBatchPriceModal').style.display = 'flex';
+        };
+
+        window.closeEditBatchPriceModal = function() {
+            document.getElementById('editBatchPriceModal').style.display = 'none';
+        };
+
+        // Submit listener for Edit Batch Price Form
+        document.getElementById('editBatchPriceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const model = document.getElementById('editBatchModelVal').value;
+            const storage = document.getElementById('editBatchStorageVal').value;
+            const oldBuy = parseFloat(document.getElementById('editBatchOldBuyVal').value) || 0;
+            const oldMrp = parseFloat(document.getElementById('editBatchOldMrpVal').value) || 0;
+            const category = document.getElementById('editBatchCatVal').value;
+
+            const newBuy = parseFloat(document.getElementById('editBatchNewBuyPrice').value) || 0;
+            const newMrp = parseFloat(document.getElementById('editBatchNewMrpPrice').value) || 0;
+
+            const submitBtn = document.getElementById('editBatchPriceSubmitBtn');
+            submitBtn.innerText = 'Updating...';
+            submitBtn.disabled = true;
+
+            try {
+                // Find all matching available items in this batch
+                const itemsToUpdate = (allInventoryItems || []).filter(item => {
+                    const mMatch = (item.model || '').trim().toLowerCase() === model.trim().toLowerCase();
+                    const sMatch = (item.storage || '').trim().toLowerCase() === storage.trim().toLowerCase();
+                    const cMatch = (item.category || 'Main Shop (Own Buy)') === category;
+                    const bMatch = Math.abs((parseFloat(item.buyPrice) || 0) - oldBuy) < 0.01;
+                    const mrpMatch = Math.abs((parseFloat(item.mrp) || 0) - oldMrp) < 0.01;
+                    return mMatch && sMatch && cMatch && bMatch && mrpMatch && item.status === 'Available';
+                });
+
+                if (itemsToUpdate.length === 0) {
+                    showToast("No available items found in this batch to update.", "warning");
+                    closeEditBatchPriceModal();
+                    return;
+                }
+
+                // Update each item in Firestore
+                const promises = itemsToUpdate.map(item => updateDoc(doc(db, "inventory", item.id), {
+                    buyPrice: newBuy,
+                    mrp: newMrp
+                }));
+
+                await Promise.all(promises);
+
+                showToast(`✅ Successfully updated prices for ${itemsToUpdate.length} items in batch!`, "success");
+                closeEditBatchPriceModal();
+                closeStockBatchModal();
+            } catch (err) {
+                console.error("Batch price update error:", err);
+                showToast("Failed to update batch prices: " + err.message, "error");
+            } finally {
+                submitBtn.innerText = 'Save Batch Prices';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Sales Form Available Stock Picker Logic
+        let currentSaleStockPickerMode = 'HO';
+
+        window.openSaleStockPicker = function(saleMode) {
+            currentSaleStockPickerMode = saleMode;
+            const targetLabel = document.getElementById('saleStockPickerTargetLabel');
+            if (targetLabel) {
+                targetLabel.innerText = saleMode === 'HO' ? 'For Head Office Direct Sale' : 'For Dialog Lesi Pay Sale';
+            }
+            renderSaleStockPickerList();
+            document.getElementById('saleStockPickerModal').style.display = 'flex';
+        };
+
+        window.closeSaleStockPicker = function() {
+            document.getElementById('saleStockPickerModal').style.display = 'none';
+        };
+
+        window.renderSaleStockPickerList = function() {
+            const listEl = document.getElementById('saleStockPickerList');
+            const searchVal = (document.getElementById('saleStockPickerSearch')?.value || '').toLowerCase().trim();
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            // Filter available stock items
+            let availItems = (allInventoryItems || []).filter(item => item.status === 'Available');
+
+            if (currentSaleStockPickerMode === 'LP') {
+                availItems = availItems.filter(item => item.category === 'Dialog Lesi Pay' || item.category === 'Main Shop (Own Buy)');
+            }
+
+            if (searchVal) {
+                availItems = availItems.filter(item => 
+                    (item.imei || '').toLowerCase().includes(searchVal) ||
+                    (item.model || '').toLowerCase().includes(searchVal) ||
+                    (item.storage || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (availItems.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted);">No available stock items found matching search.</div>';
+                return;
+            }
+
+            // Group by model & storage
+            const grouped = new Map();
+            availItems.forEach(item => {
+                const key = ((item.model || '') + '___' + (item.storage || '')).toLowerCase();
+                if (!grouped.has(key)) {
+                    grouped.set(key, {
+                        model: item.model || 'Unknown',
+                        storage: item.storage || '',
+                        category: item.category || 'Main Shop',
+                        items: []
+                    });
+                }
+                grouped.get(key).items.push(item);
+            });
+
+            Array.from(grouped.values()).forEach(grp => {
+                const card = document.createElement('div');
+                card.style.background = 'rgba(255,255,255,0.7)';
+                card.style.border = '1px solid var(--border-color)';
+                card.style.borderRadius = '12px';
+                card.style.padding = '0.9rem 1.1rem';
+                card.style.marginBottom = '0.75rem';
+
+                // Sub-group items into Batches
+                const batchMap = new Map();
+                grp.items.forEach(item => {
+                    const buy = parseFloat(item.buyPrice || 0);
+                    const mrp = parseFloat(item.mrp || 0);
+                    const bKey = `${buy}_${mrp}_${item.category}`;
+                    if (!batchMap.has(bKey)) {
+                        batchMap.set(bKey, {
+                            buy: buy,
+                            mrp: mrp,
+                            category: item.category,
+                            items: []
+                        });
+                    }
+                    batchMap.get(bKey).items.push(item);
+                });
+
+                let batchesHtml = '';
+                Array.from(batchMap.values()).forEach((b, idx) => {
+                    let imeiBtnsHtml = '';
+                    b.items.forEach(item => {
+                        const safeImei = item.imei.replace(/'/g, "\\'");
+                        imeiBtnsHtml += `
+                            <button type="button" onclick="selectImeiForSale('${safeImei}', '${currentSaleStockPickerMode}')" style="background: #ffffff; border: 1px solid rgba(59,130,246,0.4); color: #1e3a8a; padding: 4px 10px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                                📱 ${item.imei} ➔ Select
+                            </button>
+                        `;
+                    });
+
+                    batchesHtml += `
+                        <div style="background: rgba(248,250,252,0.85); border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.65rem 0.85rem; margin-top: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 6px;">
+                                <span><strong>📦 Batch #${idx + 1}</strong> (${b.items.length} units in stock)</span>
+                                <div>
+                                    <span style="color:#dc2626; font-weight:700;">Cost: Rs. ${b.buy.toLocaleString()}</span> | 
+                                    <span style="color:#2563eb; font-weight:700;">MRP: Rs. ${b.mrp.toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                ${imeiBtnsHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 1rem; color: var(--text-main);">${grp.model}</strong>
+                            <span style="background: rgba(124,58,237,0.12); color: #6d28d9; padding: 2px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 700;">${grp.storage}</span>
+                        </div>
+                        <span style="background: rgba(16,185,129,0.15); color: #059669; font-weight: 800; font-size: 0.8rem; padding: 2px 8px; border-radius: 999px;">${grp.items.length} Units Available</span>
+                    </div>
+                    ${batchesHtml}
+                `;
+
+                listEl.appendChild(card);
+            });
+        };
+
+        window.selectImeiForSale = function(imei, saleMode) {
+            closeSaleStockPicker();
+            if (saleMode === 'HO') {
+                const input = document.getElementById('mainSaleImei');
+                if (input) {
+                    input.value = imei;
+                    handleSaleImeiLookup(imei, 'HO');
+                    input.focus();
+                }
+            } else if (saleMode === 'LP') {
+                const input = document.getElementById('lpSaleImei');
+                if (input) {
+                    input.value = imei;
+                    handleSaleImeiLookup(imei, 'LP');
+                    input.focus();
+                }
+            }
+            showToast(`✅ Selected IMEI: ${imei} - Prices auto-filled!`, "success");
         };
 
         window.handleInvCategoryChange = function() {
