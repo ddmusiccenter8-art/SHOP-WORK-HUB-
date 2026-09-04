@@ -326,6 +326,34 @@
             transform: translateY(-2px);
         }
 
+        .staff-date-filter-btn {
+            padding: 0.38rem 0.85rem;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .staff-date-filter-btn:hover:not(.active) {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #1e293b;
+            transform: translateY(-1px);
+        }
+        .staff-date-filter-btn.active {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            border-color: #1d4ed8 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
+
         /* Toast Notifications */
         #toastContainer {
             position: fixed;
@@ -1478,11 +1506,29 @@
 
         <!-- Staff Profiles View -->
         <div id="staffProfilesView" class="view">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+                <h2 style="font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     Activator Staff Profiles
                 </h2>
+            </div>
+            
+            <!-- Staff Profiles Overview Period Filter -->
+            <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 0.85rem 1.1rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #475569; margin-right: 4px;">📅 Period (කාලය):</span>
+                    <button type="button" class="staff-date-filter-btn active" id="btnMainStaffDateAll" onclick="setMainStaffDateFilter('all')">All Time (සියල්ල)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateToday" onclick="setMainStaffDateFilter('today')">Today (අද)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateWeek" onclick="setMainStaffDateFilter('week')">This Week (සතිය)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateMonth" onclick="setMainStaffDateFilter('month')">This Month (මාසය)</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <input type="date" id="mainStaffFilterStartDate" onchange="setMainStaffCustomDateRange()" style="padding: 0.38rem 0.6rem; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff;">
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">to</span>
+                    <input type="date" id="mainStaffFilterEndDate" onchange="setMainStaffCustomDateRange()" style="padding: 0.38rem 0.6rem; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff;">
+                    <button type="button" onclick="setMainStaffCustomDateRange()" style="background: var(--primary); color: white; border: none; padding: 0.38rem 0.8rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">Apply</button>
+                    <button type="button" onclick="resetMainStaffDateFilter()" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.38rem 0.65rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;" title="Reset Filter">↺ Reset</button>
+                </div>
             </div>
             
             <div id="staffGrid" class="shop-grid">
@@ -1596,6 +1642,24 @@
                 <div style="background: rgba(245, 158, 11, 0.12); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.3); box-shadow: 0 4px 15px rgba(245,158,11,0.05);">
                     <h3 style="color: #92400e; font-size: 0.78rem; text-transform: uppercase; font-weight: 800;">Pending Balance</h3>
                     <p style="font-size: 1.6rem; font-weight: 800; color: #d97706; margin-top: 0.3rem;" id="staffTotalPending">Rs. 0.00</p>
+                </div>
+            </div>
+
+            <!-- Staff Modal Period / Date Range Filter Toolbar -->
+            <div style="background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.95); border-radius: 14px; padding: 0.75rem 1rem; margin-bottom: 1.2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 Period (කාලය):</span>
+                    <button type="button" class="staff-date-filter-btn active" id="btnStaffDateAll" onclick="setStaffDateFilter('all')">All Time (සියල්ල)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateToday" onclick="setStaffDateFilter('today')">Today (අද)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateWeek" onclick="setStaffDateFilter('week')">This Week (සතිය)</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateMonth" onclick="setStaffDateFilter('month')">This Month (මාසය)</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <input type="date" id="staffFilterStartDate" onchange="setStaffCustomDateRange()" style="padding: 0.35rem 0.55rem; font-size: 0.78rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main);">
+                    <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600;">to</span>
+                    <input type="date" id="staffFilterEndDate" onchange="setStaffCustomDateRange()" style="padding: 0.35rem 0.55rem; font-size: 0.78rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main);">
+                    <button type="button" onclick="setStaffCustomDateRange()" style="background: var(--primary); color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">Apply</button>
+                    <button type="button" onclick="resetStaffDateFilter()" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;" title="Reset Date Filter">↺</button>
                 </div>
             </div>
 
@@ -5289,16 +5353,83 @@
         }
 
         // ==========================================
-        // STAFF PROFILES & ACTIVATOR PAYMENTS
+        // STAFF PROFILES & ACTIVATOR PAYMENTS (WITH PERIOD FILTERING)
         // ==========================================
 
+        let currentMainStaffDateFilter = 'all'; // 'all', 'today', 'week', 'month', 'custom'
+        let currentMainStaffStartDate = '';
+        let currentMainStaffEndDate = '';
+
+        let currentStaffSales = [];
+        let currentStaffFilter = 'All'; // 'All', 'Pending', 'Paid'
+        let currentStaffDateFilter = 'all'; // 'all', 'today', 'week', 'month', 'custom'
+        let currentStaffStartDate = '';
+        let currentStaffEndDate = '';
+        let currentStaffActiveName = '';
+
+        // Helper to check if a date string matches a period filter
+        function matchesPeriodFilter(dateStr, filterType, customStart, customEnd) {
+            if (!dateStr) return false;
+            const cleanDate = dateStr.trim();
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
+            if (filterType === 'today') {
+                return cleanDate === todayStr;
+            } else if (filterType === 'week') {
+                const startOfWeek = new Date(now);
+                const dayOfWeek = now.getDay();
+                // Monday as start of week (or Sunday if dayOfWeek === 0)
+                const diffToMonday = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+                startOfWeek.setDate(diffToMonday);
+                startOfWeek.setHours(0, 0, 0, 0);
+                const startOfWeekStr = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, '0')}-${String(startOfWeek.getDate()).padStart(2, '0')}`;
+                return cleanDate >= startOfWeekStr && cleanDate <= todayStr;
+            } else if (filterType === 'month') {
+                const monthPrefix = `${year}-${month}`;
+                return cleanDate.startsWith(monthPrefix);
+            } else if (filterType === 'custom') {
+                if (customStart && cleanDate < customStart) return false;
+                if (customEnd && cleanDate > customEnd) return false;
+                return true;
+            }
+            return true; // 'all'
+        }
+
+        // Main Staff Profiles Overview Rendering
         function renderStaffProfiles() {
             const grid = document.getElementById('staffGrid');
             if (!grid) return;
             
             const staffMap = {};
             
-            allMainShopSales.forEach(s => {
+            // Filter allMainShopSales by currentMainStaffDateFilter
+            const filteredSales = (allMainShopSales || []).filter(s => 
+                matchesPeriodFilter(s.date, currentMainStaffDateFilter, currentMainStaffStartDate, currentMainStaffEndDate)
+            );
+
+            // Keep track of all known staff names so cards remain accessible
+            const allKnownNames = new Set();
+            (allMainShopSales || []).forEach(s => {
+                const rawName = (s.staffName || '').trim();
+                if (rawName) allKnownNames.add(normalizeStaffName(rawName));
+            });
+
+            allKnownNames.forEach(name => {
+                const lowerName = name.toLowerCase();
+                staffMap[lowerName] = {
+                    originalName: name,
+                    sales: [],
+                    totalCount: 0,
+                    totalPaid: 0,
+                    totalPending: 0
+                };
+            });
+
+            filteredSales.forEach(s => {
                 const rawName = (s.staffName || '').trim();
                 if (!rawName) return;
                 
@@ -5321,19 +5452,28 @@
                 if (s.staffPaymentStatus === 'Paid') {
                     staffMap[lowerName].totalPaid += fee;
                 } else {
-                    // Treat missing or 'Pending' as pending
                     staffMap[lowerName].totalPending += fee;
                 }
             });
             
-            const staffArray = Object.values(staffMap).sort((a, b) => b.totalPending - a.totalPending);
+            // Sort by total activations or pending balance descending
+            const staffArray = Object.values(staffMap).sort((a, b) => b.totalCount - a.totalCount || b.totalPending - a.totalPending);
             
             grid.innerHTML = '';
             
             if (staffArray.length === 0) {
-                grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1;">No activator staff records found yet.</p>';
+                grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1; padding: 2rem; text-align: center;">No activator staff records found for the selected period.</p>';
                 return;
             }
+
+            const periodNameMap = {
+                'all': 'All Time',
+                'today': 'Today',
+                'week': 'This Week',
+                'month': 'This Month',
+                'custom': 'Custom Range'
+            };
+            const periodLabel = periodNameMap[currentMainStaffDateFilter] || 'Period';
             
             staffArray.forEach(staff => {
                 const initial = staff.originalName.charAt(0).toUpperCase();
@@ -5355,7 +5495,7 @@
                     
                     <div style="background: rgba(255, 255, 255, 0.65); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 12px; padding: 0.9rem; margin-bottom: 1rem; text-align: left;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.45rem;">
-                            <span style="color: var(--text-muted); font-size: 0.82rem;">Total Activations:</span>
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">Activations (${periodLabel}):</span>
                             <span style="color: var(--text-main); font-weight: 700; font-size: 0.88rem;">${staff.totalCount} Phones</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.45rem;">
@@ -5374,30 +5514,121 @@
             });
         }
 
-        let currentStaffSales = [];
-        let currentStaffFilter = 'All';
+        // Main Staff Profiles Period Filter Handlers
+        window.setMainStaffDateFilter = function(period) {
+            currentMainStaffDateFilter = period;
+            document.querySelectorAll('#staffProfilesView .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (period === 'all') document.getElementById('btnMainStaffDateAll')?.classList.add('active');
+            if (period === 'today') document.getElementById('btnMainStaffDateToday')?.classList.add('active');
+            if (period === 'week') document.getElementById('btnMainStaffDateWeek')?.classList.add('active');
+            if (period === 'month') document.getElementById('btnMainStaffDateMonth')?.classList.add('active');
 
+            if (period !== 'custom') {
+                if (document.getElementById('mainStaffFilterStartDate')) document.getElementById('mainStaffFilterStartDate').value = '';
+                if (document.getElementById('mainStaffFilterEndDate')) document.getElementById('mainStaffFilterEndDate').value = '';
+                currentMainStaffStartDate = '';
+                currentMainStaffEndDate = '';
+            }
+            renderStaffProfiles();
+        };
+
+        window.setMainStaffCustomDateRange = function() {
+            const start = document.getElementById('mainStaffFilterStartDate')?.value || '';
+            const end = document.getElementById('mainStaffFilterEndDate')?.value || '';
+            if (!start && !end) return;
+
+            currentMainStaffDateFilter = 'custom';
+            currentMainStaffStartDate = start;
+            currentMainStaffEndDate = end;
+
+            document.querySelectorAll('#staffProfilesView .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            renderStaffProfiles();
+        };
+
+        window.resetMainStaffDateFilter = function() {
+            setMainStaffDateFilter('all');
+        };
+
+        // Staff Profile Detailed Modal Logic
         window.viewStaffProfile = function(name, sales, totalCount, totalPaid, totalPending) {
-            currentStaffSales = sales ? [...sales] : [];
+            currentStaffActiveName = name;
+            
+            // Fetch all sales for this specific staff member so the modal's date filter can search any period
+            const allStaffSales = (allMainShopSales || []).filter(s => {
+                const rawName = (s.staffName || '').trim();
+                return normalizeStaffName(rawName).toLowerCase() === name.trim().toLowerCase();
+            });
+
+            currentStaffSales = allStaffSales;
             currentStaffFilter = 'All';
+            currentStaffDateFilter = 'all';
+            currentStaffStartDate = '';
+            currentStaffEndDate = '';
+
+            // Reset modal date filter UI to 'All'
+            if (document.getElementById('staffFilterStartDate')) document.getElementById('staffFilterStartDate').value = '';
+            if (document.getElementById('staffFilterEndDate')) document.getElementById('staffFilterEndDate').value = '';
+            document.querySelectorAll('#staffModal .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btnStaffDateAll')?.classList.add('active');
 
             document.getElementById('staffModalName').innerText = name;
             document.getElementById('staffModalInitials').innerText = name.charAt(0).toUpperCase();
             
-            updateStaffModalCounts();
-            renderStaffHistoryTable();
+            applyStaffModalFilters();
             
             document.getElementById('staffModal').style.display = 'flex';
         };
 
-        function updateStaffModalCounts() {
-            const totalCount = currentStaffSales.length;
+        // Date Filter Handlers inside Staff Modal
+        window.setStaffDateFilter = function(period) {
+            currentStaffDateFilter = period;
+            document.querySelectorAll('#staffModal .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (period === 'all') document.getElementById('btnStaffDateAll')?.classList.add('active');
+            if (period === 'today') document.getElementById('btnStaffDateToday')?.classList.add('active');
+            if (period === 'week') document.getElementById('btnStaffDateWeek')?.classList.add('active');
+            if (period === 'month') document.getElementById('btnStaffDateMonth')?.classList.add('active');
+
+            if (period !== 'custom') {
+                if (document.getElementById('staffFilterStartDate')) document.getElementById('staffFilterStartDate').value = '';
+                if (document.getElementById('staffFilterEndDate')) document.getElementById('staffFilterEndDate').value = '';
+                currentStaffStartDate = '';
+                currentStaffEndDate = '';
+            }
+            applyStaffModalFilters();
+        };
+
+        window.setStaffCustomDateRange = function() {
+            const start = document.getElementById('staffFilterStartDate')?.value || '';
+            const end = document.getElementById('staffFilterEndDate')?.value || '';
+            if (!start && !end) return;
+
+            currentStaffDateFilter = 'custom';
+            currentStaffStartDate = start;
+            currentStaffEndDate = end;
+
+            document.querySelectorAll('#staffModal .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            applyStaffModalFilters();
+        };
+
+        window.resetStaffDateFilter = function() {
+            setStaffDateFilter('all');
+        };
+
+        // Master Filter & Render Function for Staff Modal
+        function applyStaffModalFilters() {
+            // 1. Filter staff sales by the active Date Period
+            const dateFilteredSales = currentStaffSales.filter(s => 
+                matchesPeriodFilter(s.date, currentStaffDateFilter, currentStaffStartDate, currentStaffEndDate)
+            );
+
+            // 2. Calculate summary counts & amounts for the selected period
+            const totalCount = dateFilteredSales.length;
             let totalPaid = 0;
             let totalPending = 0;
             let paidCount = 0;
             let pendingCount = 0;
 
-            currentStaffSales.forEach(s => {
+            dateFilteredSales.forEach(s => {
                 const fee = parseFloat(s.staffFee) || 0;
                 if (s.staffPaymentStatus === 'Paid') {
                     totalPaid += fee;
@@ -5408,11 +5639,12 @@
                 }
             });
 
+            // Update top cards
             document.getElementById('staffTotalActivations').innerText = totalCount;
             document.getElementById('staffTotalPaid').innerText = 'Rs. ' + totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('staffTotalPending').innerText = 'Rs. ' + totalPending.toLocaleString(undefined, {minimumFractionDigits: 2});
 
-            // Update badge counts in filter buttons
+            // Update status filter pills badges
             const elAll = document.getElementById('staffFilterCountAll');
             const elPending = document.getElementById('staffFilterCountPending');
             const elPaid = document.getElementById('staffFilterCountPaid');
@@ -5420,11 +5652,22 @@
             if (elPending) elPending.innerText = pendingCount;
             if (elPaid) elPaid.innerText = paidCount;
 
-            // Highlight active filter tab
+            // Highlight active status tab
             document.querySelectorAll('.staff-filter-btn').forEach(btn => btn.classList.remove('active'));
             if (currentStaffFilter === 'All') document.getElementById('btnStaffFilterAll')?.classList.add('active');
             if (currentStaffFilter === 'Pending') document.getElementById('btnStaffFilterPending')?.classList.add('active');
             if (currentStaffFilter === 'Paid') document.getElementById('btnStaffFilterPaid')?.classList.add('active');
+
+            // 3. Filter by Payment Status (All, Pending, Paid)
+            const finalSales = dateFilteredSales.filter(s => {
+                const isPaid = (s.staffPaymentStatus === 'Paid');
+                if (currentStaffFilter === 'Pending') return !isPaid;
+                if (currentStaffFilter === 'Paid') return isPaid;
+                return true;
+            });
+
+            // 4. Render Table
+            renderStaffHistoryTableContent(finalSales);
         }
 
         window.filterStaffHistory = function(filter) {
@@ -5433,28 +5676,28 @@
             if (filter === 'All') document.getElementById('btnStaffFilterAll')?.classList.add('active');
             if (filter === 'Pending') document.getElementById('btnStaffFilterPending')?.classList.add('active');
             if (filter === 'Paid') document.getElementById('btnStaffFilterPaid')?.classList.add('active');
-            renderStaffHistoryTable();
+            applyStaffModalFilters();
         };
 
-        function renderStaffHistoryTable() {
+        function renderStaffHistoryTableContent(salesList) {
             const tbody = document.getElementById('staffHistoryTableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
-            // Filter sales based on currentStaffFilter
-            const filteredSales = currentStaffSales.filter(s => {
-                const isPaid = s.staffPaymentStatus === 'Paid';
-                if (currentStaffFilter === 'Pending') return !isPaid;
-                if (currentStaffFilter === 'Paid') return isPaid;
-                return true; // 'All'
-            });
-
-            // Sort sales by newest first
-            const sortedSales = [...filteredSales].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            const sortedSales = [...salesList].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
             if (sortedSales.length === 0) {
+                const periodNameMap = {
+                    'all': 'All Time',
+                    'today': 'Today (අද)',
+                    'week': 'This Week (සතිය)',
+                    'month': 'This Month (මාසය)',
+                    'custom': 'Custom Range (තෝරාගත් කාලය)'
+                };
+                const pName = periodNameMap[currentStaffDateFilter] || 'selected period';
                 const msg = currentStaffFilter === 'All' 
-                    ? 'No activation records found.' 
-                    : `No ${currentStaffFilter.toLowerCase()} activation records found.`;
+                    ? `No activation records found for ${pName}.` 
+                    : `No ${currentStaffFilter.toLowerCase()} activation records found for ${pName}.`;
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">${msg}</td></tr>`;
                 return;
             }
@@ -5464,7 +5707,7 @@
                 tr.style.cursor = 'pointer';
                 tr.title = "Click to view more details";
                 tr.onclick = function(e) {
-                    if (e.target.tagName === 'BUTTON') return; // Prevent expanding when clicking the action button
+                    if (e.target.tagName === 'BUTTON') return;
                     const detailsRow = this.nextElementSibling;
                     if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
                         if (detailsRow.style.display === 'none') {
@@ -5477,7 +5720,7 @@
                     }
                 };
 
-                const isPaid = s.staffPaymentStatus === 'Paid';
+                const isPaid = (s.staffPaymentStatus === 'Paid');
                 const fee = parseFloat(s.staffFee) || 0;
                 
                 const statusBadge = isPaid 
@@ -5489,7 +5732,7 @@
                     : `<button onclick="markStaffFeePaid('${s.id}')" style="background: var(--success); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;">Mark as Paid</button>`;
 
                 tr.innerHTML = `
-                    <td>${s.date || '-'}</td>
+                    <td><strong>${s.date || '-'}</strong></td>
                     <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
                     <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
                     <td>${statusBadge}</td>
@@ -5501,33 +5744,33 @@
                 const detailsTr = document.createElement('tr');
                 detailsTr.className = 'staff-details-row';
                 detailsTr.style.display = 'none';
-                detailsTr.style.background = 'rgba(0,0,0,0.2)';
+                detailsTr.style.background = 'rgba(0,0,0,0.03)';
                 detailsTr.innerHTML = `
-                    <td colspan="5" style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+                    <td colspan="5" style="padding: 1.2rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.9rem; font-size: 0.85rem;">
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Customer NIC</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.custNic || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 600;">${s.custNic || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Contact Number</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.contact || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 600;">${s.contact || '-'}</p>
                             </div>
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">IMEI Number</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.imei || '-'}</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 600; font-family: monospace;">${s.imei || '-'}</p>
                             </div>
                             <div>
-                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Storage / RAM</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">${s.storage || '-'}</p>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Device Model & Storage</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 600;">${s.model || '-'} ${s.storage ? '(' + s.storage + ')' : ''}</p>
                             </div>
                             <div>
-                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Retail Price (MRP)</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Selling Price (MRP)</p>
+                                <p style="color: #2563eb; margin: 0; font-weight: 700;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
                             </div>
                             <div>
-                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Price</p>
-                                <p style="color: var(--text-main); margin: 0; font-weight: 500;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Cost</p>
+                                <p style="color: #ef4444; margin: 0; font-weight: 700;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
                             </div>
                         </div>
                     </td>
@@ -5546,13 +5789,18 @@
                 await updateDoc(doc(db, "main_shop_sales", docId), { staffPaymentStatus: 'Paid' });
                 showToast("Fee marked as paid successfully!", "success");
                 
-                // Update local list reactively
+                // Update local lists reactively
                 const item = currentStaffSales.find(s => s.id === docId);
                 if (item) {
                     item.staffPaymentStatus = 'Paid';
                 }
-                updateStaffModalCounts();
-                renderStaffHistoryTable();
+                const mainItem = allMainShopSales.find(s => s.id === docId);
+                if (mainItem) {
+                    mainItem.staffPaymentStatus = 'Paid';
+                }
+
+                applyStaffModalFilters();
+                renderStaffProfiles();
             } catch(e) {
                 console.error(e);
                 showToast("Failed to update fee status: " + e.message, "error");
