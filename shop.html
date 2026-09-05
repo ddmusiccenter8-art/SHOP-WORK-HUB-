@@ -1540,10 +1540,18 @@
                     else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
                     else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.fintrexPayment || '')}')">Payment Sent - Confirm</span>`;
                     else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed by Shop</span>';
+                    else if (data.status === 'NIC Clear Pending') statusHtml = `<span class="badge" style="background:rgba(239,68,68,0.18); color:#dc2626; border:1px solid rgba(239,68,68,0.45); font-weight:800; cursor:pointer;" onclick="openModal('${id}', 'reply', '${encodeURIComponent('⚠️ NIC CLEAR PENDING: ' + (data.nicClearReason || data.adminReply || 'NIC Clear වෙනතුරු රැඳී සිටින්න. Clear වූ පසු අලුත් SP Number එක ලබාදෙන්න.'))}')">🔄 NIC Clear Pending</span>`;
                     else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">✅ Completed</span>';
 
+                    let spDisplayHtml = `<strong>${data.spNumber || '-'}</strong>`;
+                    if (data.oldSpNumber && data.newSpNumber) {
+                        spDisplayHtml = `<del style="color:#ef4444; font-size:0.75rem; font-family:monospace;">${data.oldSpNumber}</del> ➔ <strong style="color:#059669; font-family:monospace;">${data.newSpNumber}</strong>`;
+                    } else if (data.oldSpNumber && data.status === 'NIC Clear Pending') {
+                        spDisplayHtml = `<del style="color:#ef4444; font-size:0.75rem; font-family:monospace;">${data.oldSpNumber}</del><br><span style="color:#dc2626; font-size:0.72rem; font-weight:800;">⏳ NIC Clear Pending</span>`;
+                    }
+
                     titleHtml = `
-                        <strong>${data.spNumber || '-'}</strong><br>
+                        ${spDisplayHtml}<br>
                         <span style="color: var(--text-muted)">${data.model || '-'} (${data.name || ''})</span><br>
                         ${profitBadge}
                     `;

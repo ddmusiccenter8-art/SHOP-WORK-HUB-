@@ -777,6 +777,29 @@
             background: #f1f5f9;
             text-decoration: line-through;
         }
+
+        .nic-tracker-filter-btn {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.55rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nic-tracker-filter-btn:hover {
+            border-color: #cbd5e1;
+            color: var(--text-main);
+        }
+        .nic-tracker-filter-btn.active {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
     </style>
 </head>
 <body style="display: none;">
@@ -819,6 +842,11 @@
         <div class="tab" data-tab="staffProfiles" onclick="switchTab('staffProfiles')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Staff Profiles
+        </div>
+        <div class="tab" data-tab="nicClear" onclick="switchTab('nicClear')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            NIC Clear Tracker
+            <span id="tabBadgeNicClear" style="display:none; background:#ef4444; color:white; font-size:0.72rem; padding:1px 7px; border-radius:999px; margin-left:6px; font-weight:800; box-shadow:0 2px 6px rgba(239,68,68,0.4);">0</span>
         </div>
     </div>
 
@@ -908,6 +936,9 @@
                     <button class="filter-btn active" data-filter="All" onclick="filterSubmissions('All')">All Entries</button>
                     <button class="filter-btn" data-filter="Pending" onclick="filterSubmissions('Pending')">⏳ Pending Settlements</button>
                     <button class="filter-btn" data-filter="Paid" onclick="filterSubmissions('Paid')">✅ Paid / Completed</button>
+                    <button class="filter-btn" data-filter="NIC Clear Pending" onclick="filterSubmissions('NIC Clear Pending')" style="display: inline-flex; align-items: center; gap: 4px;">
+                        🔄 NIC Clear Pending <span id="filterCountNicClear" style="display:none; background:#ef4444; color:white; padding:1px 6px; border-radius:999px; font-size:0.72rem; font-weight:800;">0</span>
+                    </button>
                 </div>
                 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; width: 100%; max-width: 480px;">
@@ -1535,6 +1566,254 @@
                 <!-- Staff cards will be injected here -->
             </div>
         </div>
+
+        <!-- NIC Clearance & Re-SP Tracker View -->
+        <div id="nicClearView" class="view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+                <div>
+                    <h2 style="font-size: 1.3rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                        <span style="font-size: 1.4rem;">🔄</span>
+                        NIC Clearance & Re-SP Tracker (NIC නිදහස් කිරීම් සහ අලුත් SP ලුහුබැඳීම)
+                    </h2>
+                    <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0.25rem 0 0 0;">
+                        Monitor files pending NIC clearance from finance companies and link New SP numbers upon resubmission
+                    </p>
+                </div>
+                <button onclick="openAddNicClearModal()" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.65rem 1.25rem; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); transition: all 0.2s;">
+                    ➕ Track File for NIC Clear
+                </button>
+            </div>
+
+            <!-- KPI Metric Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: rgba(239, 68, 68, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 1.25rem; border-radius: 16px; border: 1.5px solid rgba(239, 68, 68, 0.3); box-shadow: 0 4px 15px rgba(239,68,68,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <h3 style="color: #991b1b; font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">⏳ Pending NIC Clear</h3>
+                        <span style="font-size: 1.3rem;">⏳</span>
+                    </div>
+                    <p style="font-size: 1.8rem; font-weight: 900; color: #dc2626; margin: 0;" id="kpiNicClearPending">0</p>
+                    <span style="font-size: 0.73rem; color: #991b1b;">Waiting for NIC unlock / Resubmission</span>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 1.25rem; border-radius: 16px; border: 1.5px solid rgba(16, 185, 129, 0.3); box-shadow: 0 4px 15px rgba(16,185,129,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <h3 style="color: #065f46; font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">✅ Cleared & New SP Issued</h3>
+                        <span style="font-size: 1.3rem;">✅</span>
+                    </div>
+                    <p style="font-size: 1.8rem; font-weight: 900; color: #059669; margin: 0;" id="kpiNicClearCompleted">0</p>
+                    <span style="font-size: 0.73rem; color: #047857;">Completed with New SP Number</span>
+                </div>
+
+                <div style="background: rgba(59, 130, 246, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 1.25rem; border-radius: 16px; border: 1.5px solid rgba(59, 130, 246, 0.3); box-shadow: 0 4px 15px rgba(59,130,246,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <h3 style="color: #1e40af; font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">📋 Total Processed</h3>
+                        <span style="font-size: 1.3rem;">📑</span>
+                    </div>
+                    <p style="font-size: 1.8rem; font-weight: 900; color: #2563eb; margin: 0;" id="kpiNicClearTotal">0</p>
+                    <span style="font-size: 0.73rem; color: #1d4ed8;">All files tracked for NIC clearance</span>
+                </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem;">
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <button class="nic-tracker-filter-btn active" id="btnNicFilterPending" onclick="filterNicClearTracker('Pending')">
+                        ⏳ Pending NIC Clear (<span id="nicFilterCountPending">0</span>)
+                    </button>
+                    <button class="nic-tracker-filter-btn" id="btnNicFilterCompleted" onclick="filterNicClearTracker('Completed')">
+                        ✅ Cleared & Re-SP Done (<span id="nicFilterCountCompleted">0</span>)
+                    </button>
+                    <button class="nic-tracker-filter-btn" id="btnNicFilterAll" onclick="filterNicClearTracker('All')">
+                        📋 All Tracked (<span id="nicFilterCountAll">0</span>)
+                    </button>
+                </div>
+                <div style="width: 100%; max-width: 420px;">
+                    <input type="text" id="nicTrackerSearchInput" onkeyup="renderNicClearTrackerView()" placeholder="🔍 Search NIC, Old SP, New SP, Customer, Shop..." style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); padding: 0.65rem 1rem; border-radius: 12px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-size: 0.85rem;">
+                </div>
+            </div>
+
+            <!-- Tracking Table -->
+            <div class="table-responsive" style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.85); box-shadow: 0 10px 30px rgba(31,38,135,0.04);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date / Shop</th>
+                            <th>Customer NIC & Name</th>
+                            <th>Device & Loan</th>
+                            <th>SP Number History</th>
+                            <th>Reason / Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nicClearTableBody">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading NIC clearance records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enter New SP Number & Complete Modal -->
+    <div id="enterNewSpModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="modal-close" onclick="closeEnterNewSpModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 0.6rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <span style="font-size: 1.4rem;">⚡</span>
+                <div>
+                    <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0;">Assign New SP Number & Complete</h2>
+                    <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0;">NIC Clear සාර්ථක වූ පසු අලුත් SP අංකය ඇතුළත් කර File එක සම්පූර්ණ කරන්න</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="newSpTargetDocId" value="">
+            
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 0.8rem; margin-bottom: 1.2rem; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Customer NIC:</span>
+                    <strong style="color: #dc2626; font-size: 0.95rem;" id="newSpModalNic">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Customer Name:</span>
+                    <strong style="color: var(--text-main);" id="newSpModalName">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Old SP Number (Cancelled):</span>
+                    <strong style="color: #dc2626; font-family: monospace; text-decoration: line-through;" id="newSpModalOldSp">-</strong>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label style="color: var(--text-main); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.4rem;">
+                    New SP Number (අලුතින් ලැබුණු SP අංකය) <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" id="newSpModalInput" placeholder="e.g. SP202609-1185520" style="width: 100%; padding: 0.75rem; border-radius: 10px; border: 1.5px solid #3b82f6; font-size: 0.95rem; font-weight: 700; color: var(--text-main);" required>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">
+                    Completion Note / අදහස් (Optional)
+                </label>
+                <input type="text" id="newSpModalNote" placeholder="e.g. NIC cleared by Fintrex & re-submitted successfully" style="width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid var(--border-color); font-size: 0.85rem;">
+            </div>
+
+            <div style="display: flex; gap: 0.8rem;">
+                <button type="button" onclick="closeEnterNewSpModal()" style="flex: 1; padding: 0.7rem; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.05); color: var(--text-main); font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" id="btnSubmitNewSp" onclick="submitNewSpAndComplete()" style="flex: 2; padding: 0.7rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+                    ✅ Complete File With New SP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request NIC Clear Confirmation Modal -->
+    <div id="requestNicClearModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <span class="modal-close" onclick="closeRequestNicClearModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 0.6rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <span style="font-size: 1.4rem;">⚠️</span>
+                <div>
+                    <h2 style="font-size: 1.2rem; color: #dc2626; margin: 0;">Send to NIC Clear Pending</h2>
+                    <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0;">ෆයිල් එක අවලංගු කර NIC Clear වෙනකන් Pending ලැයිස්තුවට යොමු කරන්න</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="reqNicClearDocId" value="">
+            
+            <div style="background: rgba(0,0,0,0.04); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem; margin-bottom: 1.2rem; font-size: 0.85rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Customer:</span>
+                    <strong id="reqNicCustName">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">NIC Number:</span>
+                    <strong style="color: #dc2626; font-size: 0.95rem;" id="reqNicCustNic">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Current SP Number (To be cancelled):</span>
+                    <strong style="font-family: monospace; color: #1d4ed8;" id="reqNicCurrentSp">-</strong>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.4rem;">
+                <label style="color: var(--text-main); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.4rem;">
+                    Reason for Cancellation / NIC Clear (අවලංගු කිරීමට හේතුව) <span style="color: #ef4444;">*</span>
+                </label>
+                <textarea id="reqNicReasonInput" placeholder="e.g. Document error / Signature mismatch / Rejected by Fintrex, waiting for NIC clearance" rows="3" style="width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.85rem; resize: vertical;" required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem;">
+                <button type="button" onclick="closeRequestNicClearModal()" style="flex: 1; padding: 0.7rem; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.05); color: var(--text-main); font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" id="btnConfirmReqNicClear" onclick="confirmRequestNicClear()" style="flex: 2; padding: 0.7rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.3);">
+                    ⚠️ Mark as NIC Clear Pending
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add File to NIC Clear Tracker Modal -->
+    <div id="addNicClearModal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <span class="modal-close" onclick="closeAddNicClearModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 0.6rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1.2rem;">
+                <span style="font-size: 1.4rem;">➕</span>
+                <div>
+                    <h2 style="font-size: 1.2rem; color: var(--text-main); margin: 0;">Track File for NIC Clear</h2>
+                    <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0;">දැනට ඇති Submission එකක් තෝරා හෝ අලුතින් විස්තර ඇතුළත් කරන්න</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="color: var(--text-main); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Select From Existing Submissions (පවතින එකක් තෝරන්න)</label>
+                <select id="quickSelectNicDoc" onchange="populateQuickNicClearDoc(this.value)" style="width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: white;">
+                    <option value="">-- Or enter manually below --</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Customer Name *</label>
+                    <input type="text" id="manualNicCustName" placeholder="Customer Name" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem;" required>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Customer NIC *</label>
+                    <input type="text" id="manualNicCustNic" placeholder="NIC Number" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem; font-weight: 700;" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Old SP Number (Cancelled) *</label>
+                    <input type="text" id="manualNicOldSp" placeholder="e.g. SP202609-1172418" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem; font-family: monospace; font-weight: 700;" required>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Shop / Branch</label>
+                    <input type="text" id="manualNicShop" placeholder="e.g. PULASTHIGAMA" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Phone Model</label>
+                    <input type="text" id="manualNicModel" placeholder="e.g. Redmi 13C" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem;">
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">IMEI Number</label>
+                    <input type="text" id="manualNicImei" placeholder="15-digit IMEI" style="width: 100%; padding: 0.55rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.82rem; font-family: monospace;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">Reason for NIC Clear *</label>
+                <input type="text" id="manualNicReason" placeholder="e.g. Document error, waiting for Fintrex clearance" style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.85rem;" required>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem;">
+                <button type="button" onclick="closeAddNicClearModal()" style="flex: 1; padding: 0.7rem; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.05); color: var(--text-main); font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" id="btnSubmitAddNicClear" onclick="submitAddNicClearTracking()" style="flex: 2; padding: 0.7rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.3);">
+                    ➕ Start Tracking
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Add New Shop Profile Modal -->
@@ -1610,9 +1889,10 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
-                <button id="saveUpdatesBtn" class="action-btn" style="flex: 2; background: var(--primary); min-width: 160px;">Save Updates</button>
-                <button id="completeProcessBtn" class="action-btn" style="display: none; flex: 2; background: var(--success); min-width: 160px;">Complete Process ✅</button>
+            <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                <button id="saveUpdatesBtn" class="action-btn" style="flex: 2; background: var(--primary); min-width: 140px;">Save Updates</button>
+                <button id="btnSendToNicClear" type="button" onclick="initiateNicClearForCurrentDoc()" class="action-btn" style="flex: 2; background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239,68,68,0.5); color: #dc2626; min-width: 170px; font-weight: 700;">🔄 Send to NIC Clear</button>
+                <button id="completeProcessBtn" class="action-btn" style="display: none; flex: 2; background: var(--success); min-width: 150px;">Complete Process ✅</button>
                 <button id="deleteEntryBtn" class="action-btn" style="flex: 1; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; min-width: 110px;">Delete Entry</button>
             </div>
         </div>
@@ -2151,6 +2431,8 @@
                 setTimeout(() => renderAllSubmissions(), 50);
             } else if (tabName === 'mainProfit' && typeof renderMainShopProfitView === 'function') {
                 setTimeout(() => renderMainShopProfitView(), 50);
+            } else if (tabName === 'nicClear' && typeof renderNicClearTrackerView === 'function') {
+                setTimeout(() => renderNicClearTrackerView(), 50);
             }
         };
 
@@ -2493,6 +2775,27 @@
                 badgeSubmissions.innerText = `📑 Total: ${shopSalesScope.length} Submissions`;
             }
 
+            // Update NIC Clear Pending badge counts
+            const nicPendingCount = (allSales || []).filter(s => s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending').length;
+            const tabBadgeNic = document.getElementById('tabBadgeNicClear');
+            if (tabBadgeNic) {
+                if (nicPendingCount > 0) {
+                    tabBadgeNic.innerText = nicPendingCount;
+                    tabBadgeNic.style.display = 'inline-block';
+                } else {
+                    tabBadgeNic.style.display = 'none';
+                }
+            }
+            const filterBadgeNic = document.getElementById('filterCountNicClear');
+            if (filterBadgeNic) {
+                if (nicPendingCount > 0) {
+                    filterBadgeNic.innerText = nicPendingCount;
+                    filterBadgeNic.style.display = 'inline-block';
+                } else {
+                    filterBadgeNic.style.display = 'none';
+                }
+            }
+
             if (badgeStock) {
                 let stockCount = 0;
                 if (selectedShop === 'all' || !selectedShop) {
@@ -2521,14 +2824,20 @@
             const filteredSales = shopSalesScope.filter(data => {
                 const matchesSearch = (data.imei || '').toString().toLowerCase().includes(searchTerm) || 
                                       (data.spNumber || '').toString().toLowerCase().includes(searchTerm) || 
+                                      (data.oldSpNumber || '').toString().toLowerCase().includes(searchTerm) ||
+                                      (data.newSpNumber || '').toString().toLowerCase().includes(searchTerm) ||
                                       (data.nic || '').toString().toLowerCase().includes(searchTerm) ||
                                       (data.model || '').toString().toLowerCase().includes(searchTerm) ||
                                       (data.shopId || '').toString().toLowerCase().includes(searchTerm) ||
                                       (data.name || '').toString().toLowerCase().includes(searchTerm);
                 if (!matchesSearch) return false;
 
+                if (currentFilter === 'NIC Clear Pending') {
+                    return (data.status === 'NIC Clear Pending' || data.nicClearStatus === 'Pending');
+                }
+
                 const isPaid = (data.paymentStatus === 'Paid' || data.status === 'Payment Sent' || data.status === 'Confirmed' || data.status === 'Completed');
-                if (currentFilter === 'Pending' && isPaid) return false;
+                if (currentFilter === 'Pending' && (isPaid || data.status === 'NIC Clear Pending')) return false;
                 if (currentFilter === 'Paid' && !isPaid) return false;
                 
                 return true;
@@ -2568,10 +2877,17 @@
                 
                 const shopName = data.shopId ? data.shopId.split('@')[0].toUpperCase() : 'UNKNOWN';
                 
+                let spDisplayHtml = '';
+                if (data.oldSpNumber && data.newSpNumber) {
+                    spDisplayHtml = `<br><span style="font-size:0.75rem;"><del style="color:#ef4444; font-family:monospace;">${data.oldSpNumber}</del> ➔ <strong style="color:#059669; font-family:monospace;">${data.newSpNumber}</strong></span>`;
+                } else if (data.oldSpNumber && data.status === 'NIC Clear Pending') {
+                    spDisplayHtml = `<br><span style="font-size:0.75rem;"><del style="color:#ef4444; font-family:monospace;">${data.oldSpNumber}</del> <span style="color:#dc2626; font-weight:700;">(NIC Pending)</span></span>`;
+                }
+
                 tr.innerHTML = `
                     <td>${data.date || '-'}</td>
                     <td style="color: var(--accent-purple); font-weight: 600;">${shopName}</td>
-                    <td><strong>${data.name || '-'}</strong><br><span style="color:var(--text-muted)">${data.model || '-'}</span><br>${sourceHtml}</td>
+                    <td><strong>${data.name || '-'}</strong><br><span style="color:var(--text-muted)">${data.model || '-'}</span>${spDisplayHtml}<br>${sourceHtml}</td>
                     <td>${amountsHtml}</td>
                     <td>${statusHtml}</td>
                 `;
@@ -2585,6 +2901,7 @@
             if (status === 'Payment Sent') return '<span class="badge badge-sent">Pay Sent</span>';
             if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
             if (status === 'Cash Payment Pending') return '<span class="badge" style="background:rgba(245,158,11,0.18); color:#d97706; border:1px solid rgba(245,158,11,0.4); font-weight:800;">⏳ Cash Due</span>';
+            if (status === 'NIC Clear Pending') return '<span class="badge" style="background:rgba(239,68,68,0.18); color:#dc2626; border:1px solid rgba(239,68,68,0.45); font-weight:800;">🔄 NIC Clear Pending</span>';
             if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">Completed ✅</span>';
             return `<span class="badge">${status}</span>`;
         }
@@ -3405,21 +3722,55 @@
                 `;
             }
 
+            let nicClearBannerHtml = '';
+            if (data.status === 'NIC Clear Pending' || data.nicClearStatus === 'Pending') {
+                nicClearBannerHtml = `
+                    <div style="grid-column: 1 / -1; background: rgba(239, 68, 68, 0.08); border: 1.5px solid rgba(239, 68, 68, 0.4); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.85rem; box-shadow: 0 4px 15px rgba(239,68,68,0.06);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                            <strong style="color: #dc2626; font-size: 0.98rem; display: flex; align-items: center; gap: 6px;">
+                                <span>⚠️</span> FILE PENDING NIC CLEARANCE (NIC Clear වෙනකන් රැඳී සිටී)
+                            </strong>
+                            <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 800;">NIC PENDING</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 8px; line-height: 1.5;">
+                            <span style="color: var(--text-muted);">Cancelled SP Number:</span> <del style="color: #dc2626; font-weight: 800; font-family: monospace;">${data.oldSpNumber || data.spNumber || '-'}</del><br>
+                            <span style="color: var(--text-muted);">Reason / හේතුව:</span> <strong style="color: #991b1b;">${data.nicClearReason || 'Documentation error'}</strong><br>
+                            <span style="color: var(--text-muted);">Initiated Date:</span> <strong>${data.nicClearDate || data.date || '-'}</strong>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; background: rgba(255,255,255,0.75); padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.2);">
+                            <input type="text" id="modalDetailNewSpInput" placeholder="Enter New SP (e.g. SP202609-1185520)" style="flex: 1; min-width: 190px; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1.5px solid #3b82f6; font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
+                            <button type="button" onclick="applyNewSpFromDetailModal('${data.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.55rem 1.1rem; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
+                                ✅ Assign New SP & Complete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let spHistoryHtml = '';
+            if (data.oldSpNumber && data.newSpNumber) {
+                spHistoryHtml = `<div class="detail-item"><strong>SP Number History:</strong> <span class="val"><del style="color:#ef4444; font-family:monospace;">${data.oldSpNumber}</del> ➔ <strong style="color:#059669; font-family:monospace;">${data.newSpNumber}</strong></span></div>`;
+            } else if (data.oldSpNumber) {
+                spHistoryHtml = `<div class="detail-item"><strong>Original SP (Cancelled):</strong> <span class="val"><del style="color:#ef4444; font-family:monospace;">${data.oldSpNumber}</del> <span style="color:#dc2626; font-weight:700;">(NIC Pending)</span></span></div>`;
+            }
+
             let sourceHtml = data.stockSource === 'HO' 
                 ? `<span style="color:var(--success); font-weight:600;">Head Office Stock (${dHoP}% Profit Settlement)</span>` 
                 : `<span style="color:var(--text-muted);">Shop Own Stock (${dOwnP}% Profit Settlement)</span>`;
             
             content.innerHTML = `
+                ${nicClearBannerHtml}
                 ${customDetailsHtml}
                 <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
                 <div class="detail-item"><strong>Shop:</strong> <span class="val">${data.shopId || '-'}</span></div>
                 <div class="detail-item"><strong>Customer Name:</strong> <span class="val">${data.name || '-'}</span></div>
-                ${!isCash ? `<div class="detail-item"><strong>Customer NIC:</strong> <span class="val">${data.nic || '-'}</span></div>` : ''}
+                ${!isCash ? `<div class="detail-item"><strong>Customer NIC:</strong> <span class="val" style="color:#dc2626; font-weight:700;">${data.nic || '-'}</span></div>` : ''}
                 <div class="detail-item"><strong>Phone Model & Storage:</strong> <span class="val">${data.model || '-'} ${data.storage ? ' ('+data.storage+')' : ''}</span></div>
-                <div class="detail-item"><strong>IMEI Number:</strong> <span class="val">${data.imei || '-'}</span></div>
+                <div class="detail-item"><strong>IMEI Number:</strong> <span class="val" style="font-family:monospace;">${data.imei || '-'}</span></div>
                 ${!isCash ? `
                     <div class="detail-item"><strong>Stock Source:</strong> <span class="val">${sourceHtml}</span></div>
-                    <div class="detail-item"><strong>SP Number:</strong> <span class="val">${data.spNumber || '-'}</span></div>
+                    ${spHistoryHtml}
+                    <div class="detail-item"><strong>Active SP Number:</strong> <span class="val" style="font-weight:700; font-family:monospace;">${data.spNumber || '-'}</span></div>
                     <div class="detail-item"><strong>MRP Price:</strong> <span class="val">Rs. ${parseFloat(data.mrp || 0).toLocaleString()}</span></div>
                     <div class="detail-item"><strong>Down Payment:</strong> <span class="val">Rs. ${parseFloat(data.downPayment || 0).toLocaleString()}</span></div>
                     <div class="detail-item"><strong>Document Charge:</strong> <span class="val">Rs. ${parseFloat(data.document || 0).toLocaleString()}</span></div>
@@ -3440,6 +3791,15 @@
                 completeBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
             } else {
                 completeBtn.style.display = 'none';
+            }
+
+            const sendNicBtn = document.getElementById('btnSendToNicClear');
+            if (sendNicBtn) {
+                if (data.status === 'NIC Clear Pending' || data.status === 'Completed' || isCash) {
+                    sendNicBtn.style.display = 'none';
+                } else {
+                    sendNicBtn.style.display = 'block';
+                }
             }
 
             document.getElementById('detailModal').style.display = 'flex';
@@ -6203,6 +6563,507 @@
                 }
             }
         });
+
+        // ==========================================
+        // 🔄 NIC CLEARANCE & RE-SP TRACKER MODULE
+        // ==========================================
+        let currentNicTrackerFilter = 'Pending';
+
+        window.filterNicClearTracker = function(filter) {
+            currentNicTrackerFilter = filter;
+            document.querySelectorAll('.nic-tracker-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (filter === 'Pending') document.getElementById('btnNicFilterPending')?.classList.add('active');
+            if (filter === 'Completed') document.getElementById('btnNicFilterCompleted')?.classList.add('active');
+            if (filter === 'All') document.getElementById('btnNicFilterAll')?.classList.add('active');
+            renderNicClearTrackerView();
+        };
+
+        window.renderNicClearTrackerView = function() {
+            const tbody = document.getElementById('nicClearTableBody');
+            if (!tbody) return;
+
+            const searchTerm = (document.getElementById('nicTrackerSearchInput')?.value || '').trim().toLowerCase();
+
+            // All files that are tracked in NIC clearance
+            const allTrackedSales = (allSales || []).filter(s => 
+                s.status === 'NIC Clear Pending' || 
+                s.nicClearStatus === 'Pending' || 
+                s.nicClearStatus === 'Completed' || 
+                Boolean(s.oldSpNumber)
+            );
+
+            // Calculate KPI counts
+            const pendingCount = allTrackedSales.filter(s => s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending').length;
+            const completedCount = allTrackedSales.filter(s => s.nicClearStatus === 'Completed' || (s.oldSpNumber && s.status === 'Completed')).length;
+            const totalCount = allTrackedSales.length;
+
+            // Update KPI elements
+            const elPending = document.getElementById('kpiNicClearPending');
+            const elCompleted = document.getElementById('kpiNicClearCompleted');
+            const elTotal = document.getElementById('kpiNicClearTotal');
+            if (elPending) elPending.innerText = pendingCount;
+            if (elCompleted) elCompleted.innerText = completedCount;
+            if (elTotal) elTotal.innerText = totalCount;
+
+            // Update filter badges
+            const bPending = document.getElementById('nicFilterCountPending');
+            const bCompleted = document.getElementById('nicFilterCountCompleted');
+            const bAll = document.getElementById('nicFilterCountAll');
+            if (bPending) bPending.innerText = pendingCount;
+            if (bCompleted) bCompleted.innerText = completedCount;
+            if (bAll) bAll.innerText = totalCount;
+
+            // Also sync tab notification badge
+            const tabBadge = document.getElementById('tabBadgeNicClear');
+            if (tabBadge) {
+                if (pendingCount > 0) {
+                    tabBadge.innerText = pendingCount;
+                    tabBadge.style.display = 'inline-block';
+                } else {
+                    tabBadge.style.display = 'none';
+                }
+            }
+
+            // Filter by active tab
+            let displaySales = allTrackedSales.filter(s => {
+                const isPending = (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
+                if (currentNicTrackerFilter === 'Pending') return isPending;
+                if (currentNicTrackerFilter === 'Completed') return !isPending;
+                return true; // 'All'
+            });
+
+            // Filter by search term
+            if (searchTerm) {
+                displaySales = displaySales.filter(s => {
+                    return (s.nic || '').toLowerCase().includes(searchTerm) ||
+                           (s.name || '').toLowerCase().includes(searchTerm) ||
+                           (s.spNumber || '').toLowerCase().includes(searchTerm) ||
+                           (s.oldSpNumber || '').toLowerCase().includes(searchTerm) ||
+                           (s.newSpNumber || '').toLowerCase().includes(searchTerm) ||
+                           (s.model || '').toLowerCase().includes(searchTerm) ||
+                           (s.imei || '').toLowerCase().includes(searchTerm) ||
+                           (s.shopId || '').toLowerCase().includes(searchTerm) ||
+                           (s.nicClearReason || '').toLowerCase().includes(searchTerm);
+                });
+            }
+
+            // Sort newest requested first
+            displaySales.sort((a, b) => {
+                const dateA = a.nicClearDate || a.date || '';
+                const dateB = b.nicClearDate || b.date || '';
+                return dateB.localeCompare(dateA) || (b.timestamp || 0) - (a.timestamp || 0);
+            });
+
+            if (displaySales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                    No files found for this filter.
+                </td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            displaySales.forEach(s => {
+                const tr = document.createElement('tr');
+                const isPending = (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
+                const shopLabel = s.shopId ? s.shopId.split('@')[0].toUpperCase() : 'MAIN / HO';
+
+                // SP History column rendering
+                let spHistoryHtml = '';
+                if (isPending) {
+                    spHistoryHtml = `
+                        <div style="font-family: monospace;">
+                            <del style="color: #ef4444; font-weight: 800; font-size: 0.95rem;">${s.oldSpNumber || s.spNumber || '-'}</del>
+                        </div>
+                        <span style="color: #d97706; font-size: 0.74rem; font-weight: 800; background: rgba(245,158,11,0.12); padding: 2px 7px; border-radius: 6px; display: inline-block; margin-top: 3px; border: 1px solid rgba(245,158,11,0.3);">
+                            ⏳ Waiting for New SP
+                        </span>
+                    `;
+                } else {
+                    spHistoryHtml = `
+                        <div style="font-family: monospace; font-size: 0.85rem;">
+                            <del style="color: #ef4444; font-weight: 700;">${s.oldSpNumber || '-'}</del> ➔
+                        </div>
+                        <div style="font-family: monospace; color: #059669; font-weight: 900; font-size: 0.98rem; margin-top: 2px;">
+                            ${s.newSpNumber || s.spNumber || '-'}
+                        </div>
+                    `;
+                }
+
+                // Status & Reason
+                const statusBadge = isPending 
+                    ? `<span class="badge" style="background:rgba(239,68,68,0.18); color:#dc2626; border:1px solid rgba(239,68,68,0.45); font-weight:800;">🔄 NIC Clear Pending</span>`
+                    : `<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.25); color:#059669; font-weight:800;">✅ Cleared & Resubmitted</span>`;
+
+                const reasonText = s.nicClearReason || 'Documentation correction';
+
+                // Action buttons
+                let actionBtnHtml = '';
+                if (isPending) {
+                    actionBtnHtml = `
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button type="button" onclick="openEnterNewSpModal('${s.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; box-shadow: 0 2px 8px rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                ⚡ Enter New SP
+                            </button>
+                            <button type="button" onclick="openDetailsModalFromTracker('${s.id}')" style="background: rgba(59,130,246,0.1); color: #2563eb; border: 1px solid rgba(59,130,246,0.25); padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
+                                👁️ Details
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionBtnHtml = `
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <span style="color: #059669; font-weight: 800; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px;">
+                                ✅ Completed
+                            </span>
+                            <button type="button" onclick="openDetailsModalFromTracker('${s.id}')" style="background: rgba(59,130,246,0.1); color: #2563eb; border: 1px solid rgba(59,130,246,0.25); padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
+                                👁️ Details
+                            </button>
+                        </div>
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <strong>${s.nicClearDate || s.date || '-'}</strong><br>
+                        <span style="color: var(--accent-purple); font-weight: 700; font-size: 0.8rem;">${shopLabel}</span>
+                    </td>
+                    <td>
+                        <strong style="color: #dc2626; font-family: monospace; font-size: 0.95rem; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">
+                            ${s.nic || '-'}
+                        </strong>
+                        <span style="color: var(--text-main); font-weight: 600;">${s.name || '-'}</span>
+                    </td>
+                    <td>
+                        <strong>${s.model || '-'}</strong> ${s.storage ? '<span style="color:var(--text-muted)">('+s.storage+')</span>' : ''}<br>
+                        <span style="font-family: monospace; font-size: 0.76rem; color: var(--text-muted);">${s.imei || '-'}</span><br>
+                        <span style="color: #2563eb; font-weight: 700; font-size: 0.78rem;">Loan: Rs. ${parseFloat(s.loanAmount||0).toLocaleString()}</span>
+                    </td>
+                    <td>${spHistoryHtml}</td>
+                    <td>
+                        <div style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 4px; max-width: 220px; line-height: 1.35;">
+                            <strong>Note:</strong> ${reasonText}
+                        </div>
+                        ${statusBadge}
+                    </td>
+                    <td>${actionBtnHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // Open Enter New SP Modal
+        window.openEnterNewSpModal = function(docId) {
+            const data = (allSales || []).find(s => s.id === docId);
+            if (!data) return;
+
+            document.getElementById('newSpTargetDocId').value = docId;
+            document.getElementById('newSpModalNic').innerText = data.nic || '-';
+            document.getElementById('newSpModalName').innerText = data.name || '-';
+            document.getElementById('newSpModalOldSp').innerText = data.oldSpNumber || data.spNumber || '-';
+            document.getElementById('newSpModalInput').value = '';
+            document.getElementById('newSpModalNote').value = '';
+
+            document.getElementById('enterNewSpModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('newSpModalInput')?.focus(), 100);
+        };
+
+        window.closeEnterNewSpModal = function() {
+            document.getElementById('enterNewSpModal').style.display = 'none';
+            document.getElementById('newSpTargetDocId').value = '';
+        };
+
+        // Submit New SP and Complete File
+        window.submitNewSpAndComplete = async function() {
+            const docId = document.getElementById('newSpTargetDocId').value;
+            const newSp = (document.getElementById('newSpModalInput').value || '').trim();
+            const note = (document.getElementById('newSpModalNote').value || '').trim();
+
+            if (!docId) return;
+            if (!newSp) {
+                showToast("Please enter the New SP Number!", "warning");
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitNewSp');
+            btn.innerText = 'Completing File...';
+            btn.disabled = true;
+
+            try {
+                const currentData = (allSales || []).find(s => s.id === docId);
+                const originalOldSp = currentData?.oldSpNumber || currentData?.spNumber || '';
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                const updatePayload = {
+                    oldSpNumber: originalOldSp,
+                    newSpNumber: newSp,
+                    spNumber: newSp,
+                    status: 'Completed',
+                    paymentStatus: 'Paid',
+                    nicClearStatus: 'Completed',
+                    nicClearedAt: Date.now(),
+                    nicClearCompletionDate: todayStr,
+                    nicClearCompletionNote: note || 'NIC cleared & resubmitted with new SP'
+                };
+
+                await updateDoc(doc(db, "sales", docId), updatePayload);
+
+                if (currentData) {
+                    Object.assign(currentData, updatePayload);
+                }
+
+                showToast(`Success! New SP (${newSp}) assigned and file marked as Completed.`, "success");
+                closeEnterNewSpModal();
+                if (document.getElementById('detailModal').style.display === 'flex') {
+                    closeModal();
+                }
+                renderNicClearTrackerView();
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Error updating New SP:", e);
+                showToast("Failed to update New SP: " + e.message, "error");
+            } finally {
+                btn.innerText = '✅ Complete File With New SP';
+                btn.disabled = false;
+            }
+        };
+
+        // Request NIC Clear Modal Handlers
+        window.openRequestNicClearModal = function(docId) {
+            const data = (allSales || []).find(s => s.id === docId);
+            if (!data) return;
+
+            document.getElementById('reqNicClearDocId').value = docId;
+            document.getElementById('reqNicCustName').innerText = data.name || '-';
+            document.getElementById('reqNicCustNic').innerText = data.nic || '-';
+            document.getElementById('reqNicCurrentSp').innerText = data.spNumber || '-';
+            document.getElementById('reqNicReasonInput').value = '';
+
+            document.getElementById('requestNicClearModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('reqNicReasonInput')?.focus(), 100);
+        };
+
+        window.closeRequestNicClearModal = function() {
+            document.getElementById('requestNicClearModal').style.display = 'none';
+            document.getElementById('reqNicClearDocId').value = '';
+        };
+
+        window.initiateNicClearForCurrentDoc = function() {
+            if (!currentModalDocId) return;
+            openRequestNicClearModal(currentModalDocId);
+        };
+
+        window.confirmRequestNicClear = async function() {
+            const docId = document.getElementById('reqNicClearDocId').value;
+            const reason = (document.getElementById('reqNicReasonInput').value || '').trim();
+
+            if (!docId) return;
+            if (!reason) {
+                showToast("Please provide a reason for cancellation / NIC Clear!", "warning");
+                return;
+            }
+
+            const btn = document.getElementById('btnConfirmReqNicClear');
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+
+            try {
+                const currentData = (allSales || []).find(s => s.id === docId);
+                const currentSp = currentData?.spNumber || '';
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                const updatePayload = {
+                    status: 'NIC Clear Pending',
+                    nicClearStatus: 'Pending',
+                    oldSpNumber: currentData?.oldSpNumber || currentSp,
+                    nicClearReason: reason,
+                    nicClearDate: todayStr,
+                    adminReply: `[NIC Clear Requested]: ${reason}`
+                };
+
+                await updateDoc(doc(db, "sales", docId), updatePayload);
+
+                if (currentData) {
+                    Object.assign(currentData, updatePayload);
+                }
+
+                showToast("File marked as NIC Clear Pending!", "warning");
+                closeRequestNicClearModal();
+                if (document.getElementById('detailModal').style.display === 'flex') {
+                    closeModal();
+                }
+                renderNicClearTrackerView();
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Error requesting NIC clear:", e);
+                showToast("Failed to request NIC clear: " + e.message, "error");
+            } finally {
+                btn.innerText = '⚠️ Mark as NIC Clear Pending';
+                btn.disabled = false;
+            }
+        };
+
+        // Apply New SP directly from Detail Modal
+        window.applyNewSpFromDetailModal = async function(docId) {
+            const input = document.getElementById('modalDetailNewSpInput');
+            const newSp = (input?.value || '').trim();
+
+            if (!newSp) {
+                showToast("Please enter the New SP Number!", "warning");
+                return;
+            }
+
+            try {
+                const currentData = (allSales || []).find(s => s.id === docId);
+                const originalOldSp = currentData?.oldSpNumber || currentData?.spNumber || '';
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                const updatePayload = {
+                    oldSpNumber: originalOldSp,
+                    newSpNumber: newSp,
+                    spNumber: newSp,
+                    status: 'Completed',
+                    paymentStatus: 'Paid',
+                    nicClearStatus: 'Completed',
+                    nicClearedAt: Date.now(),
+                    nicClearCompletionDate: todayStr,
+                    nicClearCompletionNote: 'Assigned via Submission Details modal'
+                };
+
+                await updateDoc(doc(db, "sales", docId), updatePayload);
+
+                if (currentData) {
+                    Object.assign(currentData, updatePayload);
+                }
+
+                showToast(`Success! New SP (${newSp}) assigned and file completed.`, "success");
+                closeModal();
+                renderNicClearTrackerView();
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Error applying New SP from modal:", e);
+                showToast("Error: " + e.message, "error");
+            }
+        };
+
+        window.openDetailsModalFromTracker = function(docId) {
+            const data = (allSales || []).find(s => s.id === docId);
+            if (data) {
+                openDetailsModal(data);
+            }
+        };
+
+        // Add / Track File Modal Handlers
+        window.openAddNicClearModal = function() {
+            const sel = document.getElementById('quickSelectNicDoc');
+            if (sel) {
+                sel.innerHTML = '<option value="">-- Or select from recent submissions --</option>';
+                const candidateSales = (allSales || []).filter(s => s.saleType !== 'Cash Sale');
+                candidateSales.slice(0, 50).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.innerText = `${s.nic || 'NO-NIC'} | ${s.spNumber || 'NO-SP'} | ${s.name || 'Unknown'} (${s.model || '-'})`;
+                    sel.appendChild(opt);
+                });
+            }
+
+            document.getElementById('manualNicCustName').value = '';
+            document.getElementById('manualNicCustNic').value = '';
+            document.getElementById('manualNicOldSp').value = '';
+            document.getElementById('manualNicShop').value = '';
+            document.getElementById('manualNicModel').value = '';
+            document.getElementById('manualNicImei').value = '';
+            document.getElementById('manualNicReason').value = '';
+
+            document.getElementById('addNicClearModal').style.display = 'flex';
+        };
+
+        window.closeAddNicClearModal = function() {
+            document.getElementById('addNicClearModal').style.display = 'none';
+        };
+
+        window.populateQuickNicClearDoc = function(docId) {
+            if (!docId) return;
+            const s = (allSales || []).find(item => item.id === docId);
+            if (!s) return;
+
+            document.getElementById('manualNicCustName').value = s.name || '';
+            document.getElementById('manualNicCustNic').value = s.nic || '';
+            document.getElementById('manualNicOldSp').value = s.spNumber || s.oldSpNumber || '';
+            document.getElementById('manualNicShop').value = s.shopId ? s.shopId.split('@')[0].toUpperCase() : '';
+            document.getElementById('manualNicModel').value = s.model || '';
+            document.getElementById('manualNicImei').value = s.imei || '';
+            document.getElementById('manualNicReason').value = s.nicClearReason || 'Documentation error, waiting for clearance';
+        };
+
+        window.submitAddNicClearTracking = async function() {
+            const quickDocId = document.getElementById('quickSelectNicDoc')?.value;
+            const custName = (document.getElementById('manualNicCustName')?.value || '').trim();
+            const custNic = (document.getElementById('manualNicCustNic')?.value || '').trim();
+            const oldSp = (document.getElementById('manualNicOldSp')?.value || '').trim();
+            const shop = (document.getElementById('manualNicShop')?.value || '').trim();
+            const model = (document.getElementById('manualNicModel')?.value || '').trim();
+            const imei = (document.getElementById('manualNicImei')?.value || '').trim();
+            const reason = (document.getElementById('manualNicReason')?.value || '').trim();
+
+            if (!custName || !custNic || !oldSp || !reason) {
+                showToast("Please fill in Customer Name, NIC, Old SP, and Reason!", "warning");
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitAddNicClear');
+            btn.innerText = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                if (quickDocId) {
+                    const updatePayload = {
+                        status: 'NIC Clear Pending',
+                        nicClearStatus: 'Pending',
+                        oldSpNumber: oldSp,
+                        nicClearReason: reason,
+                        nicClearDate: todayStr,
+                        adminReply: `[NIC Clear Requested]: ${reason}`
+                    };
+                    await updateDoc(doc(db, "sales", quickDocId), updatePayload);
+                    const localItem = (allSales || []).find(s => s.id === quickDocId);
+                    if (localItem) Object.assign(localItem, updatePayload);
+                } else {
+                    const newPayload = {
+                        name: custName,
+                        nic: custNic,
+                        oldSpNumber: oldSp,
+                        spNumber: oldSp,
+                        shopId: shop || 'Main Shop',
+                        model: model || 'Phone Device',
+                        imei: imei || '',
+                        status: 'NIC Clear Pending',
+                        nicClearStatus: 'Pending',
+                        nicClearReason: reason,
+                        nicClearDate: todayStr,
+                        date: todayStr,
+                        timestamp: Date.now(),
+                        paymentStatus: 'Pending',
+                        stockSource: 'HO'
+                    };
+                    const docRef = await addDoc(collection(db, "sales"), newPayload);
+                    newPayload.id = docRef.id;
+                    allSales.unshift(newPayload);
+                }
+
+                showToast("File added to NIC Clear Tracker successfully!", "success");
+                closeAddNicClearModal();
+                renderNicClearTrackerView();
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Error adding NIC clear tracking:", e);
+                showToast("Failed to add tracking: " + e.message, "error");
+            } finally {
+                btn.innerText = '➕ Start Tracking';
+                btn.disabled = false;
+            }
+        };
 
     </script>
 </body>
