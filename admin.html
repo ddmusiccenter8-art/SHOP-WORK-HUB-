@@ -1762,11 +1762,31 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 1rem;">
-                <label style="color: var(--text-main); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Select From Existing Submissions (පවතින එකක් තෝරන්න)</label>
-                <select id="quickSelectNicDoc" onchange="populateQuickNicClearDoc(this.value)" style="width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: white;">
-                    <option value="">-- Or enter manually below --</option>
-                </select>
+            <!-- Search & Quick Selection Section -->
+            <div style="margin-bottom: 1.2rem; position: relative;">
+                <input type="hidden" id="quickSelectNicDoc" value="">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+                    <label style="color: var(--text-main); font-weight: 700; font-size: 0.86rem;">
+                        🔍 Search & Select File (SP අංකය / IMEI / නම / NIC මඟින් සොයන්න):
+                    </label>
+                    <span id="selectedFileIndicator" style="display:none; color: #059669; font-size: 0.76rem; font-weight: 800; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 2px 8px; border-radius: 6px;">
+                        ✅ File Selected
+                    </span>
+                </div>
+                
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <div style="position: relative; flex: 1;">
+                        <input type="text" id="nicModalSearchQuery" oninput="searchSalesForNicModal(this.value)" onfocus="searchSalesForNicModal(this.value)" placeholder="Type SP Number, IMEI (15 digits), Name, or NIC..." style="width: 100%; padding: 0.65rem 2.2rem 0.65rem 0.85rem; border-radius: 10px; border: 1.5px solid #3b82f6; font-size: 0.88rem; font-weight: 600; color: var(--text-main); background: #ffffff; box-shadow: 0 2px 8px rgba(59,130,246,0.08);" autocomplete="off">
+                        <span id="clearNicSearchBtn" onclick="clearNicModalSearch()" style="display:none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-weight: bold; font-size: 1.2rem;" title="Clear">&times;</span>
+                    </div>
+                    <button type="button" onclick="startScanner('nicModalSearchQuery')" style="background: rgba(59,130,246,0.12); border: 1.5px solid rgba(59,130,246,0.35); color: #2563eb; padding: 0.62rem 0.85rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; transition: all 0.2s;" title="Scan IMEI Barcode with Camera">
+                        📷 Scan IMEI
+                    </button>
+                </div>
+
+                <!-- Instant Matching Results Dropdown -->
+                <div id="nicModalSearchResults" style="display: none; position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; max-height: 240px; overflow-y: auto; background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); z-index: 1100; padding: 4px;">
+                </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
@@ -6954,18 +6974,143 @@
 
         // Add / Track File Modal Handlers
         window.openAddNicClearModal = function() {
-            const sel = document.getElementById('quickSelectNicDoc');
-            if (sel) {
-                sel.innerHTML = '<option value="">-- Or select from recent submissions --</option>';
-                const candidateSales = (allSales || []).filter(s => s.saleType !== 'Cash Sale');
-                candidateSales.slice(0, 50).forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.id;
-                    opt.innerText = `${s.nic || 'NO-NIC'} | ${s.spNumber || 'NO-SP'} | ${s.name || 'Unknown'} (${s.model || '-'})`;
-                    sel.appendChild(opt);
-                });
+            clearNicModalSearch();
+            document.getElementById('addNicClearModal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('nicModalSearchQuery')?.focus();
+            }, 100);
+        };
+
+        window.closeAddNicClearModal = function() {
+            document.getElementById('addNicClearModal').style.display = 'none';
+            const results = document.getElementById('nicModalSearchResults');
+            if (results) results.style.display = 'none';
+        };
+
+        window.searchSalesForNicModal = function(query) {
+            const resultsContainer = document.getElementById('nicModalSearchResults');
+            if (!resultsContainer) return;
+
+            const q = (query || '').trim().toLowerCase();
+            const clearBtn = document.getElementById('clearNicSearchBtn');
+            if (clearBtn) {
+                clearBtn.style.display = q ? 'block' : 'none';
             }
 
+            // Exclude direct cash sales since loans are the ones with SP & NIC
+            const candidates = (allSales || []).filter(s => s.saleType !== 'Cash Sale');
+
+            let matches = [];
+            if (q) {
+                matches = candidates.filter(s => {
+                    const sp = (s.spNumber || '').toLowerCase();
+                    const oldSp = (s.oldSpNumber || '').toLowerCase();
+                    const imei = (s.imei || '').toLowerCase();
+                    const name = (s.name || '').toLowerCase();
+                    const nic = (s.nic || '').toLowerCase();
+                    const model = (s.model || '').toLowerCase();
+                    const shop = (s.shopId || '').toLowerCase();
+                    return sp.includes(q) || oldSp.includes(q) || imei.includes(q) || name.includes(q) || nic.includes(q) || model.includes(q) || shop.includes(q);
+                }).slice(0, 20);
+            } else {
+                // If query is empty, show the 10 most recent loan submissions
+                matches = candidates.slice(0, 10);
+            }
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div style="padding: 1.1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                        🔍 No matching file found for "<strong>${q}</strong>"<br>
+                        <span style="font-size: 0.76rem; color: #94a3b8;">You can still type the details manually in the fields below.</span>
+                    </div>
+                `;
+                resultsContainer.style.display = 'block';
+                return;
+            }
+
+            let html = `
+                <div style="padding: 6px 10px; font-size: 0.74rem; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 8px 8px 0 0;">
+                    <span>${q ? `Matching Files (${matches.length})` : 'Recent Submissions (Click to select)'}</span>
+                    <span style="color: #3b82f6;">Click card to auto-fill ➔</span>
+                </div>
+            `;
+
+            matches.forEach(item => {
+                const shopLabel = item.shopId ? item.shopId.split('@')[0].toUpperCase() : 'MAIN';
+                const displaySp = item.spNumber || item.oldSpNumber || 'NO-SP';
+                const isCurrentNicPending = (item.status === 'NIC Clear Pending' || item.nicClearStatus === 'Pending');
+
+                html += `
+                    <div onclick="selectSaleForNicModal('${item.id}')" style="padding: 0.65rem 0.85rem; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f8fafc; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; gap: 8px;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='transparent'">
+                        <div style="text-align: left; min-width: 0; flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 3px;">
+                                <span style="font-family: monospace; font-weight: 800; color: #2563eb; font-size: 0.9rem; background: rgba(59,130,246,0.1); padding: 1px 7px; border-radius: 5px;">
+                                    ${displaySp}
+                                </span>
+                                <span style="font-size: 0.72rem; color: #64748b; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">${item.date || ''}</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--accent-purple);">${shopLabel}</span>
+                                ${isCurrentNicPending ? '<span style="font-size:0.7rem; color:#dc2626; font-weight:800; background:rgba(239,68,68,0.12); padding:1px 5px; border-radius:4px;">Pending NIC</span>' : ''}
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 700;">
+                                👤 ${item.name || 'Unknown'} 
+                                <span style="color: #dc2626; font-family: monospace; font-weight: 800; font-size: 0.84rem; margin-left: 6px;">NIC: ${item.nic || '-'}</span>
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                                📱 ${item.model || 'Phone'} ${item.storage ? '(' + item.storage + ')' : ''} | 🔢 <span style="font-family: monospace; color: #334155; font-weight: 600;">IMEI: ${item.imei || '-'}</span>
+                            </div>
+                        </div>
+                        <button type="button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 6px rgba(16,185,129,0.3); flex-shrink: 0;">
+                            Select ➔
+                        </button>
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = html;
+            resultsContainer.style.display = 'block';
+        };
+
+        window.selectSaleForNicModal = function(docId) {
+            const s = (allSales || []).find(item => item.id === docId);
+            if (!s) return;
+
+            document.getElementById('quickSelectNicDoc').value = docId;
+            document.getElementById('manualNicCustName').value = s.name || '';
+            document.getElementById('manualNicCustNic').value = s.nic || '';
+            document.getElementById('manualNicOldSp').value = s.spNumber || s.oldSpNumber || '';
+            document.getElementById('manualNicShop').value = s.shopId ? s.shopId.split('@')[0].toUpperCase() : '';
+            document.getElementById('manualNicModel').value = s.model || '';
+            document.getElementById('manualNicImei').value = s.imei || '';
+            if (s.nicClearReason) {
+                document.getElementById('manualNicReason').value = s.nicClearReason;
+            }
+
+            const searchInput = document.getElementById('nicModalSearchQuery');
+            if (searchInput) {
+                searchInput.value = `${s.spNumber || s.imei || ''} - ${s.name || ''}`;
+            }
+
+            const resultsContainer = document.getElementById('nicModalSearchResults');
+            if (resultsContainer) resultsContainer.style.display = 'none';
+
+            const indicator = document.getElementById('selectedFileIndicator');
+            if (indicator) {
+                indicator.style.display = 'inline-block';
+                indicator.innerText = `✅ Selected: ${s.spNumber || s.name}`;
+            }
+            const clearBtn = document.getElementById('clearNicSearchBtn');
+            if (clearBtn) clearBtn.style.display = 'block';
+
+            // Focus on reason input so user can enter reason
+            setTimeout(() => {
+                document.getElementById('manualNicReason')?.focus();
+            }, 100);
+        };
+
+        window.clearNicModalSearch = function() {
+            const searchInput = document.getElementById('nicModalSearchQuery');
+            if (searchInput) searchInput.value = '';
+            document.getElementById('quickSelectNicDoc').value = '';
             document.getElementById('manualNicCustName').value = '';
             document.getElementById('manualNicCustNic').value = '';
             document.getElementById('manualNicOldSp').value = '';
@@ -6974,26 +7119,21 @@
             document.getElementById('manualNicImei').value = '';
             document.getElementById('manualNicReason').value = '';
 
-            document.getElementById('addNicClearModal').style.display = 'flex';
+            const resultsContainer = document.getElementById('nicModalSearchResults');
+            if (resultsContainer) resultsContainer.style.display = 'none';
+            const indicator = document.getElementById('selectedFileIndicator');
+            if (indicator) indicator.style.display = 'none';
+            const clearBtn = document.getElementById('clearNicSearchBtn');
+            if (clearBtn) clearBtn.style.display = 'none';
         };
 
-        window.closeAddNicClearModal = function() {
-            document.getElementById('addNicClearModal').style.display = 'none';
-        };
-
-        window.populateQuickNicClearDoc = function(docId) {
-            if (!docId) return;
-            const s = (allSales || []).find(item => item.id === docId);
-            if (!s) return;
-
-            document.getElementById('manualNicCustName').value = s.name || '';
-            document.getElementById('manualNicCustNic').value = s.nic || '';
-            document.getElementById('manualNicOldSp').value = s.spNumber || s.oldSpNumber || '';
-            document.getElementById('manualNicShop').value = s.shopId ? s.shopId.split('@')[0].toUpperCase() : '';
-            document.getElementById('manualNicModel').value = s.model || '';
-            document.getElementById('manualNicImei').value = s.imei || '';
-            document.getElementById('manualNicReason').value = s.nicClearReason || 'Documentation error, waiting for clearance';
-        };
+        document.addEventListener('click', function(e) {
+            const results = document.getElementById('nicModalSearchResults');
+            const searchInput = document.getElementById('nicModalSearchQuery');
+            if (results && searchInput && !results.contains(e.target) && e.target !== searchInput) {
+                results.style.display = 'none';
+            }
+        });
 
         window.submitAddNicClearTracking = async function() {
             const quickDocId = document.getElementById('quickSelectNicDoc')?.value;
