@@ -2101,7 +2101,7 @@
     </div>
 
     <!-- Edit Stock Modal -->
-    <div id="editInventoryModal" class="modal">
+    <div id="editInventoryModal" class="modal" style="z-index: 2500;">
         <div class="modal-content" style="max-width: 480px;">
             <span class="modal-close" onclick="closeEditInventoryModal()">&times;</span>
             <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Edit Inventory Item</h2>
@@ -2141,7 +2141,7 @@
     </div>
 
     <!-- Transfer Stock Modal -->
-    <div id="transferModal" class="modal">
+    <div id="transferModal" class="modal" style="z-index: 2500;">
         <div class="modal-content" style="max-width: 400px;">
             <span class="modal-close" onclick="closeTransferModal()">&times;</span>
             <h2 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem;">Transfer Stock</h2>
@@ -2295,7 +2295,7 @@
     </div>
 
     <!-- Edit Batch Price Modal -->
-    <div id="editBatchPriceModal" class="modal">
+    <div id="editBatchPriceModal" class="modal" style="z-index: 2500;">
         <div class="modal-content" style="max-width: 440px; padding: 1.5rem; border-radius: 18px;">
             <span class="modal-close" onclick="closeEditBatchPriceModal()">&times;</span>
             <h2 style="font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.4rem; font-weight: 800;">✏️ Update Batch Prices</h2>
@@ -5432,6 +5432,20 @@
             const safeStorage = grp.storage.replace(/'/g, "\\'");
             const safeCategory = (grp.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
 
+            // Collect unique shop destinations for transfer
+            const availableShops = new Set();
+            availableShops.add('MAIN SHOP');
+            if (Array.isArray(registeredShopsList)) {
+                registeredShopsList.forEach(s => {
+                    if (s.name && s.name.trim()) availableShops.add(s.name.trim());
+                });
+            }
+            if (Array.isArray(allInventoryItems)) {
+                allInventoryItems.forEach(i => {
+                    if (i.shop && i.shop.trim()) availableShops.add(i.shop.trim());
+                });
+            }
+
             batches.forEach((b, bIdx) => {
                 // Filter items in this batch
                 const filteredBatchItems = b.items.filter(item => {
@@ -5486,34 +5500,81 @@
                         ? `<span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">Available</span>`
                         : `<span style="background: #f1f5f9; color: #64748b; font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">${item.status || 'Sold'}</span>`;
 
+                    // Generate shop dropdown and quick branch buttons for inline transfer
+                    let shopOptionsHtml = '<option value="" disabled selected>-- Select Target Branch / Location --</option>';
+                    let quickButtonsHtml = '';
+                    availableShops.forEach(sName => {
+                        const isCurrent = (sName.toLowerCase() === iShop.toLowerCase());
+                        const safeSName = sName.replace(/'/g, "\\'");
+                        const label = (sName === 'MAIN SHOP') ? '🏢 Head Office (MAIN SHOP)' : '📍 ' + sName;
+                        shopOptionsHtml += `<option value="${safeSName}" ${isCurrent ? 'disabled' : ''}>${label}${isCurrent ? ' (Current)' : ''}</option>`;
+
+                        if (!isCurrent) {
+                            quickButtonsHtml += `
+                                <button type="button" onclick="setInlineTargetShop('${item.id}', '${safeSName}')" style="background: white; border: 1px solid #93c5fd; border-radius: 6px; padding: 3px 8px; font-size: 0.74rem; font-weight: 700; color: #1e40af; cursor: pointer; transition: all 0.15s;" title="Select ${label}">
+                                    ${label}
+                                </button>
+                            `;
+                        }
+                    });
+
                     imeiListHtml += `
-                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}">
-                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
-                                    <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
+                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}" style="flex-direction: column; align-items: stretch;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
+                                        <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
+                                    </div>
+                                    <div>${locBadge}</div>
+                                    <div>${statusBadge}</div>
                                 </div>
-                                <div>${locBadge}</div>
-                                <div>${statusBadge}</div>
+
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    ${isBranchItem && isAvail ? `
+                                        <button type="button" onclick="recallInventoryItemToHeadOffice('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(16,185,129,0.25);" title="නැවත අපේ Head Office (MAIN SHOP) වෙත ගෙන්වා ගන්න">
+                                            🔄 Recall to Head Office
+                                        </button>
+                                    ` : ''}
+
+                                    ${isAvail ? `
+                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(37,99,235,0.25);" title="මෙම Phone එක වෙනත් Branch එකකට Transfer කරන්න">
+                                            ➡️ Transfer
+                                        </button>
+                                    ` : ''}
+
+                                    <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Edit Item Details">✏️</button>
+
+                                    <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #ef4444; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Delete Item">🗑️</button>
+                                </div>
                             </div>
 
-                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                ${isBranchItem && isAvail ? `
-                                    <button type="button" onclick="recallInventoryItemToHeadOffice('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(16,185,129,0.25);" title="නැවත අපේ Head Office (MAIN SHOP) වෙත ගෙන්වා ගන්න">
-                                        🔄 Recall to Head Office
-                                    </button>
-                                ` : ''}
+                            ${isAvail ? `
+                                <div id="inlineTransfer_${item.id}" style="display: none; width: 100%; flex-basis: 100%; margin-top: 10px; padding: 12px 14px; background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 10px; box-shadow: 0 4px 12px rgba(37,99,235,0.08);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <div style="font-weight: 700; font-size: 0.84rem; color: #1e40af; display: flex; align-items: center; gap: 6px;">
+                                            <span>➡️ Transfer IMEI <strong style="font-family: monospace; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfdbfe;">${item.imei}</strong> to Branch:</span>
+                                        </div>
+                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: none; border: none; color: #64748b; font-size: 1.1rem; cursor: pointer; font-weight: bold; line-height: 1;" title="Close Transfer">✕</button>
+                                    </div>
 
-                                ${isAvail ? `
-                                    <button type="button" onclick="openTransferModal('${item.id}', '${safeImei}', '${safeModel}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(37,99,235,0.25);" title="වෙනත් Branch එකකට Transfer කරන්න">
-                                        ➡️ Transfer
-                                    </button>
-                                ` : ''}
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+                                        ${quickButtonsHtml}
+                                    </div>
 
-                                <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Edit Item Details">✏️</button>
-
-                                <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #ef4444; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Delete Item">🗑️</button>
-                            </div>
+                                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                        <select id="inlineTargetShop_${item.id}" style="flex: 1; min-width: 180px; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #93c5fd; font-size: 0.84rem; background: white; font-weight: 700; color: #1e293b;">
+                                            ${shopOptionsHtml}
+                                        </select>
+                                        <button type="button" id="inlineConfirmBtn_${item.id}" onclick="confirmInlineTransfer('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 7px 16px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(16,185,129,0.35);">
+                                            ✅ Confirm Transfer
+                                        </button>
+                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: #e2e8f0; color: #475569; border: none; padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.82rem; cursor: pointer;">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 });
@@ -5543,7 +5604,7 @@
                     </div>
 
                     <!-- IMEIs List in this Batch -->
-                    <div style="max-height: 280px; overflow-y: auto; padding-right: 2px;">
+                    <div style="max-height: 340px; overflow-y: auto; padding-right: 2px;">
                         ${imeiListHtml}
                     </div>
                 `;
@@ -5557,6 +5618,67 @@
                         No IMEI numbers matching your filter / search criteria.
                     </div>
                 `;
+            }
+        };
+
+        // Inline Transfer Controls inside Stock Batch Modal
+        window.toggleInlineTransfer = function(itemId) {
+            const drawer = document.getElementById('inlineTransfer_' + itemId);
+            if (!drawer) return;
+            const isHidden = (drawer.style.display === 'none' || !drawer.style.display);
+            drawer.style.display = isHidden ? 'block' : 'none';
+        };
+
+        window.setInlineTargetShop = function(itemId, shopName) {
+            const sel = document.getElementById('inlineTargetShop_' + itemId);
+            if (sel) {
+                sel.value = shopName;
+                sel.style.borderColor = '#2563eb';
+                sel.style.backgroundColor = '#f0fdf4';
+                setTimeout(() => {
+                    if (sel) sel.style.backgroundColor = 'white';
+                }, 300);
+            }
+        };
+
+        window.confirmInlineTransfer = async function(docId, imei, groupKey) {
+            const sel = document.getElementById('inlineTargetShop_' + docId);
+            if (!sel || !sel.value) {
+                return showToast("කරුණාකර Phone එක Transfer කළ යුතු Branch එක තෝරන්න (Please select target branch)", "warning");
+            }
+            const targetShop = sel.value.trim();
+            const btn = document.getElementById('inlineConfirmBtn_' + docId);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Transferring...';
+            }
+
+            try {
+                await updateDoc(doc(db, "inventory", docId), {
+                    shop: targetShop,
+                    transferredAt: Date.now()
+                });
+
+                const localItem = (allInventoryItems || []).find(i => i.id === docId);
+                if (localItem) {
+                    localItem.shop = targetShop;
+                }
+
+                showToast(`✅ IMEI ${imei} සාර්ථකව ${targetShop} වෙත Transfer කරන ලදී!`, "success");
+
+                filterInventoryTable();
+
+                const targetKey = groupKey || window.currentOpenGroupKey;
+                if (targetKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    openModelBatchModal(targetKey);
+                }
+            } catch (err) {
+                console.error("Inline transfer error:", err);
+                showToast("Transfer failed: " + err.message, "error");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '✅ Confirm Transfer';
+                }
             }
         };
 
