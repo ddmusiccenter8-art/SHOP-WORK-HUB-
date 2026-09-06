@@ -778,6 +778,29 @@
             text-decoration: line-through;
         }
 
+        .batch-imei-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.55rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .batch-imei-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+        }
+        .batch-imei-card.sold {
+            background: #f8fafc;
+            opacity: 0.65;
+        }
+
         .nic-tracker-filter-btn {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(8px);
@@ -2127,6 +2150,7 @@
             <div style="margin-bottom: 1.5rem;">
                 <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Target Shop / Branch Location</label>
                 <input type="text" id="transferShopInput" list="shopDatalist" autocomplete="off" required placeholder="Select or enter branch name...">
+                <div id="transferQuickShops" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
             </div>
             
             <button id="confirmTransferBtn" class="action-btn" style="width: 100%; background: var(--primary);">Confirm Transfer</button>
@@ -2230,6 +2254,36 @@
                     <button type="button" id="batchModalAddMoreBtn" style="background: linear-gradient(135deg, var(--primary) 0%, #cc0000 100%); color: white; border: none; padding: 0.45rem 0.95rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 12px rgba(229,0,0,0.25);">
                         ➕ Add More Stock / Batch
                     </button>
+                </div>
+            </div>
+
+            <!-- Branch Distribution & Action Strip -->
+            <div id="batchModalBranchSummary" style="margin-bottom: 1.1rem; padding: 0.85rem 1.1rem; background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div id="batchModalBranchBadges" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <!-- Shop location pills dynamically rendered here -->
+                </div>
+                <div id="batchModalBulkActionBtnContainer">
+                    <!-- Recall all branch phones button if branch items exist -->
+                </div>
+            </div>
+
+            <!-- Inner Modal Search & Filter Bar -->
+            <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1.1rem; background: #ffffff; padding: 0.65rem 0.9rem; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">🔍</span>
+                    <input type="text" id="batchModalSearchInput" oninput="filterBatchModalItems()" placeholder="Search IMEI or Branch name..." style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.82rem;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <select id="batchModalLocationFilter" onchange="filterBatchModalItems()" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.82rem; font-weight: 600; background: #fff;">
+                        <option value="ALL">📍 All Locations</option>
+                        <option value="MAIN SHOP">🏢 Head Office (MAIN SHOP)</option>
+                        <option value="BRANCHES">📍 All Branches</option>
+                    </select>
+                    <select id="batchModalStatusFilter" onchange="filterBatchModalItems()" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.82rem; font-weight: 600; background: #fff;">
+                        <option value="ALL">All Status</option>
+                        <option value="Available" selected>🟢 Available Only</option>
+                        <option value="Sold">⚪ Sold / Out</option>
+                    </select>
                 </div>
             </div>
 
@@ -2487,6 +2541,10 @@
                 setTimeout(() => renderMainShopProfitView(), 50);
             } else if (tabName === 'nicClear' && typeof renderNicClearTrackerView === 'function') {
                 setTimeout(() => renderNicClearTrackerView(), 50);
+            } else if (tabName === 'inventory') {
+                if (typeof switchStockViewMode === 'function') {
+                    switchStockViewMode('grouped');
+                }
             }
         };
 
@@ -4900,18 +4958,18 @@
         };
 
         // Inventory View Mode (Grouped Catalog vs Flat IMEI Table)
-        let currentInventoryViewMode = localStorage.getItem('inventoryViewMode') || 'grouped';
+        let currentInventoryViewMode = 'grouped';
 
         window.switchStockViewMode = function(mode) {
-            currentInventoryViewMode = mode;
-            localStorage.setItem('inventoryViewMode', mode);
+            currentInventoryViewMode = mode || 'grouped';
+            localStorage.setItem('inventoryViewMode', currentInventoryViewMode);
 
             const grpBtn = document.getElementById('stockViewGroupedBtn');
             const flatBtn = document.getElementById('stockViewFlatBtn');
             const grpContainer = document.getElementById('inventoryGroupedContainer');
             const tableContainer = document.getElementById('inventoryTableContainer');
 
-            if (mode === 'grouped') {
+            if (currentInventoryViewMode === 'grouped') {
                 if (grpBtn) grpBtn.classList.add('active');
                 if (flatBtn) flatBtn.classList.remove('active');
                 if (grpContainer) grpContainer.style.display = 'block';
@@ -5044,6 +5102,8 @@
             sortedGroups.forEach(grp => {
                 // Group items inside this model into Batches based on distinct (buyPrice + '_' + mrp + '_' + category)
                 const batchMap = new Map();
+                const branchCounts = {};
+
                 grp.items.forEach(item => {
                     const buyPrice = parseFloat(item.buyPrice || 0);
                     const mrp = parseFloat(item.mrp || 0);
@@ -5068,6 +5128,8 @@
                     b.items.push(item);
                     if (item.status === 'Available') {
                         b.availableCount++;
+                        const s = (item.shop || 'MAIN SHOP').trim();
+                        branchCounts[s] = (branchCounts[s] || 0) + 1;
                     } else {
                         b.soldCount++;
                     }
@@ -5097,14 +5159,21 @@
                 if (availableMrps.length === 1) {
                     mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()}`;
                 } else if (availableMrps.length > 1) {
-                    mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()} - Rs. ${availableMrps[availableMrps.length - 1].toLocaleString()}`;
+                    mrpLabel = `MRP: Rs. ${availableMrps[availableMrps.length - 1].toLocaleString()}`;
                 } else {
                     mrpLabel = 'MRP: -';
                 }
 
-                // Locations list
-                const locationList = Array.from(new Set(grp.items.map(i => i.shop || 'MAIN SHOP'))).slice(0, 3);
-                const locationStr = locationList.join(', ') + (locationList.length > 3 ? '...' : '');
+                // Branch distribution tags
+                let branchTags = [];
+                Object.keys(branchCounts).forEach(bName => {
+                    const cnt = branchCounts[bName];
+                    if (bName.toUpperCase() === 'MAIN SHOP') {
+                        branchTags.push(`<span style="background: rgba(16, 185, 129, 0.12); color: #047857; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 0.76rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;">🏢 Head Office: ${cnt}</span>`);
+                    } else {
+                        branchTags.push(`<span style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 0.76rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">📍 ${bName}: ${cnt}</span>`);
+                    }
+                });
 
                 const isDialogLesi = (grp.category === 'Dialog Lesi Pay');
                 const safeModelKey = grp.key.replace(/'/g, "\\'");
@@ -5134,8 +5203,10 @@
                                 <span style="color: #ef4444; font-weight: 700;">${costLabel}</span>
                                 <span style="color: #cbd5e1;">|</span>
                                 <span style="color: #2563eb; font-weight: 700;">${mrpLabel}</span>
-                                <span style="color: #cbd5e1;">|</span>
-                                <span style="color: var(--text-muted); font-size: 0.8rem;">📍 ${locationStr}</span>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 0.45rem; flex-wrap: wrap;">
+                                ${branchTags.length > 0 ? branchTags.join(' ') : '<span style="font-size:0.75rem; color:var(--text-muted);">No active stock</span>'}
                             </div>
                         </div>
 
@@ -5151,15 +5222,15 @@
 
                     <!-- Actions Strip -->
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(226, 232, 240, 0.9); padding-top: 0.65rem; margin-top: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">
-                            📂 Click to view all ${grp.availableCount} IMEIs & Batches ➔
+                        <span style="font-size: 0.78rem; color: #2563eb; font-weight: 700;">
+                            👉 Click to view ${grp.availableCount} IMEIs, Branches & Transfer / Recall ➔
                         </span>
                         <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
                             <button type="button" onclick="quickAddBatchToModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Add new batch for this phone model">
                                 ➕ Add New Batch
                             </button>
                             <button type="button" onclick="openModelBatchModal('${safeModelKey}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.85rem; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.3);">
-                                👁️ View IMEIs (${grp.availableCount})
+                                👁️ View IMEIs & Branches (${grp.availableCount})
                             </button>
                         </div>
                     </div>
@@ -5169,76 +5240,45 @@
             });
         }
 
-        // Render Flat Table View (Classic view for individual IMEI inspection)
-        function renderFlatInventoryTable(filteredItems) {
-            const tbody = document.getElementById('inventoryTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            filteredItems.forEach((data) => {
-                const tr = document.createElement('tr');
-                
-                let badge = data.status === 'Available' 
-                    ? '<span class="badge badge-confirmed">Available</span>' 
-                    : '<span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">' + (data.status || 'Sold') + '</span>';
-                
-                let location = data.shop || '-';
-                let isDialogLesi = (data.category === 'Dialog Lesi Pay');
-                let catLabel = isDialogLesi
-                    ? '<span style="color: #3b82f6; font-weight:600;">📱 Dialog Lesi Pay</span>'
-                    : '<span style="color: #10b981; font-weight:600;">🟢 Head Office Stock</span>';
-                
-                let costParts = [];
-                if (data.buyPrice && parseFloat(data.buyPrice) > 0) {
-                    costParts.push(`<span style="font-size:0.78rem; color:#ef4444; font-weight:600;">Cost: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>`);
-                }
-                if (data.mrp && parseFloat(data.mrp) > 0) {
-                    costParts.push(`<span style="font-size:0.78rem; color:#2563eb; font-weight:600;">MRP: Rs. ${parseFloat(data.mrp).toLocaleString()}</span>`);
-                } else if (isDialogLesi && data.buyPrice && costParts.length === 0) {
-                    costParts.push(`<span style="font-size:0.78rem; color:#2563eb; font-weight:600;">MRP: Rs. ${parseFloat(data.buyPrice).toLocaleString()}</span>`);
-                }
-
-                let costStr = costParts.length > 0 ? `<br>${costParts.join(' | ')}` : '';
-
-                tr.onclick = function() { selectInventoryRow(this); };
-                tr.style.cursor = "pointer";
-                tr.classList.add("inventory-row");
-                
-                const safeModel = (data.model || '').replace(/'/g, "\\'");
-                const safeStorage = (data.storage || '').replace(/'/g, "\\'");
-                const safeCategory = (data.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
-
-                tr.innerHTML = `
-                    <td><strong>${data.imei}</strong></td>
-                    <td><strong>${data.model || '-'}</strong> - <span style="color:#7c3aed; font-weight:600;">${data.storage || '-'}</span></td>
-                    <td>${catLabel}${costStr}</td>
-                    <td><span style="color: var(--accent-purple); font-weight: 600;">${location}</span></td>
-                    <td>${badge}</td>
-                    <td>
-                        <button onclick="event.stopPropagation(); openEditInventoryModal('${data.id}', '${data.imei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${data.buyPrice || ''}', '${data.mrp || ''}')" style="background: transparent; border: none; color: #f59e0b; cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Edit Stock">
-                            ✏️
-                        </button>
-                        <button onclick="event.stopPropagation(); openTransferModal('${data.id}', '${data.imei}', '${safeModel}')" style="background: transparent; border: none; color: var(--info); cursor: pointer; padding: 4px; margin-right: 8px; font-size: 1.1rem;" title="Transfer Stock">
-                            🔄
-                        </button>
-                        <button onclick="event.stopPropagation(); deleteInventoryItem('${data.id}', '${data.imei}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px; font-size: 1.1rem;" title="Remove Stock">
-                            🗑️
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+        window.currentOpenGroupKey = null;
 
         // Open Model Batch & IMEI Explorer Modal
         window.openModelBatchModal = function(groupKey) {
-            const grp = window.currentModelGroupsMap ? window.currentModelGroupsMap.get(groupKey) : null;
+            window.currentOpenGroupKey = groupKey;
+            let grp = window.currentModelGroupsMap ? window.currentModelGroupsMap.get(groupKey) : null;
+            
+            // Fallback: search in allInventoryItems if not found in current map
+            if (!grp && Array.isArray(allInventoryItems) && allInventoryItems.length > 0) {
+                const parts = groupKey.split('___');
+                const mTarget = parts[0];
+                const sTarget = parts[1] || '';
+                const matchedItems = allInventoryItems.filter(i => 
+                    (i.model || '').trim().toLowerCase() === mTarget &&
+                    (i.storage || '').trim().toLowerCase() === sTarget
+                );
+                if (matchedItems.length > 0) {
+                    const first = matchedItems[0];
+                    grp = {
+                        key: groupKey,
+                        model: (first.model || 'Unknown').trim(),
+                        storage: (first.storage || 'Standard').trim(),
+                        category: first.category || 'Main Shop (Own Buy)',
+                        items: matchedItems,
+                        availableItems: matchedItems.filter(i => i.status === 'Available'),
+                        soldItems: matchedItems.filter(i => i.status !== 'Available'),
+                        batches: []
+                    };
+                }
+            }
+
             if (!grp) return;
 
             document.getElementById('batchModalModelTitle').innerText = grp.model;
             document.getElementById('batchModalStorageBadge').innerText = '💾 ' + grp.storage;
             document.getElementById('batchModalCategoryBadge').innerText = grp.category;
-            document.getElementById('batchModalAvailableBadge').innerText = `${grp.availableCount} Available (${grp.soldCount} Sold)`;
+            const availCount = grp.availableItems ? grp.availableItems.length : (grp.availableCount || 0);
+            const sldCount = grp.soldItems ? grp.soldItems.length : (grp.soldCount || 0);
+            document.getElementById('batchModalAvailableBadge').innerText = `${availCount} Available (${sldCount} Sold)`;
 
             const addBtn = document.getElementById('batchModalAddMoreBtn');
             if (addBtn) {
@@ -5250,14 +5290,180 @@
                 };
             }
 
+            // Populate Location Breakdown & Bulk Action
+            const branchBadgesContainer = document.getElementById('batchModalBranchBadges');
+            const bulkActionContainer = document.getElementById('batchModalBulkActionBtnContainer');
+            const locationSelect = document.getElementById('batchModalLocationFilter');
+
+            const branchCounts = {};
+            let branchAvailableCount = 0;
+            const uniqueLocations = new Set();
+
+            const allItems = grp.items || [];
+            allItems.forEach(item => {
+                const s = (item.shop || 'MAIN SHOP').trim();
+                uniqueLocations.add(s);
+                if (item.status === 'Available') {
+                    branchCounts[s] = (branchCounts[s] || 0) + 1;
+                    if (s.toUpperCase() !== 'MAIN SHOP') {
+                        branchAvailableCount++;
+                    }
+                }
+            });
+
+            if (branchBadgesContainer) {
+                let badgesHtml = '<strong style="font-size: 0.8rem; color: #475569;">Stock Locations:</strong> ';
+                Object.keys(branchCounts).forEach(bName => {
+                    const cnt = branchCounts[bName];
+                    if (bName.toUpperCase() === 'MAIN SHOP') {
+                        badgesHtml += `<span style="background: rgba(16,185,129,0.15); color: #047857; border: 1px solid rgba(16,185,129,0.3); font-size: 0.78rem; font-weight: 700; padding: 3px 9px; border-radius: 8px;">🏢 MAIN SHOP: ${cnt}</span> `;
+                    } else {
+                        badgesHtml += `<span style="background: rgba(245,158,11,0.15); color: #b45309; border: 1px solid rgba(245,158,11,0.4); font-size: 0.78rem; font-weight: 800; padding: 3px 9px; border-radius: 8px;">📍 ${bName}: ${cnt}</span> `;
+                    }
+                });
+                branchBadgesContainer.innerHTML = badgesHtml;
+            }
+
+            if (bulkActionContainer) {
+                const safeKey = groupKey.replace(/'/g, "\\'");
+                if (branchAvailableCount > 0) {
+                    bulkActionContainer.innerHTML = `
+                        <button type="button" onclick="recallAllBranchItemsOfModel('${safeKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.42rem 0.95rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(16,185,129,0.3);" title="Recall all branch phones back to Head Office">
+                            🔄 Recall All Branch Phones to Head Office (${branchAvailableCount})
+                        </button>
+                    `;
+                } else {
+                    bulkActionContainer.innerHTML = `<span style="font-size: 0.76rem; color: #10b981; font-weight: 700;">✅ All available units are at Head Office</span>`;
+                }
+            }
+
+            // Populate Location Filter Dropdown
+            if (locationSelect) {
+                const currentFilterVal = locationSelect.value;
+                let optHtml = '<option value="ALL">📍 All Locations</option>';
+                optHtml += '<option value="MAIN SHOP">🏢 Head Office (MAIN SHOP)</option>';
+                optHtml += '<option value="BRANCHES">📍 All Branches Combined</option>';
+                Array.from(uniqueLocations).filter(l => l.toUpperCase() !== 'MAIN SHOP').sort().forEach(loc => {
+                    optHtml += `<option value="${loc}">📍 ${loc}</option>`;
+                });
+                locationSelect.innerHTML = optHtml;
+                if (Array.from(uniqueLocations).includes(currentFilterVal) || currentFilterVal === 'ALL' || currentFilterVal === 'BRANCHES') {
+                    locationSelect.value = currentFilterVal;
+                } else {
+                    locationSelect.value = 'ALL';
+                }
+            }
+
+            renderBatchModalContent(groupKey);
+            document.getElementById('stockBatchModal').style.display = 'flex';
+        };
+
+        window.filterBatchModalItems = function() {
+            if (window.currentOpenGroupKey) {
+                renderBatchModalContent(window.currentOpenGroupKey);
+            }
+        };
+
+        // Render Batches and IMEIs content based on inner search/filter
+        window.renderBatchModalContent = function(groupKey) {
+            let grp = window.currentModelGroupsMap ? window.currentModelGroupsMap.get(groupKey) : null;
+            if (!grp && Array.isArray(allInventoryItems)) {
+                const parts = groupKey.split('___');
+                const matchedItems = allInventoryItems.filter(i => 
+                    (i.model || '').trim().toLowerCase() === parts[0] &&
+                    (i.storage || '').trim().toLowerCase() === (parts[1] || '')
+                );
+                if (matchedItems.length > 0) {
+                    const first = matchedItems[0];
+                    grp = {
+                        key: groupKey,
+                        model: (first.model || 'Unknown').trim(),
+                        storage: (first.storage || 'Standard').trim(),
+                        category: first.category || 'Main Shop (Own Buy)',
+                        items: matchedItems,
+                        availableItems: matchedItems.filter(i => i.status === 'Available'),
+                        soldItems: matchedItems.filter(i => i.status !== 'Available')
+                    };
+                }
+            }
+            if (!grp) return;
+
             const batchesContainer = document.getElementById('batchModalBatchesList');
+            if (!batchesContainer) return;
             batchesContainer.innerHTML = '';
 
+            const searchVal = (document.getElementById('batchModalSearchInput')?.value || '').toLowerCase().trim();
+            const locFilter = document.getElementById('batchModalLocationFilter')?.value || 'ALL';
+            const statusFilter = document.getElementById('batchModalStatusFilter')?.value || 'ALL';
+
+            // Rebuild batch structure from all items
+            const batchMap = new Map();
+            (grp.items || []).forEach(item => {
+                const buyPrice = parseFloat(item.buyPrice || 0);
+                const mrp = parseFloat(item.mrp || 0);
+                const cat = item.category || 'Main Shop (Own Buy)';
+                const bKey = `${buyPrice}_${mrp}_${cat}`;
+
+                if (!batchMap.has(bKey)) {
+                    batchMap.set(bKey, {
+                        batchKey: bKey,
+                        buyPrice: buyPrice,
+                        mrp: mrp,
+                        category: cat,
+                        items: [],
+                        availableCount: 0,
+                        soldCount: 0,
+                        locations: new Set()
+                    });
+                }
+
+                const b = batchMap.get(bKey);
+                b.items.push(item);
+                if (item.status === 'Available') b.availableCount++;
+                else b.soldCount++;
+                if (item.shop) b.locations.add(item.shop.trim());
+            });
+
+            const batches = Array.from(batchMap.values());
+            let totalMatchingItems = 0;
+
+            const safeModelKey = grp.key ? grp.key.replace(/'/g, "\\'") : groupKey.replace(/'/g, "\\'");
             const safeModel = grp.model.replace(/'/g, "\\'");
             const safeStorage = grp.storage.replace(/'/g, "\\'");
-            const safeCategory = grp.category.replace(/'/g, "\\'");
+            const safeCategory = (grp.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
 
-            grp.batches.forEach((b, bIdx) => {
+            batches.forEach((b, bIdx) => {
+                // Filter items in this batch
+                const filteredBatchItems = b.items.filter(item => {
+                    const iShop = (item.shop || 'MAIN SHOP').trim();
+                    const isMainShop = (iShop.toUpperCase() === 'MAIN SHOP');
+
+                    // Location filter
+                    if (locFilter === 'MAIN SHOP' && !isMainShop) return false;
+                    if (locFilter === 'BRANCHES' && isMainShop) return false;
+                    if (locFilter !== 'ALL' && locFilter !== 'MAIN SHOP' && locFilter !== 'BRANCHES' && iShop.toLowerCase() !== locFilter.toLowerCase()) {
+                        return false;
+                    }
+
+                    // Status filter
+                    if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
+
+                    // Search input filter
+                    if (searchVal) {
+                        const imeiStr = (item.imei || '').toLowerCase();
+                        const shopStr = iShop.toLowerCase();
+                        const statusStr = (item.status || '').toLowerCase();
+                        if (!imeiStr.includes(searchVal) && !shopStr.includes(searchVal) && !statusStr.includes(searchVal)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+
+                if (filteredBatchItems.length === 0) return;
+                totalMatchingItems += filteredBatchItems.length;
+
                 const batchCard = document.createElement('div');
                 batchCard.className = 'batch-card';
 
@@ -5265,18 +5471,49 @@
                 const mrpStr = b.mrp > 0 ? `Rs. ${b.mrp.toLocaleString()}` : '-';
                 const locStr = Array.from(b.locations).join(', ') || 'MAIN SHOP';
 
-                let imeiChipsHtml = '';
-                b.items.forEach(item => {
+                let imeiListHtml = '';
+                filteredBatchItems.forEach(item => {
                     const isAvail = (item.status === 'Available');
                     const safeImei = (item.imei || '').replace(/'/g, "\\'");
-                    imeiChipsHtml += `
-                        <div class="imei-badge-pill ${!isAvail ? 'sold' : ''}">
-                            <span>${item.imei}</span>
-                            <span style="font-size:0.68rem; padding:1px 6px; border-radius:4px; ${isAvail ? 'background:#dcfce7; color:#15803d; font-weight:700;' : 'background:#f1f5f9; color:#94a3b8;'}">${item.status || 'Available'}</span>
-                            <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
-                            <button type="button" onclick="openTransferModal('${item.id}', '${safeImei}', '${safeModel}')" style="background:none; border:none; cursor:pointer; padding:0; color:#2563eb; font-size:0.85rem;" title="Transfer Stock">🔄</button>
-                            <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background:none; border:none; cursor:pointer; padding:0; color:#f59e0b; font-size:0.85rem;" title="Edit Item">✏️</button>
-                            <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; color:#ef4444; font-size:0.85rem;" title="Delete Item">🗑️</button>
+                    const iShop = (item.shop || 'MAIN SHOP').trim();
+                    const isBranchItem = (iShop.toUpperCase() !== 'MAIN SHOP');
+
+                    let locBadge = isBranchItem
+                        ? `<span style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800; font-size: 0.8rem; padding: 3px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">📍 ${iShop}</span>`
+                        : `<span style="background: rgba(16, 185, 129, 0.12); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.8rem; padding: 3px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">🏢 MAIN SHOP (Head Office)</span>`;
+
+                    let statusBadge = isAvail
+                        ? `<span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">Available</span>`
+                        : `<span style="background: #f1f5f9; color: #64748b; font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">${item.status || 'Sold'}</span>`;
+
+                    imeiListHtml += `
+                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}">
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
+                                    <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
+                                </div>
+                                <div>${locBadge}</div>
+                                <div>${statusBadge}</div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                ${isBranchItem && isAvail ? `
+                                    <button type="button" onclick="recallInventoryItemToHeadOffice('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(16,185,129,0.25);" title="නැවත අපේ Head Office (MAIN SHOP) වෙත ගෙන්වා ගන්න">
+                                        🔄 Recall to Head Office
+                                    </button>
+                                ` : ''}
+
+                                ${isAvail ? `
+                                    <button type="button" onclick="openTransferModal('${item.id}', '${safeImei}', '${safeModel}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(37,99,235,0.25);" title="වෙනත් Branch එකකට Transfer කරන්න">
+                                        ➡️ Transfer
+                                    </button>
+                                ` : ''}
+
+                                <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Edit Item Details">✏️</button>
+
+                                <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #ef4444; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Delete Item">🗑️</button>
+                            </div>
                         </div>
                     `;
                 });
@@ -5289,7 +5526,7 @@
                             <span style="font-size: 0.76rem; color: var(--text-muted);">📍 ${locStr}</span>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669;">${b.availableCount} Available (${b.soldCount} Sold)</span>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669;">${filteredBatchItems.length} Matching Items</span>
                             <button type="button" onclick="openEditBatchPriceModal('${safeModel}', '${safeStorage}', '${b.buyPrice}', '${b.mrp}', '${safeCategory}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;" title="Update prices for this entire batch">
                                 ✏️ Edit Batch Price
                             </button>
@@ -5305,19 +5542,106 @@
                         </div>
                     </div>
 
-                    <!-- IMEIs Pills in this Batch -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 220px; overflow-y: auto;">
-                        ${imeiChipsHtml}
+                    <!-- IMEIs List in this Batch -->
+                    <div style="max-height: 280px; overflow-y: auto; padding-right: 2px;">
+                        ${imeiListHtml}
                     </div>
                 `;
 
                 batchesContainer.appendChild(batchCard);
             });
 
-            document.getElementById('stockBatchModal').style.display = 'flex';
+            if (totalMatchingItems === 0) {
+                batchesContainer.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                        No IMEI numbers matching your filter / search criteria.
+                    </div>
+                `;
+            }
+        };
+
+        // Recall a specific phone IMEI back to Head Office (MAIN SHOP)
+        window.recallInventoryItemToHeadOffice = async function(docId, imei, groupKey) {
+            if (!confirm(`Are you sure you want to recall phone IMEI ${imei} back to Head Office (MAIN SHOP)?\n\nමෙම දුරකථනය (IMEI: ${imei}) නැවත අපේ Head Office (MAIN SHOP) වෙත ගෙන්වා ගැනීමට තහවුරු කරන්න.`)) {
+                return;
+            }
+            try {
+                await updateDoc(doc(db, "inventory", docId), {
+                    shop: 'MAIN SHOP',
+                    status: 'Available',
+                    recalledAt: Date.now()
+                });
+                showToast(`✅ Phone (IMEI: ${imei}) recalled to Head Office!`, "success");
+
+                const item = (allInventoryItems || []).find(i => i.id === docId);
+                if (item) {
+                    item.shop = 'MAIN SHOP';
+                    item.status = 'Available';
+                }
+                filterInventoryTable();
+                const targetKey = groupKey || window.currentOpenGroupKey;
+                if (targetKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    openModelBatchModal(targetKey);
+                }
+            } catch (err) {
+                console.error("Recall error:", err);
+                showToast("Failed to recall item: " + err.message, "error");
+            }
+        };
+
+        // Bulk Recall all branch phones of this model back to Head Office
+        window.recallAllBranchItemsOfModel = async function(groupKey) {
+            let grp = window.currentModelGroupsMap ? window.currentModelGroupsMap.get(groupKey) : null;
+            if (!grp && Array.isArray(allInventoryItems)) {
+                const parts = groupKey.split('___');
+                const matched = allInventoryItems.filter(i => 
+                    (i.model || '').trim().toLowerCase() === parts[0] &&
+                    (i.storage || '').trim().toLowerCase() === (parts[1] || '')
+                );
+                grp = { items: matched, model: parts[0], storage: parts[1] || '' };
+            }
+            if (!grp) return;
+
+            const branchItems = (grp.items || []).filter(i => 
+                i.status === 'Available' &&
+                (i.shop || '').trim().toUpperCase() !== 'MAIN SHOP' &&
+                (i.shop || '').trim() !== ''
+            );
+
+            if (branchItems.length === 0) {
+                return showToast("No branch-allocated phones found to recall.", "info");
+            }
+
+            if (!confirm(`Recall all ${branchItems.length} branch-allocated phones of ${grp.model} (${grp.storage}) back to Head Office (MAIN SHOP)?\n\nමෙම Model එකේ Branches වල ඇති සියලුම දුරකථන (${branchItems.length}) නැවත Head Office එකට ගෙන්වා ගැනීමට තහවුරු කරන්න.`)) {
+                return;
+            }
+
+            try {
+                const promises = branchItems.map(item => updateDoc(doc(db, "inventory", item.id), {
+                    shop: 'MAIN SHOP',
+                    status: 'Available',
+                    recalledAt: Date.now()
+                }));
+                await Promise.all(promises);
+
+                branchItems.forEach(item => {
+                    item.shop = 'MAIN SHOP';
+                    item.status = 'Available';
+                });
+
+                showToast(`✅ Successfully recalled ${branchItems.length} phones to Head Office!`, "success");
+                filterInventoryTable();
+                if (document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    openModelBatchModal(groupKey);
+                }
+            } catch (err) {
+                console.error("Bulk recall error:", err);
+                showToast("Failed to recall items: " + err.message, "error");
+            }
         };
 
         window.closeStockBatchModal = function() {
+            window.currentOpenGroupKey = null;
             document.getElementById('stockBatchModal').style.display = 'none';
         };
 
@@ -5733,6 +6057,29 @@
             currentTransferDocId = docId;
             document.getElementById('transferItemName').innerText = `Item: ${model} (IMEI: ${imei})`;
             document.getElementById('transferShopInput').value = '';
+
+            const quickContainer = document.getElementById('transferQuickShops');
+            if (quickContainer) {
+                quickContainer.innerHTML = '';
+                const shopNames = new Set();
+                shopNames.add('MAIN SHOP');
+                if (Array.isArray(registeredShopsList)) {
+                    registeredShopsList.forEach(s => {
+                        if (s.name) shopNames.add(s.name.trim());
+                    });
+                }
+                shopNames.forEach(sName => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.innerText = (sName === 'MAIN SHOP') ? '🏢 Head Office (MAIN SHOP)' : '📍 ' + sName;
+                    btn.style.cssText = 'background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; color: #334155;';
+                    btn.onclick = () => {
+                        document.getElementById('transferShopInput').value = sName;
+                    };
+                    quickContainer.appendChild(btn);
+                });
+            }
+
             document.getElementById('transferModal').style.display = 'flex';
         };
 
@@ -5755,7 +6102,17 @@
                 try {
                     await updateDoc(doc(db, "inventory", currentTransferDocId), { shop: targetShop });
                     showToast(`Stock transferred to ${targetShop} successfully!`, "success");
+
+                    const item = (allInventoryItems || []).find(i => i.id === currentTransferDocId);
+                    if (item) {
+                        item.shop = targetShop;
+                    }
                     closeTransferModal();
+                    filterInventoryTable();
+
+                    if (window.currentOpenGroupKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                        setTimeout(() => openModelBatchModal(window.currentOpenGroupKey), 100);
+                    }
                 } catch (e) {
                     console.error("Transfer error:", e);
                     showToast("Failed to transfer stock: " + e.message, "error");
