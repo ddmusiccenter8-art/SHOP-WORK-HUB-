@@ -2287,6 +2287,41 @@
                 </div>
             </div>
 
+            <!-- Bulk Selection & Transfer Bar -->
+            <div id="batchModalBulkTransferToolbar" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px solid #38bdf8; border-radius: 14px; padding: 0.85rem 1.1rem; margin-bottom: 1.1rem; box-shadow: 0 4px 14px rgba(56,189,248,0.12);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <label style="display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-weight: 800; font-size: 0.88rem; color: #0369a1; user-select: none; background: white; padding: 5px 12px; border-radius: 8px; border: 1.5px solid #7dd3fc; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                            <input type="checkbox" id="selectAllBatchImeisCheckbox" onchange="toggleSelectAllBatchImeis(this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #0284c7;">
+                            <span>Select All Available</span>
+                        </label>
+                        <span id="selectedImeisCountBadge" style="background: #94a3b8; color: white; font-weight: 800; font-size: 0.82rem; padding: 4px 12px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">0 Selected</span>
+                        <button type="button" onclick="clearBatchImeiSelections()" id="clearSelectionBtn" style="display: none; background: #e2e8f0; color: #475569; border: none; font-size: 0.76rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                            ✕ Clear Selection
+                        </button>
+                    </div>
+
+                    <!-- Target Branch & Bulk Action Buttons -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: #0369a1;">Target:</span>
+                        <select id="bulkTransferTargetShop" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid #38bdf8; font-size: 0.84rem; font-weight: 700; background: white; color: #0f172a; min-width: 190px;">
+                            <option value="" disabled selected>-- Select Destination Branch --</option>
+                        </select>
+                        <button type="button" id="bulkTransferSubmitBtn" onclick="executeBulkImeiTransfer()" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; font-size: 0.84rem; font-weight: 700; padding: 0.5rem 1.15rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(2,132,199,0.35); transition: all 0.2s; opacity: 0.6;">
+                            ➡️ Transfer Selected (<span id="bulkTransferBtnCount">0</span>)
+                        </button>
+                        <button type="button" id="bulkRecallSubmitBtn" onclick="executeBulkRecallSelectedToHeadOffice()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.84rem; font-weight: 700; padding: 0.5rem 1.05rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(16,185,129,0.3); transition: all 0.2s;" title="Recall selected branch phones to Head Office">
+                            🔄 Recall Selected to Head Office
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Shop Badges for Bulk Selection -->
+                <div id="bulkTransferQuickShops" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 6px; border-top: 1px dashed rgba(56,189,248,0.4);">
+                    <span style="font-size: 0.75rem; color: #0369a1; font-weight: 700;">Quick Select Branch:</span>
+                </div>
+            </div>
+
             <!-- Batches Container -->
             <div id="batchModalBatchesList">
                 <!-- Dynamically rendered batch sections with IMEI chips -->
@@ -5354,6 +5389,50 @@
                 }
             }
 
+            // Initialize bulk selection state for this model
+            window.selectedBatchImeis = new Set();
+            const selectAllCb = document.getElementById('selectAllBatchImeisCheckbox');
+            if (selectAllCb) selectAllCb.checked = false;
+
+            // Populate #bulkTransferTargetShop and #bulkTransferQuickShops
+            const bulkTargetSelect = document.getElementById('bulkTransferTargetShop');
+            const bulkQuickShops = document.getElementById('bulkTransferQuickShops');
+            if (bulkTargetSelect) {
+                const allShopsSet = new Set();
+                allShopsSet.add('MAIN SHOP');
+                if (Array.isArray(registeredShopsList)) {
+                    registeredShopsList.forEach(s => {
+                        if (s.name && s.name.trim()) allShopsSet.add(s.name.trim());
+                    });
+                }
+                if (Array.isArray(allInventoryItems)) {
+                    allInventoryItems.forEach(i => {
+                        if (i.shop && i.shop.trim()) allShopsSet.add(i.shop.trim());
+                    });
+                }
+
+                let optHtml = '<option value="" disabled selected>-- Select Destination Branch --</option>';
+                allShopsSet.forEach(sName => {
+                    const label = (sName === 'MAIN SHOP') ? '🏢 Head Office (MAIN SHOP)' : '📍 ' + sName;
+                    optHtml += `<option value="${sName}">${label}</option>`;
+                });
+                bulkTargetSelect.innerHTML = optHtml;
+
+                if (bulkQuickShops) {
+                    let quickHtml = '<span style="font-size: 0.75rem; color: #0369a1; font-weight: 700;">Quick Select Branch:</span> ';
+                    allShopsSet.forEach(sName => {
+                        const safeS = sName.replace(/'/g, "\\'");
+                        const label = (sName === 'MAIN SHOP') ? '🏢 Head Office' : '📍 ' + sName;
+                        quickHtml += `
+                            <button type="button" onclick="setBulkTargetShop('${safeS}')" style="background: white; border: 1px solid #7dd3fc; border-radius: 6px; padding: 2px 8px; font-size: 0.74rem; font-weight: 700; color: #0369a1; cursor: pointer; transition: all 0.15s;" onmouseover="this.style.background='#e0f2fe'" onmouseout="this.style.background='white'">
+                                ${label}
+                            </button>
+                        `;
+                    });
+                    bulkQuickShops.innerHTML = quickHtml;
+                }
+            }
+
             renderBatchModalContent(groupKey);
             document.getElementById('stockBatchModal').style.display = 'flex';
         };
@@ -5519,10 +5598,15 @@
                     });
 
                     imeiListHtml += `
-                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}" style="flex-direction: column; align-items: stretch;">
+                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}" id="batchImeiCard_${item.id}" style="flex-direction: column; align-items: stretch;">
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
                                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                    <div style="display: flex; align-items: center; gap: 7px;">
+                                        ${isAvail ? `
+                                            <input type="checkbox" class="batch-imei-checkbox" data-id="${item.id}" data-imei="${safeImei}" data-shop="${iShop}" ${window.selectedBatchImeis && window.selectedBatchImeis.has(item.id) ? 'checked' : ''} onchange="onBatchImeiCheckboxChange(this, '${item.id}')" style="width: 19px; height: 19px; cursor: pointer; accent-color: #0284c7;" title="Select for Bulk Transfer">
+                                        ` : `
+                                            <input type="checkbox" disabled style="width: 19px; height: 19px; opacity: 0.35; cursor: not-allowed;" title="Sold item cannot be transferred">
+                                        `}
                                         <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
                                         <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
                                     </div>
@@ -5618,6 +5702,234 @@
                         No IMEI numbers matching your filter / search criteria.
                     </div>
                 `;
+            }
+
+            if (typeof updateBulkTransferUIState === 'function') {
+                updateBulkTransferUIState();
+            }
+        };
+
+        // Bulk Selection & Transfer Logic for Stock Batch Modal
+        window.selectedBatchImeis = new Set();
+
+        window.onBatchImeiCheckboxChange = function(cb, docId) {
+            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
+            if (cb.checked) {
+                window.selectedBatchImeis.add(docId);
+            } else {
+                window.selectedBatchImeis.delete(docId);
+            }
+            updateBulkTransferUIState();
+        };
+
+        window.toggleSelectAllBatchImeis = function(isChecked) {
+            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
+            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
+            allCbs.forEach(cb => {
+                cb.checked = isChecked;
+                const docId = cb.dataset.id;
+                if (isChecked) {
+                    window.selectedBatchImeis.add(docId);
+                } else {
+                    window.selectedBatchImeis.delete(docId);
+                }
+            });
+            updateBulkTransferUIState();
+        };
+
+        window.clearBatchImeiSelections = function() {
+            if (window.selectedBatchImeis) window.selectedBatchImeis.clear();
+            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
+            allCbs.forEach(cb => cb.checked = false);
+            const selectAllCb = document.getElementById('selectAllBatchImeisCheckbox');
+            if (selectAllCb) selectAllCb.checked = false;
+            updateBulkTransferUIState();
+        };
+
+        window.setBulkTargetShop = function(shopName) {
+            const sel = document.getElementById('bulkTransferTargetShop');
+            if (sel) {
+                sel.value = shopName;
+                sel.style.borderColor = '#0284c7';
+                sel.style.backgroundColor = '#f0fdf4';
+                setTimeout(() => {
+                    if (sel) sel.style.backgroundColor = 'white';
+                }, 300);
+            }
+        };
+
+        window.updateBulkTransferUIState = function() {
+            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
+            const count = window.selectedBatchImeis.size;
+
+            const countBadge = document.getElementById('selectedImeisCountBadge');
+            if (countBadge) {
+                countBadge.innerText = `${count} Selected`;
+                countBadge.style.background = count > 0 ? '#0284c7' : '#94a3b8';
+            }
+
+            const btnCount = document.getElementById('bulkTransferBtnCount');
+            if (btnCount) btnCount.innerText = count;
+
+            const transferBtn = document.getElementById('bulkTransferSubmitBtn');
+            if (transferBtn) {
+                if (count > 0) {
+                    transferBtn.style.opacity = '1';
+                    transferBtn.style.boxShadow = '0 4px 12px rgba(2,132,199,0.4)';
+                } else {
+                    transferBtn.style.opacity = '0.6';
+                    transferBtn.style.boxShadow = 'none';
+                }
+            }
+
+            const clearBtn = document.getElementById('clearSelectionBtn');
+            if (clearBtn) {
+                clearBtn.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+
+            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
+            const selectAllCb = document.getElementById('selectAllBatchImeisCheckbox');
+            if (selectAllCb && allCbs.length > 0) {
+                const allChecked = Array.from(allCbs).every(cb => cb.checked);
+                selectAllCb.checked = allChecked;
+            } else if (selectAllCb) {
+                selectAllCb.checked = false;
+            }
+
+            // Visual feedback on the IMEI card when checked
+            allCbs.forEach(cb => {
+                const card = document.getElementById('batchImeiCard_' + cb.dataset.id);
+                if (card) {
+                    if (cb.checked) {
+                        card.style.background = '#f0f9ff';
+                        card.style.borderColor = '#7dd3fc';
+                    } else {
+                        card.style.background = '#ffffff';
+                        card.style.borderColor = 'rgba(226, 232, 240, 0.95)';
+                    }
+                }
+            });
+        };
+
+        window.executeBulkImeiTransfer = async function() {
+            if (!window.selectedBatchImeis || window.selectedBatchImeis.size === 0) {
+                return showToast("කරුණාකර Transfer කිරීමට අවම වශයෙන් එක් IMEI අංකයක් හෝ තෝරන්න (Please select at least 1 phone to transfer)", "warning");
+            }
+
+            const sel = document.getElementById('bulkTransferTargetShop');
+            const targetShop = sel ? sel.value.trim() : '';
+            if (!targetShop) {
+                return showToast("කරුණාකර Phone Transfer කළ යුතු Branch එක තෝරන්න (Please select a destination branch)", "warning");
+            }
+
+            const selectedIds = Array.from(window.selectedBatchImeis);
+            const count = selectedIds.length;
+
+            const confirmMsg = `Are you sure you want to transfer ${count} selected phone(s) to "${targetShop}"?\n\nතෝරාගත් දුරකථන ${count} ක් "${targetShop}" ශාඛාව වෙත එකවර Transfer කිරීමට තහවුරු කරන්න.`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('bulkTransferSubmitBtn');
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `⏳ Transferring ${count}...`;
+            }
+
+            try {
+                const updatePromises = selectedIds.map(docId => updateDoc(doc(db, "inventory", docId), {
+                    shop: targetShop,
+                    transferredAt: Date.now()
+                }));
+
+                await Promise.all(updatePromises);
+
+                selectedIds.forEach(docId => {
+                    const it = (allInventoryItems || []).find(i => i.id === docId);
+                    if (it) it.shop = targetShop;
+                });
+
+                window.selectedBatchImeis.clear();
+
+                showToast(`✅ සාර්ථකයි! තෝරාගත් දුරකථන ${count} ක් ${targetShop} වෙත එකවර Transfer කරන ලදී!`, "success");
+
+                filterInventoryTable();
+
+                const targetKey = window.currentOpenGroupKey;
+                if (targetKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    openModelBatchModal(targetKey);
+                }
+            } catch (err) {
+                console.error("Bulk transfer error:", err);
+                showToast("Bulk transfer failed: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            }
+        };
+
+        window.executeBulkRecallSelectedToHeadOffice = async function() {
+            if (!window.selectedBatchImeis || window.selectedBatchImeis.size === 0) {
+                return showToast("කරුණාකර Recall කිරීමට අවම වශයෙන් එක් IMEI අංකයක් හෝ තෝරන්න (Please select at least 1 phone to recall)", "warning");
+            }
+
+            const selectedIds = Array.from(window.selectedBatchImeis);
+            const branchItemsToRecall = selectedIds.filter(docId => {
+                const it = (allInventoryItems || []).find(i => i.id === docId);
+                return it && (it.shop || '').trim().toUpperCase() !== 'MAIN SHOP' && it.status === 'Available';
+            });
+
+            if (branchItemsToRecall.length === 0) {
+                return showToast("තෝරාගත් දුරකථන සියල්ලම දැනටමත් Head Office (MAIN SHOP) හි ඇත! (All selected phones are already at Head Office)", "info");
+            }
+
+            const count = branchItemsToRecall.length;
+            const confirmMsg = `Recall ${count} selected branch phone(s) back to Head Office (MAIN SHOP)?\n\nතෝරාගත් ශාඛා වල ඇති දුරකථන ${count} ක් නැවත Head Office (MAIN SHOP) වෙත ගෙන්වා ගැනීමට තහවුරු කරන්න.`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('bulkRecallSubmitBtn');
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `⏳ Recalling ${count}...`;
+            }
+
+            try {
+                const updatePromises = branchItemsToRecall.map(docId => updateDoc(doc(db, "inventory", docId), {
+                    shop: 'MAIN SHOP',
+                    status: 'Available',
+                    recalledAt: Date.now()
+                }));
+
+                await Promise.all(updatePromises);
+
+                branchItemsToRecall.forEach(docId => {
+                    const it = (allInventoryItems || []).find(i => i.id === docId);
+                    if (it) {
+                        it.shop = 'MAIN SHOP';
+                        it.status = 'Available';
+                    }
+                });
+
+                window.selectedBatchImeis.clear();
+
+                showToast(`✅ සාර්ථකයි! තෝරාගත් දුරකථන ${count} ක් නැවත Head Office වෙත ගෙන්වා ගන්නා ලදී!`, "success");
+
+                filterInventoryTable();
+
+                const targetKey = window.currentOpenGroupKey;
+                if (targetKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    openModelBatchModal(targetKey);
+                }
+            } catch (err) {
+                console.error("Bulk recall error:", err);
+                showToast("Bulk recall failed: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
             }
         };
 
@@ -5764,6 +6076,7 @@
 
         window.closeStockBatchModal = function() {
             window.currentOpenGroupKey = null;
+            if (window.selectedBatchImeis) window.selectedBatchImeis.clear();
             document.getElementById('stockBatchModal').style.display = 'none';
         };
 
