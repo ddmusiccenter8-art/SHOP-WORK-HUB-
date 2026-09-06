@@ -1418,7 +1418,12 @@
             <div class="responsive-split-grid">
                 <!-- Add Inventory Form -->
                 <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.6rem; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.04); height: fit-content;">
-                    <h2 style="font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 700;">Add Head Office Stock</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                        <h2 style="font-size: 1.2rem; margin: 0; color: var(--text-main); font-weight: 700;">Add Head Office Stock</h2>
+                        <button type="button" onclick="resetInventoryForm()" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); color: #dc2626; padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer;" title="Reset / Clear all fields in form">
+                            🧹 Clear Form
+                        </button>
+                    </div>
                     <form id="inventoryForm">
                         <div style="margin-bottom: 1rem;">
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Stock Category / Source</label>
@@ -1471,7 +1476,10 @@
                             <datalist id="shopDatalist"></datalist>
                         </div>
                         
-                        <button type="submit" id="invSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add to Head Office Inventory</button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button type="submit" id="invSubmitBtn" style="flex: 1; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.92rem; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">Add to Head Office Inventory</button>
+                            <button type="button" onclick="resetInventoryForm()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.95rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem;" title="Clear all fields in form">🧹 Clear</button>
+                        </div>
                     </form>
                 </div>
 
@@ -6471,12 +6479,7 @@
                 await Promise.all(addPromises);
                 showToast(`Successfully added ${scannedImeiList.length} item(s) (${model}) to ${shop}!`, "success");
                 
-                scannedImeiList = [];
-                renderScannedImeiChips();
-                document.getElementById('invImei').value = '';
-                document.getElementById('invBuyPrice').value = '';
-                document.getElementById('invMrpPrice').value = '';
-                document.getElementById('invImei').focus();
+                resetInventoryForm();
             } catch (err) {
                 console.error("Error adding inventory items:", err);
                 showToast("Error adding inventory: " + err.message, "error");
@@ -6485,6 +6488,42 @@
                 btn.disabled = false;
             }
         });
+
+        // Completely Reset & Empty the Add Stock Form
+        window.resetInventoryForm = function() {
+            scannedImeiList = [];
+            renderScannedImeiChips();
+
+            const form = document.getElementById('inventoryForm');
+            if (form) form.reset();
+
+            const imeiInput = document.getElementById('invImei');
+            if (imeiInput) imeiInput.value = '';
+
+            const modelInput = document.getElementById('invModel');
+            if (modelInput) modelInput.value = '';
+
+            const storageInput = document.getElementById('invStorage');
+            if (storageInput) storageInput.value = '';
+
+            const buyPriceInput = document.getElementById('invBuyPrice');
+            if (buyPriceInput) buyPriceInput.value = '';
+
+            const mrpPriceInput = document.getElementById('invMrpPrice');
+            if (mrpPriceInput) mrpPriceInput.value = '';
+
+            const shopInput = document.getElementById('invShop');
+            if (shopInput) shopInput.value = '';
+
+            const catSelect = document.getElementById('invCategory');
+            if (catSelect) catSelect.value = 'Main Shop (Own Buy)';
+
+            if (typeof handleInvCategoryChange === 'function') {
+                handleInvCategoryChange();
+            }
+
+            if (imeiInput) imeiInput.focus();
+        };
 
         // Stock Transfer Logic
         let currentTransferDocId = null;
