@@ -1785,7 +1785,7 @@
                 </div>
 
                 <!-- Instant Matching Results Dropdown -->
-                <div id="nicModalSearchResults" style="display: none; position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; max-height: 240px; overflow-y: auto; background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); z-index: 1100; padding: 4px;">
+                <div id="nicModalSearchResults" style="display: none; position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; max-height: 280px; overflow-y: auto; background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); z-index: 1100; padding: 4px;">
                 </div>
             </div>
 
@@ -6604,13 +6604,28 @@
 
             const searchTerm = (document.getElementById('nicTrackerSearchInput')?.value || '').trim().toLowerCase();
 
-            // All files that are tracked in NIC clearance
+            // All files that are tracked in NIC clearance (Both branch submissions and main shop sales)
+            const mainTracked = (allMainShopSales || []).filter(m => 
+                m.status === 'NIC Clear Pending' || 
+                m.nicClearStatus === 'Pending' || 
+                m.nicClearStatus === 'Completed' || 
+                Boolean(m.oldSpNumber)
+            ).map(m => ({
+                ...m,
+                name: m.custName || m.name || '',
+                nic: m.custNic || m.nic || '',
+                shopId: m.shopId || 'Main Shop'
+            }));
+
+            const existingIds = new Set((allSales || []).map(s => s.linkedMainShopSaleId || s.id));
+            const uniqueMainTracked = mainTracked.filter(m => !existingIds.has(m.id));
+
             const allTrackedSales = (allSales || []).filter(s => 
                 s.status === 'NIC Clear Pending' || 
                 s.nicClearStatus === 'Pending' || 
                 s.nicClearStatus === 'Completed' || 
                 Boolean(s.oldSpNumber)
-            );
+            ).concat(uniqueMainTracked);
 
             // Calculate KPI counts
             const pendingCount = allTrackedSales.filter(s => s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending').length;
@@ -6987,76 +7002,251 @@
             if (results) results.style.display = 'none';
         };
 
+        let currentNicModalSourceFilter = 'ALL';
+
+        window.setNicModalSourceFilter = function(filter) {
+            currentNicModalSourceFilter = filter;
+            const query = document.getElementById('nicModalSearchQuery')?.value || '';
+            searchSalesForNicModal(query);
+        };
+
+        function getUnifiedSalesCandidates() {
+            const list = [];
+            const seenImeis = new Set();
+
+            // 1. From allSales (All branch shop submissions: Loans, Direct Cash Sales, all statuses)
+            (allSales || []).forEach(s => {
+                const sp = (s.spNumber || s.oldSpNumber || '').trim();
+                const custName = (s.name || s.custName || s.customerName || (s.cashSaleDetails && s.cashSaleDetails.custName) || '').trim();
+                const custNic = (s.nic || s.custNic || s.customerNic || '').trim();
+                const imei = (s.imei || '').trim();
+                const model = (s.model || '').trim();
+                const storage = (s.storage || '').trim();
+                const shop = s.shopId ? s.shopId.split('@')[0].toUpperCase() : 'BRANCH SHOP';
+                const date = s.date || (s.timestamp ? new Date(s.timestamp).toISOString().slice(0, 10) : '');
+                const saleType = s.saleType || (s.status === 'Cash Payment Pending' ? 'Cash Sale' : 'Loan');
+                const staff = (s.activator || s.staffName || '').trim();
+                const status = s.status || '';
+                const nicReason = s.nicClearReason || '';
+                const isNicPending = (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
+
+                list.push({
+                    id: s.id,
+                    sourceType: 'sales',
+                    sourceLabel: shop,
+                    sourceTypeBadge: (saleType === 'Cash Sale' || s.status === 'Cash Payment Pending' ? '💵 Cash Sale' : '📱 Branch Loan'),
+                    spNumber: sp,
+                    oldSpNumber: s.oldSpNumber || '',
+                    newSpNumber: s.newSpNumber || '',
+                    custName: custName,
+                    custNic: custNic,
+                    phone: s.phone || s.contact || '',
+                    imei: imei,
+                    model: model,
+                    storage: storage,
+                    shop: shop,
+                    shopId: s.shopId || '',
+                    date: date,
+                    saleType: saleType,
+                    staff: staff,
+                    status: status,
+                    nicClearReason: nicReason,
+                    isNicPending: isNicPending,
+                    timestamp: s.timestamp || (date ? new Date(date).getTime() : 0) || 0
+                });
+
+                if (imei) seenImeis.add(imei.toLowerCase());
+            });
+
+            // 2. From allMainShopSales (Head Office Direct Sales & Dialog Lesi Pay sales)
+            (allMainShopSales || []).forEach(m => {
+                const sp = (m.spNumber || m.oldSpNumber || '').trim();
+                const custName = (m.custName || m.name || '').trim();
+                const custNic = (m.custNic || m.nic || '').trim();
+                const imei = (m.imei || '').trim();
+                const model = (m.model || '').trim();
+                const storage = (m.storage || '').trim();
+                const category = m.category || m.source || 'Main Shop';
+                const date = m.date || (m.timestamp ? new Date(m.timestamp).toISOString().slice(0, 10) : '');
+                const staff = (m.staffName || m.activator || '').trim();
+                const status = m.status || 'Completed';
+                const isNicPending = (m.status === 'NIC Clear Pending' || m.nicClearStatus === 'Pending');
+
+                list.push({
+                    id: m.id,
+                    sourceType: 'main_shop_sales',
+                    sourceLabel: 'MAIN SHOP',
+                    sourceTypeBadge: (category === 'Dialog Lesi Pay' || m.source === 'Dialog Lesi Pay' ? '⚡ Dialog Lesi Pay' : '🏬 Main Direct'),
+                    spNumber: sp,
+                    oldSpNumber: m.oldSpNumber || '',
+                    newSpNumber: m.newSpNumber || '',
+                    custName: custName,
+                    custNic: custNic,
+                    phone: m.phone || '',
+                    imei: imei,
+                    model: model,
+                    storage: storage,
+                    shop: 'MAIN SHOP',
+                    shopId: 'main',
+                    date: date,
+                    saleType: category,
+                    staff: staff,
+                    status: status,
+                    nicClearReason: m.nicClearReason || '',
+                    isNicPending: isNicPending,
+                    timestamp: m.timestamp || (date ? new Date(date).getTime() : 0) || 0
+                });
+
+                if (imei) seenImeis.add(imei.toLowerCase());
+            });
+
+            // 3. From allInventoryItems (Phones in inventory - sold or available)
+            (allInventoryItems || []).forEach(inv => {
+                const imei = (inv.imei || '').trim();
+                if (!imei || seenImeis.has(imei.toLowerCase())) return;
+
+                const shop = inv.shopId ? inv.shopId.split('@')[0].toUpperCase() : 'MAIN';
+                const date = inv.date || (inv.timestamp ? new Date(inv.timestamp).toISOString().slice(0, 10) : '');
+                const model = (inv.model || '').trim();
+                const storage = (inv.storage || '').trim();
+                const status = inv.status || 'Available';
+
+                list.push({
+                    id: inv.id,
+                    sourceType: 'inventory',
+                    sourceLabel: shop,
+                    sourceTypeBadge: `📦 Stock (${status})`,
+                    spNumber: '',
+                    oldSpNumber: '',
+                    newSpNumber: '',
+                    custName: (inv.cashSaleDetails && inv.cashSaleDetails.custName) || '',
+                    custNic: '',
+                    phone: '',
+                    imei: imei,
+                    model: model,
+                    storage: storage,
+                    shop: shop,
+                    shopId: inv.shopId || '',
+                    date: date,
+                    saleType: 'Inventory Item',
+                    staff: inv.soldBy || '',
+                    status: status,
+                    nicClearReason: '',
+                    isNicPending: false,
+                    timestamp: inv.timestamp || (date ? new Date(date).getTime() : 0) || 0
+                });
+            });
+
+            // Sort newest first
+            list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            return list;
+        }
+
         window.searchSalesForNicModal = function(query) {
             const resultsContainer = document.getElementById('nicModalSearchResults');
             if (!resultsContainer) return;
 
+            const candidates = getUnifiedSalesCandidates();
             const q = (query || '').trim().toLowerCase();
             const clearBtn = document.getElementById('clearNicSearchBtn');
             if (clearBtn) {
                 clearBtn.style.display = q ? 'block' : 'none';
             }
 
-            // Exclude direct cash sales since loans are the ones with SP & NIC
-            const candidates = (allSales || []).filter(s => s.saleType !== 'Cash Sale');
+            const totalCount = candidates.length;
+            const branchCount = candidates.filter(c => c.sourceType === 'sales').length;
+            const mainCount = candidates.filter(c => c.sourceType === 'main_shop_sales').length;
+            const invCount = candidates.filter(c => c.sourceType === 'inventory').length;
+
+            // Filter by selected tab
+            let scopedCandidates = candidates;
+            if (currentNicModalSourceFilter === 'BRANCH') {
+                scopedCandidates = candidates.filter(c => c.sourceType === 'sales');
+            } else if (currentNicModalSourceFilter === 'MAIN') {
+                scopedCandidates = candidates.filter(c => c.sourceType === 'main_shop_sales');
+            } else if (currentNicModalSourceFilter === 'INVENTORY') {
+                scopedCandidates = candidates.filter(c => c.sourceType === 'inventory');
+            }
 
             let matches = [];
             if (q) {
-                matches = candidates.filter(s => {
-                    const sp = (s.spNumber || '').toLowerCase();
-                    const oldSp = (s.oldSpNumber || '').toLowerCase();
-                    const imei = (s.imei || '').toLowerCase();
-                    const name = (s.name || '').toLowerCase();
-                    const nic = (s.nic || '').toLowerCase();
-                    const model = (s.model || '').toLowerCase();
-                    const shop = (s.shopId || '').toLowerCase();
-                    return sp.includes(q) || oldSp.includes(q) || imei.includes(q) || name.includes(q) || nic.includes(q) || model.includes(q) || shop.includes(q);
-                }).slice(0, 20);
+                const terms = q.split(/\s+/).filter(t => t.length > 0);
+                matches = scopedCandidates.filter(s => {
+                    const searchString = `${s.spNumber} ${s.oldSpNumber} ${s.newSpNumber} ${s.imei} ${s.custName} ${s.custNic} ${s.phone} ${s.model} ${s.storage} ${s.shop} ${s.staff} ${s.saleType} ${s.sourceTypeBadge}`.toLowerCase();
+                    return terms.every(t => searchString.includes(t));
+                }).slice(0, 40);
             } else {
-                // If query is empty, show the 10 most recent loan submissions
-                matches = candidates.slice(0, 10);
+                // If query is empty, show up to 30 most recent records
+                matches = scopedCandidates.slice(0, 30);
             }
 
+            // Generate source tab filter pills HTML
+            const pillStyle = (filterName) => {
+                const active = currentNicModalSourceFilter === filterName;
+                return `display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s; ${active ? 'background: #2563eb; color: #ffffff; box-shadow: 0 1px 4px rgba(37,99,235,0.3);' : 'background: #f1f5f9; color: #475569;'}`;
+            };
+
+            const headerHtml = `
+                <div style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px 8px 0 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 0.75rem; font-weight: 800; color: #334155;">
+                            ${q ? `🔍 Results (${matches.length})` : `📋 All History Records (${scopedCandidates.length})`}
+                        </span>
+                        <span style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Click card to auto-fill ➔</span>
+                    </div>
+                    <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;">
+                        <span onclick="setNicModalSourceFilter('ALL')" style="${pillStyle('ALL')}">All (${totalCount})</span>
+                        <span onclick="setNicModalSourceFilter('BRANCH')" style="${pillStyle('BRANCH')}">🏢 Branches (${branchCount})</span>
+                        <span onclick="setNicModalSourceFilter('MAIN')" style="${pillStyle('MAIN')}">🏬 Main Shop (${mainCount})</span>
+                        <span onclick="setNicModalSourceFilter('INVENTORY')" style="${pillStyle('INVENTORY')}">📦 Stock (${invCount})</span>
+                    </div>
+                </div>
+            `;
+
             if (matches.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div style="padding: 1.1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-                        🔍 No matching file found for "<strong>${q}</strong>"<br>
-                        <span style="font-size: 0.76rem; color: #94a3b8;">You can still type the details manually in the fields below.</span>
+                resultsContainer.innerHTML = headerHtml + `
+                    <div style="padding: 1.2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                        🔍 No matching records found for "<strong>${q}</strong>"<br>
+                        <span style="font-size: 0.76rem; color: #94a3b8;">You can still type details manually in the fields below.</span>
                     </div>
                 `;
                 resultsContainer.style.display = 'block';
                 return;
             }
 
-            let html = `
-                <div style="padding: 6px 10px; font-size: 0.74rem; font-weight: 700; color: #64748b; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 8px 8px 0 0;">
-                    <span>${q ? `Matching Files (${matches.length})` : 'Recent Submissions (Click to select)'}</span>
-                    <span style="color: #3b82f6;">Click card to auto-fill ➔</span>
-                </div>
-            `;
-
+            let cardsHtml = '';
             matches.forEach(item => {
-                const shopLabel = item.shopId ? item.shopId.split('@')[0].toUpperCase() : 'MAIN';
-                const displaySp = item.spNumber || item.oldSpNumber || 'NO-SP';
-                const isCurrentNicPending = (item.status === 'NIC Clear Pending' || item.nicClearStatus === 'Pending');
+                const displaySp = item.spNumber || item.oldSpNumber || (item.sourceType === 'inventory' ? 'INVENTORY' : 'NO-SP');
+                const isCurrentNicPending = item.isNicPending;
 
-                html += `
-                    <div onclick="selectSaleForNicModal('${item.id}')" style="padding: 0.65rem 0.85rem; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f8fafc; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; gap: 8px;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='transparent'">
+                let badgeColor = '#2563eb';
+                let badgeBg = 'rgba(37,99,235,0.1)';
+                if (item.sourceType === 'main_shop_sales') {
+                    badgeColor = '#7c3aed';
+                    badgeBg = 'rgba(124,58,237,0.1)';
+                } else if (item.sourceType === 'inventory') {
+                    badgeColor = '#059669';
+                    badgeBg = 'rgba(5,150,105,0.1)';
+                }
+
+                cardsHtml += `
+                    <div onclick="selectSaleForNicModal('${item.id}', '${item.sourceType}')" style="padding: 0.65rem 0.85rem; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; gap: 8px;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='transparent'">
                         <div style="text-align: left; min-width: 0; flex: 1;">
                             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 3px;">
-                                <span style="font-family: monospace; font-weight: 800; color: #2563eb; font-size: 0.9rem; background: rgba(59,130,246,0.1); padding: 1px 7px; border-radius: 5px;">
+                                <span style="font-family: monospace; font-weight: 800; color: ${badgeColor}; font-size: 0.88rem; background: ${badgeBg}; padding: 1px 7px; border-radius: 5px;">
                                     ${displaySp}
                                 </span>
                                 <span style="font-size: 0.72rem; color: #64748b; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">${item.date || ''}</span>
-                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--accent-purple);">${shopLabel}</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: #475569; background: #e2e8f0; padding: 1px 6px; border-radius: 4px;">${item.sourceTypeBadge}</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--accent-purple);">${item.shop}</span>
                                 ${isCurrentNicPending ? '<span style="font-size:0.7rem; color:#dc2626; font-weight:800; background:rgba(239,68,68,0.12); padding:1px 5px; border-radius:4px;">Pending NIC</span>' : ''}
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 700;">
-                                👤 ${item.name || 'Unknown'} 
-                                <span style="color: #dc2626; font-family: monospace; font-weight: 800; font-size: 0.84rem; margin-left: 6px;">NIC: ${item.nic || '-'}</span>
+                                👤 ${item.custName || 'Direct / Inventory'} 
+                                ${item.custNic ? `<span style="color: #dc2626; font-family: monospace; font-weight: 800; font-size: 0.84rem; margin-left: 6px;">NIC: ${item.custNic}</span>` : ''}
                             </div>
                             <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                                📱 ${item.model || 'Phone'} ${item.storage ? '(' + item.storage + ')' : ''} | 🔢 <span style="font-family: monospace; color: #334155; font-weight: 600;">IMEI: ${item.imei || '-'}</span>
+                                📱 ${item.model || 'Phone Device'} ${item.storage ? '(' + item.storage + ')' : ''} | 🔢 <span style="font-family: monospace; color: #334155; font-weight: 600;">IMEI: ${item.imei || '-'}</span>
                             </div>
                         </div>
                         <button type="button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 6px rgba(16,185,129,0.3); flex-shrink: 0;">
@@ -7066,28 +7256,53 @@
                 `;
             });
 
-            resultsContainer.innerHTML = html;
+            resultsContainer.innerHTML = headerHtml + cardsHtml;
             resultsContainer.style.display = 'block';
         };
 
-        window.selectSaleForNicModal = function(docId) {
-            const s = (allSales || []).find(item => item.id === docId);
+        window.selectSaleForNicModal = function(docId, sourceType) {
+            let s;
+            if (sourceType === 'main_shop_sales') {
+                s = (allMainShopSales || []).find(item => item.id === docId);
+            } else if (sourceType === 'inventory') {
+                s = (allInventoryItems || []).find(item => item.id === docId);
+            } else {
+                s = (allSales || []).find(item => item.id === docId);
+            }
+
+            if (!s) {
+                s = (allSales || []).find(item => item.id === docId) ||
+                    (allMainShopSales || []).find(item => item.id === docId) ||
+                    (allInventoryItems || []).find(item => item.id === docId);
+            }
             if (!s) return;
 
-            document.getElementById('quickSelectNicDoc').value = docId;
-            document.getElementById('manualNicCustName').value = s.name || '';
-            document.getElementById('manualNicCustNic').value = s.nic || '';
-            document.getElementById('manualNicOldSp').value = s.spNumber || s.oldSpNumber || '';
-            document.getElementById('manualNicShop').value = s.shopId ? s.shopId.split('@')[0].toUpperCase() : '';
-            document.getElementById('manualNicModel').value = s.model || '';
-            document.getElementById('manualNicImei').value = s.imei || '';
+            const quickDocInput = document.getElementById('quickSelectNicDoc');
+            if (quickDocInput) {
+                quickDocInput.value = docId;
+                quickDocInput.dataset.sourceType = sourceType || 'sales';
+            }
+
+            const custName = s.name || s.custName || (s.cashSaleDetails && s.cashSaleDetails.custName) || '';
+            const custNic = s.nic || s.custNic || '';
+            const oldSp = s.spNumber || s.oldSpNumber || '';
+            const shop = s.shopId ? s.shopId.split('@')[0].toUpperCase() : (sourceType === 'main_shop_sales' ? 'MAIN SHOP' : '');
+            const model = s.model || '';
+            const imei = s.imei || '';
+
+            document.getElementById('manualNicCustName').value = custName;
+            document.getElementById('manualNicCustNic').value = custNic;
+            document.getElementById('manualNicOldSp').value = oldSp;
+            document.getElementById('manualNicShop').value = shop;
+            document.getElementById('manualNicModel').value = model;
+            document.getElementById('manualNicImei').value = imei;
             if (s.nicClearReason) {
                 document.getElementById('manualNicReason').value = s.nicClearReason;
             }
 
             const searchInput = document.getElementById('nicModalSearchQuery');
             if (searchInput) {
-                searchInput.value = `${s.spNumber || s.imei || ''} - ${s.name || ''}`;
+                searchInput.value = `${oldSp || imei} - ${custName || model}`;
             }
 
             const resultsContainer = document.getElementById('nicModalSearchResults');
@@ -7096,7 +7311,7 @@
             const indicator = document.getElementById('selectedFileIndicator');
             if (indicator) {
                 indicator.style.display = 'inline-block';
-                indicator.innerText = `✅ Selected: ${s.spNumber || s.name}`;
+                indicator.innerText = `✅ Selected: ${oldSp || custName || imei}`;
             }
             const clearBtn = document.getElementById('clearNicSearchBtn');
             if (clearBtn) clearBtn.style.display = 'block';
@@ -7110,7 +7325,11 @@
         window.clearNicModalSearch = function() {
             const searchInput = document.getElementById('nicModalSearchQuery');
             if (searchInput) searchInput.value = '';
-            document.getElementById('quickSelectNicDoc').value = '';
+            const quickDocInput = document.getElementById('quickSelectNicDoc');
+            if (quickDocInput) {
+                quickDocInput.value = '';
+                delete quickDocInput.dataset.sourceType;
+            }
             document.getElementById('manualNicCustName').value = '';
             document.getElementById('manualNicCustNic').value = '';
             document.getElementById('manualNicOldSp').value = '';
@@ -7119,6 +7338,7 @@
             document.getElementById('manualNicImei').value = '';
             document.getElementById('manualNicReason').value = '';
 
+            currentNicModalSourceFilter = 'ALL';
             const resultsContainer = document.getElementById('nicModalSearchResults');
             if (resultsContainer) resultsContainer.style.display = 'none';
             const indicator = document.getElementById('selectedFileIndicator');
@@ -7136,7 +7356,9 @@
         });
 
         window.submitAddNicClearTracking = async function() {
-            const quickDocId = document.getElementById('quickSelectNicDoc')?.value;
+            const quickDocInput = document.getElementById('quickSelectNicDoc');
+            const quickDocId = quickDocInput?.value;
+            const sourceType = quickDocInput?.dataset?.sourceType || 'sales';
             const custName = (document.getElementById('manualNicCustName')?.value || '').trim();
             const custNic = (document.getElementById('manualNicCustNic')?.value || '').trim();
             const oldSp = (document.getElementById('manualNicOldSp')?.value || '').trim();
@@ -7157,7 +7379,7 @@
             try {
                 const todayStr = new Date().toISOString().slice(0, 10);
 
-                if (quickDocId) {
+                if (quickDocId && sourceType === 'sales') {
                     const updatePayload = {
                         status: 'NIC Clear Pending',
                         nicClearStatus: 'Pending',
@@ -7169,6 +7391,45 @@
                     await updateDoc(doc(db, "sales", quickDocId), updatePayload);
                     const localItem = (allSales || []).find(s => s.id === quickDocId);
                     if (localItem) Object.assign(localItem, updatePayload);
+                } else if (quickDocId && sourceType === 'main_shop_sales') {
+                    // Update main_shop_sales doc
+                    const updatePayload = {
+                        status: 'NIC Clear Pending',
+                        nicClearStatus: 'Pending',
+                        oldSpNumber: oldSp,
+                        nicClearReason: reason,
+                        nicClearDate: todayStr
+                    };
+                    try {
+                        await updateDoc(doc(db, "main_shop_sales", quickDocId), updatePayload);
+                        const localItem = (allMainShopSales || []).find(s => s.id === quickDocId);
+                        if (localItem) Object.assign(localItem, updatePayload);
+                    } catch(err) {
+                        console.warn("Could not update main_shop_sales doc:", err);
+                    }
+
+                    // Create/sync record in sales collection so it appears in NIC Clear Tracker table & KPI counts
+                    const syncPayload = {
+                        name: custName,
+                        nic: custNic,
+                        oldSpNumber: oldSp,
+                        spNumber: oldSp,
+                        shopId: shop || 'Main Shop',
+                        model: model || 'Phone Device',
+                        imei: imei || '',
+                        status: 'NIC Clear Pending',
+                        nicClearStatus: 'Pending',
+                        nicClearReason: reason,
+                        nicClearDate: todayStr,
+                        date: todayStr,
+                        timestamp: Date.now(),
+                        paymentStatus: 'Pending',
+                        stockSource: 'HO',
+                        linkedMainShopSaleId: quickDocId
+                    };
+                    const docRef = await addDoc(collection(db, "sales"), syncPayload);
+                    syncPayload.id = docRef.id;
+                    allSales.unshift(syncPayload);
                 } else {
                     const newPayload = {
                         name: custName,
