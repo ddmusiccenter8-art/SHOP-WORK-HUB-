@@ -2698,6 +2698,7 @@
             updateAdminShopFilterOptions();
             renderAllSubmissions();
             renderShopDirectory(Array.from(uniqueShops));
+            if (typeof renderNicClearTrackerView === 'function') renderNicClearTrackerView();
         }
 
         function updateAdminShopFilterOptions() {
@@ -4077,6 +4078,7 @@
 
                 renderMainShopProfitView();
                 renderStaffProfiles(); // Re-render staff profiles when data changes
+                if (typeof renderNicClearTrackerView === 'function') renderNicClearTrackerView();
             }, (err) => console.error("Main shop sales fetch error:", err));
         }
 
@@ -7491,36 +7493,71 @@
                 Boolean(s.oldSpNumber)
             ).concat(mainTracked);
 
-            // Deduplicate: avoid duplicate rows for the same file
-            const uniqueTrackedMap = new Map();
+            // Robust Deduplicate: avoid duplicate rows for the same file across collections
+            const uniqueTrackedList = [];
             rawTracked.forEach(item => {
-                const spKey = (item.oldSpNumber || item.spNumber || '').trim().toLowerCase();
-                const nicKey = (item.nic || '').trim().toLowerCase();
+                const spKey = (item.oldSpNumber || item.spNumber || item.newSpNumber || '').trim().toLowerCase();
                 const imeiKey = (item.imei || '').trim().toLowerCase();
+                const nicKey = (item.nic || item.custNic || '').trim().toLowerCase();
+                const nameKey = (item.name || item.custName || '').trim().toLowerCase();
 
-                let key = item.id;
-                if (item.linkedMainShopSaleId) {
-                    key = `link_${item.linkedMainShopSaleId}`;
-                } else if (spKey && spKey !== 'no-sp' && spKey !== 'lesi-pay') {
-                    key = `sp_${spKey}`;
-                } else if (imeiKey) {
-                    key = `imei_${imeiKey}`;
-                } else if (nicKey) {
-                    key = `nic_${nicKey}`;
-                }
+                const existingIndex = uniqueTrackedList.findIndex(existing => {
+                    // 1. Direct ID or link match
+                    if (existing.id === item.id) return true;
+                    if (item.linkedMainShopSaleId && (item.linkedMainShopSaleId === existing.id || item.linkedMainShopSaleId === existing.linkedMainShopSaleId)) return true;
+                    if (existing.linkedMainShopSaleId && (existing.linkedMainShopSaleId === item.id)) return true;
 
-                if (!uniqueTrackedMap.has(key)) {
-                    uniqueTrackedMap.set(key, item);
-                } else {
-                    const existing = uniqueTrackedMap.get(key);
-                    // Prefer doc from 'sales' collection so actions update correctly
-                    if (existing._isMainShop && !item._isMainShop) {
-                        uniqueTrackedMap.set(key, item);
+                    // 2. SP Number match
+                    const exSp = (existing.oldSpNumber || existing.spNumber || existing.newSpNumber || '').trim().toLowerCase();
+                    if (spKey && exSp && spKey === exSp && spKey !== 'no-sp' && spKey !== 'lesi-pay') return true;
+
+                    // 3. IMEI match (if IMEI has at least 8 digits)
+                    const exImei = (existing.imei || '').trim().toLowerCase();
+                    if (imeiKey && exImei && imeiKey === exImei && imeiKey.length >= 8) return true;
+
+                    // 4. NIC match with either matching name or empty name
+                    const exNic = (existing.nic || existing.custNic || '').trim().toLowerCase();
+                    const exName = (existing.name || existing.custName || '').trim().toLowerCase();
+                    if (nicKey && exNic && nicKey === exNic && nicKey.length >= 8) {
+                        if (!nameKey || !exName || nameKey === exName || nameKey.includes(exName) || exName.includes(nameKey)) {
+                            return true;
+                        }
                     }
+
+                    return false;
+                });
+
+                if (existingIndex === -1) {
+                    uniqueTrackedList.push({ ...item });
+                } else {
+                    // Merge records so no data is lost and actions work smoothly
+                    const existing = uniqueTrackedList[existingIndex];
+                    const preferPending = (item.status === 'NIC Clear Pending' || item.nicClearStatus === 'Pending' || existing.status === 'NIC Clear Pending' || existing.nicClearStatus === 'Pending');
+
+                    uniqueTrackedList[existingIndex] = {
+                        ...existing,
+                        ...item,
+                        _salesDocId: !item._isMainShop ? item.id : (existing._salesDocId || (!existing._isMainShop ? existing.id : null)),
+                        _mainShopDocId: item._isMainShop ? item.id : (existing._mainShopDocId || (existing._isMainShop ? existing.id : item.linkedMainShopSaleId || existing.linkedMainShopSaleId)),
+                        id: (!item._isMainShop ? item.id : existing.id),
+                        linkedMainShopSaleId: item.linkedMainShopSaleId || existing.linkedMainShopSaleId || (item._isMainShop ? item.id : (existing._isMainShop ? existing.id : null)),
+                        status: preferPending ? 'NIC Clear Pending' : (existing.status || item.status),
+                        nicClearStatus: preferPending ? 'Pending' : (existing.nicClearStatus || item.nicClearStatus),
+                        oldSpNumber: item.oldSpNumber || existing.oldSpNumber || item.spNumber || existing.spNumber,
+                        spNumber: preferPending ? (item.oldSpNumber || existing.oldSpNumber || item.spNumber || existing.spNumber) : (item.newSpNumber || existing.newSpNumber || item.spNumber || existing.spNumber),
+                        newSpNumber: item.newSpNumber || existing.newSpNumber || '',
+                        name: item.name || existing.name || item.custName || existing.custName,
+                        nic: item.nic || existing.nic || item.custNic || existing.custNic,
+                        imei: item.imei || existing.imei,
+                        model: item.model || existing.model,
+                        shopId: (item.shopId && item.shopId !== 'Main Shop') ? item.shopId : (existing.shopId || 'Main Shop'),
+                        nicClearReason: item.nicClearReason || existing.nicClearReason || '',
+                        nicClearDate: item.nicClearDate || existing.nicClearDate || item.date || existing.date
+                    };
                 }
             });
 
-            const allTrackedSales = Array.from(uniqueTrackedMap.values());
+            const allTrackedSales = uniqueTrackedList;
 
             // Calculate KPI counts
             const pendingCount = allTrackedSales.filter(s => s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending').length;
@@ -7693,12 +7730,12 @@
 
         // Open Enter New SP Modal
         window.openEnterNewSpModal = function(docId) {
-            const data = (allSales || []).find(s => s.id === docId);
+            const data = (allSales || []).find(s => s.id === docId) || (allMainShopSales || []).find(m => m.id === docId);
             if (!data) return;
 
             document.getElementById('newSpTargetDocId').value = docId;
-            document.getElementById('newSpModalNic').innerText = data.nic || '-';
-            document.getElementById('newSpModalName').innerText = data.name || '-';
+            document.getElementById('newSpModalNic').innerText = data.nic || data.custNic || '-';
+            document.getElementById('newSpModalName').innerText = data.name || data.custName || '-';
             document.getElementById('newSpModalOldSp').innerText = data.oldSpNumber || data.spNumber || '-';
             document.getElementById('newSpModalInput').value = '';
             document.getElementById('newSpModalNote').value = '';
@@ -7729,8 +7766,10 @@
             btn.disabled = true;
 
             try {
-                const currentData = (allSales || []).find(s => s.id === docId);
-                const originalOldSp = currentData?.oldSpNumber || currentData?.spNumber || '';
+                let currentSalesData = (allSales || []).find(s => s.id === docId);
+                let currentMainData = (allMainShopSales || []).find(m => m.id === docId);
+
+                const originalOldSp = currentSalesData?.oldSpNumber || currentSalesData?.spNumber || currentMainData?.oldSpNumber || currentMainData?.spNumber || '';
                 const todayStr = new Date().toISOString().slice(0, 10);
 
                 const updatePayload = {
@@ -7745,15 +7784,36 @@
                     nicClearCompletionNote: note || 'NIC cleared & resubmitted with new SP'
                 };
 
-                await updateDoc(doc(db, "sales", docId), updatePayload);
+                // If docId is in sales or has a linked sale
+                if (currentSalesData) {
+                    await updateDoc(doc(db, "sales", currentSalesData.id), updatePayload);
+                    Object.assign(currentSalesData, updatePayload);
 
-                if (currentData) {
-                    Object.assign(currentData, updatePayload);
+                    // If linked to main_shop_sales, update main_shop_sales too
+                    const linkedMain = (allMainShopSales || []).find(m => m.id === currentSalesData.linkedMainShopSaleId || (originalOldSp && (m.oldSpNumber === originalOldSp || m.spNumber === originalOldSp)));
+                    if (linkedMain) {
+                        try {
+                            await updateDoc(doc(db, "main_shop_sales", linkedMain.id), updatePayload);
+                            Object.assign(linkedMain, updatePayload);
+                        } catch(e) { console.warn("Sync update to main_shop_sales failed:", e); }
+                    }
+                } else if (currentMainData) {
+                    await updateDoc(doc(db, "main_shop_sales", currentMainData.id), updatePayload);
+                    Object.assign(currentMainData, updatePayload);
+
+                    // If linked in sales collection, update sales too
+                    const linkedSale = (allSales || []).find(s => s.linkedMainShopSaleId === currentMainData.id || (originalOldSp && (s.oldSpNumber === originalOldSp || s.spNumber === originalOldSp)));
+                    if (linkedSale) {
+                        try {
+                            await updateDoc(doc(db, "sales", linkedSale.id), updatePayload);
+                            Object.assign(linkedSale, updatePayload);
+                        } catch(e) { console.warn("Sync update to sales failed:", e); }
+                    }
                 }
 
                 showToast(`Success! New SP (${newSp}) assigned and file marked as Completed.`, "success");
                 closeEnterNewSpModal();
-                if (document.getElementById('detailModal').style.display === 'flex') {
+                if (document.getElementById('detailModal')?.style.display === 'flex') {
                     closeModal();
                 }
                 renderNicClearTrackerView();
@@ -7769,13 +7829,13 @@
 
         // Request NIC Clear Modal Handlers
         window.openRequestNicClearModal = function(docId) {
-            const data = (allSales || []).find(s => s.id === docId);
+            const data = (allSales || []).find(s => s.id === docId) || (allMainShopSales || []).find(m => m.id === docId);
             if (!data) return;
 
             document.getElementById('reqNicClearDocId').value = docId;
-            document.getElementById('reqNicCustName').innerText = data.name || '-';
-            document.getElementById('reqNicCustNic').innerText = data.nic || '-';
-            document.getElementById('reqNicCurrentSp').innerText = data.spNumber || '-';
+            document.getElementById('reqNicCustName').innerText = data.name || data.custName || '-';
+            document.getElementById('reqNicCustNic').innerText = data.nic || data.custNic || '-';
+            document.getElementById('reqNicCurrentSp').innerText = data.spNumber || data.oldSpNumber || '-';
             document.getElementById('reqNicReasonInput').value = '';
 
             document.getElementById('requestNicClearModal').style.display = 'flex';
@@ -7807,28 +7867,31 @@
             btn.disabled = true;
 
             try {
-                const currentData = (allSales || []).find(s => s.id === docId);
-                const currentSp = currentData?.spNumber || '';
+                let currentSalesData = (allSales || []).find(s => s.id === docId);
+                let currentMainData = (allMainShopSales || []).find(m => m.id === docId);
+                const currentSp = currentSalesData?.spNumber || currentMainData?.spNumber || '';
                 const todayStr = new Date().toISOString().slice(0, 10);
 
                 const updatePayload = {
                     status: 'NIC Clear Pending',
                     nicClearStatus: 'Pending',
-                    oldSpNumber: currentData?.oldSpNumber || currentSp,
+                    oldSpNumber: currentSalesData?.oldSpNumber || currentMainData?.oldSpNumber || currentSp,
                     nicClearReason: reason,
                     nicClearDate: todayStr,
                     adminReply: `[NIC Clear Requested]: ${reason}`
                 };
 
-                await updateDoc(doc(db, "sales", docId), updatePayload);
-
-                if (currentData) {
-                    Object.assign(currentData, updatePayload);
+                if (currentSalesData) {
+                    await updateDoc(doc(db, "sales", currentSalesData.id), updatePayload);
+                    Object.assign(currentSalesData, updatePayload);
+                } else if (currentMainData) {
+                    await updateDoc(doc(db, "main_shop_sales", currentMainData.id), updatePayload);
+                    Object.assign(currentMainData, updatePayload);
                 }
 
                 showToast("File marked as NIC Clear Pending!", "warning");
                 closeRequestNicClearModal();
-                if (document.getElementById('detailModal').style.display === 'flex') {
+                if (document.getElementById('detailModal')?.style.display === 'flex') {
                     closeModal();
                 }
                 renderNicClearTrackerView();
@@ -7853,8 +7916,9 @@
             }
 
             try {
-                const currentData = (allSales || []).find(s => s.id === docId);
-                const originalOldSp = currentData?.oldSpNumber || currentData?.spNumber || '';
+                let currentSalesData = (allSales || []).find(s => s.id === docId);
+                let currentMainData = (allMainShopSales || []).find(m => m.id === docId);
+                const originalOldSp = currentSalesData?.oldSpNumber || currentSalesData?.spNumber || currentMainData?.oldSpNumber || currentMainData?.spNumber || '';
                 const todayStr = new Date().toISOString().slice(0, 10);
 
                 const updatePayload = {
@@ -7869,10 +7933,26 @@
                     nicClearCompletionNote: 'Assigned via Submission Details modal'
                 };
 
-                await updateDoc(doc(db, "sales", docId), updatePayload);
-
-                if (currentData) {
-                    Object.assign(currentData, updatePayload);
+                if (currentSalesData) {
+                    await updateDoc(doc(db, "sales", currentSalesData.id), updatePayload);
+                    Object.assign(currentSalesData, updatePayload);
+                    const linkedMain = (allMainShopSales || []).find(m => m.id === currentSalesData.linkedMainShopSaleId || (originalOldSp && (m.oldSpNumber === originalOldSp || m.spNumber === originalOldSp)));
+                    if (linkedMain) {
+                        try {
+                            await updateDoc(doc(db, "main_shop_sales", linkedMain.id), updatePayload);
+                            Object.assign(linkedMain, updatePayload);
+                        } catch(e) { console.warn(e); }
+                    }
+                } else if (currentMainData) {
+                    await updateDoc(doc(db, "main_shop_sales", currentMainData.id), updatePayload);
+                    Object.assign(currentMainData, updatePayload);
+                    const linkedSale = (allSales || []).find(s => s.linkedMainShopSaleId === currentMainData.id || (originalOldSp && (s.oldSpNumber === originalOldSp || s.spNumber === originalOldSp)));
+                    if (linkedSale) {
+                        try {
+                            await updateDoc(doc(db, "sales", linkedSale.id), updatePayload);
+                            Object.assign(linkedSale, updatePayload);
+                        } catch(e) { console.warn(e); }
+                    }
                 }
 
                 showToast(`Success! New SP (${newSp}) assigned and file completed.`, "success");
@@ -7886,7 +7966,7 @@
         };
 
         window.openDetailsModalFromTracker = function(docId) {
-            const data = (allSales || []).find(s => s.id === docId);
+            const data = (allSales || []).find(s => s.id === docId) || (allMainShopSales || []).find(m => m.id === docId);
             if (data) {
                 openDetailsModal(data);
             }
@@ -8042,9 +8122,31 @@
                 });
             });
 
+            // Deduplicate candidates so the same transaction doesn't appear twice
+            const uniqueCandidates = [];
+            list.forEach(item => {
+                const spKey = (item.spNumber || item.oldSpNumber || '').trim().toLowerCase();
+                const imeiKey = (item.imei || '').trim().toLowerCase();
+
+                const isDup = uniqueCandidates.some(ex => {
+                    if (ex.id === item.id) return true;
+                    if (item.linkedMainShopSaleId && (item.linkedMainShopSaleId === ex.id)) return true;
+                    if (ex.linkedMainShopSaleId && (ex.linkedMainShopSaleId === item.id)) return true;
+                    const exSp = (ex.spNumber || ex.oldSpNumber || '').trim().toLowerCase();
+                    if (spKey && exSp && spKey === exSp && spKey !== 'no-sp' && spKey !== 'lesi-pay') return true;
+                    const exImei = (ex.imei || '').trim().toLowerCase();
+                    if (imeiKey && exImei && imeiKey === exImei && imeiKey.length >= 8) return true;
+                    return false;
+                });
+
+                if (!isDup) {
+                    uniqueCandidates.push(item);
+                }
+            });
+
             // Sort newest first
-            list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            return list;
+            uniqueCandidates.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            return uniqueCandidates;
         }
 
         window.searchSalesForNicModal = function(query) {
@@ -8306,7 +8408,16 @@
                 const cleanNic = custNic.toLowerCase();
                 const cleanName = custName.toLowerCase();
 
-                const existingActive = (allSales || []).find(s => {
+                // Combine for duplicate check
+                const combinedAll = (allSales || []).concat((allMainShopSales || []).map(m => ({
+                    ...m,
+                    name: m.custName || m.name || '',
+                    nic: m.custNic || m.nic || '',
+                    shopId: m.shopId || 'Main Shop',
+                    _isMainShop: true
+                })));
+
+                const existingActive = combinedAll.find(s => {
                     const isPending = (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
                     if (!isPending) return false;
 
@@ -8361,7 +8472,7 @@
                     const localItem = (allSales || []).find(s => s.id === quickDocId);
                     if (localItem) Object.assign(localItem, updatePayload);
                 } else if (quickDocId && sourceType === 'main_shop_sales') {
-                    // Update main_shop_sales doc
+                    // Update main_shop_sales doc ONLY (Strictly 1 file, do NOT create an extra document in sales)
                     const updatePayload = {
                         status: 'NIC Clear Pending',
                         nicClearStatus: 'Pending',
@@ -8376,50 +8487,69 @@
                     } catch(err) {
                         console.warn("Could not update main_shop_sales doc:", err);
                     }
-
-                    // Create/sync record in sales collection so it appears in NIC Clear Tracker table & KPI counts
-                    const syncPayload = {
-                        name: custName,
-                        nic: custNic,
-                        oldSpNumber: oldSp,
-                        spNumber: oldSp,
-                        shopId: shop || 'Main Shop',
-                        model: model || 'Phone Device',
-                        imei: imei || '',
-                        status: 'NIC Clear Pending',
-                        nicClearStatus: 'Pending',
-                        nicClearReason: reason,
-                        nicClearDate: todayStr,
-                        date: todayStr,
-                        timestamp: Date.now(),
-                        paymentStatus: 'Pending',
-                        stockSource: 'HO',
-                        linkedMainShopSaleId: quickDocId
-                    };
-                    const docRef = await addDoc(collection(db, "sales"), syncPayload);
-                    syncPayload.id = docRef.id;
-                    allSales.unshift(syncPayload);
                 } else {
-                    const newPayload = {
-                        name: custName,
-                        nic: custNic,
-                        oldSpNumber: oldSp,
-                        spNumber: oldSp,
-                        shopId: shop || 'Main Shop',
-                        model: model || 'Phone Device',
-                        imei: imei || '',
-                        status: 'NIC Clear Pending',
-                        nicClearStatus: 'Pending',
-                        nicClearReason: reason,
-                        nicClearDate: todayStr,
-                        date: todayStr,
-                        timestamp: Date.now(),
-                        paymentStatus: 'Pending',
-                        stockSource: 'HO'
-                    };
-                    const docRef = await addDoc(collection(db, "sales"), newPayload);
-                    newPayload.id = docRef.id;
-                    allSales.unshift(newPayload);
+                    // Manual entry: check if SP or IMEI already exists in sales or main_shop_sales
+                    const cleanSp = oldSp.toLowerCase();
+                    const cleanIm = imei.toLowerCase();
+
+                    const existingSale = (allSales || []).find(s => {
+                        const sSp = (s.oldSpNumber || s.spNumber || '').trim().toLowerCase();
+                        const sIm = (s.imei || '').trim().toLowerCase();
+                        return (cleanSp && cleanSp === sSp && cleanSp !== 'no-sp' && cleanSp !== 'lesi-pay') || (cleanIm && cleanIm === sIm && cleanIm.length >= 8);
+                    });
+
+                    const existingMain = !existingSale && (allMainShopSales || []).find(m => {
+                        const mSp = (m.oldSpNumber || m.spNumber || '').trim().toLowerCase();
+                        const mIm = (m.imei || '').trim().toLowerCase();
+                        return (cleanSp && cleanSp === mSp && cleanSp !== 'no-sp' && cleanSp !== 'lesi-pay') || (cleanIm && cleanIm === mIm && cleanIm.length >= 8);
+                    });
+
+                    if (existingSale) {
+                        // Update existing sales document in place (keep only 1 file)
+                        const updatePayload = {
+                            status: 'NIC Clear Pending',
+                            nicClearStatus: 'Pending',
+                            oldSpNumber: oldSp,
+                            nicClearReason: reason,
+                            nicClearDate: todayStr,
+                            adminReply: `[NIC Clear Requested]: ${reason}`
+                        };
+                        await updateDoc(doc(db, "sales", existingSale.id), updatePayload);
+                        Object.assign(existingSale, updatePayload);
+                    } else if (existingMain) {
+                        // Update existing main_shop_sales document in place (keep only 1 file)
+                        const updatePayload = {
+                            status: 'NIC Clear Pending',
+                            nicClearStatus: 'Pending',
+                            oldSpNumber: oldSp,
+                            nicClearReason: reason,
+                            nicClearDate: todayStr
+                        };
+                        await updateDoc(doc(db, "main_shop_sales", existingMain.id), updatePayload);
+                        Object.assign(existingMain, updatePayload);
+                    } else {
+                        // File not found anywhere: create exactly 1 document in sales
+                        const newPayload = {
+                            name: custName,
+                            nic: custNic,
+                            oldSpNumber: oldSp,
+                            spNumber: oldSp,
+                            shopId: shop || 'Main Shop',
+                            model: model || 'Phone Device',
+                            imei: imei || '',
+                            status: 'NIC Clear Pending',
+                            nicClearStatus: 'Pending',
+                            nicClearReason: reason,
+                            nicClearDate: todayStr,
+                            date: todayStr,
+                            timestamp: Date.now(),
+                            paymentStatus: 'Pending',
+                            stockSource: 'HO'
+                        };
+                        const docRef = await addDoc(collection(db, "sales"), newPayload);
+                        newPayload.id = docRef.id;
+                        allSales.unshift(newPayload);
+                    }
                 }
 
                 showToast("File added to NIC Clear Tracker successfully!", "success");
@@ -8495,11 +8625,16 @@
 
             try {
                 // Find all linked copies of this record to clean up completely
-                const baseDoc = (allSales || []).find(x => x.id === docId);
+                const baseDoc = (allSales || []).find(x => x.id === docId) || (allMainShopSales || []).find(m => m.id === docId);
+                const targetOldSp = baseDoc?.oldSpNumber || baseDoc?.spNumber || '';
+                const targetImei = baseDoc?.imei || '';
+
                 const targetSales = (allSales || []).filter(s => 
                     s.id === docId || 
                     s.linkedMainShopSaleId === docId ||
-                    (baseDoc && s.oldSpNumber && s.oldSpNumber === baseDoc.oldSpNumber && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'))
+                    (baseDoc?.linkedMainShopSaleId && s.id === baseDoc.linkedMainShopSaleId) ||
+                    (targetOldSp && (s.oldSpNumber === targetOldSp || s.spNumber === targetOldSp) && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending')) ||
+                    (targetImei && s.imei === targetImei && targetImei.length >= 8 && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'))
                 );
 
                 // Delete from sales collection in Firestore
@@ -8511,19 +8646,26 @@
                     }
                 }
 
-                // If also linked to main_shop_sales, revert its status
-                const mainItem = (allMainShopSales || []).find(m => m.id === docId || targetSales.some(s => s.linkedMainShopSaleId === m.id));
-                if (mainItem) {
+                // If in main_shop_sales or linked, revert its status
+                const targetMain = (allMainShopSales || []).filter(m => 
+                    m.id === docId || 
+                    (baseDoc?.linkedMainShopSaleId && m.id === baseDoc.linkedMainShopSaleId) ||
+                    targetSales.some(s => s.linkedMainShopSaleId === m.id) ||
+                    (targetOldSp && (m.oldSpNumber === targetOldSp || m.spNumber === targetOldSp) && (m.status === 'NIC Clear Pending' || m.nicClearStatus === 'Pending'))
+                );
+
+                for (const m of targetMain) {
                     try {
-                        await updateDoc(doc(db, "main_shop_sales", mainItem.id), {
+                        await updateDoc(doc(db, "main_shop_sales", m.id), {
                             status: 'Completed',
                             nicClearStatus: null,
                             oldSpNumber: null,
                             nicClearReason: null
                         });
-                        mainItem.status = 'Completed';
-                        delete mainItem.nicClearStatus;
-                        delete mainItem.oldSpNumber;
+                        m.status = 'Completed';
+                        delete m.nicClearStatus;
+                        delete m.oldSpNumber;
+                        delete m.nicClearReason;
                     } catch (e) {
                         console.warn("Revert main_shop_sales error:", e);
                     }
@@ -8532,7 +8674,6 @@
                 // Remove from local allSales
                 allSales = (allSales || []).filter(s => 
                     s.id !== docId && 
-                    s.linkedMainShopSaleId !== docId &&
                     !targetSales.some(ts => ts.id === s.id)
                 );
 
