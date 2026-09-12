@@ -1246,6 +1246,9 @@
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">SP Number / Invoice Ref</label>
                                 <input type="text" id="mainSaleSp" placeholder="e.g. SP-MAIN-101">
+                                <div id="nicClearSpHelper" style="display: none; font-size: 0.76rem; color: #dc2626; font-weight: 700; margin-top: 5px; background: rgba(239, 68, 68, 0.08); padding: 6px 10px; border-radius: 8px; border: 1px dashed #ef4444;">
+                                    ⚡ Need New SP Number: Prev cancelled SP detected. Enter newly issued SP number and submit to complete file!
+                                </div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -1389,8 +1392,34 @@
                 <!-- Main Shop Sales History Table -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <h2 style="font-size: 1.15rem; color: var(--text-main);">Main Shop Direct Sales History</h2>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0;">Main Shop Direct Sales History</h2>
+                            <button type="button" id="btnCleanDupesHeader" onclick="openDuplicateSalesModal()" style="display: none; background: rgba(239,68,68,0.12); color: #dc2626; border: 1px solid rgba(239,68,68,0.35); padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                                ⚠️ Clean Duplicates (<span id="dupeCountBadge">0</span>)
+                            </button>
+                        </div>
                         <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 100%; max-width: 250px;" oninput="renderMainShopProfitView()">
+                    </div>
+
+                    <!-- Duplicate Sales Warning Alert Banner -->
+                    <div id="duplicateSalesAlertBanner" style="display: none; background: #fef2f2; border: 1.5px solid #f87171; border-radius: 12px; padding: 0.85rem 1.1rem; margin-bottom: 1rem; box-shadow: 0 4px 12px rgba(239,68,68,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.4rem;">⚠️</span>
+                                <div>
+                                    <strong style="color: #b91c1c; font-size: 0.88rem;">Duplicate IMEI Sales Detected! (<span id="duplicateCountNum">0</span> duplicate records)</strong>
+                                    <p style="margin: 2px 0 0 0; font-size: 0.76rem; color: #7f1d1d;">Same phone IMEI has been entered more than once in sales history.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <button type="button" onclick="openDuplicateSalesModal()" style="background: #ef4444; color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; cursor: pointer; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
+                                    🔍 View & Clean
+                                </button>
+                                <button type="button" onclick="cleanAllDuplicateSalesNow()" style="background: #ffffff; color: #dc2626; border: 1px solid #dc2626; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                                    🗑️ Clean All Now
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-responsive" style="max-height: 550px; overflow-y: auto;">
                         <table>
@@ -2139,6 +2168,31 @@
         </div>
     </div>
 
+    <!-- Duplicate Sales Cleaner Modal -->
+    <div id="duplicateSalesModal" class="modal" style="z-index: 2700;">
+        <div class="modal-content" style="max-width: 720px; width: 95vw; border-radius: 18px; border: 1.5px solid rgba(239, 68, 68, 0.4); box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
+            <span class="modal-close" onclick="closeDuplicateSalesModal()">&times;</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(239, 68, 68, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                        🧹
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; color: #dc2626; font-size: 1.2rem; font-weight: 800;">Duplicate Sales Cleaner</h2>
+                        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">එකම IMEI අංකය නැවත නැවත Sale කර ඇති වාර්තා පරීක්ෂා කර ඉවත් කරන්න</p>
+                    </div>
+                </div>
+                <button type="button" id="btnCleanAllDupesModal" onclick="cleanAllDuplicateSalesNow()" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.55rem 1.1rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                    🗑️ Clean All Duplicates (සියල්ල ඉවත් කරන්න)
+                </button>
+            </div>
+
+            <div id="duplicateSalesListContainer" style="max-height: 480px; overflow-y: auto;">
+                <!-- Dynamically populated duplicate groups -->
+            </div>
+        </div>
+    </div>
+
     <!-- Enhanced Ultra-HD Barcode / IMEI Scanner Modal -->
     <div id="scannerModal" class="modal">
         <div class="modal-content" style="max-width: 580px; width: 95vw; text-align: center; padding: 1.25rem; border-radius: 20px; border: 1.5px solid rgba(59, 130, 246, 0.3); box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
@@ -2629,6 +2683,8 @@
         let chartInstance = null;
         let currentFilter = 'All';
         let currentProfitRange = 'today';
+        let activeNicClearTarget = null;
+        let currentImeiAlreadySold = false;
 
         // Toast Helper
         window.showToast = function(message, type = 'info') {
@@ -4183,22 +4239,155 @@
 
         // Instant Auto-lookup when IMEI is entered or scanned
         window.handleSaleImeiLookup = function(imei, mode) {
-            if (!imei) {
-                if (mode === 'HO') {
-                    const statusEl = document.getElementById('mainSaleStockStatus');
-                    if (statusEl) statusEl.innerHTML = '';
-                } else if (mode === 'LP') {
-                    const statusEl = document.getElementById('lpSaleStockStatus');
-                    if (statusEl) statusEl.innerHTML = '';
+            const hoImeiInput = document.getElementById('mainSaleImei');
+            const lpImeiInput = document.getElementById('lpSaleImei');
+            const targetInput = (mode === 'HO') ? hoImeiInput : lpImeiInput;
+            const statusEl = (mode === 'HO') ? document.getElementById('mainSaleStockStatus') : document.getElementById('lpSaleStockStatus');
+            const helperEl = document.getElementById('nicClearSpHelper');
+            const spInput = document.getElementById('mainSaleSp');
+            const submitBtn = document.getElementById('mainSaleSubmitBtn');
+
+            function resetImeiStyles() {
+                if (targetInput) {
+                    targetInput.style.borderColor = '';
+                    targetInput.style.boxShadow = '';
                 }
+                if (spInput) {
+                    spInput.style.borderColor = '';
+                    spInput.style.background = '';
+                    spInput.placeholder = 'e.g. SP-MAIN-101';
+                }
+                if (helperEl) helperEl.style.display = 'none';
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    const isLesi = (document.getElementById('mainSaleType')?.value === 'Dialog Lesi Pay');
+                    submitBtn.innerText = isLesi ? 'Add Dialog Lesi Pay Sale Entry' : 'Add Main Shop Sale Entry';
+                    submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, #990000 100%)';
+                }
+            }
+
+            if (!imei) {
+                activeNicClearTarget = null;
+                currentImeiAlreadySold = false;
+                resetImeiStyles();
+                if (statusEl) statusEl.innerHTML = '';
                 return;
             }
+
             const cleanImei = imei.trim();
-            if (cleanImei.length < 3) return;
+            if (cleanImei.length < 3) {
+                activeNicClearTarget = null;
+                currentImeiAlreadySold = false;
+                resetImeiStyles();
+                if (statusEl) statusEl.innerHTML = '';
+                return;
+            }
 
-            // Search in loaded allInventoryItems
-            const found = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === cleanImei.toLowerCase());
+            // 1. CHECK FOR NIC CLEAR PENDING FILE (Need New SP Number workflow)
+            const nicMain = (allMainShopSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'));
+            const nicSales = (allSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'));
+            const nicTarget = nicMain || nicSales;
 
+            if (nicTarget) {
+                activeNicClearTarget = {
+                    id: nicTarget.id,
+                    collection: nicMain ? 'main_shop_sales' : 'sales',
+                    oldSp: nicTarget.oldSpNumber || nicTarget.spNumber || '',
+                    record: nicTarget
+                };
+                currentImeiAlreadySold = false;
+
+                // Ensure form is in Head Office Direct Sale mode to show SP field
+                if (document.getElementById('mainSaleType').value === 'Dialog Lesi Pay' || mode === 'LP') {
+                    document.getElementById('mainSaleType').value = 'Head Office Direct Sale';
+                    toggleMainSaleFormType();
+                    if (document.getElementById('mainSaleImei')) {
+                        document.getElementById('mainSaleImei').value = cleanImei;
+                    }
+                }
+
+                // Auto-fill existing file details so user only has to enter the new SP
+                if (document.getElementById('mainSaleCustName')) document.getElementById('mainSaleCustName').value = nicTarget.custName || nicTarget.name || '';
+                if (document.getElementById('mainSaleCustNic')) document.getElementById('mainSaleCustNic').value = nicTarget.custNic || nicTarget.nic || '';
+                if (document.getElementById('mainSaleModel')) document.getElementById('mainSaleModel').value = nicTarget.model || '';
+                if (document.getElementById('mainSaleMrp') && nicTarget.mrp) document.getElementById('mainSaleMrp').value = nicTarget.mrp;
+                if (document.getElementById('mainSaleBuyPrice') && nicTarget.buyPrice) document.getElementById('mainSaleBuyPrice').value = nicTarget.buyPrice;
+                if (document.getElementById('mainSaleStaffName') && nicTarget.staffName) {
+                    document.getElementById('mainSaleStaffName').value = nicTarget.staffName;
+                    if (typeof selectStaffQuick === 'function') selectStaffQuick(nicTarget.staffName);
+                }
+
+                // Highlight and alert user for NEW SP NUMBER
+                if (spInput) {
+                    spInput.value = '';
+                    spInput.placeholder = 'Enter NEW SP Number (e.g. SP-NEW-...)';
+                    spInput.style.borderColor = '#ef4444';
+                    spInput.style.background = '#fff5f5';
+                    setTimeout(() => spInput.focus(), 150);
+                }
+
+                if (helperEl) {
+                    helperEl.style.display = 'block';
+                    helperEl.innerHTML = `⚡ <strong>NEED NEW SP NUMBER:</strong> Previous SP (<strong>${activeNicClearTarget.oldSp || 'Cancelled'}</strong>) was cancelled for NIC Clear. Enter ONLY the newly issued SP Number and submit to complete!`;
+                }
+
+                const hoStatus = document.getElementById('mainSaleStockStatus');
+                if (hoStatus) {
+                    hoStatus.innerHTML = `<span style="color:#d97706; font-weight:800; background:rgba(245,158,11,0.15); border:1px solid #d97706; padding:3px 8px; border-radius:6px; font-size:0.76rem;">⚡ NIC CLEAR DETECTED: Need New SP Number!</span>`;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = '✅ Complete File with New SP Number';
+                    submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                }
+
+                calculateMainShopLiveProfit();
+                showToast(`⚡ NIC Clear phone detected! Previous SP was cancelled. Enter the newly issued SP number and submit to complete.`, "warning");
+                return;
+            }
+
+            // 2. CHECK IF THIS IMEI WAS ALREADY SOLD (DUPLICATE SALE REJECTION)
+            const soldMain = (allMainShopSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected');
+            const soldSales = (allSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected');
+            const invMatch = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === cleanImei.toLowerCase());
+            const isSoldInInventory = invMatch && invMatch.status === 'Sold';
+
+            if (soldMain || soldSales || isSoldInInventory) {
+                currentImeiAlreadySold = true;
+                activeNicClearTarget = null;
+                resetImeiStyles();
+
+                const prevRecord = soldMain || soldSales;
+                const prevDate = prevRecord?.date || (prevRecord?.timestamp ? new Date(prevRecord.timestamp).toLocaleDateString() : '') || (invMatch?.soldDate || 'Past Date');
+                const prevSp = prevRecord?.spNumber || prevRecord?.oldSpNumber || '-';
+                const prevModel = prevRecord?.model || invMatch?.model || 'Device';
+
+                if (targetInput) {
+                    targetInput.style.borderColor = '#ef4444';
+                    targetInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)';
+                }
+
+                if (statusEl) {
+                    statusEl.innerHTML = `<span style="color:#ef4444; font-weight:800; background:#fee2e2; border:1.5px solid #f87171; padding:4px 10px; border-radius:6px; display:inline-block; font-size:0.76rem;">❌ EXISTING IMEI: This phone was already sold! [Sold: ${prevDate} | SP: ${prevSp}] (Re-sale Rejected)</span>`;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = '❌ IMEI Already Sold (Re-sale Rejected)';
+                    submitBtn.style.background = '#9ca3af';
+                }
+
+                showToast(`❌ EXISTING IMEI: Phone ${cleanImei} (${prevModel}) was already sold on ${prevDate}! Re-sale rejected.`, "error");
+                return;
+            }
+
+            // 3. NORMAL STOCK LOOKUP (AVAILABLE PHONE)
+            currentImeiAlreadySold = false;
+            activeNicClearTarget = null;
+            resetImeiStyles();
+
+            const found = invMatch;
             if (mode === 'HO') {
                 const statusEl = document.getElementById('mainSaleStockStatus');
                 if (found) {
@@ -4313,10 +4502,102 @@
             const saleType = document.getElementById('mainSaleType').value;
             const dateVal = document.getElementById('mainSaleDate').value;
             
+            // 1. Check if IMEI is flagged as already sold
+            if (currentImeiAlreadySold) {
+                showToast("❌ Submission Blocked: This IMEI has already been sold! Re-sale rejected.", "error");
+                return;
+            }
+
+            const currentImei = (saleType === 'Dialog Lesi Pay' ? document.getElementById('lpSaleImei')?.value : document.getElementById('mainSaleImei')?.value || '').trim();
+
+            // 2. Direct database safeguard against duplicate IMEI sales
+            if (!activeNicClearTarget && currentImei) {
+                const soldMain = (allMainShopSales || []).some(s => s.imei && s.imei.trim().toLowerCase() === currentImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected' && s.status !== 'NIC Clear Pending' && s.nicClearStatus !== 'Pending');
+                const soldSales = (allSales || []).some(s => s.imei && s.imei.trim().toLowerCase() === currentImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected' && s.status !== 'NIC Clear Pending' && s.nicClearStatus !== 'Pending');
+                if (soldMain || soldSales) {
+                    showToast(`❌ Submission Blocked: Phone IMEI (${currentImei}) already exists in sales records! Duplicate sale rejected.`, "error");
+                    return;
+                }
+            }
+
             btn.disabled = true;
-            btn.innerText = 'Saving Entry...';
+            btn.innerText = activeNicClearTarget ? 'Completing File...' : 'Saving Entry...';
 
             try {
+                // 3. HANDLING NIC CLEAR RESUBMISSION WITH NEW SP NUMBER
+                if (activeNicClearTarget) {
+                    const newSp = (document.getElementById('mainSaleSp')?.value || '').trim();
+                    if (!newSp) {
+                        showToast("⚡ Need New SP Number: Please enter the newly issued SP number to complete this file!", "warning");
+                        document.getElementById('mainSaleSp')?.focus();
+                        btn.disabled = false;
+                        btn.innerText = '✅ Complete File with New SP Number';
+                        return;
+                    }
+                    if (newSp.toLowerCase() === (activeNicClearTarget.oldSp || '').toLowerCase()) {
+                        showToast("⚠️ This is the old cancelled SP number. Please enter the NEW SP number!", "warning");
+                        document.getElementById('mainSaleSp')?.focus();
+                        btn.disabled = false;
+                        btn.innerText = '✅ Complete File with New SP Number';
+                        return;
+                    }
+
+                    const todayStr = dateVal || new Date().toISOString().slice(0, 10);
+                    const rawStaff = document.getElementById('mainSaleStaffName')?.value.trim();
+                    const staffName = rawStaff ? normalizeStaffName(rawStaff) : (activeNicClearTarget.record.staffName || '');
+
+                    const updatePayload = {
+                        oldSpNumber: activeNicClearTarget.oldSp,
+                        newSpNumber: newSp,
+                        spNumber: newSp,
+                        status: 'Completed',
+                        paymentStatus: 'Paid',
+                        nicClearStatus: 'Completed',
+                        nicClearedAt: Date.now(),
+                        nicClearCompletionDate: todayStr,
+                        nicClearCompletionNote: 'Resubmitted with New SP: ' + newSp
+                    };
+                    if (dateVal) updatePayload.date = dateVal;
+                    if (staffName) updatePayload.staffName = staffName;
+
+                    await updateDoc(doc(db, activeNicClearTarget.collection, activeNicClearTarget.id), updatePayload);
+
+                    // Sync linked record between sales and main_shop_sales
+                    if (activeNicClearTarget.collection === 'sales') {
+                        const linkedMain = (allMainShopSales || []).find(m => m.id === activeNicClearTarget.record.linkedMainShopSaleId || (activeNicClearTarget.oldSp && (m.oldSpNumber === activeNicClearTarget.oldSp || m.spNumber === activeNicClearTarget.oldSp)));
+                        if (linkedMain) {
+                            try { await updateDoc(doc(db, "main_shop_sales", linkedMain.id), updatePayload); } catch(e) {}
+                        }
+                    } else {
+                        const linkedSale = (allSales || []).find(s => s.linkedMainShopSaleId === activeNicClearTarget.id || (activeNicClearTarget.oldSp && (s.oldSpNumber === activeNicClearTarget.oldSp || s.spNumber === activeNicClearTarget.oldSp)));
+                        if (linkedSale) {
+                            try { await updateDoc(doc(db, "sales", linkedSale.id), updatePayload); } catch(e) {}
+                        }
+                    }
+
+                    // Mark stock item in inventory as Sold
+                    const invMatch = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === currentImei.toLowerCase());
+                    if (invMatch) {
+                        try {
+                            await updateDoc(doc(db, "inventory", invMatch.id), {
+                                status: 'Sold',
+                                soldAt: Date.now(),
+                                soldDate: todayStr,
+                                salesSource: activeNicClearTarget.collection
+                            });
+                        } catch(e) {}
+                    }
+
+                    if (staffName) saveActivatorStaffName(staffName);
+                    showToast(`✨ Success! File Completed with New SP (${newSp})!`, "success");
+                    activeNicClearTarget = null;
+                    currentImeiAlreadySold = false;
+                    resetMainSaleFormForNextEntry(saleType, staffName);
+                    if (typeof renderNicClearTrackerView === 'function') renderNicClearTrackerView();
+                    if (typeof renderAllSubmissions === 'function') renderAllSubmissions();
+                    return;
+                }
+
                 if (saleType === 'Dialog Lesi Pay') {
                     const model = document.getElementById('lpSaleModel').value.trim();
                     const imei = document.getElementById('lpSaleImei').value.trim();
@@ -4670,9 +4951,20 @@
         window.resetMainSaleFormForNextEntry = function(saleType, keepStaffName) {
             const isLesi = (saleType === 'Dialog Lesi Pay');
 
+            // Reset duplicate detection & NIC clear state
+            activeNicClearTarget = null;
+            currentImeiAlreadySold = false;
+
+            const helperEl = document.getElementById('nicClearSpHelper');
+            if (helperEl) helperEl.style.display = 'none';
+
             // Reset Direct Sale inputs
             const hoImei = document.getElementById('mainSaleImei');
-            if (hoImei) hoImei.value = '';
+            if (hoImei) {
+                hoImei.value = '';
+                hoImei.style.borderColor = '';
+                hoImei.style.boxShadow = '';
+            }
             const hoModel = document.getElementById('mainSaleModel');
             if (hoModel) hoModel.value = '';
             const hoMrp = document.getElementById('mainSaleMrp');
@@ -4684,7 +4976,12 @@
             const hoNic = document.getElementById('mainSaleCustNic');
             if (hoNic) hoNic.value = '';
             const hoSp = document.getElementById('mainSaleSp');
-            if (hoSp) hoSp.value = '';
+            if (hoSp) {
+                hoSp.value = '';
+                hoSp.style.borderColor = '';
+                hoSp.style.background = '';
+                hoSp.placeholder = 'e.g. SP-MAIN-101';
+            }
             const hoLease = document.getElementById('mainSaleLeasePercent');
             if (hoLease) hoLease.value = '2.0';
             const hoFee = document.getElementById('mainSaleStaffFee');
@@ -4692,7 +4989,11 @@
 
             // Reset Dialog Lesi Pay inputs
             const lpImei = document.getElementById('lpSaleImei');
-            if (lpImei) lpImei.value = '';
+            if (lpImei) {
+                lpImei.value = '';
+                lpImei.style.borderColor = '';
+                lpImei.style.boxShadow = '';
+            }
             const lpModel = document.getElementById('lpSaleModel');
             if (lpModel) lpModel.value = '';
             const lpMrp = document.getElementById('lpSaleMrp');
@@ -4701,6 +5002,14 @@
             if (lpDp) lpDp.value = '';
             const lpComm = document.getElementById('lpSaleComm');
             if (lpComm) lpComm.value = '0';
+
+            // Reset Submit Button
+            const submitBtn = document.getElementById('mainSaleSubmitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = isLesi ? 'Add Dialog Lesi Pay Sale Entry' : 'Add Main Shop Sale Entry';
+                submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, #990000 100%)';
+            }
 
             // Clear stock status indicators
             const hoStatus = document.getElementById('mainSaleStockStatus');
@@ -4985,6 +5294,13 @@
                 lesiSubEl.innerText = `${totalDialogLesiPayCount} Phones | 7% Profit Added to Total`;
             }
 
+            // Check for duplicate sales and update banner & badges
+            if (typeof checkDuplicateSalesAlert === 'function') {
+                checkDuplicateSalesAlert();
+            }
+            const dupeGroups = (typeof getDuplicateMainShopSales === 'function') ? getDuplicateMainShopSales() : [];
+            const dupeImeiSet = new Set(dupeGroups.map(g => (g.imei || '').trim().toLowerCase()));
+
             if (filteredSales.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records for selected time range.</td></tr>';
                 return;
@@ -5009,17 +5325,20 @@
 
                 let profitColor = net >= 0 ? 'var(--success)' : 'var(--danger)';
 
+                const isDupe = item.imei && dupeImeiSet.has(item.imei.trim().toLowerCase());
+                const dupeBadge = isDupe ? `<span style="background: #fee2e2; color: #dc2626; border: 1px solid #f87171; font-size: 0.7rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; display: inline-block; margin-left: 4px; cursor: pointer;" onclick="openDuplicateSalesModal()" title="Duplicate IMEI detected! Click to clean duplicate records">⚠️ DUPLICATE</span>` : '';
+
                 let deviceCol = '';
                 let priceCol = '';
                 let feesCol = '';
 
                 if (isLesi) {
                     const profit7 = (item.profit !== undefined && item.profit !== null && !isNaN(parseFloat(item.profit))) ? parseFloat(item.profit) : (mrp * 0.07);
-                    deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:#3b82f6; font-weight:600; font-size:0.75rem;">📱 Dialog Lesi Pay</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}</span>`;
+                    deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:#3b82f6; font-weight:600; font-size:0.75rem;">📱 Dialog Lesi Pay</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}${dupeBadge}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#3b82f6; font-size:0.75rem;">DP: Rs. ${(item.downPayment || 0).toLocaleString()}</span>`;
                     feesCol = `<span style="color:var(--accent-purple); font-weight:700;">7% Profit: Rs. ${profit7.toLocaleString(undefined, {minimumFractionDigits:2})}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">Comm: Rs. ${staff.toLocaleString()}</span>`;
                 } else {
-                    deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}</span>`;
+                    deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}${dupeBadge}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span>`;
                     feesCol = `Lease 2%: Rs. ${lease.toLocaleString()}<br>Staff: Rs. ${staff.toLocaleString()}`;
                 }
@@ -5062,6 +5381,215 @@
                 showToast("Sale entry deleted (stock restored if applicable)", "warning");
             } catch (e) {
                 showToast("Failed to delete record: " + e.message, "error");
+            }
+        };
+
+        // ==========================================
+        // DUPLICATE SALES DETECTION & CLEANER
+        // ==========================================
+
+        window.getDuplicateMainShopSales = function() {
+            const imeiMap = new Map();
+            (allMainShopSales || []).forEach(item => {
+                const clean = (item.imei || '').trim().toLowerCase();
+                if (!clean || clean === '-' || clean === 'n/a' || clean === 'none') return;
+                if (item.status === 'Cancelled' || item.status === 'Rejected') return;
+                if (!imeiMap.has(clean)) {
+                    imeiMap.set(clean, []);
+                }
+                imeiMap.get(clean).push(item);
+            });
+
+            const duplicates = [];
+            imeiMap.forEach((records, imei) => {
+                if (records.length > 1) {
+                    records.sort((a, b) => {
+                        const timeA = a.timestamp || (a.date ? new Date(a.date).getTime() : 0);
+                        const timeB = b.timestamp || (b.date ? new Date(b.date).getTime() : 0);
+                        return timeA - timeB;
+                    });
+                    duplicates.push({
+                        imei: records[0].imei,
+                        model: records[0].model || 'Unknown Model',
+                        original: records[0],
+                        duplicates: records.slice(1),
+                        all: records
+                    });
+                }
+            });
+            return duplicates;
+        };
+
+        window.checkDuplicateSalesAlert = function() {
+            const dupeGroups = getDuplicateMainShopSales();
+            let totalDuplicates = 0;
+            dupeGroups.forEach(g => {
+                totalDuplicates += g.duplicates.length;
+            });
+
+            const banner = document.getElementById('duplicateSalesAlertBanner');
+            const headerBtn = document.getElementById('btnCleanDupesHeader');
+            const badge = document.getElementById('dupeCountBadge');
+            const countNum = document.getElementById('duplicateCountNum');
+
+            if (totalDuplicates > 0) {
+                if (banner) banner.style.display = 'block';
+                if (headerBtn) headerBtn.style.display = 'inline-block';
+                if (badge) badge.innerText = totalDuplicates.toString();
+                if (countNum) countNum.innerText = totalDuplicates.toString();
+            } else {
+                if (banner) banner.style.display = 'none';
+                if (headerBtn) headerBtn.style.display = 'none';
+            }
+        };
+
+        window.openDuplicateSalesModal = function() {
+            const modal = document.getElementById('duplicateSalesModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                renderDuplicateSalesModalList();
+            }
+        };
+
+        window.closeDuplicateSalesModal = function() {
+            const modal = document.getElementById('duplicateSalesModal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        window.renderDuplicateSalesModalList = function() {
+            const container = document.getElementById('duplicateSalesListContainer');
+            if (!container) return;
+
+            const dupeGroups = getDuplicateMainShopSales();
+            const cleanAllBtn = document.getElementById('btnCleanAllDupesModal');
+
+            if (dupeGroups.length === 0) {
+                if (cleanAllBtn) cleanAllBtn.style.display = 'none';
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉</div>
+                        <h3 style="color: var(--success); margin: 0 0 0.5rem 0;">No Duplicate Sales Detected!</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">All IMEI entries in Main Shop Direct Sales are unique and clean.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (cleanAllBtn) cleanAllBtn.style.display = 'inline-block';
+
+            let totalExcess = 0;
+            dupeGroups.forEach(g => totalExcess += g.duplicates.length);
+
+            let html = `
+                <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); padding: 0.75rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: 0.82rem; color: #991b1b;">
+                    Found <strong>${dupeGroups.length} phone IMEI(s)</strong> with a total of <strong>${totalExcess} extra duplicate records</strong>.
+                    <br>The original first sale for each phone is kept safe. You can delete individual copies or click "Clean All Duplicates" below.
+                </div>
+            `;
+
+            dupeGroups.forEach((g) => {
+                html += `
+                    <div style="background: var(--card-bg, #ffffff); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 6px;">
+                            <div>
+                                <strong style="font-size: 0.95rem; color: var(--text-main);">📱 ${g.model}</strong>
+                                <span style="display: inline-block; margin-left: 8px; font-family: monospace; background: rgba(59,130,246,0.1); color: #2563eb; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.82rem;">IMEI: ${g.imei}</span>
+                            </div>
+                            <span style="font-size: 0.78rem; font-weight: 700; background: #fee2e2; color: #dc2626; padding: 3px 8px; border-radius: 6px;">
+                                ${g.all.length} Total Entries (${g.duplicates.length} duplicate copies)
+                            </span>
+                        </div>
+
+                        <!-- Original Safe Record -->
+                        <div style="background: rgba(16,185,129,0.06); border: 1.5px solid #10b981; border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                            <div style="font-size: 0.8rem;">
+                                <span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; margin-right: 6px;">🟢 ORIGINAL FIRST SALE</span>
+                                <strong>Date:</strong> ${g.original.date || '-'} | <strong>SP:</strong> ${g.original.spNumber || '-'} | <strong>Customer:</strong> ${g.original.custName || '-'} | <strong>Profit:</strong> Rs. ${parseFloat(g.original.netProfit || g.original.profit || 0).toLocaleString()}
+                            </div>
+                            <span style="font-size: 0.72rem; color: #059669; font-weight: 700;">✅ Kept Safe</span>
+                        </div>
+
+                        <!-- Duplicate Copies -->
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                `;
+
+                g.duplicates.forEach((dup) => {
+                    html += `
+                        <div style="background: #fff5f5; border: 1.5px dashed #f87171; border-radius: 8px; padding: 0.65rem 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                            <div style="font-size: 0.8rem; color: #7f1d1d;">
+                                <span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; margin-right: 6px;">🔴 DUPLICATE COPY</span>
+                                <strong>Date:</strong> ${dup.date || '-'} | <strong>SP:</strong> ${dup.spNumber || '-'} | <strong>Customer:</strong> ${dup.custName || '-'} | <strong>Profit:</strong> Rs. ${parseFloat(dup.netProfit || dup.profit || 0).toLocaleString()}
+                            </div>
+                            <button type="button" onclick="deleteSingleDuplicateCopy('${dup.id}', '${g.imei}')" style="background: #ef4444; color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                🗑️ Delete Copy
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        };
+
+        window.deleteSingleDuplicateCopy = async function(docId, imei) {
+            if (!confirm(`Delete this duplicate copy for IMEI: ${imei}?`)) return;
+            try {
+                await deleteDoc(doc(db, "main_shop_sales", docId));
+                showToast("🗑️ Duplicate copy deleted successfully!", "success");
+                renderDuplicateSalesModalList();
+                renderMainShopProfitView();
+            } catch(err) {
+                console.error("Error deleting duplicate:", err);
+                showToast("Failed to delete duplicate copy: " + err.message, "error");
+            }
+        };
+
+        window.cleanAllDuplicateSalesNow = async function() {
+            const dupeGroups = getDuplicateMainShopSales();
+            let totalExcess = 0;
+            const docsToDelete = [];
+            dupeGroups.forEach(g => {
+                totalExcess += g.duplicates.length;
+                g.duplicates.forEach(d => docsToDelete.push(d.id));
+            });
+
+            if (docsToDelete.length === 0) {
+                showToast("No duplicate sales to clean!", "info");
+                return;
+            }
+
+            const confirmMsg = `⚠️ DUPLICATE CLEANER CONFIRMATION:\n\nFound ${dupeGroups.length} phones with a total of ${totalExcess} duplicate records.\n\nFor each phone, the ORIGINAL first sale will remain KEPT and all extra duplicate records will be deleted.\n\nDo you want to proceed with cleaning all duplicates now?`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('btnCleanAllDupesModal');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Cleaning Duplicates...';
+            }
+
+            try {
+                let deletedCount = 0;
+                for (const docId of docsToDelete) {
+                    await deleteDoc(doc(db, "main_shop_sales", docId));
+                    deletedCount++;
+                }
+
+                showToast(`✨ Cleaned ${deletedCount} duplicate sale records successfully!`, "success");
+                closeDuplicateSalesModal();
+                renderMainShopProfitView();
+            } catch(err) {
+                console.error("Error cleaning duplicates:", err);
+                showToast("Error during duplicate cleanup: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = '🗑️ Clean All Duplicates (සියල්ල ඉවත් කරන්න)';
+                }
             }
         };
 
