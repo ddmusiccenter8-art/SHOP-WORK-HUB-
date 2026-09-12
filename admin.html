@@ -1614,6 +1614,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     Activator Staff Profiles
                 </h2>
+                <button type="button" id="btnCleanAllStaffDupes" onclick="cleanAllStaffDuplicatesGlobal()" style="display: none; background: rgba(239,68,68,0.12); color: #dc2626; border: 1.5px solid rgba(239,68,68,0.35); padding: 0.45rem 0.95rem; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer;">
+                    ⚠️ Clean Duplicate Activations (<span id="globalStaffDupeCount">0</span>)
+                </button>
             </div>
             
             <!-- Staff Profiles Overview Period Filter -->
@@ -2066,6 +2069,22 @@
                     <input type="date" id="staffFilterEndDate" onchange="setStaffCustomDateRange()" style="padding: 0.35rem 0.55rem; font-size: 0.78rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main);">
                     <button type="button" onclick="setStaffCustomDateRange()" style="background: var(--primary); color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">Apply</button>
                     <button type="button" onclick="resetStaffDateFilter()" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;" title="Reset Date Filter">↺</button>
+                </div>
+            </div>
+
+            <!-- Staff Duplicate Activations Alert Banner -->
+            <div id="staffModalDupeBanner" style="display: none; background: #fef2f2; border: 1.5px solid #f87171; border-radius: 12px; padding: 0.8rem 1.1rem; margin-bottom: 1.2rem; box-shadow: 0 4px 12px rgba(239,68,68,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.35rem;">⚠️</span>
+                        <div>
+                            <strong style="color: #b91c1c; font-size: 0.88rem;">Duplicate Activations Detected! (<span id="staffModalDupeCountNum">0</span> duplicate records)</strong>
+                            <p style="margin: 2px 0 0 0; font-size: 0.76rem; color: #7f1d1d;">Same phone / IMEI was recorded multiple times for this staff member. You can delete duplicate entries to correct activation counts and balance.</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="cleanAllStaffDuplicatesForCurrentModal()" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.45rem 0.95rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; box-shadow: 0 3px 10px rgba(239,68,68,0.3);">
+                        🗑️ Clean All Duplicates (<span id="staffModalDupeBtnCount">0</span>)
+                    </button>
                 </div>
             </div>
 
@@ -5389,19 +5408,28 @@
         // ==========================================
 
         window.getDuplicateMainShopSales = function() {
-            const imeiMap = new Map();
+            const keyMap = new Map();
             (allMainShopSales || []).forEach(item => {
-                const clean = (item.imei || '').trim().toLowerCase();
-                if (!clean || clean === '-' || clean === 'n/a' || clean === 'none') return;
                 if (item.status === 'Cancelled' || item.status === 'Rejected') return;
-                if (!imeiMap.has(clean)) {
-                    imeiMap.set(clean, []);
+
+                const clean = (item.imei || '').trim().toLowerCase();
+                let key = '';
+                if (clean && clean !== '-' && clean !== 'n/a' && clean !== 'none' && clean.length >= 4) {
+                    key = 'imei:' + clean;
+                } else if (item.custName && item.custName.trim().length >= 2 && item.model && item.model.trim().length >= 2) {
+                    key = 'cust:' + item.custName.trim().toLowerCase() + '::' + item.model.trim().toLowerCase() + '::' + (item.date || '');
+                } else {
+                    return;
                 }
-                imeiMap.get(clean).push(item);
+
+                if (!keyMap.has(key)) {
+                    keyMap.set(key, []);
+                }
+                keyMap.get(key).push(item);
             });
 
             const duplicates = [];
-            imeiMap.forEach((records, imei) => {
+            keyMap.forEach((records, key) => {
                 if (records.length > 1) {
                     records.sort((a, b) => {
                         const timeA = a.timestamp || (a.date ? new Date(a.date).getTime() : 0);
@@ -5409,8 +5437,10 @@
                         return timeA - timeB;
                     });
                     duplicates.push({
-                        imei: records[0].imei,
+                        key: key,
+                        imei: records[0].imei || '(Manual / No IMEI)',
                         model: records[0].model || 'Unknown Model',
+                        custName: records[0].custName || '',
                         original: records[0],
                         duplicates: records.slice(1),
                         all: records
@@ -5469,7 +5499,7 @@
                     <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
                         <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉</div>
                         <h3 style="color: var(--success); margin: 0 0 0.5rem 0;">No Duplicate Sales Detected!</h3>
-                        <p style="margin: 0; font-size: 0.85rem;">All IMEI entries in Main Shop Direct Sales are unique and clean.</p>
+                        <p style="margin: 0; font-size: 0.85rem;">All entries in Main Shop Direct Sales are unique and clean.</p>
                     </div>
                 `;
                 return;
@@ -5482,7 +5512,7 @@
 
             let html = `
                 <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); padding: 0.75rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: 0.82rem; color: #991b1b;">
-                    Found <strong>${dupeGroups.length} phone IMEI(s)</strong> with a total of <strong>${totalExcess} extra duplicate records</strong>.
+                    Found <strong>${dupeGroups.length} duplicate item group(s)</strong> with a total of <strong>${totalExcess} extra duplicate records</strong>.
                     <br>The original first sale for each phone is kept safe. You can delete individual copies or click "Clean All Duplicates" below.
                 </div>
             `;
@@ -5494,6 +5524,7 @@
                             <div>
                                 <strong style="font-size: 0.95rem; color: var(--text-main);">📱 ${g.model}</strong>
                                 <span style="display: inline-block; margin-left: 8px; font-family: monospace; background: rgba(59,130,246,0.1); color: #2563eb; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.82rem;">IMEI: ${g.imei}</span>
+                                ${g.custName ? `<span style="font-size:0.78rem; color:var(--text-muted); margin-left:6px;">(${g.custName})</span>` : ''}
                             </div>
                             <span style="font-size: 0.78rem; font-weight: 700; background: #fee2e2; color: #dc2626; padding: 3px 8px; border-radius: 6px;">
                                 ${g.all.length} Total Entries (${g.duplicates.length} duplicate copies)
@@ -5537,12 +5568,20 @@
         };
 
         window.deleteSingleDuplicateCopy = async function(docId, imei) {
-            if (!confirm(`Delete this duplicate copy for IMEI: ${imei}?`)) return;
+            if (!confirm(`Delete this duplicate copy for ${imei}?`)) return;
             try {
                 await deleteDoc(doc(db, "main_shop_sales", docId));
+                allMainShopSales = allMainShopSales.filter(s => s.id !== docId);
+                if (currentStaffSales && currentStaffSales.length > 0) {
+                    currentStaffSales = currentStaffSales.filter(s => s.id !== docId);
+                }
                 showToast("🗑️ Duplicate copy deleted successfully!", "success");
                 renderDuplicateSalesModalList();
                 renderMainShopProfitView();
+                renderStaffProfiles();
+                if (document.getElementById('staffModal')?.style.display === 'flex') {
+                    applyStaffModalFilters();
+                }
             } catch(err) {
                 console.error("Error deleting duplicate:", err);
                 showToast("Failed to delete duplicate copy: " + err.message, "error");
@@ -5563,7 +5602,7 @@
                 return;
             }
 
-            const confirmMsg = `⚠️ DUPLICATE CLEANER CONFIRMATION:\n\nFound ${dupeGroups.length} phones with a total of ${totalExcess} duplicate records.\n\nFor each phone, the ORIGINAL first sale will remain KEPT and all extra duplicate records will be deleted.\n\nDo you want to proceed with cleaning all duplicates now?`;
+            const confirmMsg = `⚠️ DUPLICATE CLEANER CONFIRMATION:\n\nFound ${dupeGroups.length} item groups with a total of ${totalExcess} duplicate records.\n\nFor each phone, the ORIGINAL first sale will remain KEPT and all extra duplicate records will be deleted.\n\nDo you want to proceed with cleaning all duplicates now?`;
             if (!confirm(confirmMsg)) return;
 
             const btn = document.getElementById('btnCleanAllDupesModal');
@@ -5579,9 +5618,18 @@
                     deletedCount++;
                 }
 
+                allMainShopSales = allMainShopSales.filter(s => !docsToDelete.includes(s.id));
+                if (currentStaffSales && currentStaffSales.length > 0) {
+                    currentStaffSales = currentStaffSales.filter(s => !docsToDelete.includes(s.id));
+                }
+
                 showToast(`✨ Cleaned ${deletedCount} duplicate sale records successfully!`, "success");
                 closeDuplicateSalesModal();
                 renderMainShopProfitView();
+                renderStaffProfiles();
+                if (document.getElementById('staffModal')?.style.display === 'flex') {
+                    applyStaffModalFilters();
+                }
             } catch(err) {
                 console.error("Error cleaning duplicates:", err);
                 showToast("Error during duplicate cleanup: " + err.message, "error");
@@ -7416,12 +7464,87 @@
             return true; // 'all'
         }
 
+        // Activator Staff Duplicate Detection Helper
+        function getStaffDuplicates(salesList) {
+            const keyMap = new Map();
+            const duplicateDocIds = new Set();
+            const duplicateGroups = [];
+
+            (salesList || []).forEach(item => {
+                if (!item || !item.id) return;
+                if (item.status === 'Cancelled' || item.status === 'Rejected') return;
+
+                const rawStaff = (item.staffName || '').trim();
+                if (!rawStaff) return;
+                const staffKey = normalizeStaffName(rawStaff).toLowerCase();
+
+                const cleanImei = (item.imei || '').trim().toLowerCase();
+                let key = '';
+                if (cleanImei && cleanImei !== '-' && cleanImei !== 'n/a' && cleanImei !== 'none' && cleanImei.length >= 4) {
+                    key = staffKey + '::imei:' + cleanImei;
+                } else if (item.custName && item.custName.trim().length >= 2 && item.model && item.model.trim().length >= 2) {
+                    key = staffKey + '::cust:' + item.custName.trim().toLowerCase() + '::' + item.model.trim().toLowerCase() + '::' + (item.date || '');
+                } else {
+                    return;
+                }
+
+                if (!keyMap.has(key)) {
+                    keyMap.set(key, []);
+                }
+                keyMap.get(key).push(item);
+            });
+
+            keyMap.forEach((records, key) => {
+                if (records.length > 1) {
+                    records.sort((a, b) => {
+                        const paidA = (a.staffPaymentStatus === 'Paid') ? 1 : 0;
+                        const paidB = (b.staffPaymentStatus === 'Paid') ? 1 : 0;
+                        if (paidA !== paidB) return paidB - paidA;
+                        const timeA = a.timestamp || (a.date ? new Date(a.date).getTime() : 0);
+                        const timeB = b.timestamp || (b.date ? new Date(b.date).getTime() : 0);
+                        return timeA - timeB;
+                    });
+
+                    const original = records[0];
+                    const dupes = records.slice(1);
+                    dupes.forEach(d => duplicateDocIds.add(d.id));
+
+                    duplicateGroups.push({
+                        key: key,
+                        staffName: original.staffName || '',
+                        imei: original.imei || '(Manual / No IMEI)',
+                        model: original.model || 'Unknown Model',
+                        custName: original.custName || '',
+                        original: original,
+                        duplicates: dupes,
+                        all: records
+                    });
+                }
+            });
+
+            return { duplicateGroups, duplicateDocIds };
+        }
+        window.getStaffDuplicates = getStaffDuplicates;
+
         // Main Staff Profiles Overview Rendering
         function renderStaffProfiles() {
             const grid = document.getElementById('staffGrid');
             if (!grid) return;
             
             const staffMap = {};
+
+            // Check duplicates across all staff activations
+            const allStaffDupes = (typeof getStaffDuplicates === 'function') ? getStaffDuplicates(allMainShopSales || []) : { duplicateDocIds: new Set() };
+            const globalBtn = document.getElementById('btnCleanAllStaffDupes');
+            const globalCountEl = document.getElementById('globalStaffDupeCount');
+            if (globalBtn && globalCountEl) {
+                if (allStaffDupes.duplicateDocIds.size > 0) {
+                    globalBtn.style.display = 'inline-block';
+                    globalCountEl.innerText = allStaffDupes.duplicateDocIds.size.toString();
+                } else {
+                    globalBtn.style.display = 'none';
+                }
+            }
             
             // Filter allMainShopSales by currentMainStaffDateFilter
             const filteredSales = (allMainShopSales || []).filter(s => 
@@ -7494,6 +7617,11 @@
             
             staffArray.forEach(staff => {
                 const initial = staff.originalName.charAt(0).toUpperCase();
+                const staffDupes = (typeof getStaffDuplicates === 'function') ? getStaffDuplicates(staff.sales) : { duplicateDocIds: new Set() };
+                const dupeCount = staffDupes.duplicateDocIds.size;
+                const dupeBadge = dupeCount > 0 
+                    ? `<span style="background: #fee2e2; color: #dc2626; border: 1px solid #f87171; font-size: 0.70rem; font-weight: 800; padding: 2px 7px; border-radius: 6px;">⚠️ ${dupeCount} Dup</span>` 
+                    : '';
                 
                 const card = document.createElement('div');
                 card.className = 'shop-card';
@@ -7504,8 +7632,11 @@
                         <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: bold; color: white; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
                             ${initial}
                         </div>
-                        <div style="text-align: left;">
-                            <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; font-weight: 700;">${staff.originalName}</h3>
+                        <div style="text-align: left; flex: 1;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                                <h3 style="color: var(--text-main); margin: 0; font-size: 1.15rem; font-weight: 700;">${staff.originalName}</h3>
+                                ${dupeBadge}
+                            </div>
                             <span style="font-size: 0.76rem; color: var(--text-muted);">Activator Staff</span>
                         </div>
                     </div>
@@ -7633,6 +7764,22 @@
 
         // Master Filter & Render Function for Staff Modal
         function applyStaffModalFilters() {
+            // Check duplicate activations for this staff member
+            const staffDupes = getStaffDuplicates(currentStaffSales || []);
+            const dupeBanner = document.getElementById('staffModalDupeBanner');
+            const dupeCountNum = document.getElementById('staffModalDupeCountNum');
+            const dupeBtnCount = document.getElementById('staffModalDupeBtnCount');
+            if (dupeBanner && dupeCountNum && dupeBtnCount) {
+                const dupeCount = staffDupes.duplicateDocIds.size;
+                if (dupeCount > 0) {
+                    dupeBanner.style.display = 'block';
+                    dupeCountNum.innerText = dupeCount;
+                    dupeBtnCount.innerText = dupeCount;
+                } else {
+                    dupeBanner.style.display = 'none';
+                }
+            }
+
             // 1. Filter staff sales by the active Date Period
             const dateFilteredSales = currentStaffSales.filter(s => {
                 const dateMatches = matchesPeriodFilter(s.date, currentStaffDateFilter, currentStaffStartDate, currentStaffEndDate);
@@ -7686,7 +7833,7 @@
             });
 
             // 4. Render Table
-            renderStaffHistoryTableContent(finalSales);
+            renderStaffHistoryTableContent(finalSales, staffDupes.duplicateDocIds);
         }
 
         window.filterStaffHistory = function(filter) {
@@ -7698,7 +7845,7 @@
             applyStaffModalFilters();
         };
 
-        function renderStaffHistoryTableContent(salesList) {
+        function renderStaffHistoryTableContent(salesList, duplicateDocIds = new Set()) {
             const tbody = document.getElementById('staffHistoryTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
@@ -7722,19 +7869,24 @@
             }
 
             sortedSales.forEach(s => {
+                const isDupe = duplicateDocIds && duplicateDocIds.has(s.id);
                 const tr = document.createElement('tr');
                 tr.style.cursor = 'pointer';
                 tr.title = "Click to view more details";
+                if (isDupe) {
+                    tr.style.background = '#fff5f5';
+                    tr.style.borderLeft = '3.5px solid #ef4444';
+                }
                 tr.onclick = function(e) {
                     if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
                     const detailsRow = this.nextElementSibling;
                     if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
                         if (detailsRow.style.display === 'none') {
                             detailsRow.style.display = 'table-row';
-                            this.style.background = 'rgba(255,255,255,0.05)';
+                            this.style.background = isDupe ? '#fee2e2' : 'rgba(255,255,255,0.05)';
                         } else {
                             detailsRow.style.display = 'none';
-                            this.style.background = '';
+                            this.style.background = isDupe ? '#fff5f5' : '';
                         }
                     }
                 };
@@ -7779,7 +7931,18 @@
                 }
 
                 let actionBtnHtml = '';
-                if (isPaid) {
+                if (isDupe) {
+                    actionBtnHtml = `
+                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <button type="button" onclick="deleteSingleStaffDuplicate('${s.id}')" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.42rem 0.75rem; border-radius: 7px; cursor: pointer; font-weight: 800; font-size: 0.74rem; box-shadow: 0 2px 6px rgba(239,68,68,0.3); display: inline-flex; align-items: center; gap: 4px;" title="Delete this duplicate record">
+                                🗑️ Delete Dupe
+                            </button>
+                            <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.70rem; font-weight: 600;" title="Edit details">
+                                ✏️
+                            </button>
+                        </div>
+                    `;
+                } else if (isPaid) {
                     actionBtnHtml = `
                         <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
                             <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.35rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;" title="Change / Edit payment date & time">
@@ -7788,19 +7951,29 @@
                             <button type="button" onclick="revertStaffFeeToPending('${s.id}')" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600;" title="Revert back to Pending">
                                 ↺
                             </button>
+                            <button type="button" onclick="deleteSingleStaffDuplicate('${s.id}')" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 0.35rem 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem;" title="Delete this activation record" onmouseover="this.style.color='#ef4444'; this.style.borderColor='#fca5a5';" onmouseout="this.style.color='#94a3b8'; this.style.borderColor='#e2e8f0';">
+                                🗑️
+                            </button>
                         </div>
                     `;
                 } else {
                     actionBtnHtml = `
-                        <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.42rem 0.8rem; border-radius: 7px; cursor: pointer; font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(16,185,129,0.25); display: inline-flex; align-items: center; gap: 4px;">
-                            💰 Mark as Paid
-                        </button>
+                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.42rem 0.8rem; border-radius: 7px; cursor: pointer; font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(16,185,129,0.25); display: inline-flex; align-items: center; gap: 4px;">
+                                💰 Mark as Paid
+                            </button>
+                            <button type="button" onclick="deleteSingleStaffDuplicate('${s.id}')" style="background: transparent; color: #94a3b8; border: 1px solid #e2e8f0; padding: 0.35rem 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem;" title="Delete this activation record" onmouseover="this.style.color='#ef4444'; this.style.borderColor='#fca5a5';" onmouseout="this.style.color='#94a3b8'; this.style.borderColor='#e2e8f0';">
+                                🗑️
+                            </button>
+                        </div>
                     `;
                 }
 
+                const dupeBadge = isDupe ? `<br><span style="background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px;">⚠️ DUPLICATE ENTRY</span>` : '';
+
                 tr.innerHTML = `
                     <td><strong>${s.date || '-'}</strong></td>
-                    <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
+                    <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span>${dupeBadge}</td>
                     <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
                     <td>${statusBadgeHtml}</td>
                     <td>${actionBtnHtml}</td>
@@ -7811,7 +7984,7 @@
                 const detailsTr = document.createElement('tr');
                 detailsTr.className = 'staff-details-row';
                 detailsTr.style.display = 'none';
-                detailsTr.style.background = 'rgba(0,0,0,0.03)';
+                detailsTr.style.background = isDupe ? '#fef2f2' : 'rgba(0,0,0,0.03)';
                 detailsTr.innerHTML = `
                     <td colspan="5" style="padding: 1.2rem; border-bottom: 1px solid var(--border-color);">
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.9rem; font-size: 0.85rem;">
@@ -7850,6 +8023,11 @@
                                 <p style="color: var(--text-main); margin: 0; font-weight: 600;">${s.staffPaidNote}</p>
                             </div>` : ''}
                             ` : ''}
+                            <div style="grid-column: 1 / -1; margin-top: 0.5rem; display: flex; justify-content: flex-end; gap: 8px;">
+                                <button type="button" onclick="deleteSingleStaffDuplicate('${s.id}')" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1.5px solid rgba(239, 68, 68, 0.3); padding: 0.4rem 0.85rem; border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-weight: 700;">
+                                    🗑️ Delete This Record
+                                </button>
+                            </div>
                         </div>
                     </td>
                 `;
@@ -8022,6 +8200,142 @@
 
         window.markStaffFeePaid = function(docId) {
             openMarkStaffPaidModal(docId);
+        };
+
+        // ==========================================
+        // STAFF ACTIVATION DUPLICATE CLEANER HANDLERS
+        // ==========================================
+        window.deleteSingleStaffDuplicate = async function(docId) {
+            const sale = (allMainShopSales || []).find(s => s.id === docId);
+            const desc = sale 
+                ? `Customer: ${sale.custName || 'N/A'}\nDevice: ${sale.model || 'N/A'}\nIMEI: ${sale.imei || '-'}\nDate: ${sale.date || '-'}` 
+                : 'this record';
+                
+            if (!confirm(`⚠️ Delete Activation Record?\n\n${desc}\n\nThis will remove the entry and recalculate activations and balance.`)) return;
+
+            try {
+                // If this phone had an inventory item and NO OTHER sale exists for it, restore inventory
+                if (sale && sale.imei) {
+                    const cleanImei = sale.imei.trim().toLowerCase();
+                    const hasOtherSale = (allMainShopSales || []).some(s => s.id !== docId && s.imei && s.imei.trim().toLowerCase() === cleanImei);
+                    if (!hasOtherSale && cleanImei && cleanImei !== '-' && cleanImei !== 'n/a') {
+                        const invMatch = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === cleanImei);
+                        if (invMatch && invMatch.status === 'Sold') {
+                            try {
+                                await updateDoc(doc(db, "inventory", invMatch.id), {
+                                    status: 'Available',
+                                    updatedAt: Date.now()
+                                });
+                            } catch(e) {
+                                console.warn("Could not revert inventory status:", e);
+                            }
+                        }
+                    }
+                }
+
+                await deleteDoc(doc(db, "main_shop_sales", docId));
+                allMainShopSales = (allMainShopSales || []).filter(s => s.id !== docId);
+                if (currentStaffSales) {
+                    currentStaffSales = currentStaffSales.filter(s => s.id !== docId);
+                }
+
+                showToast("🗑️ Activation record deleted successfully!", "success");
+                applyStaffModalFilters();
+                renderStaffProfiles();
+                if (typeof checkDuplicateSalesAlert === 'function') checkDuplicateSalesAlert();
+                if (typeof renderDuplicateSalesModalList === 'function') renderDuplicateSalesModalList();
+                if (typeof renderMainShopProfitView === 'function') renderMainShopProfitView();
+            } catch(err) {
+                console.error("Error deleting staff activation:", err);
+                showToast("Failed to delete record: " + err.message, "error");
+            }
+        };
+
+        window.deleteSingleStaffSale = window.deleteSingleStaffDuplicate;
+
+        window.cleanAllStaffDuplicatesForCurrentModal = async function() {
+            const staffDupes = getStaffDuplicates(currentStaffSales || []);
+            const docsToDelete = Array.from(staffDupes.duplicateDocIds);
+
+            if (docsToDelete.length === 0) {
+                showToast("No duplicate activations found for this staff member.", "info");
+                return;
+            }
+
+            const staffName = currentStaffActiveName || 'this staff member';
+            const confirmMsg = `⚠️ CLEAN DUPLICATE ACTIVATIONS:\n\nFound ${docsToDelete.length} duplicate activation records for ${staffName}.\n\nThe ORIGINAL sale record will be safely KEPT, and extra duplicates will be deleted.\n\nDo you want to clean all ${docsToDelete.length} duplicate activations now?`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                let deletedCount = 0;
+                for (const docId of docsToDelete) {
+                    await deleteDoc(doc(db, "main_shop_sales", docId));
+                    deletedCount++;
+                }
+
+                allMainShopSales = (allMainShopSales || []).filter(s => !docsToDelete.includes(s.id));
+                if (currentStaffSales) {
+                    currentStaffSales = currentStaffSales.filter(s => !docsToDelete.includes(s.id));
+                }
+
+                showToast(`✨ Cleaned ${deletedCount} duplicate activations for ${staffName}!`, "success");
+                applyStaffModalFilters();
+                renderStaffProfiles();
+                if (typeof checkDuplicateSalesAlert === 'function') checkDuplicateSalesAlert();
+                if (typeof renderDuplicateSalesModalList === 'function') renderDuplicateSalesModalList();
+                if (typeof renderMainShopProfitView === 'function') renderMainShopProfitView();
+            } catch(err) {
+                console.error("Error cleaning duplicates for staff:", err);
+                showToast("Failed to clean duplicates: " + err.message, "error");
+            }
+        };
+
+        window.cleanAllStaffDuplicatesGlobal = async function() {
+            const allStaffDupes = getStaffDuplicates(allMainShopSales || []);
+            const docsToDelete = Array.from(allStaffDupes.duplicateDocIds);
+
+            if (docsToDelete.length === 0) {
+                showToast("No duplicate activations found across staff members.", "info");
+                return;
+            }
+
+            const confirmMsg = `⚠️ GLOBAL ACTIVATOR DUPLICATE CLEANER:\n\nFound ${allStaffDupes.duplicateGroups.length} duplicate groups with ${docsToDelete.length} duplicate activation records across all staff members.\n\nOriginal activations will be KEPT, and only redundant duplicate records will be deleted.\n\nDo you want to clean all ${docsToDelete.length} duplicate activations now?`;
+            if (!confirm(confirmMsg)) return;
+
+            const globalBtn = document.getElementById('btnCleanAllStaffDupes');
+            if (globalBtn) {
+                globalBtn.disabled = true;
+                globalBtn.innerText = 'Cleaning Duplicates...';
+            }
+
+            try {
+                let deletedCount = 0;
+                for (const docId of docsToDelete) {
+                    await deleteDoc(doc(db, "main_shop_sales", docId));
+                    deletedCount++;
+                }
+
+                allMainShopSales = (allMainShopSales || []).filter(s => !docsToDelete.includes(s.id));
+                if (currentStaffSales) {
+                    currentStaffSales = currentStaffSales.filter(s => !docsToDelete.includes(s.id));
+                }
+
+                showToast(`✨ Successfully cleaned ${deletedCount} duplicate activations across all staff!`, "success");
+                renderStaffProfiles();
+                if (document.getElementById('staffModal')?.style.display === 'flex') {
+                    applyStaffModalFilters();
+                }
+                if (typeof checkDuplicateSalesAlert === 'function') checkDuplicateSalesAlert();
+                if (typeof renderDuplicateSalesModalList === 'function') renderDuplicateSalesModalList();
+                if (typeof renderMainShopProfitView === 'function') renderMainShopProfitView();
+            } catch(err) {
+                console.error("Error cleaning global staff duplicates:", err);
+                showToast("Failed to clean duplicates: " + err.message, "error");
+            } finally {
+                if (globalBtn) {
+                    globalBtn.disabled = false;
+                }
+            }
         };
 
         // Barcode Scanner Logic (Ultra-HD, Continuous Autofocus, Zoom & Torch Flash)
