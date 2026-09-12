@@ -1191,7 +1191,8 @@
                 <div style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 32px 0 rgba(37, 99, 235, 0.12); padding: 1.2rem; border-radius: 16px; position: relative; overflow: hidden;">
                     <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">🔵</div>
                     <h3 style="color: #1d4ed8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; margin-bottom: 0.4rem;">DIALOG LESI PAY PROFIT</h3>
-                    <p style="font-size: 1.6rem; font-weight: 900; color: #1e3a8a;" id="mainDialogLesiPayProfit">Rs. 0.00</p>
+                    <p style="font-size: 1.6rem; font-weight: 900; color: #1e3a8a; margin: 0;" id="mainDialogLesiPayProfit">Rs. 0.00</p>
+                    <span id="mainDialogLesiPaySub" style="font-size: 0.75rem; color: #2563eb; font-weight: 700; display: block; margin-top: 4px;">7% Profit from Dialog</span>
                 </div>
 
                 <div style="grid-column: 1 / -1; background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.2); padding: 1.8rem; border-radius: 20px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
@@ -1328,12 +1329,12 @@
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.)</label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.) <span style="font-size: 0.74rem; color: #2563eb; font-weight: 700;">(Required - enter manually)</span></label>
                                 <input type="number" id="lpSaleMrp" step="0.01" placeholder="e.g. 56990.00" oninput="calculateLesiPayLiveProfit()">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Down Payment (මූලික ගෙවීම රු.)</label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Down Payment (මූලික ගෙවීම රු.) <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if full loan)</span></label>
                                 <input type="number" id="lpSaleDp" step="0.01" placeholder="e.g. 19600.00" oninput="calculateLesiPayLiveProfit()">
                             </div>
 
@@ -1352,23 +1353,23 @@
                                 <div id="lpStaffPills" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.45rem;"></div>
 
                                 <!-- Autocomplete Input for Custom Names -->
-                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Or type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'LP')" style="width: 100%;">
+                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Or type staff name (leave blank for Direct/Owner)..." autocomplete="off" oninput="handleStaffInput(this.value, 'LP')" style="width: 100%;">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Commission (කොමිස් මුදල රු.)</label>
-                                <input type="number" id="lpSaleComm" step="1" value="500" placeholder="500" oninput="calculateLesiPayLiveProfit()">
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Commission (කොමිස් මුදල රු.) <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if direct sale)</span></label>
+                                <input type="number" id="lpSaleComm" step="1" value="0" placeholder="0" oninput="calculateLesiPayLiveProfit()">
                             </div>
 
                             <!-- Live Dialog Lesi Pay Profit Breakdown Banner -->
-                            <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 12px; border: 1px dashed #3b82f6; margin-bottom: 1.2rem;">
+                            <div style="background: rgba(59, 130, 246, 0.08); padding: 1rem; border-radius: 12px; border: 1.5px dashed #3b82f6; margin-bottom: 1.2rem;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
-                                    <span style="font-size: 0.82rem; color: var(--text-muted);">Dialog Lesi Pay Profit (7% MRP):</span>
-                                    <strong id="lpLiveProfit" style="color: #3b82f6;">Rs. 0.00</strong>
+                                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Dialog Lesi Pay Profit (7% of MRP):</span>
+                                    <strong id="lpLiveProfit" style="color: #2563eb; font-size: 1.05rem;">Rs. 0.00</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
-                                    <span style="font-size: 0.82rem; color: var(--text-muted);">Net Profit (Profit - Commission):</span>
-                                    <strong id="lpLiveNetProfit" style="color: var(--success); font-size: 1.05rem;">Rs. 0.00</strong>
+                                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Net Profit (Added to Sales Profit):</span>
+                                    <strong id="lpLiveNetProfit" style="color: var(--success); font-size: 1.15rem;">Rs. 0.00</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(59, 130, 246, 0.25); padding-top: 0.4rem; margin-top: 0.4rem;">
                                     <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: bold;">Settlement to Dialog (MRP - DP - Profit):</span>
@@ -1457,6 +1458,17 @@
                             <label style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Storage Capacity</label>
                             <input type="text" id="invStorage" list="invStorageDatalist" required placeholder="e.g. 4+128GB, 8+256GB..." style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
                             <datalist id="invStorageDatalist"></datalist>
+                        </div>
+
+                        <!-- Dialog Lesi Pay Info Banner for Inventory Addition -->
+                        <div id="lesiPayInvInfoBanner" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1.5px solid rgba(59, 130, 246, 0.3); padding: 0.85rem 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                            <div style="display: flex; gap: 8px; align-items: flex-start;">
+                                <span style="font-size: 1.25rem;">📱</span>
+                                <div style="font-size: 0.82rem; color: #1e40af; line-height: 1.45;">
+                                    <strong style="color: #1e3a8a; font-size: 0.88rem;">Dialog Lesi Pay Stock Mode:</strong><br>
+                                    Buy Cost is <strong>Rs. 0</strong> (අපි Item Buy කරන්නේ නැත). Selling MRP ඇතුළත් කිරීම <strong>අවශ්‍ය නැත</strong> (විකුණුම් අවස්ථාවේදී MRP ඇතුළත් කළ හැක). විකුණන විට <strong>7% Profit</strong> එක ස්වයංක්‍රීයව Sales Profit එකට එකතු වේ.
+                                </div>
+                            </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
@@ -4117,6 +4129,20 @@
             if (mode === 'HO') {
                 const statusEl = document.getElementById('mainSaleStockStatus');
                 if (found) {
+                    if (found.category === 'Dialog Lesi Pay') {
+                        // Automatically switch to Dialog Lesi Pay mode for this phone
+                        document.getElementById('mainSaleType').value = 'Dialog Lesi Pay';
+                        toggleMainSaleFormType();
+                        document.getElementById('lpSaleImei').value = found.imei;
+                        handleSaleImeiLookup(found.imei, 'LP');
+                        showToast(`📱 Dialog Lesi Pay item detected (${found.model})! Switched to Dialog Lesi Pay mode. Enter Selling MRP manually for 7% profit.`, "info");
+                        setTimeout(() => {
+                            const mrpInput = document.getElementById('lpSaleMrp');
+                            if (mrpInput) mrpInput.focus();
+                        }, 150);
+                        return;
+                    }
+
                     if (found.model) {
                         const modelInput = document.getElementById('mainSaleModel');
                         if (modelInput) {
@@ -4151,16 +4177,21 @@
                             modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
                         }
                     }
+                    const mrpInput = document.getElementById('lpSaleMrp');
                     if (found.mrp && parseFloat(found.mrp) > 0) {
-                        document.getElementById('lpSaleMrp').value = found.mrp;
-                    } else if (found.buyPrice && parseFloat(found.buyPrice) > 0) {
-                        document.getElementById('lpSaleMrp').value = found.buyPrice;
+                        if (mrpInput && !mrpInput.value) mrpInput.value = found.mrp;
                     }
                     if (statusEl) {
-                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()}</span>`;
+                        const mrpText = (found.mrp && parseFloat(found.mrp) > 0) 
+                            ? `MRP: Rs. ${parseFloat(found.mrp).toLocaleString()}` 
+                            : `MRP: Enter manually below (7% profit)`;
+                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | ${mrpText}</span>`;
                     }
                     calculateLesiPayLiveProfit();
-                    showToast(`✨ Stock Found: ${found.model} | MRP: Rs. ${parseFloat(found.mrp || found.buyPrice || 0).toLocaleString()}`, "success");
+                    setTimeout(() => {
+                        if (mrpInput) mrpInput.focus();
+                    }, 100);
+                    showToast(`✨ Stock Found: ${found.model}! Enter Selling MRP manually for 7% profit.`, "success");
                 } else {
                     if (statusEl) {
                         statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
@@ -4179,7 +4210,11 @@
             const settlement = mrp - dp - profit;
 
             document.getElementById('lpLiveProfit').innerText = 'Rs. ' + profit.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('lpLiveNetProfit').innerText = 'Rs. ' + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            const netEl = document.getElementById('lpLiveNetProfit');
+            if (netEl) {
+                netEl.innerText = 'Rs. ' + netProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+                netEl.style.color = netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
             document.getElementById('lpLiveSettlement').innerText = 'Rs. ' + settlement.toLocaleString(undefined, {minimumFractionDigits: 2});
         };
 
@@ -4215,11 +4250,19 @@
                     const mrp = parseFloat(document.getElementById('lpSaleMrp').value) || 0;
                     const dp = parseFloat(document.getElementById('lpSaleDp').value) || 0;
                     const rawActivator = document.getElementById('lpSaleActivator').value.trim();
-                    const activator = normalizeStaffName(rawActivator);
+                    const activator = rawActivator ? normalizeStaffName(rawActivator) : 'DIRECT / OWNER';
                     const comm = parseFloat(document.getElementById('lpSaleComm').value) || 0;
 
-                    if (!model || !imei || !mrp || !activator) {
-                        showToast("Please fill all required Dialog Lesi Pay fields", "warning");
+                    if (!model || !imei) {
+                        showToast("Please enter Model and IMEI number", "warning");
+                        btn.disabled = false;
+                        btn.innerText = 'Add Dialog Lesi Pay Sale Entry';
+                        return;
+                    }
+                    if (mrp <= 0) {
+                        showToast("Please enter the Selling MRP manually (7% profit will be calculated)", "warning");
+                        const mrpInput = document.getElementById('lpSaleMrp');
+                        if (mrpInput) mrpInput.focus();
                         btn.disabled = false;
                         btn.innerText = 'Add Dialog Lesi Pay Sale Entry';
                         return;
@@ -4251,11 +4294,30 @@
                     };
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
-                    saveActivatorStaffName(activator);
+                    if (activator && activator !== 'DIRECT / OWNER') {
+                        saveActivatorStaffName(activator);
+                    }
+
+                    // Mark stock item in inventory as Sold if matched
+                    const invMatch = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === imei.toLowerCase());
+                    if (invMatch) {
+                        try {
+                            await updateDoc(doc(db, "inventory", invMatch.id), {
+                                status: 'Sold',
+                                soldAt: Date.now(),
+                                soldDate: dateVal,
+                                soldPrice: mrp,
+                                soldType: 'Dialog Lesi Pay',
+                                salesSource: 'main_shop_sales'
+                            });
+                        } catch (invErr) {
+                            console.warn("Could not update inventory doc status:", invErr);
+                        }
+                    }
                     
                     // Instant Form Reset & Auto-Refresh for Next Entry
                     resetMainSaleFormForNextEntry('Dialog Lesi Pay', activator);
-                    showToast("✨ Dialog Lesi Pay sale added! Ready for next phone.", "success");
+                    showToast(`✨ Dialog Lesi Pay sale added! 7% Profit (Rs. ${profit.toLocaleString(undefined, {minimumFractionDigits: 2})}) added to Sales Profit.`, "success");
                 } else {
                     const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
                     const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
@@ -4265,13 +4327,14 @@
                     const rawStaffName = document.getElementById('mainSaleStaffName').value.trim();
                     const staffName = normalizeStaffName(rawStaffName);
                     const netProfit = mrp - buyPrice - leaseFee - staffFee;
+                    const hoImeiVal = document.getElementById('mainSaleImei').value.trim();
 
                     const payload = {
                         date: dateVal,
                         spNumber: document.getElementById('mainSaleSp').value.trim(),
                         custName: document.getElementById('mainSaleCustName').value.trim(),
                         custNic: document.getElementById('mainSaleCustNic').value.trim(),
-                        imei: document.getElementById('mainSaleImei').value.trim(),
+                        imei: hoImeiVal,
                         model: document.getElementById('mainSaleModel').value.trim(),
                         mrp: mrp,
                         buyPrice: buyPrice,
@@ -4287,6 +4350,23 @@
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
                     saveActivatorStaffName(staffName);
+
+                    // Mark stock item in inventory as Sold if matched
+                    const invMatch = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === hoImeiVal.toLowerCase());
+                    if (invMatch) {
+                        try {
+                            await updateDoc(doc(db, "inventory", invMatch.id), {
+                                status: 'Sold',
+                                soldAt: Date.now(),
+                                soldDate: dateVal,
+                                soldPrice: mrp,
+                                soldType: 'Head Office Direct Sale',
+                                salesSource: 'main_shop_sales'
+                            });
+                        } catch (invErr) {
+                            console.warn("Could not update inventory doc status:", invErr);
+                        }
+                    }
 
                     // Instant Form Reset & Auto-Refresh for Next Entry
                     resetMainSaleFormForNextEntry('Head Office Direct Sale', staffName);
@@ -4547,7 +4627,7 @@
             const lpDp = document.getElementById('lpSaleDp');
             if (lpDp) lpDp.value = '';
             const lpComm = document.getElementById('lpSaleComm');
-            if (lpComm) lpComm.value = '500';
+            if (lpComm) lpComm.value = '0';
 
             // Clear stock status indicators
             const hoStatus = document.getElementById('mainSaleStockStatus');
@@ -4610,11 +4690,20 @@
                 if (!dateMap[d]) {
                     dateMap[d] = { mrp: 0, buy: 0, net: 0 };
                 }
+                const isLesi = (s.category === 'Dialog Lesi Pay' || s.source === 'Dialog Lesi Pay');
                 const mrp = parseFloat(s.mrp) || 0;
-                const buy = parseFloat(s.buyPrice) || 0;
+                const buy = isLesi ? 0 : (parseFloat(s.buyPrice) || 0);
                 const lease = parseFloat(s.leaseFee) || 0;
                 const staff = parseFloat(s.staffFee) || 0;
-                const net = parseFloat(s.netProfit) || (mrp - buy - lease - staff);
+
+                let net = 0;
+                if (s.netProfit !== undefined && s.netProfit !== null && !isNaN(parseFloat(s.netProfit))) {
+                    net = parseFloat(s.netProfit);
+                } else if (isLesi) {
+                    net = (mrp * 0.07) - staff;
+                } else {
+                    net = mrp - buy - lease - staff;
+                }
 
                 dateMap[d].mrp += mrp;
                 dateMap[d].buy += buy;
@@ -4767,18 +4856,36 @@
                 return true;
             });
 
+            let totalDialogLesiPayProfit = 0;
+            let totalDialogLesiPayCount = 0;
+
             filteredSales.forEach(item => {
+                const isLesi = (item.category === 'Dialog Lesi Pay' || item.source === 'Dialog Lesi Pay');
                 const mrp = parseFloat(item.mrp) || 0;
-                const buy = parseFloat(item.buyPrice) || 0;
+                const buy = isLesi ? 0 : (parseFloat(item.buyPrice) || 0);
                 const lease = parseFloat(item.leaseFee) || 0;
                 const staff = parseFloat(item.staffFee) || 0;
-                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+
+                let net = 0;
+                if (item.netProfit !== undefined && item.netProfit !== null && !isNaN(parseFloat(item.netProfit))) {
+                    net = parseFloat(item.netProfit);
+                } else if (isLesi) {
+                    net = (mrp * 0.07) - staff;
+                } else {
+                    net = mrp - buy - lease - staff;
+                }
 
                 totalMrp += mrp;
                 totalBuyPrice += buy;
                 totalLeaseFees += lease;
                 totalStaffFees += staff;
                 totalNetProfit += net;
+
+                if (isLesi) {
+                    const profit7 = (item.profit !== undefined && item.profit !== null && !isNaN(parseFloat(item.profit))) ? parseFloat(item.profit) : (mrp * 0.07);
+                    totalDialogLesiPayProfit += profit7;
+                    totalDialogLesiPayCount++;
+                }
             });
 
             document.getElementById('mainTotalPhonesSold').innerText = filteredSales.length.toString();
@@ -4795,17 +4902,14 @@
             // Render visual analytics chart
             renderMainProfitAnalyticsChart(filteredSales);
 
-            // Calculate Dialog Lesi Pay (7% of MRP) Profit separately
-            let totalDialogLesiPayProfit = 0;
-            allMainShopSales.concat(allSales || []).forEach(item => {
-                if (item.category === 'Dialog Lesi Pay' || item.source === 'Dialog Lesi Pay') {
-                    const mrpVal = parseFloat(item.mrp || item.loanAmount) || 0;
-                    totalDialogLesiPayProfit += mrpVal * 0.07;
-                }
-            });
+            // Dialog Lesi Pay (7% of MRP) Profit separately for selected period
             const lesiPayEl = document.getElementById('mainDialogLesiPayProfit');
             if (lesiPayEl) {
                 lesiPayEl.innerText = 'Rs. ' + totalDialogLesiPayProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+            }
+            const lesiSubEl = document.getElementById('mainDialogLesiPaySub');
+            if (lesiSubEl) {
+                lesiSubEl.innerText = `${totalDialogLesiPayCount} Phones | 7% Profit Added to Total`;
             }
 
             if (filteredSales.length === 0) {
@@ -4815,23 +4919,32 @@
 
             filteredSales.forEach(item => {
                 const tr = document.createElement('tr');
+                const isLesi = (item.category === 'Dialog Lesi Pay' || item.source === 'Dialog Lesi Pay');
                 const mrp = parseFloat(item.mrp) || 0;
-                const buy = parseFloat(item.buyPrice) || 0;
+                const buy = isLesi ? 0 : (parseFloat(item.buyPrice) || 0);
                 const lease = parseFloat(item.leaseFee) || 0;
                 const staff = parseFloat(item.staffFee) || 0;
-                const net = parseFloat(item.netProfit) || (mrp - buy - lease - staff);
+                
+                let net = 0;
+                if (item.netProfit !== undefined && item.netProfit !== null && !isNaN(parseFloat(item.netProfit))) {
+                    net = parseFloat(item.netProfit);
+                } else if (isLesi) {
+                    net = (mrp * 0.07) - staff;
+                } else {
+                    net = mrp - buy - lease - staff;
+                }
 
                 let profitColor = net >= 0 ? 'var(--success)' : 'var(--danger)';
-                const isLesi = (item.category === 'Dialog Lesi Pay' || item.source === 'Dialog Lesi Pay');
 
                 let deviceCol = '';
                 let priceCol = '';
                 let feesCol = '';
 
                 if (isLesi) {
+                    const profit7 = (item.profit !== undefined && item.profit !== null && !isNaN(parseFloat(item.profit))) ? parseFloat(item.profit) : (mrp * 0.07);
                     deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:#3b82f6; font-weight:600; font-size:0.75rem;">📱 Dialog Lesi Pay</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#3b82f6; font-size:0.75rem;">DP: Rs. ${(item.downPayment || 0).toLocaleString()}</span>`;
-                    feesCol = `<span style="color:var(--accent-purple);">7% Profit: Rs. ${(mrp * 0.07).toLocaleString(undefined, {minimumFractionDigits:2})}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">Comm: Rs. ${staff.toLocaleString()}</span>`;
+                    feesCol = `<span style="color:var(--accent-purple); font-weight:700;">7% Profit: Rs. ${profit7.toLocaleString(undefined, {minimumFractionDigits:2})}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">Comm: Rs. ${staff.toLocaleString()}</span>`;
                 } else {
                     deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span>`;
@@ -4858,8 +4971,22 @@
         window.deleteMainShopSale = async function(id) {
             if (!confirm("Delete this Main Shop direct sale record?")) return;
             try {
+                const saleToDelete = (allMainShopSales || []).find(s => s.id === id);
+                if (saleToDelete && saleToDelete.imei) {
+                    const invMatch = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === saleToDelete.imei.trim().toLowerCase());
+                    if (invMatch && invMatch.status === 'Sold') {
+                        try {
+                            await updateDoc(doc(db, "inventory", invMatch.id), {
+                                status: 'Available',
+                                updatedAt: Date.now()
+                            });
+                        } catch (e) {
+                            console.warn("Could not revert inventory status:", e);
+                        }
+                    }
+                }
                 await deleteDoc(doc(db, "main_shop_sales", id));
-                showToast("Record deleted", "warning");
+                showToast("Sale entry deleted (stock restored if applicable)", "warning");
             } catch (e) {
                 showToast("Failed to delete record: " + e.message, "error");
             }
@@ -5187,12 +5314,15 @@
                 grp.soldCount = grp.soldItems.length;
                 grp.totalCount = grp.items.length;
 
+                const isDialogLesi = (grp.category === 'Dialog Lesi Pay');
                 // Determine Cost & MRP range
                 const availableCosts = Array.from(new Set(grp.availableItems.map(i => parseFloat(i.buyPrice || 0)).filter(p => p > 0))).sort((a, b) => a - b);
                 const availableMrps = Array.from(new Set(grp.availableItems.map(i => parseFloat(i.mrp || 0)).filter(p => p > 0))).sort((a, b) => a - b);
 
                 let costLabel = '';
-                if (availableCosts.length === 1) {
+                if (isDialogLesi) {
+                    costLabel = `Cost: Rs. 0 (Lesi Pay)`;
+                } else if (availableCosts.length === 1) {
                     costLabel = `Cost: Rs. ${availableCosts[0].toLocaleString()}`;
                 } else if (availableCosts.length > 1) {
                     costLabel = `Cost: Rs. ${availableCosts[0].toLocaleString()} - Rs. ${availableCosts[availableCosts.length - 1].toLocaleString()}`;
@@ -5204,7 +5334,9 @@
                 if (availableMrps.length === 1) {
                     mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()}`;
                 } else if (availableMrps.length > 1) {
-                    mrpLabel = `MRP: Rs. ${availableMrps[availableMrps.length - 1].toLocaleString()}`;
+                    mrpLabel = `MRP: Rs. ${availableMrps[0].toLocaleString()} - Rs. ${availableMrps[availableMrps.length - 1].toLocaleString()}`;
+                } else if (isDialogLesi) {
+                    mrpLabel = `MRP: Manual at Sale (7% Profit)`;
                 } else {
                     mrpLabel = 'MRP: -';
                 }
@@ -5219,8 +5351,6 @@
                         branchTags.push(`<span style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 0.76rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">📍 ${bName}: ${cnt}</span>`);
                     }
                 });
-
-                const isDialogLesi = (grp.category === 'Dialog Lesi Pay');
                 const safeModelKey = grp.key.replace(/'/g, "\\'");
                 const safeModel = grp.model.replace(/'/g, "\\'");
                 const safeStorage = grp.storage.replace(/'/g, "\\'");
@@ -5570,8 +5700,8 @@
                 const batchCard = document.createElement('div');
                 batchCard.className = 'batch-card';
 
-                const buyStr = b.buyPrice > 0 ? `Rs. ${b.buyPrice.toLocaleString()}` : '-';
-                const mrpStr = b.mrp > 0 ? `Rs. ${b.mrp.toLocaleString()}` : '-';
+                const buyStr = b.category === 'Dialog Lesi Pay' ? 'Rs. 0 (Lesi Pay)' : (b.buyPrice > 0 ? `Rs. ${b.buyPrice.toLocaleString()}` : '-');
+                const mrpStr = (b.mrp && b.mrp > 0) ? `Rs. ${b.mrp.toLocaleString()}` : (b.category === 'Dialog Lesi Pay' ? 'Manual at Sale (7% Profit)' : '-');
                 const locStr = Array.from(b.locations).join(', ') || 'MAIN SHOP';
 
                 let imeiListHtml = '';
@@ -6223,7 +6353,8 @@
             let availItems = (allInventoryItems || []).filter(item => item.status === 'Available');
 
             if (currentSaleStockPickerMode === 'LP') {
-                availItems = availItems.filter(item => item.category === 'Dialog Lesi Pay' || item.category === 'Main Shop (Own Buy)');
+                const lpItems = availItems.filter(item => item.category === 'Dialog Lesi Pay');
+                availItems = lpItems.length > 0 ? lpItems : availItems;
             }
 
             if (searchVal) {
@@ -6296,8 +6427,8 @@
                             <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 6px;">
                                 <span><strong>📦 Batch #${idx + 1}</strong> (${b.items.length} units in stock)</span>
                                 <div>
-                                    <span style="color:#dc2626; font-weight:700;">Cost: Rs. ${b.buy.toLocaleString()}</span> | 
-                                    <span style="color:#2563eb; font-weight:700;">MRP: Rs. ${b.mrp.toLocaleString()}</span>
+                                    <span style="color:#dc2626; font-weight:700;">${b.category === 'Dialog Lesi Pay' ? 'Cost: Rs. 0 (Lesi Pay)' : 'Cost: Rs. ' + b.buy.toLocaleString()}</span> | 
+                                    <span style="color:#2563eb; font-weight:700;">${b.category === 'Dialog Lesi Pay' && b.mrp === 0 ? 'MRP: Manual at Sale (7%)' : 'MRP: Rs. ' + b.mrp.toLocaleString()}</span>
                                 </div>
                             </div>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
@@ -6324,22 +6455,34 @@
 
         window.selectImeiForSale = function(imei, saleMode) {
             closeSaleStockPicker();
-            if (saleMode === 'HO') {
+            const found = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === imei.trim().toLowerCase());
+            const isLesiItem = found && (found.category === 'Dialog Lesi Pay');
+
+            if (isLesiItem || saleMode === 'LP') {
+                document.getElementById('mainSaleType').value = 'Dialog Lesi Pay';
+                toggleMainSaleFormType();
+                const input = document.getElementById('lpSaleImei');
+                if (input) {
+                    input.value = imei;
+                    handleSaleImeiLookup(imei, 'LP');
+                }
+                setTimeout(() => {
+                    const mrpInput = document.getElementById('lpSaleMrp');
+                    if (mrpInput) {
+                        mrpInput.focus();
+                        if (!mrpInput.value || parseFloat(mrpInput.value) === 0) {
+                            showToast(`📱 Selected Dialog Lesi Pay (${found?.model || ''})! Enter Selling MRP manually for 7% profit.`, "info");
+                        }
+                    }
+                }, 150);
+            } else {
                 const input = document.getElementById('mainSaleImei');
                 if (input) {
                     input.value = imei;
                     handleSaleImeiLookup(imei, 'HO');
                     input.focus();
                 }
-            } else if (saleMode === 'LP') {
-                const input = document.getElementById('lpSaleImei');
-                if (input) {
-                    input.value = imei;
-                    handleSaleImeiLookup(imei, 'LP');
-                    input.focus();
-                }
             }
-            showToast(`✅ Selected IMEI: ${imei} - Prices auto-filled!`, "success");
         };
 
         window.handleInvCategoryChange = function() {
@@ -6347,21 +6490,43 @@
             const isLesi = (cat === 'Dialog Lesi Pay');
             const costLabel = document.getElementById('invPriceLabel');
             const mrpLabel = document.getElementById('invMrpLabel');
+            const costInput = document.getElementById('invBuyPrice');
+            const mrpInput = document.getElementById('invMrpPrice');
+            const infoBanner = document.getElementById('lesiPayInvInfoBanner');
+
             if (costLabel) {
                 if (isLesi) {
-                    costLabel.innerHTML = `Buy Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Optional)</span>`;
+                    costLabel.innerHTML = `Buy Cost (Rs.) <span style="font-size: 0.72rem; color: #10b981; font-weight: 700;">(Rs. 0.00 - Not Bought by us)</span>`;
+                    if (costInput) {
+                        costInput.value = '0';
+                        costInput.placeholder = '0.00 (No Buy Cost)';
+                    }
                 } else {
                     costLabel.innerHTML = `Buy Price / Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Cost)</span>`;
+                    if (costInput && costInput.value === '0') {
+                        costInput.value = '';
+                        costInput.placeholder = '0.00';
+                    }
                 }
             }
             if (mrpLabel) {
                 if (isLesi) {
-                    mrpLabel.innerHTML = `Dialog Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: bold;">(Required)</span>`;
-                    document.getElementById('invMrpPrice').placeholder = "e.g. 56990.00";
+                    mrpLabel.innerHTML = `Selling MRP (Rs.) <span style="font-size: 0.72rem; color: #3b82f6; font-weight: 700;">(Optional - Enter at sale time)</span>`;
+                    if (mrpInput) {
+                        mrpInput.required = false;
+                        mrpInput.value = '';
+                        mrpInput.placeholder = "Not required now (Enter at sale time)";
+                        mrpInput.style.borderColor = 'rgba(203,213,225,0.85)';
+                    }
                 } else {
                     mrpLabel.innerHTML = `Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: normal;">(Retail MRP)</span>`;
-                    document.getElementById('invMrpPrice').placeholder = "0.00";
+                    if (mrpInput) {
+                        mrpInput.placeholder = "0.00";
+                    }
                 }
+            }
+            if (infoBanner) {
+                infoBanner.style.display = isLesi ? 'block' : 'none';
             }
         };
 
@@ -6454,11 +6619,12 @@
 
             addImeiFromInput();
 
-            const buyPrice = parseFloat(document.getElementById('invBuyPrice').value) || 0;
+            const isLesi = (category === 'Dialog Lesi Pay');
+            const buyPrice = isLesi ? 0 : (parseFloat(document.getElementById('invBuyPrice').value) || 0);
             const mrpPrice = parseFloat(document.getElementById('invMrpPrice').value) || 0;
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
-            if (!model || !storage || !shop) return showToast("Please fill all required inventory fields", "warning");
+            if (!model || !storage || !shop) return showToast("Please fill all required fields (Model, Storage, Target Location)", "warning");
 
             btn.disabled = true;
             btn.innerText = `Adding ${scannedImeiList.length} Stock Item(s)...`;
@@ -6519,6 +6685,9 @@
 
             const catSelect = document.getElementById('invCategory');
             if (catSelect) catSelect.value = 'Main Shop (Own Buy)';
+
+            const banner = document.getElementById('lesiPayInvInfoBanner');
+            if (banner) banner.style.display = 'none';
 
             if (typeof handleInvCategoryChange === 'function') {
                 handleInvCategoryChange();
@@ -7376,9 +7545,20 @@
             document.getElementById('editInvImeiLabel').innerText = imei;
             document.getElementById('editInvModel').value = model;
             document.getElementById('editInvStorage').value = storage;
-            document.getElementById('editInvCategory').value = category;
-            document.getElementById('editInvBuyPrice').value = buyPrice || '';
-            document.getElementById('editInvMrp').value = mrp || '';
+            document.getElementById('editInvCategory').value = category || 'Main Shop (Own Buy)';
+
+            const isLesi = (category === 'Dialog Lesi Pay');
+            const buyInput = document.getElementById('editInvBuyPrice');
+            const mrpInput = document.getElementById('editInvMrp');
+
+            if (buyInput) {
+                buyInput.value = isLesi ? '0' : (buyPrice !== undefined && buyPrice !== null ? buyPrice : '');
+                buyInput.placeholder = isLesi ? '0.00 (Dialog Lesi Pay)' : '0.00';
+            }
+            if (mrpInput) {
+                mrpInput.value = (mrp && mrp > 0) ? mrp : '';
+                mrpInput.placeholder = isLesi ? 'Optional (Enter at sale time)' : '0.00';
+            }
             
             document.getElementById('editInventoryModal').style.display = 'flex';
         };
@@ -7386,6 +7566,24 @@
         window.closeEditInventoryModal = function() {
             document.getElementById('editInventoryModal').style.display = 'none';
         };
+
+        document.getElementById('editInvCategory')?.addEventListener('change', (e) => {
+            const isLesi = (e.target.value === 'Dialog Lesi Pay');
+            const buyInput = document.getElementById('editInvBuyPrice');
+            const mrpInput = document.getElementById('editInvMrp');
+            if (buyInput) {
+                if (isLesi) {
+                    buyInput.value = '0';
+                    buyInput.placeholder = '0.00 (Dialog Lesi Pay)';
+                } else if (buyInput.value === '0') {
+                    buyInput.value = '';
+                    buyInput.placeholder = '0.00';
+                }
+            }
+            if (mrpInput) {
+                mrpInput.placeholder = isLesi ? 'Optional (Enter at sale time)' : '0.00';
+            }
+        });
 
         document.getElementById('editInventoryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -7397,16 +7595,20 @@
             const model = document.getElementById('editInvModel').value.trim();
             const storage = document.getElementById('editInvStorage').value.trim();
             const category = document.getElementById('editInvCategory').value;
-            const buyPrice = document.getElementById('editInvBuyPrice').value;
-            const mrp = document.getElementById('editInvMrp').value;
+            const buyPriceRaw = document.getElementById('editInvBuyPrice').value;
+            const mrpRaw = document.getElementById('editInvMrp').value;
+
+            const isLesi = (category === 'Dialog Lesi Pay');
+            const finalBuyPrice = isLesi ? 0 : (buyPriceRaw ? parseFloat(buyPriceRaw) : 0);
+            const finalMrp = mrpRaw ? parseFloat(mrpRaw) : 0;
 
             try {
                 await updateDoc(doc(db, "inventory", id), {
                     model: model,
                     storage: storage,
                     category: category,
-                    buyPrice: buyPrice ? parseFloat(buyPrice) : null,
-                    mrp: mrp ? parseFloat(mrp) : null,
+                    buyPrice: finalBuyPrice,
+                    mrp: finalMrp,
                     updatedAt: Date.now()
                 });
                 showToast("Inventory item updated successfully!", "success");
