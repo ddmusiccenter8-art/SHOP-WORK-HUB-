@@ -2052,10 +2052,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
+                            <th>Activation Date</th>
                             <th>Customer & Device</th>
                             <th>Fee Amount</th>
-                            <th>Payment Status</th>
+                            <th>Payment Status & Paid Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -2063,6 +2063,79 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- Mark / Edit Staff Payment Modal -->
+    <div id="markStaffPaymentModal" class="modal" style="z-index: 2600;">
+        <div class="modal-content" style="max-width: 470px; border-radius: 18px; border: 1.5px solid rgba(16, 185, 129, 0.4); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);">
+            <span class="modal-close" onclick="closeMarkStaffPaymentModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                    💰
+                </div>
+                <div>
+                    <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem; font-weight: 800;" id="markStaffPaymentModalTitle">Mark Activation Payment</h3>
+                    <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">Record payment date & time for activator commission</p>
+                </div>
+            </div>
+
+            <!-- Activation Item Summary Card -->
+            <div style="background: rgba(248, 250, 252, 0.95); border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1.2rem; font-size: 0.84rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <span style="color: var(--text-muted);">Activator Staff:</span>
+                    <strong style="color: var(--text-main);" id="markStaffItemStaffName">-</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <span style="color: var(--text-muted);">Customer & Device:</span>
+                    <span style="font-weight: 600; text-align: right; color: var(--text-main);" id="markStaffItemCustomerDevice">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <span style="color: var(--text-muted);">Activation Date:</span>
+                    <span style="font-weight: 600;" id="markStaffItemActivationDate">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 0.45rem; border-top: 1px dashed #cbd5e1; font-size: 0.95rem;">
+                    <span style="font-weight: 700; color: var(--text-main);">Fee Amount:</span>
+                    <strong style="color: #059669; font-size: 1.15rem;" id="markStaffItemFee">Rs. 500</strong>
+                </div>
+            </div>
+
+            <form id="markStaffPaymentForm" onsubmit="handleSaveStaffPayment(event)">
+                <input type="hidden" id="markStaffPaymentDocId">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+                            📅 Payment Date (දිනය)
+                        </label>
+                        <input type="date" id="staffPaymentDateInput" required style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+                            ⏰ Payment Time (වේලාව)
+                        </label>
+                        <input type="time" id="staffPaymentTimeInput" required style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem; font-weight: 600;">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <button type="button" onclick="setStaffPaymentToNow()" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #2563eb; padding: 0.3rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                        ⚡ Set to Current Date & Time (දැන් වෙලාව)
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 1.4rem;">
+                    <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
+                        📝 Note / Payment Reference (විකල්ප සටහනක්)
+                    </label>
+                    <input type="text" id="staffPaymentNoteInput" placeholder="e.g. Paid in Cash, Bank Transfer, Handed over by..." style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem;">
+                </div>
+
+                <div style="display: flex; gap: 0.75rem;">
+                    <button type="button" onclick="closeMarkStaffPaymentModal()" style="flex: 1; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.8rem; border-radius: 8px; font-weight: 700; cursor: pointer;">Cancel</button>
+                    <button type="submit" id="saveStaffPaymentBtn" style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; color: white; padding: 0.8rem; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">✅ Confirm & Mark as Paid</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -7033,9 +7106,11 @@
         // Master Filter & Render Function for Staff Modal
         function applyStaffModalFilters() {
             // 1. Filter staff sales by the active Date Period
-            const dateFilteredSales = currentStaffSales.filter(s => 
-                matchesPeriodFilter(s.date, currentStaffDateFilter, currentStaffStartDate, currentStaffEndDate)
-            );
+            const dateFilteredSales = currentStaffSales.filter(s => {
+                const dateMatches = matchesPeriodFilter(s.date, currentStaffDateFilter, currentStaffStartDate, currentStaffEndDate);
+                const paidDateMatches = s.staffPaidDate ? matchesPeriodFilter(s.staffPaidDate, currentStaffDateFilter, currentStaffStartDate, currentStaffEndDate) : false;
+                return dateMatches || (currentStaffFilter === 'Paid' && paidDateMatches);
+            });
 
             // 2. Calculate summary counts & amounts for the selected period
             const totalCount = dateFilteredSales.length;
@@ -7123,7 +7198,7 @@
                 tr.style.cursor = 'pointer';
                 tr.title = "Click to view more details";
                 tr.onclick = function(e) {
-                    if (e.target.tagName === 'BUTTON') return;
+                    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
                     const detailsRow = this.nextElementSibling;
                     if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
                         if (detailsRow.style.display === 'none') {
@@ -7138,21 +7213,69 @@
 
                 const isPaid = (s.staffPaymentStatus === 'Paid');
                 const fee = parseFloat(s.staffFee) || 0;
-                
-                const statusBadge = isPaid 
-                    ? '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.2)">Paid</span>' 
-                    : '<span class="badge badge-replied">Pending</span>';
-                    
-                const actionBtn = isPaid
-                    ? `<button disabled style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px; cursor: not-allowed; font-size: 0.75rem;">Done</button>`
-                    : `<button onclick="markStaffFeePaid('${s.id}')" style="background: var(--success); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem;">Mark as Paid</button>`;
+
+                // Format payment date and time for display
+                let paidDateStr = s.staffPaidDate || '';
+                let paidTimeStr = s.staffPaidTime || '';
+                if (isPaid && !paidDateStr && s.staffPaidAt) {
+                    const dt = new Date(s.staffPaidAt);
+                    paidDateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+                    const hr = dt.getHours();
+                    const mn = String(dt.getMinutes()).padStart(2, '0');
+                    paidTimeStr = `${String(hr % 12 || 12).padStart(2, '0')}:${mn} ${hr >= 12 ? 'PM' : 'AM'}`;
+                } else if (isPaid && !paidDateStr && s.date) {
+                    paidDateStr = s.date;
+                    paidTimeStr = '-';
+                }
+
+                let statusBadgeHtml = '';
+                if (isPaid) {
+                    statusBadgeHtml = `
+                        <div>
+                            <span class="badge badge-confirmed" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
+                                ✅ Paid
+                            </span>
+                            <div style="margin-top: 5px; font-size: 0.74rem; line-height: 1.35; background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 4px 6px;">
+                                <div style="color: #065f46; font-weight: 700;">📅 ${paidDateStr || 'Recorded'}</div>
+                                <div style="color: #4b5563; font-size: 0.70rem; font-weight: 600;">⏰ ${paidTimeStr || '-'}</div>
+                                ${s.staffPaidNote ? `<div style="font-size: 0.68rem; color: var(--text-muted); font-style: italic; margin-top: 2px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${s.staffPaidNote}">💬 ${s.staffPaidNote}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statusBadgeHtml = `
+                        <span class="badge badge-replied" style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
+                            ⏳ Pending
+                        </span>
+                    `;
+                }
+
+                let actionBtnHtml = '';
+                if (isPaid) {
+                    actionBtnHtml = `
+                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                            <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 0.35rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;" title="Change / Edit payment date & time">
+                                ✏️ Edit
+                            </button>
+                            <button type="button" onclick="revertStaffFeeToPending('${s.id}')" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.35rem 0.55rem; border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600;" title="Revert back to Pending">
+                                ↺
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionBtnHtml = `
+                        <button type="button" onclick="openMarkStaffPaidModal('${s.id}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.42rem 0.8rem; border-radius: 7px; cursor: pointer; font-weight: 700; font-size: 0.75rem; box-shadow: 0 2px 6px rgba(16,185,129,0.25); display: inline-flex; align-items: center; gap: 4px;">
+                            💰 Mark as Paid
+                        </button>
+                    `;
+                }
 
                 tr.innerHTML = `
                     <td><strong>${s.date || '-'}</strong></td>
                     <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span></td>
                     <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
-                    <td>${statusBadge}</td>
-                    <td>${actionBtn}</td>
+                    <td>${statusBadgeHtml}</td>
+                    <td>${actionBtnHtml}</td>
                 `;
                 tbody.appendChild(tr);
 
@@ -7185,9 +7308,20 @@
                                 <p style="color: #2563eb; margin: 0; font-weight: 700;">Rs. ${parseFloat(s.mrp||0).toLocaleString()}</p>
                             </div>
                             <div>
-                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Buy Cost</p>
-                                <p style="color: #ef4444; margin: 0; font-weight: 700;">Rs. ${parseFloat(s.buyPrice||0).toLocaleString()}</p>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Payment Status</p>
+                                <p style="margin: 0; font-weight: 700; color: ${isPaid ? '#059669' : '#d97706'};">${isPaid ? '✅ Paid' : '⏳ Pending'}</p>
                             </div>
+                            ${isPaid ? `
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Payment Date & Time</p>
+                                <p style="color: #059669; margin: 0; font-weight: 700;">📅 ${paidDateStr || '-'} ⏰ ${paidTimeStr || '-'}</p>
+                            </div>
+                            ${s.staffPaidNote ? `
+                            <div>
+                                <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Payment Note</p>
+                                <p style="color: var(--text-main); margin: 0; font-weight: 600;">${s.staffPaidNote}</p>
+                            </div>` : ''}
+                            ` : ''}
                         </div>
                     </td>
                 `;
@@ -7199,28 +7333,167 @@
             document.getElementById('staffModal').style.display = 'none';
         };
 
-        window.markStaffFeePaid = async function(docId) {
-            if(!confirm("Mark this activation fee as paid?")) return;
+        window.setStaffPaymentToNow = function() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const hr = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+
+            const dateInput = document.getElementById('staffPaymentDateInput');
+            const timeInput = document.getElementById('staffPaymentTimeInput');
+            if (dateInput) dateInput.value = `${y}-${m}-${d}`;
+            if (timeInput) timeInput.value = `${hr}:${min}`;
+        };
+
+        window.openMarkStaffPaidModal = function(docId) {
+            const sale = (allMainShopSales || []).find(s => s.id === docId);
+            if (!sale) return showToast("Sale record not found", "error");
+
+            document.getElementById('markStaffPaymentDocId').value = docId;
+            document.getElementById('markStaffItemStaffName').innerText = sale.staffName || currentStaffActiveName || '-';
+            document.getElementById('markStaffItemCustomerDevice').innerText = `${sale.custName || '-'} / ${sale.model || '-'}`;
+            document.getElementById('markStaffItemActivationDate').innerText = sale.date || '-';
+            document.getElementById('markStaffItemFee').innerText = 'Rs. ' + (parseFloat(sale.staffFee) || 0).toLocaleString();
+
+            const isCurrentlyPaid = (sale.staffPaymentStatus === 'Paid');
+            const titleEl = document.getElementById('markStaffPaymentModalTitle');
+            const submitBtn = document.getElementById('saveStaffPaymentBtn');
+
+            if (titleEl) titleEl.innerText = isCurrentlyPaid ? '✏️ Edit Payment Date & Time' : '💰 Mark Activation Payment';
+            if (submitBtn) submitBtn.innerText = isCurrentlyPaid ? '💾 Update Payment Info' : '✅ Confirm & Mark as Paid';
+
+            if (isCurrentlyPaid && (sale.staffPaidDate || sale.staffPaidAt)) {
+                let dateVal = sale.staffPaidDate || '';
+                let timeVal = sale.staffPaidTime24 || '';
+                if (!dateVal && sale.staffPaidAt) {
+                    const dt = new Date(sale.staffPaidAt);
+                    dateVal = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+                    timeVal = `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+                }
+                document.getElementById('staffPaymentDateInput').value = dateVal;
+                document.getElementById('staffPaymentTimeInput').value = timeVal;
+                document.getElementById('staffPaymentNoteInput').value = sale.staffPaidNote || '';
+            } else {
+                setStaffPaymentToNow();
+                document.getElementById('staffPaymentNoteInput').value = '';
+            }
+
+            document.getElementById('markStaffPaymentModal').style.display = 'flex';
+        };
+
+        window.closeMarkStaffPaymentModal = function() {
+            document.getElementById('markStaffPaymentModal').style.display = 'none';
+        };
+
+        window.handleSaveStaffPayment = async function(e) {
+            e.preventDefault();
+            const docId = document.getElementById('markStaffPaymentDocId').value;
+            if (!docId) return;
+
+            const paidDate = document.getElementById('staffPaymentDateInput').value;
+            const paidTime = document.getElementById('staffPaymentTimeInput').value;
+            const paidNote = document.getElementById('staffPaymentNoteInput').value.trim();
+
+            if (!paidDate || !paidTime) {
+                return showToast("Please select both Payment Date and Time", "warning");
+            }
+
+            const btn = document.getElementById('saveStaffPaymentBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            const [hStr, mStr] = paidTime.split(':');
+            let h = parseInt(hStr, 10);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            const formatted12Hr = `${String(h).padStart(2, '0')}:${mStr} ${ampm}`;
+            const displayDateTime = `${paidDate} ${formatted12Hr}`;
+
+            const paidDateTimeObj = new Date(`${paidDate}T${paidTime}:00`);
+            const paidTimestamp = isNaN(paidDateTimeObj.getTime()) ? Date.now() : paidDateTimeObj.getTime();
+
+            const payload = {
+                staffPaymentStatus: 'Paid',
+                staffPaidDate: paidDate,
+                staffPaidTime: formatted12Hr,
+                staffPaidTime24: paidTime,
+                staffPaidDateTime: displayDateTime,
+                staffPaidNote: paidNote || '',
+                staffPaidAt: paidTimestamp,
+                staffPaidUpdatedAt: Date.now()
+            };
+
             try {
-                await updateDoc(doc(db, "main_shop_sales", docId), { staffPaymentStatus: 'Paid' });
-                showToast("Fee marked as paid successfully!", "success");
-                
-                // Update local lists reactively
-                const item = currentStaffSales.find(s => s.id === docId);
-                if (item) {
-                    item.staffPaymentStatus = 'Paid';
-                }
-                const mainItem = allMainShopSales.find(s => s.id === docId);
-                if (mainItem) {
-                    mainItem.staffPaymentStatus = 'Paid';
-                }
+                await updateDoc(doc(db, "main_shop_sales", docId), payload);
+                showToast("Payment date & time saved successfully!", "success");
+
+                const updateItem = (item) => {
+                    if (item) {
+                        item.staffPaymentStatus = 'Paid';
+                        item.staffPaidDate = paidDate;
+                        item.staffPaidTime = formatted12Hr;
+                        item.staffPaidTime24 = paidTime;
+                        item.staffPaidDateTime = displayDateTime;
+                        item.staffPaidNote = paidNote || '';
+                        item.staffPaidAt = paidTimestamp;
+                    }
+                };
+                updateItem(currentStaffSales.find(s => s.id === docId));
+                updateItem(allMainShopSales.find(s => s.id === docId));
+
+                closeMarkStaffPaymentModal();
+                applyStaffModalFilters();
+                renderStaffProfiles();
+            } catch(err) {
+                console.error("Error saving staff payment:", err);
+                showToast("Failed to save payment: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '✅ Confirm & Mark as Paid';
+            }
+        };
+
+        window.revertStaffFeeToPending = async function(docId) {
+            if (!confirm("Are you sure you want to revert this payment back to Pending?")) return;
+
+            try {
+                await updateDoc(doc(db, "main_shop_sales", docId), {
+                    staffPaymentStatus: 'Pending',
+                    staffPaidDate: null,
+                    staffPaidTime: null,
+                    staffPaidTime24: null,
+                    staffPaidDateTime: null,
+                    staffPaidNote: null,
+                    staffPaidAt: null
+                });
+                showToast("Payment reverted to Pending.", "info");
+
+                const updateItem = (item) => {
+                    if (item) {
+                        item.staffPaymentStatus = 'Pending';
+                        delete item.staffPaidDate;
+                        delete item.staffPaidTime;
+                        delete item.staffPaidTime24;
+                        delete item.staffPaidDateTime;
+                        delete item.staffPaidNote;
+                        delete item.staffPaidAt;
+                    }
+                };
+                updateItem(currentStaffSales.find(s => s.id === docId));
+                updateItem(allMainShopSales.find(s => s.id === docId));
 
                 applyStaffModalFilters();
                 renderStaffProfiles();
-            } catch(e) {
-                console.error(e);
-                showToast("Failed to update fee status: " + e.message, "error");
+            } catch(err) {
+                console.error("Error reverting fee:", err);
+                showToast("Failed to revert: " + err.message, "error");
             }
+        };
+
+        window.markStaffFeePaid = function(docId) {
+            openMarkStaffPaidModal(docId);
         };
 
         // Barcode Scanner Logic (Ultra-HD, Continuous Autofocus, Zoom & Torch Flash)
