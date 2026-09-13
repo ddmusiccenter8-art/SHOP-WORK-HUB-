@@ -823,6 +823,17 @@
             border-color: #ef4444;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
+        @keyframes imeiRejectShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-9px); }
+            40%, 80% { transform: translateX(9px); }
+        }
+        .imei-rejected-shake {
+            animation: imeiRejectShake 0.45s ease-in-out !important;
+            border-color: #ef4444 !important;
+            background-color: #fee2e2 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.35) !important;
+        }
     </style>
 </head>
 <body style="display: none;">
@@ -1272,10 +1283,11 @@
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number & Model <span id="mainSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
                                 <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
-                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'HO')">
+                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'HO')" onchange="handleSaleImeiLookup(this.value, 'HO')" onpaste="handleSaleImeiPaste(event, 'HO')" autocomplete="off">
                                     <button type="button" onclick="startScanner('mainSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
                                     <button type="button" onclick="openSaleStockPicker('HO')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
                                 </div>
+                                <div id="mainSaleImeiRejectionBanner" style="display: none; margin-bottom: 0.5rem;"></div>
                                 <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock or enter manually)" style="width: 100%;">
                             </div>
 
@@ -1330,10 +1342,11 @@
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number <span id="lpSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
                                 <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
-                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'LP')">
+                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'LP')" onchange="handleSaleImeiLookup(this.value, 'LP')" onpaste="handleSaleImeiPaste(event, 'LP')" autocomplete="off">
                                     <button type="button" onclick="startScanner('lpSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
                                     <button type="button" onclick="openSaleStockPicker('LP')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
                                 </div>
+                                <div id="lpSaleImeiRejectionBanner" style="display: none; margin-bottom: 0.5rem;"></div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -2346,6 +2359,28 @@
                     <button type="submit" id="saveEditSaleBtn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">💾 Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Already Sold IMEI Rejection Modal Alert -->
+    <div id="alreadySoldRejectModal" class="modal" style="z-index: 2900;">
+        <div class="modal-content" style="max-width: 490px; width: 92vw; text-align: center; border-radius: 20px; border: 2px solid #ef4444; box-shadow: 0 25px 60px rgba(239, 68, 68, 0.4); padding: 1.5rem 1.25rem;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: #fee2e2; border: 2px solid #f87171; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 0.9rem auto;">
+                ⛔
+            </div>
+            <h3 style="margin: 0 0 0.35rem 0; color: #b91c1c; font-size: 1.25rem; font-weight: 900;">RE-SALE REJECTED!</h3>
+            <div style="font-size: 0.92rem; font-weight: 700; color: #1e293b; margin-bottom: 0.8rem;" id="soldModalTitle">
+                Phone with this IMEI was already sold!
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; text-align: left; margin-bottom: 1.1rem; font-size: 0.82rem; line-height: 1.6;" id="soldModalDetails">
+                <!-- Details dynamically injected -->
+            </div>
+            <p style="margin: 0 0 1.2rem 0; font-size: 0.82rem; color: #dc2626; font-weight: 700;">
+                ⚠️ මෙම IMEI අංකය සහිත දුරකථනය මීට පෙර විකුණා ඇති බැවින් නැවත ඇතුළත් කිරීමට පද්ධතියෙන් අවසර නොලැබේ.
+            </p>
+            <button type="button" onclick="closeAlreadySoldRejectModal()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 0.65rem 1.6rem; border-radius: 10px; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                මම තේරුම් ගත්තා (OK)
+            </button>
         </div>
     </div>
 
@@ -4394,12 +4429,113 @@
             }
         };
 
-        // Instant Auto-lookup when IMEI is entered or scanned
+        // Audio Warning Alert for Rejection
+        function playWarningBeep() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.28);
+                gain.gain.setValueAtTime(0.35, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.28);
+            } catch (e) {}
+        }
+
+        window.closeAlreadySoldRejectModal = function() {
+            const modal = document.getElementById('alreadySoldRejectModal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        // Master IMEI Sales Status Auditor
+        window.checkImeiSalesStatus = function(rawImei) {
+            if (!rawImei) return null;
+            const clean = rawImei.toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+            if (clean.length < 3) return null;
+
+            // 1. Check NIC Clear Pending first
+            const nicMain = (allMainShopSales || []).find(s => {
+                const sImei = (s.imei || '').toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+                return sImei === clean && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
+            });
+            const nicSales = (allSales || []).find(s => {
+                const sImei = (s.imei || '').toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+                return sImei === clean && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending');
+            });
+            const nicTarget = nicMain || nicSales;
+            if (nicTarget) {
+                return { isNicClear: true, target: nicTarget, isMain: !!nicMain };
+            }
+
+            // 2. Check if already sold in main_shop_sales
+            const soldMain = (allMainShopSales || []).find(s => {
+                if (s.status === 'Cancelled' || s.status === 'Rejected' || s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending') return false;
+                const sImei = (s.imei || '').toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+                return sImei && sImei === clean;
+            });
+
+            // 3. Check if already sold in sales (dealer shops)
+            const soldSales = (allSales || []).find(s => {
+                if (s.status === 'Cancelled' || s.status === 'Rejected' || s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending') return false;
+                const sImei = (s.imei || '').toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+                return sImei && sImei === clean;
+            });
+
+            // 4. Check inventory sold status
+            const invMatch = (allInventoryItems || []).find(i => {
+                const iImei = (i.imei || '').toString().replace(/[\s\-\/\.]/g, '').trim().toLowerCase();
+                return iImei && iImei === clean;
+            });
+            const isSoldInInv = invMatch && invMatch.status === 'Sold';
+
+            if (soldMain || soldSales || isSoldInInv) {
+                const prevRecord = soldMain || soldSales;
+                const prevDate = prevRecord?.date || (prevRecord?.timestamp ? new Date(prevRecord.timestamp).toLocaleDateString() : '') || invMatch?.soldDate || 'Past Date';
+                const prevSp = prevRecord?.spNumber || prevRecord?.oldSpNumber || '-';
+                const prevModel = prevRecord?.model || invMatch?.model || 'Device';
+                const source = soldMain ? (soldMain.source || 'Head Office Direct Sale') : (soldSales ? 'Shop Sale' : 'Inventory Sold');
+
+                return {
+                    isSold: true,
+                    cleanImei: clean,
+                    rawImei: rawImei,
+                    model: prevModel,
+                    date: prevDate,
+                    sp: prevSp,
+                    source: source,
+                    record: prevRecord,
+                    invMatch: invMatch
+                };
+            }
+
+            return { isAvailable: true, invMatch: invMatch };
+        };
+
+        window.handleSaleImeiPaste = function(e, mode) {
+            const pastedData = (e.clipboardData || window.clipboardData)?.getData('text');
+            if (!pastedData) return;
+            const status = checkImeiSalesStatus(pastedData);
+            if (status && status.isSold) {
+                e.preventDefault();
+                handleSaleImeiLookup(pastedData, mode);
+                return false;
+            }
+        };
+
+        // Instant Auto-lookup when IMEI is entered, typed, pasted, or scanned
         window.handleSaleImeiLookup = function(imei, mode) {
             const hoImeiInput = document.getElementById('mainSaleImei');
             const lpImeiInput = document.getElementById('lpSaleImei');
             const targetInput = (mode === 'HO') ? hoImeiInput : lpImeiInput;
             const statusEl = (mode === 'HO') ? document.getElementById('mainSaleStockStatus') : document.getElementById('lpSaleStockStatus');
+            const rejectionBanner = (mode === 'HO') ? document.getElementById('mainSaleImeiRejectionBanner') : document.getElementById('lpSaleImeiRejectionBanner');
             const helperEl = document.getElementById('nicClearSpHelper');
             const spInput = document.getElementById('mainSaleSp');
             const submitBtn = document.getElementById('mainSaleSubmitBtn');
@@ -4408,6 +4544,7 @@
                 if (targetInput) {
                     targetInput.style.borderColor = '';
                     targetInput.style.boxShadow = '';
+                    targetInput.classList.remove('imei-rejected-shake');
                 }
                 if (spInput) {
                     spInput.style.borderColor = '';
@@ -4415,6 +4552,10 @@
                     spInput.placeholder = 'e.g. SP-MAIN-101';
                 }
                 if (helperEl) helperEl.style.display = 'none';
+                if (rejectionBanner) {
+                    rejectionBanner.style.display = 'none';
+                    rejectionBanner.innerHTML = '';
+                }
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     const isLesi = (document.getElementById('mainSaleType')?.value === 'Dialog Lesi Pay');
@@ -4431,7 +4572,7 @@
                 return;
             }
 
-            const cleanImei = imei.trim();
+            const cleanImei = imei.toString().replace(/[\s\-\/\.]/g, '').trim();
             if (cleanImei.length < 3) {
                 activeNicClearTarget = null;
                 currentImeiAlreadySold = false;
@@ -4440,19 +4581,23 @@
                 return;
             }
 
-            // 1. CHECK FOR NIC CLEAR PENDING FILE (Need New SP Number workflow)
-            const nicMain = (allMainShopSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'));
-            const nicSales = (allSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && (s.status === 'NIC Clear Pending' || s.nicClearStatus === 'Pending'));
-            const nicTarget = nicMain || nicSales;
+            const check = checkImeiSalesStatus(cleanImei);
 
-            if (nicTarget) {
+            // 1. CHECK FOR NIC CLEAR PENDING FILE (Need New SP Number workflow)
+            if (check && check.isNicClear) {
+                const nicTarget = check.target;
                 activeNicClearTarget = {
                     id: nicTarget.id,
-                    collection: nicMain ? 'main_shop_sales' : 'sales',
+                    collection: check.isMain ? 'main_shop_sales' : 'sales',
                     oldSp: nicTarget.oldSpNumber || nicTarget.spNumber || '',
                     record: nicTarget
                 };
                 currentImeiAlreadySold = false;
+
+                if (rejectionBanner) {
+                    rejectionBanner.style.display = 'none';
+                    rejectionBanner.innerHTML = '';
+                }
 
                 // Ensure form is in Head Office Direct Sale mode to show SP field
                 if (document.getElementById('mainSaleType').value === 'Dialog Lesi Pay' || mode === 'LP') {
@@ -4504,38 +4649,80 @@
                 return;
             }
 
-            // 2. CHECK IF THIS IMEI WAS ALREADY SOLD (DUPLICATE SALE REJECTION)
-            const soldMain = (allMainShopSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected');
-            const soldSales = (allSales || []).find(s => s.imei && s.imei.trim().toLowerCase() === cleanImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected');
-            const invMatch = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === cleanImei.toLowerCase());
-            const isSoldInInventory = invMatch && invMatch.status === 'Sold';
-
-            if (soldMain || soldSales || isSoldInInventory) {
+            // 2. CHECK IF THIS IMEI WAS ALREADY SOLD (DUPLICATE SALE REJECTION - ABSOLUTELY NOT ALLOWED)
+            if (check && check.isSold) {
                 currentImeiAlreadySold = true;
                 activeNicClearTarget = null;
-                resetImeiStyles();
+                playWarningBeep();
 
-                const prevRecord = soldMain || soldSales;
-                const prevDate = prevRecord?.date || (prevRecord?.timestamp ? new Date(prevRecord.timestamp).toLocaleDateString() : '') || (invMatch?.soldDate || 'Past Date');
-                const prevSp = prevRecord?.spNumber || prevRecord?.oldSpNumber || '-';
-                const prevModel = prevRecord?.model || invMatch?.model || 'Device';
+                // Clear any auto-filled models or prices
+                if (document.getElementById('mainSaleModel')) document.getElementById('mainSaleModel').value = '';
+                if (document.getElementById('mainSaleBuyPrice')) document.getElementById('mainSaleBuyPrice').value = '';
+                if (document.getElementById('lpSaleModel')) document.getElementById('lpSaleModel').value = '';
 
+                // IMMEDIATELY CLEAR THE IMEI INPUT FIELD - DO NOT ALLOW TO ENTER IT HERE AT ALL!
                 if (targetInput) {
-                    targetInput.style.borderColor = '#ef4444';
-                    targetInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)';
+                    targetInput.value = '';
+                    targetInput.classList.remove('imei-rejected-shake');
+                    void targetInput.offsetWidth; // trigger reflow
+                    targetInput.classList.add('imei-rejected-shake');
+                    targetInput.placeholder = `⛔ REJECTED: ${check.cleanImei} Already Sold!`;
+                    targetInput.focus();
+                    setTimeout(() => {
+                        if (targetInput) {
+                            targetInput.classList.remove('imei-rejected-shake');
+                            targetInput.placeholder = (mode === 'HO') ? 'Type or scan IMEI here...' : 'Enter or scan IMEI...';
+                        }
+                    }, 4500);
+                }
+
+                // Show prominent red warning banner right below the IMEI input
+                if (rejectionBanner) {
+                    rejectionBanner.style.display = 'block';
+                    rejectionBanner.innerHTML = `
+                        <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <strong style="color: #b91c1c; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>⛔ RE-SALE REJECTED: ALREADY SOLD IMEI!</span>
+                                </strong>
+                                <span style="background: #ef4444; color: white; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 4px;">BLOCKED</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #991b1b; margin-top: 5px; line-height: 1.45;">
+                                <strong>Phone Details:</strong> ${check.model} | <strong>IMEI:</strong> <code style="font-weight:800;">${check.cleanImei}</code><br>
+                                <strong>Previous Sale:</strong> Sold on <strong>${check.date}</strong> | Ref/SP: <strong>${check.sp}</strong><br>
+                                <span style="color: #dc2626; font-weight: 700;">⚠️ මෙම දුරකථනය මීට පෙර විකුණා ඇති බැවින් නැවත ඇතුළත් කිරීමට පද්ධතියෙන් අවසර නැත.</span>
+                            </div>
+                        </div>
+                    `;
                 }
 
                 if (statusEl) {
-                    statusEl.innerHTML = `<span style="color:#ef4444; font-weight:800; background:#fee2e2; border:1.5px solid #f87171; padding:4px 10px; border-radius:6px; display:inline-block; font-size:0.76rem;">❌ EXISTING IMEI: This phone was already sold! [Sold: ${prevDate} | SP: ${prevSp}] (Re-sale Rejected)</span>`;
+                    statusEl.innerHTML = `<span style="color:#ef4444; font-weight:800; background:#fee2e2; border:1.5px solid #f87171; padding:3px 8px; border-radius:6px; display:inline-block; font-size:0.75rem;">⛔ REJECTED: Already Sold on ${check.date}!</span>`;
                 }
 
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.innerText = '❌ IMEI Already Sold (Re-sale Rejected)';
+                    submitBtn.innerText = '❌ IMEI Already Sold (Re-sale Blocked)';
                     submitBtn.style.background = '#9ca3af';
                 }
 
-                showToast(`❌ EXISTING IMEI: Phone ${cleanImei} (${prevModel}) was already sold on ${prevDate}! Re-sale rejected.`, "error");
+                // Trigger Rejection Modal Popup Alert
+                const modal = document.getElementById('alreadySoldRejectModal');
+                const modalTitle = document.getElementById('soldModalTitle');
+                const modalDetails = document.getElementById('soldModalDetails');
+                if (modal && modalDetails) {
+                    modalTitle.innerText = `Phone IMEI: ${check.cleanImei} was already sold!`;
+                    modalDetails.innerHTML = `
+                        <div><strong>Device Model:</strong> ${check.model}</div>
+                        <div><strong>IMEI Number:</strong> <code style="font-weight:bold; color:#b91c1c; font-size:0.95rem;">${check.cleanImei}</code></div>
+                        <div><strong>Previous Sale Date:</strong> ${check.date}</div>
+                        <div><strong>SP Number / Ref:</strong> ${check.sp}</div>
+                        <div><strong>Sale Source:</strong> ${check.source}</div>
+                    `;
+                    modal.style.display = 'flex';
+                }
+
+                showToast(`❌ BLOCKED: Phone ${check.cleanImei} was already sold on ${check.date}! Re-sale rejected.`, "error");
                 return;
             }
 
@@ -4696,10 +4883,12 @@
 
             // 2. Direct database safeguard against duplicate IMEI sales
             if (!activeNicClearTarget && currentImei) {
-                const soldMain = (allMainShopSales || []).some(s => s.imei && s.imei.trim().toLowerCase() === currentImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected' && s.status !== 'NIC Clear Pending' && s.nicClearStatus !== 'Pending');
-                const soldSales = (allSales || []).some(s => s.imei && s.imei.trim().toLowerCase() === currentImei.toLowerCase() && s.status !== 'Cancelled' && s.status !== 'Rejected' && s.status !== 'NIC Clear Pending' && s.nicClearStatus !== 'Pending');
-                if (soldMain || soldSales) {
-                    showToast(`❌ Submission Blocked: Phone IMEI (${currentImei}) already exists in sales records! Duplicate sale rejected.`, "error");
+                const chk = (typeof checkImeiSalesStatus === 'function') ? checkImeiSalesStatus(currentImei) : null;
+                if (chk && chk.isSold) {
+                    showToast(`❌ Submission Blocked: Phone IMEI (${currentImei}) was already sold on ${chk.date}! Re-sale rejected.`, "error");
+                    if (typeof handleSaleImeiLookup === 'function') {
+                        handleSaleImeiLookup(currentImei, saleType === 'Dialog Lesi Pay' ? 'LP' : 'HO');
+                    }
                     return;
                 }
             }
@@ -7755,8 +7944,13 @@
             if (!listEl) return;
             listEl.innerHTML = '';
 
-            // Filter available stock items
-            let availItems = (allInventoryItems || []).filter(item => item.status === 'Available');
+            // Filter available stock items - STRICTLY EXCLUDE ANY ALREADY SOLD PHONES
+            let availItems = (allInventoryItems || []).filter(item => {
+                if (item.status !== 'Available') return false;
+                const chk = (typeof checkImeiSalesStatus === 'function') ? checkImeiSalesStatus(item.imei) : null;
+                if (chk && chk.isSold) return false;
+                return true;
+            });
 
             if (currentSaleStockPickerMode === 'LP') {
                 const lpItems = availItems.filter(item => item.category === 'Dialog Lesi Pay');
@@ -7861,6 +8055,14 @@
 
         window.selectImeiForSale = function(imei, saleMode) {
             closeSaleStockPicker();
+            const chk = (typeof checkImeiSalesStatus === 'function') ? checkImeiSalesStatus(imei) : null;
+            if (chk && chk.isSold) {
+                if (typeof handleSaleImeiLookup === 'function') {
+                    handleSaleImeiLookup(imei, saleMode || 'HO');
+                }
+                return;
+            }
+
             const found = (allInventoryItems || []).find(item => item.imei && item.imei.trim().toLowerCase() === imei.trim().toLowerCase());
             const isLesiItem = found && (found.category === 'Dialog Lesi Pay');
 
@@ -9217,6 +9419,16 @@
                     if (currentScannerInputId === 'invImei' && typeof addImeiToList === 'function') {
                         addImeiToList(decodedText);
                     } else {
+                        const chk = (typeof checkImeiSalesStatus === 'function') ? checkImeiSalesStatus(decodedText) : null;
+                        if (chk && chk.isSold) {
+                            stopScanner();
+                            const mode = (currentScannerInputId === 'lpSaleImei') ? 'LP' : 'HO';
+                            if (typeof handleSaleImeiLookup === 'function') {
+                                handleSaleImeiLookup(decodedText, mode);
+                            }
+                            return;
+                        }
+
                         const inputEl = document.getElementById(currentScannerInputId);
                         if (inputEl) {
                             inputEl.value = decodedText;
@@ -9341,6 +9553,16 @@
             if (currentScannerInputId === 'invImei' && typeof addImeiToList === 'function') {
                 addImeiToList(val);
             } else {
+                const chk = (typeof checkImeiSalesStatus === 'function') ? checkImeiSalesStatus(val) : null;
+                if (chk && chk.isSold) {
+                    stopScanner();
+                    const mode = (currentScannerInputId === 'lpSaleImei') ? 'LP' : 'HO';
+                    if (typeof handleSaleImeiLookup === 'function') {
+                        handleSaleImeiLookup(val, mode);
+                    }
+                    return;
+                }
+
                 const inputEl = document.getElementById(currentScannerInputId);
                 if (inputEl) {
                     inputEl.value = val;
