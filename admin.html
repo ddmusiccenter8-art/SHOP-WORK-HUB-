@@ -326,7 +326,7 @@
             transform: translateY(-2px);
         }
 
-        .staff-date-filter-btn {
+        .staff-date-filter-btn, .history-date-btn {
             padding: 0.38rem 0.85rem;
             background: #ffffff;
             border: 1px solid #cbd5e1;
@@ -341,13 +341,13 @@
             gap: 4px;
             white-space: nowrap;
         }
-        .staff-date-filter-btn:hover:not(.active) {
+        .staff-date-filter-btn:hover:not(.active), .history-date-btn:hover:not(.active) {
             background: #f1f5f9;
             border-color: #94a3b8;
             color: #1e293b;
             transform: translateY(-1px);
         }
-        .staff-date-filter-btn.active {
+        .staff-date-filter-btn.active, .history-date-btn.active {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
             border-color: #1d4ed8 !important;
             color: #ffffff !important;
@@ -1136,12 +1136,13 @@
                 <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0; font-weight: 700;">Main Shop Direct Profit & Sales Accounting</h2>
                 <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
                     <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); font-weight: 600; padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.88rem; outline: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
+                        <option value="today">Today (අද)</option>
+                        <option value="yesterday">Yesterday (ඊයේ)</option>
+                        <option value="week">This Week (සතිය)</option>
+                        <option value="month">This Month (මාසය)</option>
                         <option value="3months">3 Months</option>
                         <option value="year">This Year</option>
-                        <option value="all">All Time</option>
+                        <option value="all">All Time (සියල්ල)</option>
                         <option value="custom">Custom Range...</option>
                     </select>
 
@@ -1236,9 +1237,18 @@
                             </select>
                         </div>
 
-                        <div style="margin-bottom: 0.9rem;">
-                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Date (දිනය)</label>
-                            <input type="date" id="mainSaleDate" required>
+                        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.6rem; margin-bottom: 0.9rem;">
+                            <div>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">📅 Date (දිනය)</label>
+                                <input type="date" id="mainSaleDate" required style="width: 100%;">
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                    <label style="color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">⏰ Time (වේලාව)</label>
+                                    <span onclick="setMainSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;" title="Set to current time">⚡ Now</span>
+                                </div>
+                                <input type="time" id="mainSaleTime" style="width: 100%;">
+                            </div>
                         </div>
 
                         <!-- HEAD OFFICE DIRECT SALE FIELDS -->
@@ -1398,7 +1408,46 @@
                                 ⚠️ Clean Duplicates (<span id="dupeCountBadge">0</span>)
                             </button>
                         </div>
-                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP..." style="width: 100%; max-width: 250px;" oninput="renderMainShopProfitView()">
+                        <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP, Customer..." style="width: 100%; max-width: 250px;" oninput="renderMainShopProfitView()">
+                    </div>
+
+                    <!-- History Date & Time Filter Toolbar -->
+                    <div style="background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.95); border-radius: 12px; padding: 0.75rem 0.9rem; margin-bottom: 0.9rem; display: flex; flex-direction: column; gap: 0.6rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                        <!-- Row 1: Quick Period Filter Buttons & Sorting -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;" id="historyDateQuickPills">
+                                <span style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 View:</span>
+                                <button type="button" class="history-date-btn active" id="btnHistDateToday" onclick="setHistoryDateFilter('today')">Today (අද)</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateYesterday" onclick="setHistoryDateFilter('yesterday')">Yesterday (ඊයේ)</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateWeek" onclick="setHistoryDateFilter('week')">This Week (සතිය)</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateMonth" onclick="setHistoryDateFilter('month')">This Month (මාසය)</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateAll" onclick="setHistoryDateFilter('all')">All Time (සියල්ල)</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                <button type="button" id="btnHistSortOrder" onclick="toggleHistorySortOrder()" style="background: white; border: 1px solid #cbd5e1; padding: 0.35rem 0.7rem; border-radius: 7px; font-size: 0.76rem; font-weight: 700; color: #334155; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Toggle between Newest First and Oldest First">
+                                    ⏱️ Latest First ⬇️
+                                </button>
+                                <button type="button" onclick="printDailySalesReport()" style="background: white; border: 1px solid #cbd5e1; padding: 0.35rem 0.65rem; border-radius: 7px; font-size: 0.76rem; font-weight: 700; color: #334155; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Print or save current sales report">
+                                    🖨️ Print Sheet
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Row 2: Specific Date Picker, Date Range & Summary Badge -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                <span style="font-size: 0.76rem; color: #64748b; font-weight: 600;">Specific Date:</span>
+                                <input type="date" id="historySpecificDate" onchange="setHistorySpecificDate(this.value)" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
+                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 600;">or Range:</span>
+                                <input type="date" id="historyStartDate" onchange="setHistoryCustomDateRange()" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
+                                <span style="font-size: 0.74rem; color: #94a3b8;">to</span>
+                                <input type="date" id="historyEndDate" onchange="setHistoryCustomDateRange()" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
+                                <button type="button" onclick="resetHistoryDateFilter()" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer;" title="Reset Date Filter to All Time">↺ Reset</button>
+                            </div>
+                            <!-- Live summary stats for current filter -->
+                            <div id="historyFilterSummaryPill" style="font-size: 0.76rem; font-weight: 700; color: #0f766e; background: #ccfbf1; padding: 3px 9px; border-radius: 6px; border: 1px solid #99f6e4;">
+                                <span id="histSummaryCount">0</span> Sales | Net Profit: <span id="histSummaryProfit">Rs. 0.00</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Duplicate Sales Warning Alert Banner -->
@@ -2212,6 +2261,94 @@
         </div>
     </div>
 
+    <!-- Edit Direct Sale Details & Date/Time Modal -->
+    <div id="editMainSaleModal" class="modal" style="z-index: 2650;">
+        <div class="modal-content" style="max-width: 540px; width: 95vw; border-radius: 18px; border: 1.5px solid rgba(59, 130, 246, 0.4); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);">
+            <span class="modal-close" onclick="closeEditMainSaleModal()">&times;</span>
+            <div style="display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 1.2rem;">
+                <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(59, 130, 246, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                    ✏️
+                </div>
+                <div>
+                    <h3 style="margin: 0; color: var(--text-main); font-size: 1.15rem; font-weight: 800;">Edit Sale & Timing Details</h3>
+                    <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">විකුණුමේ දිනය, වේලාව සහ විස්තර සංස්කරණය කරන්න</p>
+                </div>
+            </div>
+
+            <form id="editMainSaleForm" onsubmit="handleSaveEditMainSale(event)">
+                <input type="hidden" id="editSaleDocId">
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">📅 Sale Date (දිනය)</label>
+                        <input type="date" id="editSaleDate" required style="width: 100%;">
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">⏰ Sale Time (වේලාව)</label>
+                            <span onclick="setEditSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;">⚡ Now</span>
+                        </div>
+                        <input type="time" id="editSaleTime" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0.85rem;">
+                    <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">SP Number / Invoice Ref</label>
+                    <input type="text" id="editSaleSp" placeholder="e.g. SP-MAIN-101" style="width: 100%;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Customer Name</label>
+                        <input type="text" id="editSaleCustName" placeholder="Customer Name" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Customer NIC</label>
+                        <input type="text" id="editSaleCustNic" placeholder="NIC" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Model Name</label>
+                        <input type="text" id="editSaleModel" placeholder="Phone Model" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">IMEI Number</label>
+                        <input type="text" id="editSaleImei" placeholder="IMEI" style="width: 100%; font-family: monospace;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Selling Price MRP (රු.)</label>
+                        <input type="number" id="editSaleMrp" step="0.01" style="width: 100%;">
+                    </div>
+                    <div id="editSaleBuyPriceContainer">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Buy Price / Cost (රු.)</label>
+                        <input type="number" id="editSaleBuyPrice" step="0.01" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 0.75rem; margin-bottom: 1.2rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Activator Staff Name</label>
+                        <input type="text" id="editSaleStaffName" list="activatorDatalist" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Staff Fee / Comm (රු.)</label>
+                        <input type="number" id="editSaleStaffFee" step="1" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.6rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button type="button" onclick="closeEditMainSaleModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.55rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" id="saveEditSaleBtn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 0.55rem 1.2rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Enhanced Ultra-HD Barcode / IMEI Scanner Modal -->
     <div id="scannerModal" class="modal">
         <div class="modal-content" style="max-width: 580px; width: 95vw; text-align: center; padding: 1.25rem; border-radius: 20px; border: 1.5px solid rgba(59, 130, 246, 0.3); box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
@@ -2807,6 +2944,7 @@
                 loadActivatorStaffDatalist();
                 if (document.getElementById('mainSaleDate')) {
                     document.getElementById('mainSaleDate').valueAsDate = new Date();
+                    if (typeof setMainSaleTimeToNow === 'function') setMainSaleTimeToNow();
                 }
             } catch (e) {
                 console.error("Data load error:", e);
@@ -4520,6 +4658,33 @@
             const btn = document.getElementById('mainSaleSubmitBtn');
             const saleType = document.getElementById('mainSaleType').value;
             const dateVal = document.getElementById('mainSaleDate').value;
+            const rawTime = document.getElementById('mainSaleTime')?.value || '';
+            let formattedTime12 = '';
+            let saleTimestamp = Date.now();
+
+            const curDate = new Date();
+            const curHr = curDate.getHours();
+            const curMn = String(curDate.getMinutes()).padStart(2, '0');
+            const defaultTime12 = `${String(curHr % 12 || 12).padStart(2, '0')}:${curMn} ${curHr >= 12 ? 'PM' : 'AM'}`;
+            const defaultTime24 = `${String(curHr).padStart(2, '0')}:${curMn}`;
+
+            if (rawTime) {
+                const [hStr, mStr] = rawTime.split(':');
+                let h = parseInt(hStr, 10);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                formattedTime12 = `${String(h).padStart(2, '0')}:${mStr} ${ampm}`;
+                if (dateVal) {
+                    const combinedDt = new Date(`${dateVal}T${rawTime}:00`);
+                    if (!isNaN(combinedDt.getTime())) saleTimestamp = combinedDt.getTime();
+                }
+            } else {
+                formattedTime12 = defaultTime12;
+                if (dateVal) {
+                    const combinedDt = new Date(`${dateVal}T${defaultTime24}:00`);
+                    if (!isNaN(combinedDt.getTime())) saleTimestamp = combinedDt.getTime();
+                }
+            }
             
             // 1. Check if IMEI is flagged as already sold
             if (currentImeiAlreadySold) {
@@ -4562,28 +4727,33 @@
                     }
 
                     const todayStr = dateVal || new Date().toISOString().slice(0, 10);
-                    const rawStaff = document.getElementById('mainSaleStaffName')?.value.trim();
-                    const staffName = rawStaff ? normalizeStaffName(rawStaff) : (activeNicClearTarget.record.staffName || '');
+                    const rawStaff = document.getElementById('mainSaleStaffName')?.value || '';
+                    const staffName = normalizeStaffName(rawStaff);
 
                     const updatePayload = {
-                        oldSpNumber: activeNicClearTarget.oldSp,
+                        oldSpNumber: activeNicClearTarget.oldSp || '',
                         newSpNumber: newSp,
                         spNumber: newSp,
+                        time: formattedTime12,
+                        time24: rawTime || defaultTime24,
+                        timestamp: saleTimestamp,
                         status: 'Completed',
                         paymentStatus: 'Paid',
                         nicClearStatus: 'Completed',
-                        nicClearedAt: Date.now(),
                         nicClearCompletionDate: todayStr,
-                        nicClearCompletionNote: 'Resubmitted with New SP: ' + newSp
+                        nicClearCompletedAt: Date.now(),
+                        updatedAt: Date.now()
                     };
-                    if (dateVal) updatePayload.date = dateVal;
-                    if (staffName) updatePayload.staffName = staffName;
 
-                    await updateDoc(doc(db, activeNicClearTarget.collection, activeNicClearTarget.id), updatePayload);
-
-                    // Sync linked record between sales and main_shop_sales
-                    if (activeNicClearTarget.collection === 'sales') {
-                        const linkedMain = (allMainShopSales || []).find(m => m.id === activeNicClearTarget.record.linkedMainShopSaleId || (activeNicClearTarget.oldSp && (m.oldSpNumber === activeNicClearTarget.oldSp || m.spNumber === activeNicClearTarget.oldSp)));
+                    if (activeNicClearTarget.collection === 'main_shop_sales') {
+                        await updateDoc(doc(db, "main_shop_sales", activeNicClearTarget.id), updatePayload);
+                        const linkedSale = (allSales || []).find(s => s.linkedMainShopSaleId === activeNicClearTarget.id || (activeNicClearTarget.oldSp && (s.oldSpNumber === activeNicClearTarget.oldSp || s.spNumber === activeNicClearTarget.oldSp)));
+                        if (linkedSale) {
+                            try { await updateDoc(doc(db, "sales", linkedSale.id), updatePayload); } catch(e) {}
+                        }
+                    } else if (activeNicClearTarget.collection === 'sales') {
+                        await updateDoc(doc(db, "sales", activeNicClearTarget.id), updatePayload);
+                        const linkedMain = (allMainShopSales || []).find(s => s.id === activeNicClearTarget.id || (activeNicClearTarget.oldSp && (s.oldSpNumber === activeNicClearTarget.oldSp || s.spNumber === activeNicClearTarget.oldSp)));
                         if (linkedMain) {
                             try { await updateDoc(doc(db, "main_shop_sales", linkedMain.id), updatePayload); } catch(e) {}
                         }
@@ -4647,6 +4817,8 @@
 
                     const payload = {
                         date: dateVal,
+                        time: formattedTime12,
+                        time24: rawTime || defaultTime24,
                         spNumber: 'LESI-PAY',
                         custName: 'Dialog Lesi Pay',
                         custNic: '-',
@@ -4663,7 +4835,8 @@
                         settlement: settlement,
                         source: 'Dialog Lesi Pay',
                         category: 'Dialog Lesi Pay',
-                        timestamp: Date.now()
+                        timestamp: saleTimestamp,
+                        createdAt: saleTimestamp
                     };
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
@@ -4704,6 +4877,8 @@
 
                     const payload = {
                         date: dateVal,
+                        time: formattedTime12,
+                        time24: rawTime || defaultTime24,
                         spNumber: document.getElementById('mainSaleSp').value.trim(),
                         custName: document.getElementById('mainSaleCustName').value.trim(),
                         custNic: document.getElementById('mainSaleCustNic').value.trim(),
@@ -4718,7 +4893,8 @@
                         netProfit: netProfit,
                         source: 'Head Office Direct Sale',
                         category: 'Main Shop (Own Buy)',
-                        timestamp: Date.now()
+                        timestamp: saleTimestamp,
+                        createdAt: saleTimestamp
                     };
 
                     await addDoc(collection(db, "main_shop_sales"), payload);
@@ -5055,25 +5231,135 @@
                     if (el) el.focus();
                 }, 80);
             }
+            if (typeof setMainSaleTimeToNow === 'function') setMainSaleTimeToNow();
         };
 
+        window.setMainSaleTimeToNow = function() {
+            const now = new Date();
+            const hr = String(now.getHours()).padStart(2, '0');
+            const mn = String(now.getMinutes()).padStart(2, '0');
+            const timeInput = document.getElementById('mainSaleTime');
+            if (timeInput) timeInput.value = `${hr}:${mn}`;
+        };
+
+        function formatSaleTime(item) {
+            if (item && item.time) return item.time;
+            if (item && item.timestamp) {
+                const dt = new Date(item.timestamp);
+                if (!isNaN(dt.getTime())) {
+                    let hr = dt.getHours();
+                    const mn = String(dt.getMinutes()).padStart(2, '0');
+                    const ampm = hr >= 12 ? 'PM' : 'AM';
+                    hr = hr % 12 || 12;
+                    return `${String(hr).padStart(2, '0')}:${mn} ${ampm}`;
+                }
+            }
+            return '';
+        }
+
         // Date Range Filtering for Main Shop
+        window.currentHistorySortOrder = 'desc';
+
+        window.setHistoryDateFilter = function(rangeType) {
+            currentProfitRange = rangeType;
+            
+            // Clear specific date and custom range inputs
+            const specDate = document.getElementById('historySpecificDate');
+            const sDate = document.getElementById('historyStartDate');
+            const eDate = document.getElementById('historyEndDate');
+            if (specDate) specDate.value = '';
+            if (sDate) sDate.value = '';
+            if (eDate) eDate.value = '';
+
+            const topDropdown = document.getElementById('mainProfitDateDropdown');
+            if (topDropdown) {
+                if (['today', 'yesterday', 'week', 'month', '3months', 'year', 'all'].includes(rangeType)) {
+                    topDropdown.value = rangeType;
+                }
+            }
+
+            document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
+            if (rangeType === 'today') document.getElementById('btnHistDateToday')?.classList.add('active');
+            if (rangeType === 'yesterday') document.getElementById('btnHistDateYesterday')?.classList.add('active');
+            if (rangeType === 'week') document.getElementById('btnHistDateWeek')?.classList.add('active');
+            if (rangeType === 'month') document.getElementById('btnHistDateMonth')?.classList.add('active');
+            if (rangeType === 'all') document.getElementById('btnHistDateAll')?.classList.add('active');
+
+            renderMainShopProfitView();
+        };
+
+        window.setHistorySpecificDate = function(dateStr) {
+            if (!dateStr) return;
+            currentProfitRange = 'custom';
+            
+            const startInput = document.getElementById('profitStartDate');
+            const endInput = document.getElementById('profitEndDate');
+            if (startInput) startInput.value = dateStr;
+            if (endInput) endInput.value = dateStr;
+
+            const sDate = document.getElementById('historyStartDate');
+            const eDate = document.getElementById('historyEndDate');
+            if (sDate) sDate.value = dateStr;
+            if (eDate) eDate.value = dateStr;
+
+            document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
+            renderMainShopProfitView();
+        };
+
+        window.setHistoryCustomDateRange = function() {
+            const start = document.getElementById('historyStartDate')?.value || '';
+            const end = document.getElementById('historyEndDate')?.value || '';
+            if (!start && !end) return;
+
+            currentProfitRange = 'custom';
+            const startInput = document.getElementById('profitStartDate');
+            const endInput = document.getElementById('profitEndDate');
+            if (startInput) startInput.value = start;
+            if (endInput) endInput.value = end;
+
+            const specDate = document.getElementById('historySpecificDate');
+            if (specDate) specDate.value = '';
+
+            document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
+            renderMainShopProfitView();
+        };
+
+        window.resetHistoryDateFilter = function() {
+            setHistoryDateFilter('today');
+        };
+
+        window.toggleHistorySortOrder = function() {
+            currentHistorySortOrder = (currentHistorySortOrder === 'desc') ? 'asc' : 'desc';
+            const btn = document.getElementById('btnHistSortOrder');
+            if (btn) {
+                btn.innerHTML = (currentHistorySortOrder === 'desc') ? '⏱️ Latest First ⬇️' : '⏱️ Oldest First ⬆️';
+            }
+            renderMainShopProfitView();
+        };
+
         window.handleMainProfitDateSelection = function(val) {
             if (val === 'custom') {
                 document.getElementById('customDateRangeContainer').style.display = 'flex';
             } else {
                 document.getElementById('customDateRangeContainer').style.display = 'none';
-                filterMainShopByDateRange(val);
+                setHistoryDateFilter(val);
             }
         };
 
         window.filterMainShopByDateRange = function(rangeType) {
-            currentProfitRange = rangeType;
-            renderMainShopProfitView();
+            setHistoryDateFilter(rangeType);
         };
 
         window.applyCustomDateRange = function() {
+            const start = document.getElementById('profitStartDate')?.value || '';
+            const end = document.getElementById('profitEndDate')?.value || '';
+            const sDate = document.getElementById('historyStartDate');
+            const eDate = document.getElementById('historyEndDate');
+            if (sDate) sDate.value = start;
+            if (eDate) eDate.value = end;
+
             currentProfitRange = 'custom';
+            document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
             renderMainShopProfitView();
         };
 
@@ -5203,10 +5489,18 @@
 
         function renderMainShopProfitView() {
             const tbody = document.getElementById('mainShopTableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             const now = new Date();
-            const todayStr = now.toISOString().slice(0, 10);
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
+            const yDate = new Date(now);
+            yDate.setDate(now.getDate() - 1);
+            const yesterdayStr = `${yDate.getFullYear()}-${String(yDate.getMonth() + 1).padStart(2, '0')}-${String(yDate.getDate()).padStart(2, '0')}`;
             
             const startOfWeek = new Date(now);
             startOfWeek.setDate(now.getDate() - now.getDay());
@@ -5232,6 +5526,8 @@
                 
                 if (currentProfitRange === 'today') {
                     return item.date === todayStr;
+                } else if (currentProfitRange === 'yesterday') {
+                    return item.date === yesterdayStr;
                 } else if (currentProfitRange === 'week') {
                     return itemDate >= startOfWeek;
                 } else if (currentProfitRange === 'month') {
@@ -5250,12 +5546,21 @@
                                         (item.custNic || '').toLowerCase().includes(searchInput) ||
                                         (item.spNumber || '').toLowerCase().includes(searchInput) ||
                                         (item.model || '').toLowerCase().includes(searchInput) ||
-                                        (item.custName || '').toLowerCase().includes(searchInput);
+                                        (item.custName || '').toLowerCase().includes(searchInput) ||
+                                        (item.staffName || '').toLowerCase().includes(searchInput);
                     if (!matchSearch) return false;
                 }
                 
                 return true;
             });
+
+            // Sort filtered sales by date & time according to currentHistorySortOrder
+            filteredSales.sort((a, b) => {
+                const timeA = a.timestamp || (a.date ? new Date(`${a.date}T${a.time24 || '00:00'}:00`).getTime() : 0);
+                const timeB = b.timestamp || (b.date ? new Date(`${b.date}T${b.time24 || '00:00'}:00`).getTime() : 0);
+                return (currentHistorySortOrder === 'desc') ? (timeB - timeA) : (timeA - timeB);
+            });
+            window.currentRenderedSales = filteredSales;
 
             let totalDialogLesiPayProfit = 0;
             let totalDialogLesiPayCount = 0;
@@ -5300,6 +5605,12 @@
             if (totalNetProfit < 0) netProfitEl.style.color = 'var(--danger)';
             else netProfitEl.style.color = 'var(--success)';
 
+            // Update live summary stats pill in history toolbar
+            const histCountEl = document.getElementById('histSummaryCount');
+            const histProfitEl = document.getElementById('histSummaryProfit');
+            if (histCountEl) histCountEl.innerText = filteredSales.length.toString();
+            if (histProfitEl) histProfitEl.innerText = 'Rs. ' + totalNetProfit.toLocaleString(undefined, {minimumFractionDigits: 2});
+
             // Render visual analytics chart
             renderMainProfitAnalyticsChart(filteredSales);
 
@@ -5321,7 +5632,7 @@
             const dupeImeiSet = new Set(dupeGroups.map(g => (g.imei || '').trim().toLowerCase()));
 
             if (filteredSales.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records for selected time range.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales records found for selected date/time filter.</td></tr>';
                 return;
             }
 
@@ -5362,17 +5673,44 @@
                     feesCol = `Lease 2%: Rs. ${lease.toLocaleString()}<br>Staff: Rs. ${staff.toLocaleString()}`;
                 }
 
+                const timeDisplay = formatSaleTime(item);
+                let timeBadge = '';
+                if (timeDisplay) {
+                    let dayTag = '';
+                    if (item.date === todayStr) {
+                        dayTag = '<span style="color:#059669; font-weight:800; font-size:0.68rem; background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:3px;">Today</span> ';
+                    } else if (item.date === yesterdayStr) {
+                        dayTag = '<span style="color:#d97706; font-weight:800; font-size:0.68rem; background:rgba(245,158,11,0.1); padding:1px 4px; border-radius:3px;">Yesterday</span> ';
+                    }
+                    timeBadge = `
+                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.74rem; color: #1e293b; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 700; padding: 2px 6px; border-radius: 5px; width: fit-content;">
+                            ⏰ ${dayTag}${timeDisplay}
+                        </span>
+                    `;
+                }
+
                 tr.innerHTML = `
-                    <td><strong>${item.date || '-'}</strong><br><span style="color:var(--text-muted)">${item.spNumber || '-'}</span></td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 3px;">
+                            <strong style="font-size: 0.88rem; color: var(--text-main); display: flex; align-items: center; gap: 4px;">📅 ${item.date || '-'}</strong>
+                            ${timeBadge}
+                            <span style="color:var(--text-muted); font-size: 0.75rem; font-family: monospace; font-weight: 600;">${item.spNumber || '-'}</span>
+                        </div>
+                    </td>
                     <td>${deviceCol}</td>
                     <td><span class="badge badge-new">${item.staffName || 'Staff'}</span></td>
                     <td>${priceCol}</td>
                     <td>${feesCol}</td>
                     <td><strong style="color:${profitColor}; font-size:1rem;">Rs. ${net.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></td>
                     <td>
-                        <button onclick="deleteMainShopSale('${item.id}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Delete Record">
-                            🗑️
-                        </button>
+                        <div style="display: flex; gap: 4px; align-items: center;">
+                            <button type="button" onclick="openEditMainSaleModal('${item.id}')" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; cursor: pointer; padding: 4px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 600;" title="Edit Sale Record & Time">
+                                ✏️
+                            </button>
+                            <button type="button" onclick="deleteMainShopSale('${item.id}')" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; padding: 4px;" title="Delete Record" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#fca5a5';">
+                                🗑️
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -5401,6 +5739,425 @@
             } catch (e) {
                 showToast("Failed to delete record: " + e.message, "error");
             }
+        };
+
+        // ==========================================
+        // EDIT MAIN SALE MODAL & PRINT REPORT HANDLERS
+        // ==========================================
+
+        window.openEditMainSaleModal = function(id) {
+            const sale = (allMainShopSales || []).find(s => s.id === id);
+            if (!sale) {
+                showToast("Sale record not found", "error");
+                return;
+            }
+
+            document.getElementById('editSaleDocId').value = sale.id || '';
+            document.getElementById('editSaleDate').value = sale.date || '';
+
+            let t24 = sale.time24 || '';
+            if (!t24 && sale.timestamp) {
+                const dt = new Date(sale.timestamp);
+                if (!isNaN(dt.getTime())) {
+                    t24 = `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+                }
+            } else if (!t24 && sale.time) {
+                const m = sale.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+                if (m) {
+                    let h = parseInt(m[1], 10);
+                    const min = m[2];
+                    const ampm = (m[3] || '').toUpperCase();
+                    if (ampm === 'PM' && h < 12) h += 12;
+                    if (ampm === 'AM' && h === 12) h = 0;
+                    t24 = `${String(h).padStart(2, '0')}:${min}`;
+                }
+            }
+            document.getElementById('editSaleTime').value = t24;
+
+            document.getElementById('editSaleSp').value = sale.spNumber || '';
+            document.getElementById('editSaleCustName').value = sale.custName || '';
+            document.getElementById('editSaleCustNic').value = sale.custNic || '';
+            document.getElementById('editSaleModel').value = sale.model || '';
+            document.getElementById('editSaleImei').value = sale.imei || '';
+            document.getElementById('editSaleMrp').value = (sale.mrp !== undefined && sale.mrp !== null) ? sale.mrp : '';
+            
+            const buyContainer = document.getElementById('editSaleBuyPriceContainer');
+            const isLesi = (sale.category === 'Dialog Lesi Pay' || sale.source === 'Dialog Lesi Pay' || sale.saleType === 'dialog_lesi_pay');
+            if (isLesi) {
+                if (buyContainer) buyContainer.style.display = 'none';
+                document.getElementById('editSaleBuyPrice').value = '0';
+            } else {
+                if (buyContainer) buyContainer.style.display = 'block';
+                document.getElementById('editSaleBuyPrice').value = (sale.buyPrice !== undefined && sale.buyPrice !== null) ? sale.buyPrice : '';
+            }
+
+            document.getElementById('editSaleStaffName').value = sale.staffName || '';
+            document.getElementById('editSaleStaffFee').value = (sale.staffFee !== undefined && sale.staffFee !== null) ? sale.staffFee : 0;
+
+            const modal = document.getElementById('editMainSaleModal');
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeEditMainSaleModal = function() {
+            const modal = document.getElementById('editMainSaleModal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        window.setEditSaleTimeToNow = function() {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const tInput = document.getElementById('editSaleTime');
+            if (tInput) tInput.value = `${hh}:${mm}`;
+        };
+
+        window.handleSaveEditMainSale = async function(e) {
+            if (e) e.preventDefault();
+            const saveBtn = document.getElementById('saveEditSaleBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'Saving...';
+            }
+
+            try {
+                const id = document.getElementById('editSaleDocId').value;
+                if (!id) {
+                    showToast("Invalid sale document ID", "error");
+                    return;
+                }
+
+                const sale = (allMainShopSales || []).find(s => s.id === id);
+                const dateVal = document.getElementById('editSaleDate').value;
+                const timeVal = document.getElementById('editSaleTime').value; // 'HH:mm'
+                const spVal = document.getElementById('editSaleSp').value.trim();
+                const custNameVal = document.getElementById('editSaleCustName').value.trim();
+                const custNicVal = document.getElementById('editSaleCustNic').value.trim();
+                const modelVal = document.getElementById('editSaleModel').value.trim();
+                const imeiVal = document.getElementById('editSaleImei').value.trim();
+                const mrpVal = parseFloat(document.getElementById('editSaleMrp').value) || 0;
+                const buyPriceVal = parseFloat(document.getElementById('editSaleBuyPrice').value) || 0;
+                const staffNameVal = document.getElementById('editSaleStaffName').value.trim();
+                const staffFeeVal = parseFloat(document.getElementById('editSaleStaffFee').value) || 0;
+
+                let timeStr = '';
+                if (timeVal) {
+                    const [hStr, mStr] = timeVal.split(':');
+                    let hours = parseInt(hStr, 10);
+                    const minutes = mStr || '00';
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12 || 12;
+                    timeStr = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+                }
+
+                let timestampVal = sale && sale.timestamp ? sale.timestamp : Date.now();
+                if (dateVal) {
+                    const combinedTime = timeVal || '12:00';
+                    const parsedDate = new Date(`${dateVal}T${combinedTime}:00`);
+                    if (!isNaN(parsedDate.getTime())) {
+                        timestampVal = parsedDate.getTime();
+                    }
+                }
+
+                const isLesi = sale && (sale.category === 'Dialog Lesi Pay' || sale.source === 'Dialog Lesi Pay' || sale.saleType === 'dialog_lesi_pay');
+                let profitVal = 0;
+                let leaseFeeVal = sale && sale.leaseFee !== undefined ? sale.leaseFee : 0;
+                if (isLesi) {
+                    leaseFeeVal = mrpVal * 0.02;
+                    const dialogComm = mrpVal * 0.07;
+                    profitVal = dialogComm - staffFeeVal;
+                } else {
+                    leaseFeeVal = mrpVal * 0.02;
+                    profitVal = mrpVal - buyPriceVal - staffFeeVal;
+                }
+
+                const updateData = {
+                    date: dateVal,
+                    time: timeStr,
+                    time24: timeVal,
+                    timestamp: timestampVal,
+                    spNumber: spVal,
+                    custName: custNameVal,
+                    custNic: custNicVal,
+                    model: modelVal,
+                    imei: imeiVal,
+                    mrp: mrpVal,
+                    staffName: staffNameVal,
+                    staffFee: staffFeeVal,
+                    netProfit: profitVal,
+                    updatedAt: Date.now()
+                };
+
+                if (isLesi) {
+                    updateData.leaseFee = leaseFeeVal;
+                } else {
+                    updateData.buyPrice = buyPriceVal;
+                }
+
+                // If IMEI changed, synchronize inventory
+                if (sale && sale.imei && sale.imei.trim().toLowerCase() !== imeiVal.toLowerCase()) {
+                    const oldInv = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === sale.imei.trim().toLowerCase());
+                    if (oldInv && oldInv.status === 'Sold') {
+                        try {
+                            await updateDoc(doc(db, "inventory", oldInv.id), { status: 'Available', updatedAt: Date.now() });
+                        } catch(err) { console.warn("Failed to reset old inv:", err); }
+                    }
+                    const newInv = (allInventoryItems || []).find(i => i.imei && i.imei.trim().toLowerCase() === imeiVal.toLowerCase());
+                    if (newInv && newInv.status === 'Available') {
+                        try {
+                            await updateDoc(doc(db, "inventory", newInv.id), { status: 'Sold', updatedAt: Date.now() });
+                        } catch(err) { console.warn("Failed to update new inv:", err); }
+                    }
+                }
+
+                await updateDoc(doc(db, "main_shop_sales", id), updateData);
+                showToast("Sale record updated successfully!", "success");
+                closeEditMainSaleModal();
+            } catch (err) {
+                console.error("Save edit sale error:", err);
+                showToast("Failed to save changes: " + err.message, "error");
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = '💾 Save Changes';
+                }
+            }
+        };
+
+        window.printDailySalesReport = function() {
+            const sales = window.currentRenderedSales || [];
+            if (sales.length === 0) {
+                showToast("No sales to print for the selected filter.", "warning");
+                return;
+            }
+
+            let filterLabel = 'All Time';
+            if (currentProfitRange === 'today') filterLabel = 'Today';
+            else if (currentProfitRange === 'yesterday') filterLabel = 'Yesterday';
+            else if (currentProfitRange === 'week') filterLabel = 'This Week';
+            else if (currentProfitRange === 'month') filterLabel = 'This Month';
+            else if (currentProfitRange === 'custom') {
+                const s = document.getElementById('historyStartDate')?.value || '';
+                const e = document.getElementById('historyEndDate')?.value || '';
+                filterLabel = `Custom Range (${s || 'Start'} to ${e || 'End'})`;
+            }
+
+            let totalMrp = 0;
+            let totalCost = 0;
+            let totalProfit = 0;
+
+            let rowsHtml = '';
+            sales.forEach((s, idx) => {
+                const isLesi = (s.category === 'Dialog Lesi Pay' || s.source === 'Dialog Lesi Pay' || s.saleType === 'dialog_lesi_pay');
+                const mrp = parseFloat(s.mrp) || 0;
+                const buy = isLesi ? 0 : (parseFloat(s.buyPrice) || 0);
+                const lease = parseFloat(s.leaseFee) || 0;
+                const staff = parseFloat(s.staffFee) || 0;
+                let net = 0;
+                if (s.netProfit !== undefined && s.netProfit !== null && !isNaN(parseFloat(s.netProfit))) {
+                    net = parseFloat(s.netProfit);
+                } else if (isLesi) {
+                    net = (mrp * 0.07) - staff;
+                } else {
+                    net = mrp - buy - lease - staff;
+                }
+
+                totalMrp += mrp;
+                totalCost += buy;
+                totalProfit += net;
+
+                const timeStr = formatSaleTime(s);
+                const dateDisplay = s.date ? `${s.date}${timeStr ? ' ' + timeStr : ''}` : '-';
+
+                rowsHtml += `
+                    <tr>
+                        <td style="text-align:center;">${idx + 1}</td>
+                        <td><strong>${dateDisplay}</strong></td>
+                        <td><code>${s.spNumber || '-'}</code></td>
+                        <td>
+                            <strong>${s.model || '-'}</strong>
+                            <div style="font-size:10px; color:#555; font-family:monospace;">${s.imei || '-'}</div>
+                        </td>
+                        <td>
+                            ${s.custName || '-'}
+                            ${s.custNic ? `<div style="font-size:10px; color:#555;">NIC: ${s.custNic}</div>` : ''}
+                        </td>
+                        <td>${s.staffName || '-'}</td>
+                        <td style="text-align:right;">Rs. ${mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td style="text-align:right;">${isLesi ? '<em style="color:#666;">Lesi Pay</em>' : 'Rs. ' + buy.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td style="text-align:right; font-weight:bold; color: ${net >= 0 ? '#059669' : '#dc2626'};">
+                            Rs. ${net.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const nowStr = new Date().toLocaleString();
+
+            const printWin = window.open('', '_blank', 'width=950,height=750');
+            if (!printWin) {
+                showToast("Popup blocked! Please allow popups to print report.", "error");
+                return;
+            }
+
+            printWin.document.open();
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Main Shop Sales Report - \${filterLabel}</title>
+                    <style>
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                            margin: 20px;
+                            color: #111;
+                            font-size: 12px;
+                        }
+                        .header {
+                            text-align: center;
+                            border-bottom: 2px solid #2563eb;
+                            padding-bottom: 12px;
+                            margin-bottom: 15px;
+                        }
+                        .header h1 {
+                            margin: 0 0 5px 0;
+                            font-size: 20px;
+                            color: #1e3a8a;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .meta-row {
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 11px;
+                            color: #555;
+                            margin-bottom: 15px;
+                        }
+                        .summary-cards {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 10px;
+                            margin-bottom: 15px;
+                        }
+                        .card {
+                            background: #f8fafc;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 8px;
+                            padding: 8px 12px;
+                        }
+                        .card-title {
+                            font-size: 10px;
+                            color: #64748b;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                        }
+                        .card-value {
+                            font-size: 14px;
+                            font-weight: 800;
+                            color: #0f172a;
+                            margin-top: 3px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 25px;
+                        }
+                        th, td {
+                            border: 1px solid #cbd5e1;
+                            padding: 6px 8px;
+                            font-size: 11px;
+                        }
+                        th {
+                            background: #f1f5f9;
+                            font-weight: 700;
+                            color: #1e293b;
+                            text-align: left;
+                        }
+                        tr:nth-child(even) {
+                            background: #fafafa;
+                        }
+                        .footer {
+                            margin-top: 40px;
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 0 30px;
+                        }
+                        .sig-line {
+                            border-top: 1px dashed #64748b;
+                            width: 180px;
+                            text-align: center;
+                            padding-top: 5px;
+                            font-size: 11px;
+                            color: #475569;
+                        }
+                        @media print {
+                            body { margin: 10mm; }
+                            .no-print { display: none; }
+                            @page { size: portrait; margin: 10mm; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print" style="margin-bottom: 12px; display: flex; justify-content: flex-end; gap: 8px;">
+                        <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer;">🖨️ Print Now</button>
+                        <button onclick="window.close()" style="background: #e2e8f0; color: #334155; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">Close</button>
+                    </div>
+                    <div class="header">
+                        <h1>Main Shop Sales & Timing Report</h1>
+                        <div style="font-weight: 600; color: #475569;">Filtered View: \${filterLabel}</div>
+                    </div>
+                    <div class="meta-row">
+                        <div><strong>Printed On:</strong> \${nowStr}</div>
+                        <div><strong>Total Sales Recorded:</strong> \${sales.length}</div>
+                    </div>
+                    <div class="summary-cards">
+                        <div class="card">
+                            <div class="card-title">Total Sales Count</div>
+                            <div class="card-value">\${sales.length} Devices</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Total Revenue (MRP)</div>
+                            <div class="card-value">Rs. \${totalMrp.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Total Cost (Buy Price)</div>
+                            <div class="card-value">Rs. \${totalCost.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Total Net Profit</div>
+                            <div class="card-value" style="color: \${totalProfit >= 0 ? '#059669' : '#dc2626'};">Rs. \${totalProfit.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30px; text-align:center;">#</th>
+                                <th style="width: 120px;">Date & Time</th>
+                                <th style="width: 90px;">SP / Invoice</th>
+                                <th>Device Model & IMEI</th>
+                                <th>Customer</th>
+                                <th style="width: 80px;">Activator</th>
+                                <th style="width: 95px; text-align:right;">MRP</th>
+                                <th style="width: 95px; text-align:right;">Cost</th>
+                                <th style="width: 95px; text-align:right;">Net Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            \${rowsHtml}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <div class="sig-line">Prepared By (Staff)</div>
+                        <div class="sig-line">Manager / Authorized Sign</div>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() { window.print(); }, 400);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
         };
 
         // ==========================================
