@@ -5851,11 +5851,18 @@
                 let priceCol = '';
                 let feesCol = '';
 
+                const isPos = (item.source && item.source.includes('POS')) || (item.category && item.category.includes('POS'));
+
                 if (isLesi) {
                     const profit7 = (item.profit !== undefined && item.profit !== null && !isNaN(parseFloat(item.profit))) ? parseFloat(item.profit) : (mrp * 0.07);
                     deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:#3b82f6; font-weight:600; font-size:0.75rem;">📱 Dialog Lesi Pay</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}${dupeBadge}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#3b82f6; font-size:0.75rem;">DP: Rs. ${(item.downPayment || 0).toLocaleString()}</span>`;
                     feesCol = `<span style="color:var(--accent-purple); font-weight:700;">7% Profit: Rs. ${profit7.toLocaleString(undefined, {minimumFractionDigits:2})}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">Comm: Rs. ${staff.toLocaleString()}</span>`;
+                } else if (isPos) {
+                    deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple); font-weight:600;">${item.custName || 'In-Store Customer'}</span> <span style="background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.68rem; font-weight: 800; padding: 1px 5px; border-radius: 4px;">🏪 In-Store POS</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}${dupeBadge}</span>`;
+                    priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span>`;
+                    const discountText = item.discount > 0 ? `<br><span style="color:#d97706; font-size:0.72rem;">Disc: -Rs. ${Number(item.discount).toLocaleString()}</span>` : '';
+                    feesCol = `<span style="color:#059669; font-weight:700;">Direct Store POS</span>${discountText}<br><span style="color:var(--text-muted); font-size:0.72rem;">No Lease Fee</span>`;
                 } else {
                     deviceCol = `<strong>${item.model || '-'}</strong><br><span style="color:var(--accent-purple)">${item.custName || '-'}</span><br><span style="color:var(--text-muted); font-size:0.75rem;">IMEI: ${item.imei || '-'}${dupeBadge}</span>`;
                     priceCol = `MRP: Rs. ${mrp.toLocaleString()}<br><span style="color:#fca5a5">Cost: Rs. ${buy.toLocaleString()}</span>`;
