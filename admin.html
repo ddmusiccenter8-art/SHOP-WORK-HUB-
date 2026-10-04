@@ -1062,7 +1062,7 @@
                                 <span style="font-size: 0.74rem; font-weight: 800; color: #b91c1c; text-transform: uppercase;">1. Agent Owes to HO (නියෝජිතයාගෙන් අපට)</span>
                             </div>
                             <p style="font-size: 1.45rem; font-weight: 900; color: #dc2626; margin: 0;" id="adminAgentOwesHOVal">Rs. 0.00</p>
-                            <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="adminAgentOwesHODesc">Direct Cash + Excess Down Payments</span>
+                            <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="adminAgentOwesHODesc">Direct Cash + Excess DP & Doc Charges</span>
                         </div>
 
                         <!-- 2. Head Office Owes to Agent (Own Stock Settlements + Low/0 DP Commissions) -->
@@ -3602,11 +3602,13 @@
                             shopOwesHQ_fromHOSales += parseFloat(s.headOfficeDue !== undefined && s.headOfficeDue !== null ? s.headOfficeDue : (cPrice - cComm));
                         } else if (isHO) {
                             const dp = parseFloat(s.downPayment) || 0;
+                            const docCharge = parseFloat(s.document) || 0;
+                            const totalCollected = dp + docCharge;
                             const mrp = parseFloat(s.mrp) || parseFloat(s.loanAmount) || 0;
                             const comm = (s.shopCommission !== undefined && s.shopCommission !== null && !isNaN(parseFloat(s.shopCommission)) && parseFloat(s.shopCommission) > 0)
                                 ? parseFloat(s.shopCommission)
                                 : (mrp * (shopHoP / 100));
-                            const netDiff = dp - comm;
+                            const netDiff = totalCollected - comm;
                             if (netDiff >= 0) {
                                 shopOwesHQ_fromHOSales += netDiff;
                             } else {
@@ -4217,18 +4219,22 @@
                         pendingCashSaleCount++;
                     } else if (isHO) {
                         const dp = parseFloat(sale.downPayment) || 0;
-                        const netDiff = dp - comm;
+                        const docCharge = parseFloat(sale.document) || 0;
+                        const totalCollectedAtCounter = dp + docCharge;
+
+                        const netDiff = totalCollectedAtCounter - comm;
                         if (netDiff >= 0) {
-                            shopOwesHQ_fromHOSales += netDiff; // Shop holds excess DP
+                            shopOwesHQ_fromHOSales += netDiff; // Shop holds excess cash (DP + Doc Charge)
                             hoCommissionDeducted += comm;
                         } else {
-                            // DP was less than commission (e.g. 0 DP), HQ owes agent this commission balance
+                            // Cash collected was less than commission, HQ owes agent this commission balance
                             hqOwesShop_pendingSettlement += Math.abs(netDiff);
-                            hoCommissionDeducted += dp;
+                            hoCommissionDeducted += totalCollectedAtCounter;
                         }
-                        if (dp > 0) pendingLoanDpCount++;
+                        if (totalCollectedAtCounter > 0) pendingLoanDpCount++;
                     } else {
                         // Own stock loan sale: HQ owes shop the settlement
+                        // (sale.settlement already deducts DP and Document Charge collected by agent)
                         const setl = parseFloat(sale.settlement) || 0;
                         hqOwesShop_pendingSettlement += setl;
                         pendingOwnStockCount++;
@@ -4249,7 +4255,7 @@
             const elAgentOwes = document.getElementById('adminAgentOwesHOVal');
             const elAgentOwesDesc = document.getElementById('adminAgentOwesHODesc');
             if (elAgentOwes) elAgentOwes.innerText = fmt(shopOwesHQ_fromHOSales);
-            if (elAgentOwesDesc) elAgentOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO Down Payment(s)`;
+            if (elAgentOwesDesc) elAgentOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO DP & Doc Fee(s)`;
 
             // Box 2: Head Office Owes to Agent
             const elHOOwes = document.getElementById('adminHOOwesAgentVal');

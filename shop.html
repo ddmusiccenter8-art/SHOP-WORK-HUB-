@@ -701,7 +701,7 @@
                             <span style="font-size: 0.74rem; font-weight: 800; color: #b91c1c; text-transform: uppercase;">1. We Owe to HO (අපෙන් HO එකට)</span>
                         </div>
                         <p style="font-size: 1.45rem; font-weight: 900; color: #dc2626; margin: 0;" id="shopOwesHOVal">Rs. 0.00</p>
-                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopOwesHODesc">Direct Cash + Excess Down Payments</span>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopOwesHODesc">Direct Cash + Excess DP & Doc Charges</span>
                     </div>
 
                     <!-- 2. Head Office Owes to Us (Own Stock Settlements + Low/0 DP Commissions) -->
@@ -1682,20 +1682,24 @@
                         hoCommissionDeducted += comm;
                         pendingCashSaleCount++;
                     } else if (isHO) {
-                        // Loan on HO Stock: Shop collected Down Payment from customer
+                        // Loan on HO Stock: Shop collected Down Payment + Document Charge from customer
                         const dp = parseFloat(sale.downPayment) || 0;
-                        const netDiff = dp - comm;
+                        const docCharge = parseFloat(sale.document) || 0;
+                        const totalCollectedAtCounter = dp + docCharge;
+
+                        const netDiff = totalCollectedAtCounter - comm;
                         if (netDiff >= 0) {
-                            shopOwesHO += netDiff; // Shop owes HQ excess DP after retaining commission
+                            shopOwesHO += netDiff; // Shop owes HQ excess collections (DP + Doc Charge) after retaining commission
                             hoCommissionDeducted += comm;
                         } else {
-                            // DP was less than commission (e.g. 0 DP), HQ owes shop remaining commission balance
+                            // Cash collected at counter was less than commission, HQ owes shop remaining commission balance
                             hoOwesShop += Math.abs(netDiff);
-                            hoCommissionDeducted += dp;
+                            hoCommissionDeducted += totalCollectedAtCounter;
                         }
-                        if (dp > 0) pendingLoanDpCount++;
+                        if (totalCollectedAtCounter > 0) pendingLoanDpCount++;
                     } else {
                         // Loan on Own Stock: HQ owes shop the loan settlement amount
+                        // (sale.settlement already deducts DP and Document Charge collected by agent)
                         const setl = parseFloat(sale.settlement) || 0;
                         hoOwesShop += setl;
                         pendingOwnStockCount++;
@@ -1716,7 +1720,7 @@
             const elShopOwes = document.getElementById('shopOwesHOVal');
             const elShopOwesDesc = document.getElementById('shopOwesHODesc');
             if (elShopOwes) elShopOwes.innerText = fmt(shopOwesHO);
-            if (elShopOwesDesc) elShopOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO Down Payment(s)`;
+            if (elShopOwesDesc) elShopOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO DP & Doc Fee(s)`;
 
             // Box 2: Head Office Owes to Us
             const elHOOwes = document.getElementById('hoOwesShopVal');
