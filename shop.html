@@ -701,17 +701,17 @@
                             <span style="font-size: 0.74rem; font-weight: 800; color: #b91c1c; text-transform: uppercase;">1. We Owe to HO (අපෙන් HO එකට)</span>
                         </div>
                         <p style="font-size: 1.45rem; font-weight: 900; color: #dc2626; margin: 0;" id="shopOwesHOVal">Rs. 0.00</p>
-                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopOwesHODesc">Direct Cash + Excess DP & Doc Charges</span>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopOwesHODesc">Direct Cash Sales (Due to HO)</span>
                     </div>
 
-                    <!-- 2. Head Office Owes to Us (Own Stock Settlements + Low/0 DP Commissions) -->
+                    <!-- 2. Head Office Owes to Us (Own Stock & HO Stock Submitted Settlements) -->
                     <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(37,99,235,0.32); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
                             <span style="font-size: 1.2rem;">📤</span>
                             <span style="font-size: 0.74rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">2. HO Owes Us (HO එකෙන් අපිට)</span>
                         </div>
                         <p style="font-size: 1.45rem; font-weight: 900; color: #2563eb; margin: 0;" id="hoOwesShopVal">Rs. 0.00</p>
-                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="hoOwesShopDesc">Own Stock Settlements + Unpaid Profit</span>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="hoOwesShopDesc">Submitted Loan Settlements Pending</span>
                     </div>
 
                     <!-- 3. Total Earned Profit (Commission across all sales) -->
@@ -1645,20 +1645,19 @@
 
         // ====== SETTLEMENT CARD CALCULATOR (Based Strictly on Submitted Sales) ======
         function updateShopSettlementCard() {
-            let shopOwesHO = 0;              // Total cash shop owes Head Office (Direct Cash + excess DP)
-            let hoOwesShop = 0;              // Total pending settlements HO owes Shop (Own stock loans + unpaid comm)
-            let totalCommissionEarned = 0;   // All-time commission earned across all submitted sales
-            let hoCommissionDeducted = 0;     // Commission shop retained directly from cash/DP collections
+            let shopOwesHO = 0;              // Total cash shop owes Head Office (Direct Cash Sales Due to HO)
+            let hoOwesShop = 0;              // Total pending settlements HO owes Shop (from all submitted loan files)
+            let totalCommissionEarned = 0;   // All-time commission/profit earned across all submitted sales
             let pendingCashSaleCount = 0;
-            let pendingLoanDpCount = 0;
-            let pendingOwnStockCount = 0;
+            let pendingLoanFileCount = 0;
 
             allShopSales.forEach(sale => {
                 const isCash = (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
                 const isPaid = (sale.paymentStatus === 'Paid' || sale.status === 'Payment Sent' || sale.status === 'Confirmed' || sale.status === 'Completed');
                 const isHO = (sale.stockSource === 'HO' || sale.stockSource === 'Head Office');
+                const mrp = parseFloat(sale.mrp) || parseFloat(sale.loanAmount) || parseFloat(sale.cashSalePrice) || 0;
 
-                // 1) Commission earned on this sale
+                // 1) Profit/Commission earned on this sale (matches table profit display)
                 let comm = 0;
                 if (isCash) {
                     comm = parseFloat(sale.shopCommission) || 0;
@@ -1666,43 +1665,26 @@
                     if (sale.shopCommission !== undefined && sale.shopCommission !== null && !isNaN(parseFloat(sale.shopCommission)) && parseFloat(sale.shopCommission) > 0) {
                         comm = parseFloat(sale.shopCommission);
                     } else {
-                        const mrp = parseFloat(sale.mrp) || parseFloat(sale.loanAmount) || 0;
                         const rate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
                         comm = mrp * rate;
                     }
                 }
                 totalCommissionEarned += comm;
 
-                // 2) Unsettled Sales Balance
+                // 2) Unsettled Payments (Strictly matching submitted files in table)
                 if (!isPaid) {
                     if (isCash) {
-                        const cPrice = parseFloat(sale.cashSalePrice || sale.mrp || 0);
+                        // Direct Cash Sale: Shop owes Head Office 'Due to HO'
+                        const cPrice = parseFloat(sale.cashSalePrice || mrp || 0);
                         const cDue = parseFloat(sale.headOfficeDue !== undefined && sale.headOfficeDue !== null ? sale.headOfficeDue : (cPrice - comm));
                         shopOwesHO += cDue;
-                        hoCommissionDeducted += comm;
                         pendingCashSaleCount++;
-                    } else if (isHO) {
-                        // Loan on HO Stock: Shop collected Down Payment + Document Charge from customer
-                        const dp = parseFloat(sale.downPayment) || 0;
-                        const docCharge = parseFloat(sale.document) || 0;
-                        const totalCollectedAtCounter = dp + docCharge;
-
-                        const netDiff = totalCollectedAtCounter - comm;
-                        if (netDiff >= 0) {
-                            shopOwesHO += netDiff; // Shop owes HQ excess collections (DP + Doc Charge) after retaining commission
-                            hoCommissionDeducted += comm;
-                        } else {
-                            // Cash collected at counter was less than commission, HQ owes shop remaining commission balance
-                            hoOwesShop += Math.abs(netDiff);
-                            hoCommissionDeducted += totalCollectedAtCounter;
-                        }
-                        if (totalCollectedAtCounter > 0) pendingLoanDpCount++;
                     } else {
-                        // Loan on Own Stock: HQ owes shop the loan settlement amount
-                        // (sale.settlement already deducts DP and Document Charge collected by agent)
+                        // Submitted Loan Sale (Both Own Stock & HO Stock):
+                        // Head Office owes the shop the exact 'Setl' (Settlement) amount shown in submitted table
                         const setl = parseFloat(sale.settlement) || 0;
                         hoOwesShop += setl;
-                        pendingOwnStockCount++;
+                        pendingLoanFileCount++;
                     }
                 }
             });
@@ -1716,23 +1698,23 @@
 
             const fmt = (v) => 'Rs. ' + (parseFloat(v)||0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            // Box 1: We Owe to Head Office
+            // Box 1: We Owe to Head Office (Direct Cash Sales Due to HO)
             const elShopOwes = document.getElementById('shopOwesHOVal');
             const elShopOwesDesc = document.getElementById('shopOwesHODesc');
             if (elShopOwes) elShopOwes.innerText = fmt(shopOwesHO);
-            if (elShopOwesDesc) elShopOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO DP & Doc Fee(s)`;
+            if (elShopOwesDesc) elShopOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) (Due to HO)`;
 
-            // Box 2: Head Office Owes to Us
+            // Box 2: Head Office Owes to Us (Pending Settlements for Submitted Loans)
             const elHOOwes = document.getElementById('hoOwesShopVal');
             const elHOOwesDesc = document.getElementById('hoOwesShopDesc');
             if (elHOOwes) elHOOwes.innerText = fmt(hoOwesShop);
-            if (elHOOwesDesc) elHOOwesDesc.innerText = `${pendingOwnStockCount} Own Stock Sale(s) + Unpaid Profit`;
+            if (elHOOwesDesc) elHOOwesDesc.innerText = `${pendingLoanFileCount} Submitted File(s) (Pending Settlement)`;
 
             // Box 3: Total Profit Earned
             const elComm = document.getElementById('shopCommissionEarnedVal');
             const elCommDesc = document.getElementById('shopCommissionDesc');
             if (elComm) elComm.innerText = fmt(totalCommissionEarned);
-            if (elCommDesc) elCommDesc.innerText = `Deducted from collections: ${fmt(hoCommissionDeducted)}`;
+            if (elCommDesc) elCommDesc.innerText = `Total profit on submitted sales`;
 
             // Bottom Bar: Net Settlement
             const elSummaryHQOwes = document.getElementById('shopSummaryStockVal');
