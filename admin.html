@@ -1039,6 +1039,83 @@
                     </div>
                 </div>
 
+                <!-- ====== HEAD OFFICE VS BRANCH AGENT SETTLEMENT & BALANCE CARD (Admin View) ====== -->
+                <div id="adminShopSettlementCard" style="background: linear-gradient(135deg, rgba(229,0,0,0.06) 0%, rgba(16,185,129,0.08) 50%, rgba(59,130,246,0.07) 100%); border: 2px solid rgba(229,0,0,0.22); border-radius: 20px; padding: 1.5rem 1.7rem; margin-bottom: 1.5rem; box-shadow: 0 8px 32px rgba(229,0,0,0.08);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.3rem; flex-wrap: wrap; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 1.8rem;">🏛️</span>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 900; color: #b91c1c;">Agent Settlement & Stock Liability Position</h3>
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">ශාඛා නියෝජිතයා සමග ගිණුම් ශේෂය, එකතු කළ මුදල්, හිමි කොමිස් සහ අතැති තොග වටිනාකම</span>
+                            </div>
+                        </div>
+                        <span id="adminShopNetBalanceBadge" style="background: rgba(239,68,68,0.15); color: #dc2626; border: 1.5px solid rgba(239,68,68,0.35); padding: 0.4rem 1.1rem; border-radius: 999px; font-weight: 900; font-size: 0.92rem;">Calculating...</span>
+                    </div>
+
+                    <!-- 4-column detailed breakdown -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.3rem;">
+
+                        <!-- 1. Unsold HO Stock with Agent -->
+                        <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1.1rem; border: 1.5px solid rgba(124,58,237,0.3); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+                                <span style="font-size: 1.2rem;">📦</span>
+                                <span style="font-size: 0.72rem; font-weight: 800; color: #6d28d9; text-transform: uppercase;">1. HO Stock Held (අතැති අපේ තොගය)</span>
+                            </div>
+                            <p style="font-size: 1.4rem; font-weight: 900; color: #5b21b6; margin: 0;" id="adminShopHeldStockVal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" id="adminShopHeldStockCount">0 phones in shop</span>
+                        </div>
+
+                        <!-- 2. Cash in Hand with Agent (DP + Cash Sales) -->
+                        <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1.1rem; border: 1.5px solid rgba(245,158,11,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+                                <span style="font-size: 1.2rem;">💵</span>
+                                <span style="font-size: 0.72rem; font-weight: 800; color: #b45309; text-transform: uppercase;">2. Cash Collected (ලබාගත් මුළු මුදල්)</span>
+                            </div>
+                            <p style="font-size: 1.4rem; font-weight: 900; color: #d97706; margin: 0;" id="adminShopCashInHandVal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" id="adminShopCashInHandDesc">DP + Direct Cash</span>
+                        </div>
+
+                        <!-- 3. Commission Earned & Deducted -->
+                        <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1.1rem; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+                                <span style="font-size: 1.2rem;">💰</span>
+                                <span style="font-size: 0.72rem; font-weight: 800; color: #047857; text-transform: uppercase;">3. Agent Commission (එයාගේ කමිෂන්)</span>
+                            </div>
+                            <p style="font-size: 1.4rem; font-weight: 900; color: #059669; margin: 0;" id="adminShopCommissionEarnedVal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" id="adminShopCommissionDesc">Deducted from collections</span>
+                        </div>
+
+                        <!-- 4. Net Cash Due to Head Office -->
+                        <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1.1rem; border: 1.5px solid rgba(229,0,0,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+                                <span style="font-size: 1.2rem;">🏦</span>
+                                <span style="font-size: 0.72rem; font-weight: 800; color: #b91c1c; text-transform: uppercase;">4. Net Cash to HO (අපට එන්න ඇති මුදල්)</span>
+                            </div>
+                            <p style="font-size: 1.4rem; font-weight: 900; color: #dc2626; margin: 0;" id="adminShopNetCashDueVal">Rs. 0.00</p>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" id="adminShopNetCashDueDesc">Cash in Hand − Commission</span>
+                        </div>
+                    </div>
+
+                    <!-- Net Total Exposure Bar -->
+                    <div style="background: rgba(255,255,255,0.95); border-radius: 14px; padding: 1.2rem 1.6rem; border: 2px solid rgba(229,0,0,0.25); box-shadow: 0 4px 18px rgba(229,0,0,0.08);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 900; color: #7f1d1d; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px;">
+                                    💎 TOTAL HEAD OFFICE ASSETS WITH THIS AGENT (එයාගේ අතේ ඇති අපේ මුළු මුදල හා තොගය)
+                                </div>
+                                <div style="font-size: 0.78rem; color: var(--text-muted);">
+                                    [Unsold HO Stock: <span id="adminShopSummaryStockVal" style="font-weight: 700; color: #5b21b6;">Rs. 0.00</span>] + [Net Cash Due: <span id="adminShopSummaryCashVal" style="font-weight: 700; color: #dc2626;">Rs. 0.00</span>]
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-size: 1.85rem; font-weight: 900; margin: 0; line-height: 1;" id="adminShopNetDueToHO">Rs. 0.00</p>
+                                <span style="font-size: 0.78rem; font-weight: 800;" id="adminShopNetDueLabel">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ====== END SETTLEMENT CARD ====== -->
+
                 <div style="position: relative; width: 100%; height: 200px; margin: 1rem 0 1.5rem 0; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 1rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8);">
                     <canvas id="shopChart"></canvas>
                 </div>
@@ -3031,6 +3108,10 @@
             updateAdminShopFilterOptions();
             renderAllSubmissions();
             renderShopDirectory(Array.from(uniqueShops));
+            if (typeof currentViewingShopEmail !== 'undefined' && currentViewingShopEmail) {
+                const refreshedSales = allSales.filter(s => (s.shopId || '').toLowerCase() === currentViewingShopEmail.toLowerCase());
+                viewShopProfile(currentViewingShopEmail, refreshedSales);
+            }
             if (typeof renderNicClearTrackerView === 'function') renderNicClearTrackerView();
         }
 
@@ -3510,18 +3591,39 @@
                 
                 let shopPaid = 0;
                 let shopPending = 0;
+                let shopNetCashDue = 0;
+
+                const shopHoP = regInfo?.hoPercent ?? 4;
+                const shopOwnP = regInfo?.shopOwnPercent ?? 6;
+
                 shopSales.forEach(s => {
                     const st = parseFloat(s.settlement) || 0;
                     const isPaid = (s.paymentStatus === 'Paid' || s.status === 'Payment Sent' || s.status === 'Confirmed' || s.status === 'Completed');
+                    const isCash = (s.saleType === 'Cash Sale' || s.status === 'Cash Payment Pending');
+                    const isHO = (s.stockSource === 'HO' || s.stockSource === 'Head Office');
+
                     if (isPaid) {
                         shopPaid += st;
                     } else {
                         shopPending += st;
+                        if (isCash) {
+                            const cPrice = parseFloat(s.cashSalePrice || s.mrp || 0);
+                            const cComm = parseFloat(s.shopCommission || 0);
+                            shopNetCashDue += parseFloat(s.headOfficeDue || (cPrice - cComm));
+                        } else if (isHO) {
+                            const dp = parseFloat(s.downPayment) || 0;
+                            const mrp = parseFloat(s.mrp) || parseFloat(s.loanAmount) || 0;
+                            const comm = mrp * (shopHoP / 100);
+                            shopNetCashDue += (dp - comm);
+                        } else {
+                            shopNetCashDue -= st;
+                        }
                     }
                 });
 
                 // Calculate stock currently allocated to this branch
-                const branchStockCount = (allInventoryItems || []).filter(item => {
+                let branchStockVal = 0;
+                const branchStockItems = (allInventoryItems || []).filter(item => {
                     if (item.status !== 'Available') return false;
                     const itemShop = (item.shop || '').toLowerCase().trim();
                     const sName = (regInfo?.name || '').toLowerCase().trim();
@@ -3529,10 +3631,18 @@
                     const sEmail = (shopEmail || '').toLowerCase().trim();
                     const sPrefix = sEmail.split('@')[0].toLowerCase().trim();
 
-                    return (sName && (itemShop === sName || itemShop.includes(sName))) ||
+                    const match = (sName && (itemShop === sName || itemShop.includes(sName))) ||
                            (sLoc && (itemShop === sLoc || itemShop.includes(sLoc))) ||
                            (itemShop === sEmail || itemShop === sPrefix);
-                }).length;
+                    if (match) {
+                        branchStockVal += parseFloat(item.mrp) || 0;
+                    }
+                    return match;
+                });
+                const branchStockCount = branchStockItems.length;
+
+                const finalCashDue = Math.max(0, shopNetCashDue);
+                const totalExposure = branchStockVal + finalCashDue;
 
                 const card = document.createElement('div');
                 card.className = 'shop-card';
@@ -3558,8 +3668,6 @@
                     `;
                 }
 
-                const shopHoP = regInfo?.hoPercent ?? 4;
-                const shopOwnP = regInfo?.shopOwnPercent ?? 6;
                 card.innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.4rem;">
                         <span style="font-size: 1.3rem;">🏪</span>
@@ -3580,12 +3688,18 @@
                             <span style="color: var(--text-muted); font-size: 0.8rem;">Paid Settlements:</span>
                             <span style="color: #059669; font-weight: 700; font-size: 0.88rem;">Rs. ${shopPaid.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(226, 232, 240, 0.8); padding-top: 0.35rem;">
-                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 600;">Pending Settlements:</span>
-                            <span style="color: #d97706; font-weight: 800; font-size: 0.88rem;">Rs. ${shopPending.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Stock with Agent:</span>
+                            <span style="color: #7c3aed; font-weight: 700; font-size: 0.88rem;">${branchStockCount} Phones (Rs. ${branchStockVal.toLocaleString()})</span>
                         </div>
-                        <div style="margin-top: 0.5rem; text-align: center;">
-                            <span style="font-size: 0.78rem; color: #7c3aed; font-weight: 600; background: rgba(139, 92, 246, 0.12); padding: 0.2rem 0.6rem; border-radius: 6px;">📦 Stock: ${branchStockCount} Available</span>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(226, 232, 240, 0.8); padding-top: 0.35rem;">
+                            <span style="color: #dc2626; font-size: 0.8rem; font-weight: 700;">Net Cash Due HO:</span>
+                            <span style="color: #dc2626; font-weight: 900; font-size: 0.92rem;">Rs. ${finalCashDue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div style="margin-top: 0.5rem; text-align: center; background: ${totalExposure > 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; border: 1px solid ${totalExposure > 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'}; border-radius: 8px; padding: 0.35rem 0.6rem;">
+                            <span style="font-size: 0.8rem; font-weight: 800; color: ${totalExposure > 0 ? '#b91c1c' : '#059669'};">
+                                ${totalExposure > 0 ? `💎 Total Owed to HO: Rs. ${totalExposure.toLocaleString(undefined, {minimumFractionDigits: 2})}` : '✅ Fully Settled'}
+                            </span>
                         </div>
                     </div>
                     ${actionsHTML}
@@ -4060,6 +4174,141 @@
             const allocated = getShopAllocatedInventory(shopEmail);
             const invCountEl = document.getElementById('shopInventoryTabCount');
             if (invCountEl) invCountEl.innerText = allocated.length.toString();
+
+            // Calculate and render Head Office vs Agent Settlement & Balance Position
+            const regInfo = (registeredShopsList || []).find(r => (r.email || '').toLowerCase() === (shopEmail || '').toLowerCase());
+            const sHoPercent = parseFloat(regInfo?.hoPercent) || 4;
+            const sOwnPercent = parseFloat(regInfo?.shopOwnPercent) || 6;
+
+            // 1. Unsold HO stock held with agent
+            let heldStockVal = 0;
+            let heldStockCount = 0;
+            (allocated || []).forEach(item => {
+                if (item.status === 'Available') {
+                    heldStockVal += parseFloat(item.mrp) || 0;
+                    heldStockCount++;
+                }
+            });
+
+            // 2. Sales collections and commissions
+            let cashInHandTotal = 0;
+            let pendingCashSaleCount = 0;
+            let pendingLoanDpCount = 0;
+            let totalCommissionEarned = 0;
+            let pendingCommissionDeduction = 0;
+            let netCashDueToHO = 0;
+            let hqOwesShopTotal = 0;
+
+            currentSingleShopSales.forEach(sale => {
+                const isCash = (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
+                const isPaid = (sale.paymentStatus === 'Paid' || sale.status === 'Payment Sent' || sale.status === 'Confirmed' || sale.status === 'Completed');
+                const isHO = (sale.stockSource === 'HO' || sale.stockSource === 'Head Office');
+
+                let comm = 0;
+                if (isCash) {
+                    comm = parseFloat(sale.shopCommission) || 0;
+                } else {
+                    const mrp = parseFloat(sale.mrp) || parseFloat(sale.loanAmount) || 0;
+                    const rate = isHO ? (sHoPercent / 100) : (sOwnPercent / 100);
+                    comm = mrp * rate;
+                }
+                totalCommissionEarned += comm;
+
+                if (!isPaid) {
+                    if (isCash) {
+                        const cPrice = parseFloat(sale.cashSalePrice || sale.mrp || 0);
+                        const cDue = parseFloat(sale.headOfficeDue || (cPrice - comm));
+                        cashInHandTotal += cPrice;
+                        pendingCommissionDeduction += comm;
+                        netCashDueToHO += cDue;
+                        pendingCashSaleCount++;
+                    } else if (isHO) {
+                        const dp = parseFloat(sale.downPayment) || 0;
+                        cashInHandTotal += dp;
+                        pendingCommissionDeduction += comm;
+                        const netDiff = dp - comm;
+                        if (netDiff >= 0) {
+                            netCashDueToHO += netDiff;
+                        } else {
+                            hqOwesShopTotal += Math.abs(netDiff);
+                            netCashDueToHO += netDiff;
+                        }
+                        if (dp > 0) pendingLoanDpCount++;
+                    } else {
+                        const setl = parseFloat(sale.settlement) || 0;
+                        hqOwesShopTotal += setl;
+                        netCashDueToHO -= setl;
+                    }
+                }
+            });
+
+            const finalCashPayable = Math.max(0, netCashDueToHO);
+            const totalPosition = heldStockVal + finalCashPayable;
+            const isSettled = (heldStockVal === 0 && finalCashPayable === 0);
+
+            const fmt = (v) => 'Rs. ' + (parseFloat(v)||0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            const elHeldVal = document.getElementById('adminShopHeldStockVal');
+            const elHeldCount = document.getElementById('adminShopHeldStockCount');
+            const elCashInHand = document.getElementById('adminShopCashInHandVal');
+            const elCashDesc = document.getElementById('adminShopCashInHandDesc');
+            const elCommVal = document.getElementById('adminShopCommissionEarnedVal');
+            const elCommDesc = document.getElementById('adminShopCommissionDesc');
+            const elNetCash = document.getElementById('adminShopNetCashDueVal');
+            const elNetCashDesc = document.getElementById('adminShopNetCashDueDesc');
+
+            const elSummaryStock = document.getElementById('adminShopSummaryStockVal');
+            const elSummaryCash = document.getElementById('adminShopSummaryCashVal');
+            const elNetTotal = document.getElementById('adminShopNetDueToHO');
+            const elNetLabel = document.getElementById('adminShopNetDueLabel');
+            const elBadge = document.getElementById('adminShopNetBalanceBadge');
+
+            if (elHeldVal) elHeldVal.innerText = fmt(heldStockVal);
+            if (elHeldCount) elHeldCount.innerText = `${heldStockCount} unsold phone${heldStockCount !== 1 ? 's' : ''} in shop`;
+
+            if (elCashInHand) elCashInHand.innerText = fmt(cashInHandTotal);
+            if (elCashDesc) elCashDesc.innerText = `${pendingCashSaleCount} Cash Sale${pendingCashSaleCount !== 1 ? 's' : ''} + ${pendingLoanDpCount} Loan DP`;
+
+            if (elCommVal) elCommVal.innerText = fmt(totalCommissionEarned);
+            if (elCommDesc) elCommDesc.innerText = `Deducted: ${fmt(pendingCommissionDeduction)}`;
+
+            if (elNetCash) {
+                if (netCashDueToHO >= 0) {
+                    elNetCash.innerText = fmt(netCashDueToHO);
+                    elNetCash.style.color = '#dc2626';
+                    if (elNetCashDesc) elNetCashDesc.innerText = 'Payable to Head Office (අපට එන්න ඇති මුදල්)';
+                } else {
+                    elNetCash.innerText = fmt(Math.abs(netCashDueToHO));
+                    elNetCash.style.color = '#059669';
+                    if (elNetCashDesc) elNetCashDesc.innerText = 'HQ to Pay Shop (අපෙන් නියෝජිතයාට දිය යුතුයි)';
+                }
+            }
+
+            if (elSummaryStock) elSummaryStock.innerText = fmt(heldStockVal);
+            if (elSummaryCash) elSummaryCash.innerText = fmt(finalCashPayable);
+
+            if (elNetTotal) {
+                elNetTotal.innerText = fmt(totalPosition);
+                elNetTotal.style.color = isSettled ? '#059669' : '#b91c1c';
+            }
+            if (elNetLabel) {
+                if (isSettled) {
+                    elNetLabel.innerText = '✅ All settled! No pending stock or cash dues.';
+                    elNetLabel.style.color = '#059669';
+                } else if (netCashDueToHO >= 0) {
+                    elNetLabel.innerText = `⚠️ Agent owes HO: ${fmt(finalCashPayable)} Cash + ${fmt(heldStockVal)} Stock`;
+                    elNetLabel.style.color = '#dc2626';
+                } else {
+                    elNetLabel.innerText = `📦 Agent holds ${fmt(heldStockVal)} Stock (HQ owes Agent ${fmt(Math.abs(netCashDueToHO))} Cash)`;
+                    elNetLabel.style.color = '#2563eb';
+                }
+            }
+            if (elBadge) {
+                elBadge.innerText = isSettled ? '✅ Clear' : `⚠️ Due: ${fmt(totalPosition)}`;
+                elBadge.style.background = isSettled ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+                elBadge.style.color = isSettled ? '#059669' : '#dc2626';
+                elBadge.style.borderColor = isSettled ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)';
+            }
 
             const dates = Object.keys(salesByDate).sort();
             const amounts = dates.map(d => salesByDate[d]);
@@ -6620,6 +6869,10 @@
                 renderAllSubmissions();
                 if (typeof renderShopAllocatedInventory === 'function' && currentViewingShopEmail) {
                     renderShopAllocatedInventory();
+                }
+                if (typeof currentViewingShopEmail !== 'undefined' && currentViewingShopEmail) {
+                    const refreshedSales = allSales.filter(s => (s.shopId || '').toLowerCase() === currentViewingShopEmail.toLowerCase());
+                    viewShopProfile(currentViewingShopEmail, refreshedSales);
                 }
             }, (err) => {
                 console.error("Inventory error:", err);
