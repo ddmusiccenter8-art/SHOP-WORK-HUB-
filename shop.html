@@ -684,55 +684,46 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 1.6rem;">🏦</span>
                         <div>
-                            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 900; color: #b91c1c;">Head Office Settlement & Stock Position</h3>
-                            <span style="font-size: 0.76rem; color: var(--text-muted);">ප්‍රධාන කාර්යාලය සමග ගනුදෙනු ශේෂය, ලැබුණු මුදල් සහ කමිෂන් සාරාංශය</span>
+                            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #b91c1c;">Head Office Sales Settlement Summary</h3>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">විකුණුම් ලිපිගොනු (Submitted Sales) මත පදනම් වූ ශුද්ධ ගිණුම් බේරුම සහ හිමි කොමිස්</span>
                         </div>
                     </div>
-                    <span id="shopNetBalanceBadge" style="background: rgba(239,68,68,0.15); color: #dc2626; border: 1.5px solid rgba(239,68,68,0.35); padding: 0.35rem 1rem; border-radius: 999px; font-weight: 900; font-size: 0.88rem;">Calculating...</span>
+                    <span id="shopNetBalanceBadge" style="background: rgba(239,68,68,0.15); color: #dc2626; border: 1.5px solid rgba(239,68,68,0.35); padding: 0.4rem 1.1rem; border-radius: 999px; font-weight: 900; font-size: 0.88rem;">Calculating...</span>
                 </div>
 
-                <!-- 4-column detailed breakdown -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
+                <!-- 3-box breakdown based strictly on submitted sales -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.2rem;">
 
-                    <!-- 1. HO Stock Held (Shelf Inventory) -->
-                    <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1rem 1.1rem; border: 1.5px solid rgba(124,58,237,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <!-- 1. We Owe to Head Office (Direct Cash + HO Stock Down Payments) -->
+                    <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(239,68,68,0.32); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-                            <span style="font-size: 1.15rem;">📦</span>
-                            <span style="font-size: 0.72rem; font-weight: 800; color: #6d28d9; text-transform: uppercase;">1. HO Stock Held (අතැති තොගය)</span>
+                            <span style="font-size: 1.2rem;">📥</span>
+                            <span style="font-size: 0.74rem; font-weight: 800; color: #b91c1c; text-transform: uppercase;">1. We Owe to HO (අපෙන් HO එකට)</span>
                         </div>
-                        <p style="font-size: 1.35rem; font-weight: 900; color: #5b21b6; margin: 0;" id="shopHeldStockVal">Rs. 0.00</p>
-                        <span style="font-size: 0.73rem; color: var(--text-muted); font-weight: 600;" id="shopHeldStockCount">0 phones (තොගය පමණි)</span>
+                        <p style="font-size: 1.45rem; font-weight: 900; color: #dc2626; margin: 0;" id="shopOwesHOVal">Rs. 0.00</p>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopOwesHODesc">Direct Cash + Excess Down Payments</span>
                     </div>
 
-                    <!-- 2. Cash Collected from HO Sales (Cash Sales + Down Payments) -->
-                    <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1rem 1.1rem; border: 1.5px solid rgba(245,158,11,0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <!-- 2. Head Office Owes to Us (Own Stock Settlements + Low/0 DP Commissions) -->
+                    <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(37,99,235,0.32); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-                            <span style="font-size: 1.15rem;">💵</span>
-                            <span style="font-size: 0.72rem; font-weight: 800; color: #b45309; text-transform: uppercase;">2. Cash from HO Sales (අතැති HO මුදල්)</span>
+                            <span style="font-size: 1.2rem;">📤</span>
+                            <span style="font-size: 0.74rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">2. HO Owes Us (HO එකෙන් අපිට)</span>
                         </div>
-                        <p style="font-size: 1.35rem; font-weight: 900; color: #d97706; margin: 0;" id="shopCashInHandVal">Rs. 0.00</p>
-                        <span style="font-size: 0.73rem; color: var(--text-muted); font-weight: 600;" id="shopCashInHandDesc">DP + Direct Cash</span>
+                        <p style="font-size: 1.45rem; font-weight: 900; color: #2563eb; margin: 0;" id="hoOwesShopVal">Rs. 0.00</p>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="hoOwesShopDesc">Own Stock Settlements + Unpaid Profit</span>
                     </div>
 
-                    <!-- 3. Commission Earned -->
-                    <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1rem 1.1rem; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <!-- 3. Total Earned Profit (Commission across all sales) -->
+                    <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-                            <span style="font-size: 1.15rem;">💰</span>
-                            <span style="font-size: 0.72rem; font-weight: 800; color: #047857; text-transform: uppercase;">3. My Commission (හිමි කොමිස්)</span>
+                            <span style="font-size: 1.2rem;">💰</span>
+                            <span style="font-size: 0.74rem; font-weight: 800; color: #047857; text-transform: uppercase;">3. My Total Profit (අපේ මුළු ලාභය)</span>
                         </div>
-                        <p style="font-size: 1.35rem; font-weight: 900; color: #059669; margin: 0;" id="shopCommissionEarnedVal">Rs. 0.00</p>
-                        <span style="font-size: 0.73rem; color: var(--text-muted); font-weight: 600;" id="shopCommissionDesc">Total earned commission</span>
+                        <p style="font-size: 1.45rem; font-weight: 900; color: #059669; margin: 0;" id="shopCommissionEarnedVal">Rs. 0.00</p>
+                        <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="shopCommissionDesc">Total earned commission</span>
                     </div>
 
-                    <!-- 4. HO Pending Settlements (HQ Owes to Shop) -->
-                    <div style="background: rgba(255,255,255,0.85); border-radius: 14px; padding: 1rem 1.1rem; border: 1.5px solid rgba(37,99,235,0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-                            <span style="font-size: 1.15rem;">🏦</span>
-                            <span style="font-size: 0.72rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">4. HO Pending Settlement (HO එකෙන් ඔබට)</span>
-                        </div>
-                        <p style="font-size: 1.35rem; font-weight: 900; color: #2563eb; margin: 0;" id="shopNetCashDueVal">Rs. 0.00</p>
-                        <span style="font-size: 0.73rem; color: var(--text-muted); font-weight: 600;" id="shopNetCashDueDesc">Own Stock Sales Settlements</span>
-                    </div>
                 </div>
 
                 <!-- Final Net Settlement Bar -->
@@ -743,7 +734,7 @@
                                 💎 FINAL NET SETTLEMENT (අවසාන ශුද්ධ ගිණුම් බේරුම)
                             </div>
                             <div style="font-size: 0.77rem; color: var(--text-muted);">
-                                [HO එකෙන් ඔබට හිමි: <span id="shopSummaryStockVal" style="font-weight:700; color:#2563eb;">Rs. 0.00</span>] − [ඔබ අතැති HO මුදල්: <span id="shopSummaryCashVal" style="font-weight:700; color:#d97706;">Rs. 0.00</span>]
+                                [HO එකෙන් අපිට: <span id="shopSummaryStockVal" style="font-weight:700; color:#2563eb;">Rs. 0.00</span>] − [අපෙන් HO එකට: <span id="shopSummaryCashVal" style="font-weight:700; color:#dc2626;">Rs. 0.00</span>]
                             </div>
                         </div>
                         <div style="text-align: right;">
@@ -1652,124 +1643,102 @@
             });
         };
 
-        // ====== SETTLEMENT CARD CALCULATOR ======
+        // ====== SETTLEMENT CARD CALCULATOR (Based Strictly on Submitted Sales) ======
         function updateShopSettlementCard() {
-            // --- 1. HO Stock value currently held on shelf (Available status only) ---
-            const items = (window.myShopHeldItems && window.myShopHeldItems.length > 0) 
-                ? window.myShopHeldItems 
-                : (window.currentShopAllocatedItems || []).filter(i => !i.isHeadOffice);
-
-            let heldStockVal = 0;
-            let heldStockCount = 0;
-            items.forEach(item => {
-                if (item.status === 'Available') {
-                    heldStockVal += parseFloat(item.mrp) || 0;
-                    heldStockCount++;
-                }
-            });
-
-            // --- 2. Sales Cash & Settlement breakdown ---
-            let cashCollectedFromHO = 0;          // Total cash in hand from HO sales (Cash Sales + HO Down Payments)
-            let hoCommissionDeducted = 0;         // Commission deducted on those HO sales
-            let shopOwesHQ_fromHOSales = 0;       // Net cash shop holds belonging to HQ: (Cash - Commission)
+            let shopOwesHO = 0;              // Total cash shop owes Head Office (Direct Cash + excess DP)
+            let hoOwesShop = 0;              // Total pending settlements HO owes Shop (Own stock loans + unpaid comm)
+            let totalCommissionEarned = 0;   // All-time commission earned across all submitted sales
+            let hoCommissionDeducted = 0;     // Commission shop retained directly from cash/DP collections
             let pendingCashSaleCount = 0;
             let pendingLoanDpCount = 0;
-
-            let totalCommissionEarned = 0;        // Total commission across all sales (all-time)
-            let hqOwesShop_pendingSettlement = 0; // Total pending settlements HQ owes to shop (from Own Stock sales)
+            let pendingOwnStockCount = 0;
 
             allShopSales.forEach(sale => {
                 const isCash = (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
                 const isPaid = (sale.paymentStatus === 'Paid' || sale.status === 'Payment Sent' || sale.status === 'Confirmed' || sale.status === 'Completed');
                 const isHO = (sale.stockSource === 'HO' || sale.stockSource === 'Head Office');
 
-                // 1) Total Commission earned across all sales
+                // 1) Commission earned on this sale
                 let comm = 0;
                 if (isCash) {
                     comm = parseFloat(sale.shopCommission) || 0;
                 } else {
-                    const mrp = parseFloat(sale.mrp) || parseFloat(sale.loanAmount) || 0;
-                    const rate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
-                    comm = mrp * rate;
+                    if (sale.shopCommission !== undefined && sale.shopCommission !== null && !isNaN(parseFloat(sale.shopCommission)) && parseFloat(sale.shopCommission) > 0) {
+                        comm = parseFloat(sale.shopCommission);
+                    } else {
+                        const mrp = parseFloat(sale.mrp) || parseFloat(sale.loanAmount) || 0;
+                        const rate = isHO ? (myHoPercent / 100) : (myShopOwnPercent / 100);
+                        comm = mrp * rate;
+                    }
                 }
                 totalCommissionEarned += comm;
 
-                // 2) Unsettled Sales Cash Flow
+                // 2) Unsettled Sales Balance
                 if (!isPaid) {
                     if (isCash) {
                         const cPrice = parseFloat(sale.cashSalePrice || sale.mrp || 0);
-                        const cDue = parseFloat(sale.headOfficeDue || (cPrice - comm));
-                        cashCollectedFromHO += cPrice;
+                        const cDue = parseFloat(sale.headOfficeDue !== undefined && sale.headOfficeDue !== null ? sale.headOfficeDue : (cPrice - comm));
+                        shopOwesHO += cDue;
                         hoCommissionDeducted += comm;
-                        shopOwesHQ_fromHOSales += cDue;
                         pendingCashSaleCount++;
                     } else if (isHO) {
                         // Loan on HO Stock: Shop collected Down Payment from customer
                         const dp = parseFloat(sale.downPayment) || 0;
-                        cashCollectedFromHO += dp;
-                        hoCommissionDeducted += comm;
                         const netDiff = dp - comm;
                         if (netDiff >= 0) {
-                            shopOwesHQ_fromHOSales += netDiff; // Shop owes HQ excess DP
+                            shopOwesHO += netDiff; // Shop owes HQ excess DP after retaining commission
+                            hoCommissionDeducted += comm;
                         } else {
-                            // DP was less than commission (e.g. 0 DP), HQ owes shop this commission balance
-                            hqOwesShop_pendingSettlement += Math.abs(netDiff);
+                            // DP was less than commission (e.g. 0 DP), HQ owes shop remaining commission balance
+                            hoOwesShop += Math.abs(netDiff);
+                            hoCommissionDeducted += dp;
                         }
                         if (dp > 0) pendingLoanDpCount++;
                     } else {
-                        // Loan on Own Stock: HQ owes shop the settlement amount
+                        // Loan on Own Stock: HQ owes shop the loan settlement amount
                         const setl = parseFloat(sale.settlement) || 0;
-                        hqOwesShop_pendingSettlement += setl;
+                        hoOwesShop += setl;
+                        pendingOwnStockCount++;
                     }
                 }
             });
 
-            // Net Difference: What HQ owes Shop minus what Shop holds of HQ cash
-            const netHQPayableToShop = hqOwesShop_pendingSettlement - shopOwesHQ_fromHOSales;
+            // Net Difference: What HQ owes Shop minus what Shop owes HQ
+            const netHQPayableToShop = hoOwesShop - shopOwesHO;
             const hqPaysShop = netHQPayableToShop > 0;
             const shopPaysHQ = netHQPayableToShop < 0;
             const absoluteNet = Math.abs(netHQPayableToShop);
-            const isSettled = (absoluteNet === 0 && shopOwesHQ_fromHOSales === 0 && hqOwesShop_pendingSettlement === 0);
+            const isSettled = (absoluteNet === 0 && shopOwesHO === 0 && hoOwesShop === 0);
 
-            // --- 3. Update DOM ---
             const fmt = (v) => 'Rs. ' + (parseFloat(v)||0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            // Card 1: HO Stock Held on Shelf (Not part of cash balance)
-            const elStock = document.getElementById('shopHeldStockVal');
-            const elStockCount = document.getElementById('shopHeldStockCount');
-            if (elStock) elStock.innerText = fmt(heldStockVal);
-            if (elStockCount) elStockCount.innerText = `${heldStockCount} unsold phone${heldStockCount !== 1 ? 's' : ''} (තොගය පමණි)`;
+            // Box 1: We Owe to Head Office
+            const elShopOwes = document.getElementById('shopOwesHOVal');
+            const elShopOwesDesc = document.getElementById('shopOwesHODesc');
+            if (elShopOwes) elShopOwes.innerText = fmt(shopOwesHO);
+            if (elShopOwesDesc) elShopOwesDesc.innerText = `${pendingCashSaleCount} Cash Sale(s) + ${pendingLoanDpCount} HO Down Payment(s)`;
 
-            // Card 2: Cash Collected from HO Sales
-            const elCashInHand = document.getElementById('shopCashInHandVal');
-            const elCashInHandDesc = document.getElementById('shopCashInHandDesc');
-            if (elCashInHand) elCashInHand.innerText = fmt(cashCollectedFromHO);
-            if (elCashInHandDesc) elCashInHandDesc.innerText = `HO එකට දිය යුතු මුදල: ${fmt(shopOwesHQ_fromHOSales)} (කොමිස් අඩු කර)`;
+            // Box 2: Head Office Owes to Us
+            const elHOOwes = document.getElementById('hoOwesShopVal');
+            const elHOOwesDesc = document.getElementById('hoOwesShopDesc');
+            if (elHOOwes) elHOOwes.innerText = fmt(hoOwesShop);
+            if (elHOOwesDesc) elHOOwesDesc.innerText = `${pendingOwnStockCount} Own Stock Sale(s) + Unpaid Profit`;
 
-            // Card 3: Commission Earned
+            // Box 3: Total Profit Earned
             const elComm = document.getElementById('shopCommissionEarnedVal');
             const elCommDesc = document.getElementById('shopCommissionDesc');
             if (elComm) elComm.innerText = fmt(totalCommissionEarned);
-            if (elCommDesc) elCommDesc.innerText = `HO එකෙන් අඩු කළ කොමිස්: ${fmt(hoCommissionDeducted)}`;
+            if (elCommDesc) elCommDesc.innerText = `Deducted from collections: ${fmt(hoCommissionDeducted)}`;
 
-            // Card 4: HO Pending Settlement (Money HQ owes to Shop for Own Stock / Sales)
-            const elHqOwesShop = document.getElementById('shopNetCashDueVal');
-            const elHqOwesShopDesc = document.getElementById('shopNetCashDueDesc');
-            if (elHqOwesShop) {
-                elHqOwesShop.innerText = fmt(hqOwesShop_pendingSettlement);
-                elHqOwesShop.style.color = '#2563eb';
-            }
-            if (elHqOwesShopDesc) elHqOwesShopDesc.innerText = 'Own Stock Sales Settlements Pending from HQ';
-
-            // Summary Bar (Offset between HQ debt and Shop cash held)
+            // Bottom Bar: Net Settlement
             const elSummaryHQOwes = document.getElementById('shopSummaryStockVal');
             const elSummaryShopHolds = document.getElementById('shopSummaryCashVal');
             const elNetTotal = document.getElementById('shopNetDueToHO');
             const elNetLabel = document.getElementById('shopNetDueLabel');
             const elBadge = document.getElementById('shopNetBalanceBadge');
 
-            if (elSummaryHQOwes) elSummaryHQOwes.innerText = fmt(hqOwesShop_pendingSettlement);
-            if (elSummaryShopHolds) elSummaryShopHolds.innerText = fmt(shopOwesHQ_fromHOSales);
+            if (elSummaryHQOwes) elSummaryHQOwes.innerText = fmt(hoOwesShop);
+            if (elSummaryShopHolds) elSummaryShopHolds.innerText = fmt(shopOwesHO);
 
             if (elNetTotal) {
                 elNetTotal.innerText = fmt(absoluteNet);
@@ -1778,13 +1747,13 @@
 
             if (elNetLabel) {
                 if (isSettled) {
-                    elNetLabel.innerText = '✅ All sales settled! No pending dues.';
+                    elNetLabel.innerText = '✅ සියලුම ගිණුම් බේරා ඇත (All sales settled!)';
                     elNetLabel.style.color = '#059669';
                 } else if (hqPaysShop) {
-                    elNetLabel.innerText = `🎉 Head Office එකෙන් ඔබට ලැබිය යුතු ශුද්ධ මුදල (HQ to Pay You: ${fmt(absoluteNet)})`;
+                    elNetLabel.innerText = `🎉 Head Office එකෙන් අපිට ලැබිය යුතු ශුද්ධ මුදල (HQ to Pay You: ${fmt(absoluteNet)})`;
                     elNetLabel.style.color = '#059669';
                 } else {
-                    elNetLabel.innerText = `⚠️ ඔබ Head Office එකට ගෙවිය යුතු ශුද්ධ මුදල (You to Pay HQ: ${fmt(absoluteNet)})`;
+                    elNetLabel.innerText = `⚠️ අපෙන් Head Office එකට ගෙවිය යුතු ශුද්ධ මුදල (You Must Pay HQ: ${fmt(absoluteNet)})`;
                     elNetLabel.style.color = '#dc2626';
                 }
             }
@@ -1796,12 +1765,12 @@
                     elBadge.style.color = '#059669';
                     elBadge.style.borderColor = 'rgba(16,185,129,0.4)';
                 } else if (hqPaysShop) {
-                    elBadge.innerText = `🟢 HQ Pays: ${fmt(absoluteNet)}`;
+                    elBadge.innerText = `🟢 HQ to Pay: ${fmt(absoluteNet)}`;
                     elBadge.style.background = 'rgba(16,185,129,0.15)';
                     elBadge.style.color = '#059669';
                     elBadge.style.borderColor = 'rgba(16,185,129,0.4)';
                 } else {
-                    elBadge.innerText = `🔴 Shop Owes: ${fmt(absoluteNet)}`;
+                    elBadge.innerText = `🔴 We Owe HQ: ${fmt(absoluteNet)}`;
                     elBadge.style.background = 'rgba(239,68,68,0.15)';
                     elBadge.style.color = '#dc2626';
                     elBadge.style.borderColor = 'rgba(239,68,68,0.4)';
