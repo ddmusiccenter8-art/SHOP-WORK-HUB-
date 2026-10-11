@@ -867,8 +867,8 @@
             Shop Profiles
         </div>
         <div class="tab" data-tab="mainProfit" onclick="switchTab('mainProfit')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            Main Shop Profit & Sales
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            Sale
         </div>
         <div class="tab" data-tab="inventory" onclick="switchTab('inventory')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
@@ -1219,11 +1219,11 @@
             </div>
         </div>
 
-        <!-- Main Shop Profit & Sales Manager View -->
+        <!-- Sale & Billing Manager View -->
         <div id="mainProfitView" class="view">
             <!-- Date Filter Controls Header -->
             <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1rem 1.4rem; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 30px rgba(31, 38, 135, 0.05); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0; font-weight: 700;">Main Shop Direct Profit & Sales Accounting</h2>
+                <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0; font-weight: 700;">🛒 Sale & Profit Accounting</h2>
                 <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
                     <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); font-weight: 600; padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.88rem; outline: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                         <option value="today">Today (අද)</option>
@@ -1315,34 +1315,78 @@
 
             <!-- Form and History Grid -->
             <div class="responsive-split-grid">
-                <!-- Main Shop Direct Sales Entry Form -->
-                <div style="background: var(--card-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.6rem; border-radius: 14px; border: 1px solid var(--border-color); height: fit-content;">
-                    <h2 style="font-size: 1.15rem; margin-bottom: 1.2rem; color: var(--text-main);">Main Shop Direct Sale Entry</h2>
+                <!-- Sale / Billing Screen Form -->
+                <div style="background: var(--card-bg); box-shadow: 0 4px 12px -1px rgba(0,0,0,0.06); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); height: fit-content;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.18rem; margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 8px; font-weight: 800;">
+                            <span>🧾</span> Sale / Billing
+                        </h2>
+                        <button type="button" onclick="clearBillingProduct()" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); color: #dc2626; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                            🧹 Clear Bill
+                        </button>
+                    </div>
                     <form id="mainSaleForm">
-                        <div style="margin-bottom: 0.9rem;">
-                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Sale Type / Source (විකුණුම් වර්ගය)</label>
-                            <select id="mainSaleType" onchange="toggleMainSaleFormType()" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem; border-radius: 8px; font-weight: 600;">
-                                <option value="Head Office Direct Sale" selected>🏢 Head Office Direct Sale</option>
+                        <div style="margin-bottom: 0.85rem;">
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">Sale Type / Source (විකුණුම් වර්ගය)</label>
+                            <select id="mainSaleType" onchange="toggleMainSaleFormType()" style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); color: var(--text-main); padding: 0.7rem; border-radius: 8px; font-weight: 700;">
+                                <option value="Head Office Direct Sale" selected>🏢 Direct Sale / Billing</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Sale / Activation</option>
                             </select>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.6rem; margin-bottom: 0.9rem;">
-                            <div>
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">📅 Date (දිනය)</label>
-                                <input type="date" id="mainSaleDate" required style="width: 100%;">
-                            </div>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                                    <label style="color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">⏰ Time (වේලාව)</label>
-                                    <span onclick="setMainSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;" title="Set to current time">⚡ Now</span>
-                                </div>
-                                <input type="time" id="mainSaleTime" style="width: 100%;">
-                            </div>
-                        </div>
-
-                        <!-- HEAD OFFICE DIRECT SALE FIELDS -->
+                        <!-- HEAD OFFICE DIRECT SALE BILLING SCREEN -->
                         <div id="hoSaleFields">
+                            <!-- STEP 1: SCAN IMEI TO ADD PRODUCT TO BILL -->
+                            <div style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(16, 185, 129, 0.06) 100%); border: 1.5px solid rgba(37, 99, 235, 0.28); border-radius: 12px; padding: 0.85rem 0.95rem; margin-bottom: 0.9rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: #1e3a8a; font-size: 0.82rem; font-weight: 800;">
+                                    🔍 Scan or Enter IMEI to Add Product <span id="mainSaleStockStatus" style="font-size: 0.75rem; font-weight: normal; margin-left: 4px; display: none;"></span>
+                                </label>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; width: 100%; min-width: 0;">
+                                    <input type="text" id="mainSaleImei" placeholder="Scan or type IMEI here..." style="flex: 1; min-width: 0; width: 100%; background: #ffffff; border: 1.5px solid #93c5fd; font-weight: 700;" oninput="handleSaleImeiLookup(this.value, 'HO')" onchange="handleSaleImeiLookup(this.value, 'HO')" onpaste="handleSaleImeiPaste(event, 'HO')" autocomplete="off">
+                                    <button type="button" onclick="startScanner('mainSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.72rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                    <button type="button" onclick="openSaleStockPicker('HO')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.72rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
+                                </div>
+                                <div id="mainSaleImeiRejectionBanner" style="display: none; margin-top: 0.5rem;"></div>
+
+                                <!-- ADDED PRODUCT BILL ITEM CARD (Populated automatically when IMEI is scanned) -->
+                                <div id="hoAddedProductBillCard" style="margin-top: 0.65rem; background: rgba(255, 255, 255, 0.9); border: 1px dashed #cbd5e1; border-radius: 10px; padding: 0.65rem 0.8rem; font-size: 0.8rem; color: #64748b; text-align: center;">
+                                    📱 IMEI එක Scan කළ විට හෝ තේරූ විට Product එක මෙතැනට Add වේ (Scan IMEI to add product to bill)
+                                </div>
+
+                                <!-- Hidden Product Detail Inputs (Auto-filled from Inventory; keeps profit math 100% intact) -->
+                                <div id="hoManualProductInputs" style="display: none; margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px dashed #cbd5e1;">
+                                    <div style="margin-bottom: 0.6rem;">
+                                        <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Model Name</label>
+                                        <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock)" style="width: 100%; padding: 0.5rem 0.65rem; font-size: 0.84rem;" oninput="updateAddedBillProductCardDisplay('HO')">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                        <div>
+                                            <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Selling Price MRP (Rs.)</label>
+                                            <input type="number" id="mainSaleMrp" step="0.01" placeholder="100000.00" style="padding: 0.5rem 0.65rem; font-size: 0.84rem;" oninput="calculateMainShopLiveProfit(); updateAddedBillProductCardDisplay('HO');">
+                                        </div>
+                                        <div>
+                                            <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Buy Cost (Rs.)</label>
+                                            <input type="number" id="mainSaleBuyPrice" step="0.01" placeholder="80000.00" style="padding: 0.5rem 0.65rem; font-size: 0.84rem;" oninput="calculateMainShopLiveProfit(); updateAddedBillProductCardDisplay('HO');">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 2: REMAINING BILLING DETAILS TO FILL -->
+                            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.6rem; margin-bottom: 0.9rem;">
+                                <div>
+                                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">📅 Date (දිනය)</label>
+                                    <input type="date" id="mainSaleDate" required style="width: 100%;">
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                        <label style="color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">⏰ Time (වේලාව)</label>
+                                        <span onclick="setMainSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;" title="Set to current time">⚡ Now</span>
+                                    </div>
+                                    <input type="time" id="mainSaleTime" style="width: 100%;">
+                                </div>
+                            </div>
+
                             <div style="margin-bottom: 0.9rem;">
                                 <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">SP Number / Invoice Ref</label>
                                 <input type="text" id="mainSaleSp" placeholder="e.g. SP-MAIN-101">
@@ -1357,27 +1401,6 @@
                                     <input type="text" id="mainSaleCustName" placeholder="Name" style="flex: 1; min-width: 0;">
                                     <input type="text" id="mainSaleCustNic" placeholder="NIC" style="flex: 1; min-width: 0;">
                                 </div>
-                            </div>
-
-                            <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number & Model <span id="mainSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
-                                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
-                                    <input type="text" id="mainSaleImei" placeholder="Type or scan IMEI here..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'HO')" onchange="handleSaleImeiLookup(this.value, 'HO')" onpaste="handleSaleImeiPaste(event, 'HO')" autocomplete="off">
-                                    <button type="button" onclick="startScanner('mainSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
-                                    <button type="button" onclick="openSaleStockPicker('HO')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
-                                </div>
-                                <div id="mainSaleImeiRejectionBanner" style="display: none; margin-bottom: 0.5rem;"></div>
-                                <input type="text" id="mainSaleModel" placeholder="Model Name (Auto-filled from stock or enter manually)" style="width: 100%;">
-                            </div>
-
-                            <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.)</label>
-                                <input type="number" id="mainSaleMrp" step="0.01" placeholder="100000.00" oninput="calculateMainShopLiveProfit()">
-                            </div>
-
-                            <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Mobile Buy Price / Cost (අපේ මිලදී ගත් මිල රු.) <span style="font-size:0.75rem; color:var(--success); font-weight:normal;">(Auto-filled from inventory)</span></label>
-                                <input type="number" id="mainSaleBuyPrice" step="0.01" placeholder="80000.00" oninput="calculateMainShopLiveProfit()">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -1418,24 +1441,31 @@
 
                         <!-- DIALOG LESI PAY SALE FIELDS -->
                         <div id="lesiPaySaleFields" style="display: none;">
-                            <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">IMEI Number <span id="lpSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px;"></span></label>
-                                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.5rem; width: 100%; min-width: 0;">
-                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%;" oninput="handleSaleImeiLookup(this.value, 'LP')" onchange="handleSaleImeiLookup(this.value, 'LP')" onpaste="handleSaleImeiPaste(event, 'LP')" autocomplete="off">
-                                    <button type="button" onclick="startScanner('lpSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
-                                    <button type="button" onclick="openSaleStockPicker('LP')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.75rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
+                            <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%); border: 1.5px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 0.85rem 0.95rem; margin-bottom: 0.9rem;">
+                                <label style="display:block; margin-bottom: 0.4rem; color: #1e3a8a; font-size: 0.82rem; font-weight: 800;">
+                                    🔍 Scan or Enter IMEI to Add Product <span id="lpSaleStockStatus" style="font-size: 0.76rem; font-weight: normal; margin-left: 6px; display: none;"></span>
+                                </label>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; width: 100%; min-width: 0;">
+                                    <input type="text" id="lpSaleImei" placeholder="Enter or scan IMEI..." style="flex: 1; min-width: 0; width: 100%; background: #ffffff; border: 1.5px solid #93c5fd; font-weight: 700;" oninput="handleSaleImeiLookup(this.value, 'LP')" onchange="handleSaleImeiLookup(this.value, 'LP')" onpaste="handleSaleImeiPaste(event, 'LP')" autocomplete="off">
+                                    <button type="button" onclick="startScanner('lpSaleImei')" style="flex-shrink: 0; background: var(--info); color: white; border: none; padding: 0.72rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(59,130,246,0.25);">📷 Scan</button>
+                                    <button type="button" onclick="openSaleStockPicker('LP')" style="flex-shrink: 0; background: #8b5cf6; color: white; border: none; padding: 0.72rem 0.85rem; border-radius: 8px; cursor: pointer; white-space: nowrap; font-weight: 700; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(139,92,246,0.25);" title="Pick from Available Stock">📦 Pick Stock</button>
                                 </div>
-                                <div id="lpSaleImeiRejectionBanner" style="display: none; margin-bottom: 0.5rem;"></div>
+                                <div id="lpSaleImeiRejectionBanner" style="display: none; margin-top: 0.5rem;"></div>
+
+                                <!-- ADDED PRODUCT BILL ITEM CARD (LP) -->
+                                <div id="lpAddedProductBillCard" style="margin-top: 0.65rem; background: rgba(255, 255, 255, 0.9); border: 1px dashed #cbd5e1; border-radius: 10px; padding: 0.65rem 0.8rem; font-size: 0.8rem; color: #64748b; text-align: center;">
+                                    📱 IMEI එක Scan කළ විට Product එක මෙතැනට Add වේ
+                                </div>
+
+                                <div id="lpManualProductInputs" style="display: none; margin-top: 0.6rem;">
+                                    <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Model Name (දුරකථන මාදිලිය)</label>
+                                    <input type="text" id="lpSaleModel" placeholder="e.g. Redmi 14C / Honor X5b (Auto-filled from stock)" oninput="updateAddedBillProductCardDisplay('LP')">
+                                </div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Model Name (දුරකථන මාදිලිය)</label>
-                                <input type="text" id="lpSaleModel" placeholder="e.g. Redmi 14C / Honor X5b (Auto-filled from stock)">
-                            </div>
-
-                            <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.) <span style="font-size: 0.74rem; color: #2563eb; font-weight: 700;">(Required - enter manually)</span></label>
-                                <input type="number" id="lpSaleMrp" step="0.01" placeholder="e.g. 56990.00" oninput="calculateLesiPayLiveProfit()">
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.) <span style="font-size: 0.74rem; color: #2563eb; font-weight: 700;">(Required)</span></label>
+                                <input type="number" id="lpSaleMrp" step="0.01" placeholder="e.g. 56990.00" oninput="calculateLesiPayLiveProfit(); updateAddedBillProductCardDisplay('LP');">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -1485,17 +1515,17 @@
 
                         <datalist id="activatorDatalist"></datalist>
 
-                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
-                            Add Main Shop Sale Entry
+                        <button type="submit" id="mainSaleSubmitBtn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #990000 100%); color: white; border: none; padding: 0.95rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(229, 0, 0, 0.3);">
+                            🧾 Complete Sale / Add Bill
                         </button>
                     </form>
                 </div>
 
-                <!-- Main Shop Sales History Table -->
+                <!-- Sales History Table -->
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0;">Main Shop Direct Sales History</h2>
+                            <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0;">Sales & Billing History</h2>
                             <button type="button" id="btnCleanDupesHeader" onclick="openDuplicateSalesModal()" style="display: none; background: rgba(239,68,68,0.12); color: #dc2626; border: 1px solid rgba(239,68,68,0.35); padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
                                 ⚠️ Clean Duplicates (<span id="dupeCountBadge">0</span>)
                             </button>
@@ -1596,21 +1626,33 @@
                         </button>
                     </div>
 
-                    <!-- Bulk Excel Upload Box (Skips Existing IMEIs Automatically) -->
-                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px dashed rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 0.95rem 1rem; margin-bottom: 1.25rem;">
+                    <!-- Bulk & Model-Wise Excel Upload Box (Skips Existing IMEIs Automatically) -->
+                    <div id="excelUploadBoxContainer" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px dashed rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 0.95rem 1rem; margin-bottom: 1.25rem; transition: all 0.25s;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem;">
                             <div style="font-weight: 800; font-size: 0.88rem; color: #065f46; display: flex; align-items: center; gap: 6px;">
-                                <span>📊</span> Bulk Excel Stock Upload (Excel මගින් එකවර දැමීම)
+                                <span>📊</span> Excel Stock Upload (Model අනුව හෝ Bulk ලෙස)
                             </div>
                             <button type="button" onclick="downloadSampleInventoryExcel()" style="background: white; border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 3px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
                                 📥 Sample Excel
                             </button>
                         </div>
-                        <p style="font-size: 0.76rem; color: #475569; margin: 0 0 0.65rem 0; line-height: 1.4;">
-                            Excel ගොනුවක (<code>.xlsx</code>, <code>.xls</code>, <code>.csv</code>) ඇති IMEI, Model, Storage, Buy Price, MRP එකවර Upload කරන්න. <strong>කලින් Inventory එකේ ඇති IMEI අංක ස්වයංක්‍රීයව මඟ හැර (Skip වී) අලුත් IMEI පමණක් Upload වේ.</strong>
+                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 0.6rem 0; line-height: 1.4;">
+                            එක් එක් <strong>Phone Model එක අනුව වෙන වෙනම Excel</strong> Upload කිරීමට පහතින් Model එක තෝරන්න (හෝ පහත Form එකේ Model/Cost/MRP පුරවන්න). <strong>කලින් Inventory එකේ ඇති IMEI ස්වයංක්‍රීයව Skip වී අලුත් IMEI පමණක් Upload වේ.</strong>
                         </p>
+
+                        <!-- Model-wise Selector Dropdown for Excel Upload -->
+                        <div style="margin-bottom: 0.55rem;">
+                            <label style="display: block; font-size: 0.73rem; font-weight: 800; color: #1e3a8a; margin-bottom: 3px;">
+                                📱 Select Phone Model for Excel Upload (Model එක තෝරන්න):
+                            </label>
+                            <select id="excelModelPresetSelect" onchange="handleExcelModelPresetChange(this.value)" style="width: 100%; background: #ffffff; border: 1.5px solid #93c5fd; color: #1e3a8a; padding: 0.48rem 0.6rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">
+                                <option value="">➕ Custom / Use Form Fields Below (පහත Form එකේ හෝ Excel හි ඇති Model එක)</option>
+                            </select>
+                            <div id="excelActiveModelBadge" style="display: none; margin-top: 5px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 4px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700;"></div>
+                        </div>
+
                         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                            <input type="file" id="excelInventoryFileInput" accept=".xlsx,.xls,.csv" style="flex: 1; min-width: 170px; font-size: 0.78rem; padding: 0.45rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px;">
+                            <input type="file" id="excelInventoryFileInput" accept=".xlsx,.xls,.csv" multiple style="flex: 1; min-width: 170px; font-size: 0.78rem; padding: 0.45rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px;">
                             <button type="button" id="excelUploadBtn" onclick="handleExcelInventoryUpload()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.55rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);">
                                 📤 Upload Excel
                             </button>
@@ -4854,6 +4896,115 @@
             }
         };
 
+        // Render the Added Product Card on the Billing Screen
+        window.updateAddedBillProductCardDisplay = function(mode = 'HO') {
+            if (mode === 'HO') {
+                const cardEl = document.getElementById('hoAddedProductBillCard');
+                if (!cardEl) return;
+                const imeiVal = (document.getElementById('mainSaleImei')?.value || '').trim();
+                const modelVal = (document.getElementById('mainSaleModel')?.value || '').trim();
+                const mrpVal = parseFloat(document.getElementById('mainSaleMrp')?.value) || 0;
+                const buyVal = parseFloat(document.getElementById('mainSaleBuyPrice')?.value) || 0;
+
+                if (!imeiVal && !modelVal) {
+                    cardEl.style.background = 'rgba(255, 255, 255, 0.9)';
+                    cardEl.style.border = '1px dashed #cbd5e1';
+                    cardEl.innerHTML = '📱 IMEI එක Scan කළ විට හෝ තේරූ විට Product එක මෙතැනට Add වේ (Scan IMEI to add product to bill)';
+                    return;
+                }
+
+                cardEl.style.background = '#f0fdf4';
+                cardEl.style.border = '1.5px solid #10b981';
+                cardEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-size: 0.7rem; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px;">
+                                ✅ PRODUCT ADDED TO BILL
+                            </div>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">
+                                📱 ${modelVal || 'Manual / Custom Device'}
+                            </div>
+                            <div style="font-size: 0.78rem; color: #475569; font-family: monospace; font-weight: 700; margin-top: 2px;">
+                                IMEI: ${imeiVal || '-'}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.92rem; font-weight: 900; color: #2563eb;">
+                                MRP: Rs. ${mrpVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #dc2626; margin-top: 1px;">
+                                Cost: Rs. ${buyVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                            </div>
+                            <div style="display: flex; gap: 5px; justify-content: flex-end; margin-top: 5px;">
+                                <button type="button" onclick="toggleManualProductEdit('HO')" style="background: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; cursor: pointer;" title="Edit Product Price or Model">✏️ Edit</button>
+                                <button type="button" onclick="clearBillingProduct()" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; cursor: pointer;" title="Remove Product from Bill">✖ Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const cardEl = document.getElementById('lpAddedProductBillCard');
+                if (!cardEl) return;
+                const imeiVal = (document.getElementById('lpSaleImei')?.value || '').trim();
+                const modelVal = (document.getElementById('lpSaleModel')?.value || '').trim();
+                const mrpVal = parseFloat(document.getElementById('lpSaleMrp')?.value) || 0;
+
+                if (!imeiVal && !modelVal) {
+                    cardEl.style.background = 'rgba(255, 255, 255, 0.9)';
+                    cardEl.style.border = '1px dashed #cbd5e1';
+                    cardEl.innerHTML = '📱 IMEI එක Scan කළ විට Product එක මෙතැනට Add වේ';
+                    return;
+                }
+
+                cardEl.style.background = '#eff6ff';
+                cardEl.style.border = '1.5px solid #3b82f6';
+                cardEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-size: 0.7rem; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px;">
+                                ✅ DIALOG LESI PAY PRODUCT ADDED
+                            </div>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">
+                                📱 ${modelVal || 'Dialog Lesi Pay Device'}
+                            </div>
+                            <div style="font-size: 0.78rem; color: #475569; font-family: monospace; font-weight: 700; margin-top: 2px;">
+                                IMEI: ${imeiVal || '-'}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.9rem; font-weight: 900; color: #2563eb;">
+                                ${mrpVal > 0 ? 'MRP: Rs. ' + mrpVal.toLocaleString(undefined, {minimumFractionDigits: 2}) : 'Enter MRP Below'}
+                            </div>
+                            <div style="display: flex; gap: 5px; justify-content: flex-end; margin-top: 5px;">
+                                <button type="button" onclick="toggleManualProductEdit('LP')" style="background: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">✏️ Edit</button>
+                                <button type="button" onclick="clearBillingProduct()" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">✖ Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        window.toggleManualProductEdit = function(mode = 'HO') {
+            const box = document.getElementById(mode === 'HO' ? 'hoManualProductInputs' : 'lpManualProductInputs');
+            if (!box) return;
+            box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+        };
+
+        window.clearBillingProduct = function() {
+            const saleType = document.getElementById('mainSaleType')?.value || 'Head Office Direct Sale';
+            const staff = document.getElementById('mainSaleStaffName')?.value || '';
+            if (typeof resetMainSaleFormForNextEntry === 'function') {
+                resetMainSaleFormForNextEntry(saleType, staff);
+            }
+            const hoManual = document.getElementById('hoManualProductInputs');
+            if (hoManual) hoManual.style.display = 'none';
+            const lpManual = document.getElementById('lpManualProductInputs');
+            if (lpManual) lpManual.style.display = 'none';
+            updateAddedBillProductCardDisplay('HO');
+            updateAddedBillProductCardDisplay('LP');
+        };
+
         // Instant Auto-lookup when IMEI is entered, typed, pasted, or scanned
         window.handleSaleImeiLookup = function(imei, mode) {
             const hoImeiInput = document.getElementById('mainSaleImei');
@@ -4884,7 +5035,7 @@
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     const isLesi = (document.getElementById('mainSaleType')?.value === 'Dialog Lesi Pay');
-                    submitBtn.innerText = isLesi ? 'Add Dialog Lesi Pay Sale Entry' : 'Add Main Shop Sale Entry';
+                    submitBtn.innerText = isLesi ? '🧾 Complete Dialog Lesi Pay Sale' : '🧾 Complete Sale / Add Bill';
                     submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, #990000 100%)';
                 }
             }
@@ -4894,6 +5045,7 @@
                 currentImeiAlreadySold = false;
                 resetImeiStyles();
                 if (statusEl) statusEl.innerHTML = '';
+                updateAddedBillProductCardDisplay(mode);
                 return;
             }
 
@@ -4903,6 +5055,7 @@
                 currentImeiAlreadySold = false;
                 resetImeiStyles();
                 if (statusEl) statusEl.innerHTML = '';
+                updateAddedBillProductCardDisplay(mode);
                 return;
             }
 
@@ -4969,6 +5122,9 @@
                     submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                 }
 
+                const hoManual = document.getElementById('hoManualProductInputs');
+                if (hoManual) hoManual.style.display = 'none';
+                updateAddedBillProductCardDisplay('HO');
                 calculateMainShopLiveProfit();
                 showToast(`⚡ NIC Clear phone detected! Previous SP was cancelled. Enter the newly issued SP number and submit to complete.`, "warning");
                 return;
@@ -4983,6 +5139,7 @@
                 // Clear any auto-filled models or prices
                 if (document.getElementById('mainSaleModel')) document.getElementById('mainSaleModel').value = '';
                 if (document.getElementById('mainSaleBuyPrice')) document.getElementById('mainSaleBuyPrice').value = '';
+                if (document.getElementById('mainSaleMrp')) document.getElementById('mainSaleMrp').value = '';
                 if (document.getElementById('lpSaleModel')) document.getElementById('lpSaleModel').value = '';
 
                 // IMMEDIATELY CLEAR THE IMEI INPUT FIELD - DO NOT ALLOW TO ENTER IT HERE AT ALL!
@@ -4996,10 +5153,12 @@
                     setTimeout(() => {
                         if (targetInput) {
                             targetInput.classList.remove('imei-rejected-shake');
-                            targetInput.placeholder = (mode === 'HO') ? 'Type or scan IMEI here...' : 'Enter or scan IMEI...';
+                            targetInput.placeholder = (mode === 'HO') ? 'Scan or type IMEI here...' : 'Enter or scan IMEI...';
                         }
                     }, 4500);
                 }
+
+                updateAddedBillProductCardDisplay(mode);
 
                 // Show prominent red warning banner right below the IMEI input
                 if (rejectionBanner) {
@@ -5051,7 +5210,7 @@
                 return;
             }
 
-            // 3. NORMAL STOCK LOOKUP (AVAILABLE PHONE)
+            // 3. NORMAL STOCK LOOKUP (AVAILABLE PHONE -> ADD TO BILL CARD)
             currentImeiAlreadySold = false;
             activeNicClearTarget = null;
             resetImeiStyles();
@@ -5062,6 +5221,7 @@
             });
             if (mode === 'HO') {
                 const statusEl = document.getElementById('mainSaleStockStatus');
+                const hoManual = document.getElementById('hoManualProductInputs');
                 if (found) {
                     if (found.category === 'Dialog Lesi Pay') {
                         // Automatically switch to Dialog Lesi Pay mode for this phone
@@ -5069,7 +5229,7 @@
                         toggleMainSaleFormType();
                         document.getElementById('lpSaleImei').value = found.imei;
                         handleSaleImeiLookup(found.imei, 'LP');
-                        showToast(`📱 Dialog Lesi Pay item detected (${found.model})! Switched to Dialog Lesi Pay mode. Enter Selling MRP manually for 7% profit.`, "info");
+                        showToast(`📱 Dialog Lesi Pay item detected (${found.model})! Switched to Dialog Lesi Pay mode.`, "info");
                         setTimeout(() => {
                             const mrpInput = document.getElementById('lpSaleMrp');
                             if (mrpInput) mrpInput.focus();
@@ -5080,7 +5240,7 @@
                     if (found.model) {
                         const modelInput = document.getElementById('mainSaleModel');
                         if (modelInput) {
-                            modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
+                            modelInput.value = found.model + (found.storage ? ` (${found.storage})` : '');
                         }
                     }
                     if (found.buyPrice !== undefined && found.buyPrice !== null && found.buyPrice !== '') {
@@ -5092,44 +5252,48 @@
                             mrpInput.value = found.mrp;
                         }
                     }
-                    if (statusEl) {
-                        statusEl.innerHTML = `<span style="color:#10b981; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()} | MRP: Rs. ${parseFloat(found.mrp || 0).toLocaleString()}</span>`;
-                    }
+                    if (hoManual) hoManual.style.display = 'none';
+                    updateAddedBillProductCardDisplay('HO');
                     calculateMainShopLiveProfit();
-                    showToast(`✨ Stock Found: ${found.model} | Cost: Rs. ${parseFloat(found.buyPrice || 0).toLocaleString()} | MRP: Rs. ${parseFloat(found.mrp || 0).toLocaleString()}`, "success");
+                    showToast(`✅ Product Added to Bill: ${found.model} | MRP: Rs. ${parseFloat(found.mrp || 0).toLocaleString()}`, "success");
                 } else {
                     if (statusEl) {
                         statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
                     }
+                    if (cleanImei.length >= 10 && hoManual) {
+                        hoManual.style.display = 'block';
+                    }
+                    updateAddedBillProductCardDisplay('HO');
                 }
             } else if (mode === 'LP') {
                 const statusEl = document.getElementById('lpSaleStockStatus');
+                const lpManual = document.getElementById('lpManualProductInputs');
                 if (found) {
                     if (found.model) {
                         const modelInput = document.getElementById('lpSaleModel');
                         if (modelInput) {
-                            modelInput.value = found.model + (found.storage ? ` - ${found.storage}` : '');
+                            modelInput.value = found.model + (found.storage ? ` (${found.storage})` : '');
                         }
                     }
                     const mrpInput = document.getElementById('lpSaleMrp');
                     if (found.mrp && parseFloat(found.mrp) > 0) {
                         if (mrpInput && !mrpInput.value) mrpInput.value = found.mrp;
                     }
-                    if (statusEl) {
-                        const mrpText = (found.mrp && parseFloat(found.mrp) > 0) 
-                            ? `MRP: Rs. ${parseFloat(found.mrp).toLocaleString()}` 
-                            : `MRP: Enter manually below (7% profit)`;
-                        statusEl.innerHTML = `<span style="color:#3b82f6; font-weight:700;">✅ Stock Found: ${found.model} ${found.storage ? '(' + found.storage + ')' : ''} | ${mrpText}</span>`;
-                    }
+                    if (lpManual) lpManual.style.display = 'none';
+                    updateAddedBillProductCardDisplay('LP');
                     calculateLesiPayLiveProfit();
                     setTimeout(() => {
                         if (mrpInput) mrpInput.focus();
                     }, 100);
-                    showToast(`✨ Stock Found: ${found.model}! Enter Selling MRP manually for 7% profit.`, "success");
+                    showToast(`✅ Product Added to Bill: ${found.model}!`, "success");
                 } else {
                     if (statusEl) {
                         statusEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">(Manual / External IMEI)</span>`;
                     }
+                    if (cleanImei.length >= 10 && lpManual) {
+                        lpManual.style.display = 'block';
+                    }
+                    updateAddedBillProductCardDisplay('LP');
                 }
             }
         };
@@ -5719,15 +5883,24 @@
             const submitBtn = document.getElementById('mainSaleSubmitBtn');
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.innerText = isLesi ? 'Add Dialog Lesi Pay Sale Entry' : 'Add Main Shop Sale Entry';
+                submitBtn.innerText = isLesi ? '🧾 Complete Dialog Lesi Pay Sale' : '🧾 Complete Sale / Add Bill';
                 submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, #990000 100%)';
             }
 
-            // Clear stock status indicators
+            // Clear stock status indicators & reset product bill card
             const hoStatus = document.getElementById('mainSaleStockStatus');
             if (hoStatus) hoStatus.innerHTML = '';
             const lpStatus = document.getElementById('lpSaleStockStatus');
             if (lpStatus) lpStatus.innerHTML = '';
+
+            const hoManual = document.getElementById('hoManualProductInputs');
+            if (hoManual) hoManual.style.display = 'none';
+            const lpManual = document.getElementById('lpManualProductInputs');
+            if (lpManual) lpManual.style.display = 'none';
+            if (typeof updateAddedBillProductCardDisplay === 'function') {
+                updateAddedBillProductCardDisplay('HO');
+                updateAddedBillProductCardDisplay('LP');
+            }
 
             // Retain the Activator Staff Name & Active Pill
             if (keepStaffName) {
@@ -7092,6 +7265,61 @@
                 defaultStorages.forEach(s => uniqueStorages.add(s));
                 storageDatalist.innerHTML = Array.from(uniqueStorages).map(s => `<option value="${s}"></option>`).join('');
             }
+
+            // 5. Populate Excel Upload Model Preset Dropdown (#excelModelPresetSelect)
+            const excelModelSelect = document.getElementById('excelModelPresetSelect');
+            if (excelModelSelect) {
+                const prevSelected = excelModelSelect.value;
+                window.excelModelPresetsMap = new Map();
+                items.forEach(item => {
+                    const m = (item.model || '').trim();
+                    if (!m) return;
+                    const s = (item.storage || '128GB').trim();
+                    const key = `${m.toLowerCase()}___${s.toLowerCase()}`;
+                    const ts = item.timestamp || 0;
+                    const existing = window.excelModelPresetsMap.get(key);
+                    if (!existing || ts >= existing.timestamp) {
+                        window.excelModelPresetsMap.set(key, {
+                            key: key,
+                            model: m,
+                            storage: s,
+                            buyPrice: parseFloat(item.buyPrice || 0),
+                            mrp: parseFloat(item.mrp || 0),
+                            category: item.category || 'Main Shop (Own Buy)',
+                            timestamp: ts
+                        });
+                    }
+                });
+
+                let presetHtml = '<option value="">-- Select Existing Phone Model (or type new model below) --</option>';
+                Array.from(window.excelModelPresetsMap.values())
+                    .sort((a, b) => a.model.localeCompare(b.model))
+                    .forEach(p => {
+                        const mrpTxt = p.mrp > 0 ? ` | MRP: Rs.${p.mrp.toLocaleString()}` : '';
+                        const costTxt = p.buyPrice > 0 ? ` | Cost: Rs.${p.buyPrice.toLocaleString()}` : '';
+                        presetHtml += `<option value="${p.key}">📱 ${p.model} (${p.storage})${costTxt}${mrpTxt}</option>`;
+                    });
+                excelModelSelect.innerHTML = presetHtml;
+                if (prevSelected && window.excelModelPresetsMap.has(prevSelected)) {
+                    excelModelSelect.value = prevSelected;
+                }
+            }
+
+            // Bind live badge sync on inventory form inputs once
+            if (!window._excelModelInputListenersBound) {
+                window._excelModelInputListenersBound = true;
+                ['invModel', 'invStorage', 'invBuyPrice', 'invMrpPrice', 'invCategory', 'invShop'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.addEventListener('input', () => {
+                            if (typeof window.updateExcelActiveModelBadge === 'function') window.updateExcelActiveModelBadge();
+                        });
+                        el.addEventListener('change', () => {
+                            if (typeof window.updateExcelActiveModelBadge === 'function') window.updateExcelActiveModelBadge();
+                        });
+                    }
+                });
+            }
         }
 
         window.quickFilterByModel = function(modelName) {
@@ -7415,7 +7643,10 @@
                         <span style="font-size: 0.78rem; color: #2563eb; font-weight: 700;">
                             👉 Click to view ${grp.availableCount} IMEIs, Filter by Shop & Transfer ➔
                         </span>
-                        <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;" onclick="event.stopPropagation();">
+                            <button type="button" onclick="quickExcelUploadForModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-weight: 800; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Upload an Excel sheet of IMEIs specifically for this phone model">
+                                📤 Excel Upload
+                            </button>
                             <button type="button" onclick="quickAddBatchToModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Add new batch for this phone model">
                                 ➕ Add New Batch
                             </button>
@@ -8655,7 +8886,87 @@
             showToast("📥 Sample Excel Template downloaded!", "info");
         };
 
-        // Bulk Excel Inventory Upload (Skips IMEIs that already exist in inventory)
+        // Handle selecting a Phone Model preset inside the Excel Upload Box
+        window.handleExcelModelPresetChange = function(presetKey) {
+            if (!presetKey || !window.excelModelPresetsMap || !window.excelModelPresetsMap.has(presetKey)) {
+                window.updateExcelActiveModelBadge();
+                return;
+            }
+            const preset = window.excelModelPresetsMap.get(presetKey);
+            if (document.getElementById('invModel')) document.getElementById('invModel').value = preset.model || '';
+            if (document.getElementById('invStorage')) document.getElementById('invStorage').value = preset.storage || '128GB';
+            if (document.getElementById('invCategory') && preset.category) {
+                document.getElementById('invCategory').value = preset.category;
+                if (typeof window.toggleInvBuyPrice === 'function') window.toggleInvBuyPrice();
+            }
+            if (document.getElementById('invBuyPrice')) {
+                document.getElementById('invBuyPrice').value = preset.buyPrice > 0 ? preset.buyPrice : '';
+            }
+            if (document.getElementById('invMrpPrice')) {
+                document.getElementById('invMrpPrice').value = preset.mrp > 0 ? preset.mrp : '';
+            }
+            window.updateExcelActiveModelBadge();
+            showToast(`📱 Selected ${preset.model} (${preset.storage}) for Model Excel Upload!`, "info");
+        };
+
+        // Update the active Phone Model badge inside the Excel Upload Box
+        window.updateExcelActiveModelBadge = function() {
+            const badge = document.getElementById('excelActiveModelBadge');
+            if (!badge) return;
+            const modelVal = (document.getElementById('invModel')?.value || '').trim();
+            const storageVal = (document.getElementById('invStorage')?.value || '128GB').trim();
+            const buyVal = parseFloat(document.getElementById('invBuyPrice')?.value) || 0;
+            const mrpVal = parseFloat(document.getElementById('invMrpPrice')?.value) || 0;
+            const shopVal = (document.getElementById('invShop')?.value || 'MAIN SHOP').trim();
+
+            if (!modelVal) {
+                badge.style.display = 'none';
+                badge.innerHTML = '';
+                return;
+            }
+            badge.style.display = 'block';
+            badge.innerHTML = `
+                ✅ <b>Selected Model for Excel Upload:</b> <span style="color:#047857; font-size:0.84rem;">📱 ${modelVal} (${storageVal})</span>
+                &nbsp;|&nbsp; Cost: <b>Rs. ${buyVal.toLocaleString()}</b>
+                &nbsp;|&nbsp; MRP: <b>Rs. ${mrpVal.toLocaleString()}</b>
+                &nbsp;|&nbsp; Shop: <b>${shopVal}</b>
+            `;
+        };
+
+        // Trigger Model-Specific Excel Upload directly from any Model Card in Current Stock List
+        window.quickExcelUploadForModel = function(model, storage, category) {
+            const key = `${(model || '').trim().toLowerCase()}___${(storage || '128GB').trim().toLowerCase()}`;
+            const excelSelect = document.getElementById('excelModelPresetSelect');
+            if (excelSelect && window.excelModelPresetsMap && window.excelModelPresetsMap.has(key)) {
+                excelSelect.value = key;
+                window.handleExcelModelPresetChange(key);
+            } else {
+                if (document.getElementById('invModel')) document.getElementById('invModel').value = model || '';
+                if (document.getElementById('invStorage')) document.getElementById('invStorage').value = storage || '128GB';
+                if (document.getElementById('invCategory') && category) {
+                    document.getElementById('invCategory').value = category;
+                    if (typeof window.toggleInvBuyPrice === 'function') window.toggleInvBuyPrice();
+                }
+                window.updateExcelActiveModelBadge();
+            }
+
+            if (typeof closeStockBatchModal === 'function') closeStockBatchModal();
+
+            const uploadBox = document.getElementById('excelUploadBoxContainer');
+            if (uploadBox) {
+                uploadBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                uploadBox.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.45)';
+                setTimeout(() => { uploadBox.style.boxShadow = 'none'; }, 2200);
+            }
+
+            const fileInput = document.getElementById('excelInventoryFileInput');
+            if (fileInput) {
+                fileInput.click();
+            }
+            showToast(`📤 Select the Excel file for ${model} (${storage})`, "info");
+        };
+
+        // Bulk / Model-Wise Excel Inventory Upload (Supports single-model IMEI sheets, multi-model sheets & multiple files, skipping existing IMEIs)
         window.handleExcelInventoryUpload = async function() {
             const fileInput = document.getElementById('excelInventoryFileInput');
             const resultBox = document.getElementById('excelUploadResultBox');
@@ -8668,7 +8979,7 @@
                 return showToast("Excel library not loaded. Check your internet connection.", "error");
             }
 
-            const file = fileInput.files[0];
+            const files = Array.from(fileInput.files);
             if (uploadBtn) {
                 uploadBtn.disabled = true;
                 uploadBtn.innerText = "⏳ Uploading...";
@@ -8678,20 +8989,10 @@
                 resultBox.style.background = '#eff6ff';
                 resultBox.style.border = '1px solid #93c5fd';
                 resultBox.style.color = '#1e3a8a';
-                resultBox.innerHTML = '⏳ Reading Excel file and checking existing IMEIs...';
+                resultBox.innerHTML = '⏳ Reading Excel file(s) and checking existing IMEIs...';
             }
 
             try {
-                const arrayBuffer = await file.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-
-                if (!rawRows || rawRows.length === 0) {
-                    throw new Error("Excel ගොනුවේ දත්ත කිසිවක් හමු නොවීය (No rows found in the Excel file).");
-                }
-
                 // Build a Set of all existing IMEIs in current inventory (normalized lowercase)
                 const existingImeiSet = new Set();
                 (allInventoryItems || []).forEach(item => {
@@ -8700,7 +9001,7 @@
                     }
                 });
 
-                // Fallback form values if not provided in Excel columns
+                // Fallback form values (used when uploading a Model-Specific Excel sheet)
                 const defaultCategory = (document.getElementById('invCategory')?.value || 'Main Shop (Own Buy)').trim();
                 const defaultModel = (document.getElementById('invModel')?.value || '').trim();
                 const defaultStorage = (document.getElementById('invStorage')?.value || '128GB').trim();
@@ -8708,91 +9009,207 @@
                 const defaultBuyPrice = parseFloat(document.getElementById('invBuyPrice')?.value) || 0;
                 const defaultMrpPrice = parseFloat(document.getElementById('invMrpPrice')?.value) || 0;
 
-                const getColVal = (rowObj, possibleNames) => {
-                    const keys = Object.keys(rowObj);
-                    for (const pName of possibleNames) {
-                        const matchKey = keys.find(k => k.trim().toLowerCase().replace(/[^a-z0-9]/g, '') === pName.toLowerCase().replace(/[^a-z0-9]/g, ''));
-                        if (matchKey !== undefined && String(rowObj[matchKey]).trim() !== '') {
-                            return String(rowObj[matchKey]).trim();
-                        }
-                    }
-                    return '';
-                };
-
                 const itemsToUpload = [];
                 const skippedExistingImeis = [];
                 const skippedFileDuplicateImeis = [];
                 let invalidRowCount = 0;
                 const seenInFileSet = new Set();
+                const uploadedByModelCounts = {};
 
-                rawRows.forEach((row) => {
-                    let imeiVal = getColVal(row, ['IMEI', 'IMEINumber', 'IMEINo', 'Serial', 'SerialNumber', 'Barcode']);
-                    // If the Excel has only 1 column or unnamed first column containing IMEI
-                    if (!imeiVal) {
-                        const firstVal = Object.values(row)[0];
-                        if (firstVal !== undefined && String(firstVal).trim().length >= 8) {
-                            imeiVal = String(firstVal).trim();
+                const normHeader = (s) => String(s || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+                const imeiHeaderKeys = ['imei', 'imeinumber', 'imeino', 'serial', 'serialnumber', 'barcode', 'imeis'];
+                const modelHeaderKeys = ['model', 'phonemodel', 'modelname', 'item', 'itemname', 'device', 'product', 'handset'];
+                const storageHeaderKeys = ['storage', 'capacity', 'rom', 'ramstorage', 'memory', 'size', 'ramrom'];
+                const shopHeaderKeys = ['shop', 'branch', 'location', 'targetshop', 'store', 'shopname'];
+                const catHeaderKeys = ['category', 'stockcategory', 'type', 'source'];
+                const buyHeaderKeys = ['buyprice', 'buycost', 'cost', 'costprice', 'wholesaleprice', 'purchaseprice', 'dealerprice'];
+                const mrpHeaderKeys = ['mrp', 'sellingmrp', 'sellingprice', 'retailprice', 'price', 'saleprice', 'mrpprice'];
+                const allKnownHeaders = new Set([
+                    ...imeiHeaderKeys, ...modelHeaderKeys, ...storageHeaderKeys,
+                    ...shopHeaderKeys, ...catHeaderKeys, ...buyHeaderKeys, ...mrpHeaderKeys
+                ]);
+
+                const cleanImeiValue = (rawVal) => {
+                    if (rawVal === undefined || rawVal === null) return '';
+                    let str = String(rawVal).trim();
+                    if (!str) return '';
+                    // If numeric or scientific notation from Excel
+                    if (typeof rawVal === 'number') {
+                        str = Math.trunc(rawVal).toString();
+                    } else if (/^\d+\.0+$/.test(str)) {
+                        str = str.replace(/\.0+$/, '');
+                    } else if (/^\d+\.\d+e\+\d+$/i.test(str)) {
+                        const num = Number(str);
+                        if (!isNaN(num)) str = Math.round(num).toString();
+                    }
+                    return str.trim();
+                };
+
+                const isLikelyImei = (valStr) => {
+                    if (!valStr || valStr.length < 7 || valStr.length > 30) return false;
+                    // Must contain at least 6 digits and no spaces inside standard IMEI/Serial
+                    const digitCount = (valStr.match(/\d/g) || []).length;
+                    return digitCount >= 6 && !/\s{2,}/.test(valStr);
+                };
+
+                for (const file of files) {
+                    const fileBaseName = (file.name || '').replace(/\.(xlsx|xls|csv)$/i, '').trim();
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+                    for (const sheetName of workbook.SheetNames) {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const rows2D = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                        if (!rows2D || rows2D.length === 0) continue;
+
+                        // Detect if one of the first 5 non-empty rows is a header row
+                        let headerRowIndex = -1;
+                        let colMap = {};
+                        let sheetTitleModel = '';
+
+                        for (let r = 0; r < Math.min(rows2D.length, 5); r++) {
+                            const rowArr = rows2D[r] || [];
+                            const nonEmptyCells = rowArr.map(c => String(c ?? '').trim()).filter(Boolean);
+                            if (nonEmptyCells.length === 0) continue;
+
+                            const matchedHeaders = rowArr.filter(cell => allKnownHeaders.has(normHeader(cell)));
+                            if (matchedHeaders.length > 0) {
+                                headerRowIndex = r;
+                                rowArr.forEach((cell, idx) => {
+                                    const nh = normHeader(cell);
+                                    if (imeiHeaderKeys.includes(nh) && colMap.imei === undefined) colMap.imei = idx;
+                                    else if (modelHeaderKeys.includes(nh) && colMap.model === undefined) colMap.model = idx;
+                                    else if (storageHeaderKeys.includes(nh) && colMap.storage === undefined) colMap.storage = idx;
+                                    else if (shopHeaderKeys.includes(nh) && colMap.shop === undefined) colMap.shop = idx;
+                                    else if (catHeaderKeys.includes(nh) && colMap.category === undefined) colMap.category = idx;
+                                    else if (buyHeaderKeys.includes(nh) && colMap.buyPrice === undefined) colMap.buyPrice = idx;
+                                    else if (mrpHeaderKeys.includes(nh) && colMap.mrp === undefined) colMap.mrp = idx;
+                                });
+                                break;
+                            } else if (r === 0 && nonEmptyCells.length === 1 && !isLikelyImei(cleanImeiValue(nonEmptyCells[0]))) {
+                                // E.g. Row 0 has a single title cell like "VIVO Y05 4+64GB" and rows below are IMEIs
+                                sheetTitleModel = nonEmptyCells[0];
+                            }
+                        }
+
+                        const startRow = headerRowIndex >= 0 ? headerRowIndex + 1 : 0;
+
+                        for (let r = startRow; r < rows2D.length; r++) {
+                            const rowArr = rows2D[r] || [];
+                            const nonEmpty = rowArr.filter(c => String(c ?? '').trim() !== '');
+                            if (nonEmpty.length === 0) continue;
+
+                            let imeiVal = '';
+                            if (colMap.imei !== undefined) {
+                                imeiVal = cleanImeiValue(rowArr[colMap.imei]);
+                            }
+                            if (!imeiVal) {
+                                // Find the first cell in the row that looks like an IMEI/Serial number
+                                for (let c = 0; c < rowArr.length; c++) {
+                                    if (c === colMap.model || c === colMap.storage || c === colMap.shop || c === colMap.category || c === colMap.buyPrice || c === colMap.mrp) continue;
+                                    const candidate = cleanImeiValue(rowArr[c]);
+                                    if (isLikelyImei(candidate)) {
+                                        imeiVal = candidate;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!imeiVal || !isLikelyImei(imeiVal)) {
+                                // If row 0 was a model title row, don't count it as an invalid IMEI row
+                                if (r === 0 && sheetTitleModel) continue;
+                                invalidRowCount++;
+                                continue;
+                            }
+
+                            const normImei = imeiVal.toLowerCase();
+
+                            // 1. Skip if already in current inventory
+                            if (existingImeiSet.has(normImei)) {
+                                skippedExistingImeis.push(imeiVal);
+                                continue;
+                            }
+
+                            // 2. Skip if duplicate inside the same Excel upload
+                            if (seenInFileSet.has(normImei)) {
+                                skippedFileDuplicateImeis.push(imeiVal);
+                                continue;
+                            }
+                            seenInFileSet.add(normImei);
+
+                            // Determine Model Name:
+                            // Priority: Excel Model Column -> Form/Selected Model (#invModel) -> Sheet Title Cell -> Sheet Name (if custom) -> File Name (if multi-file)
+                            let rowModel = (colMap.model !== undefined ? String(rowArr[colMap.model] ?? '').trim() : '');
+                            if (!rowModel) rowModel = defaultModel;
+                            if (!rowModel && sheetTitleModel) rowModel = sheetTitleModel;
+                            if (!rowModel && sheetName && !/^sheet\d*$/i.test(sheetName.trim()) && sheetName.trim().toLowerCase() !== 'inventory_upload') {
+                                rowModel = sheetName.trim();
+                            }
+                            if (!rowModel && files.length > 1 && fileBaseName) {
+                                rowModel = fileBaseName;
+                            }
+
+                            // Check if this model matches a known model preset when prices/storage weren't explicitly filled
+                            let matchedPreset = null;
+                            if (rowModel && window.excelModelPresetsMap) {
+                                for (const p of window.excelModelPresetsMap.values()) {
+                                    if (p.model.toLowerCase() === rowModel.toLowerCase()) {
+                                        matchedPreset = p;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            const storageVal = (colMap.storage !== undefined && String(rowArr[colMap.storage] ?? '').trim() !== '')
+                                ? String(rowArr[colMap.storage]).trim()
+                                : (defaultStorage || (matchedPreset ? matchedPreset.storage : '128GB'));
+
+                            const shopVal = (colMap.shop !== undefined && String(rowArr[colMap.shop] ?? '').trim() !== '')
+                                ? String(rowArr[colMap.shop]).trim()
+                                : (defaultShop || 'MAIN SHOP');
+
+                            let categoryVal = (colMap.category !== undefined && String(rowArr[colMap.category] ?? '').trim() !== '')
+                                ? String(rowArr[colMap.category]).trim()
+                                : (defaultCategory || (matchedPreset ? matchedPreset.category : 'Main Shop (Own Buy)'));
+
+                            if (categoryVal.toLowerCase().includes('lesi') || categoryVal.toLowerCase().includes('dialog')) {
+                                categoryVal = 'Dialog Lesi Pay';
+                            } else {
+                                categoryVal = 'Main Shop (Own Buy)';
+                            }
+
+                            const rawBuy = colMap.buyPrice !== undefined ? String(rowArr[colMap.buyPrice] ?? '').trim() : '';
+                            const rawMrp = colMap.mrp !== undefined ? String(rowArr[colMap.mrp] ?? '').trim() : '';
+
+                            const isLesi = (categoryVal === 'Dialog Lesi Pay');
+                            const fallbackBuy = defaultBuyPrice > 0 ? defaultBuyPrice : (matchedPreset ? matchedPreset.buyPrice : 0);
+                            const fallbackMrp = defaultMrpPrice > 0 ? defaultMrpPrice : (matchedPreset ? matchedPreset.mrp : 0);
+
+                            const buyPriceNum = isLesi ? 0 : (rawBuy !== '' ? (parseFloat(rawBuy.replace(/,/g, '')) || 0) : fallbackBuy);
+                            const mrpPriceNum = rawMrp !== '' ? (parseFloat(rawMrp.replace(/,/g, '')) || 0) : fallbackMrp;
+
+                            if (!rowModel) {
+                                invalidRowCount++;
+                                continue;
+                            }
+
+                            const modelSummaryKey = `${rowModel} (${storageVal})`;
+                            uploadedByModelCounts[modelSummaryKey] = (uploadedByModelCounts[modelSummaryKey] || 0) + 1;
+
+                            itemsToUpload.push({
+                                imei: imeiVal,
+                                model: rowModel,
+                                storage: storageVal,
+                                shop: shopVal,
+                                category: categoryVal,
+                                buyPrice: buyPriceNum,
+                                mrp: mrpPriceNum,
+                                status: 'Available',
+                                timestamp: Date.now()
+                            });
                         }
                     }
-                    if (!imeiVal) {
-                        invalidRowCount++;
-                        return;
-                    }
-
-                    // Clean scientific notation or trailing .0 if numeric in Excel
-                    if (/^\d+\.0+$/.test(imeiVal)) {
-                        imeiVal = imeiVal.replace(/\.0+$/, '');
-                    }
-
-                    const normImei = imeiVal.toLowerCase();
-
-                    // Check if already in current inventory
-                    if (existingImeiSet.has(normImei)) {
-                        skippedExistingImeis.push(imeiVal);
-                        return;
-                    }
-
-                    // Check if duplicate inside the same Excel file
-                    if (seenInFileSet.has(normImei)) {
-                        skippedFileDuplicateImeis.push(imeiVal);
-                        return;
-                    }
-                    seenInFileSet.add(normImei);
-
-                    const modelVal = getColVal(row, ['Model', 'PhoneModel', 'ModelName', 'Item', 'ItemName', 'Device', 'Product']) || defaultModel;
-                    const storageVal = getColVal(row, ['Storage', 'Capacity', 'ROM', 'RAMStorage', 'Memory', 'Size']) || defaultStorage || '128GB';
-                    const shopVal = getColVal(row, ['Shop', 'Branch', 'Location', 'TargetShop', 'Store']) || defaultShop || 'MAIN SHOP';
-                    let categoryVal = getColVal(row, ['Category', 'StockCategory', 'Type', 'Source']) || defaultCategory || 'Main Shop (Own Buy)';
-                    if (categoryVal.toLowerCase().includes('lesi') || categoryVal.toLowerCase().includes('dialog')) {
-                        categoryVal = 'Dialog Lesi Pay';
-                    } else {
-                        categoryVal = 'Main Shop (Own Buy)';
-                    }
-
-                    const rawBuy = getColVal(row, ['BuyPrice', 'BuyCost', 'Cost', 'CostPrice', 'WholesalePrice', 'PurchasePrice']);
-                    const rawMrp = getColVal(row, ['MRP', 'SellingMRP', 'SellingPrice', 'RetailPrice', 'Price', 'SalePrice']);
-
-                    const isLesi = (categoryVal === 'Dialog Lesi Pay');
-                    const buyPriceNum = isLesi ? 0 : (rawBuy !== '' ? (parseFloat(String(rawBuy).replace(/,/g, '')) || 0) : defaultBuyPrice);
-                    const mrpPriceNum = rawMrp !== '' ? (parseFloat(String(rawMrp).replace(/,/g, '')) || 0) : defaultMrpPrice;
-
-                    if (!modelVal) {
-                        invalidRowCount++;
-                        return;
-                    }
-
-                    itemsToUpload.push({
-                        imei: imeiVal,
-                        model: modelVal,
-                        storage: storageVal,
-                        shop: shopVal,
-                        category: categoryVal,
-                        buyPrice: buyPriceNum,
-                        mrp: mrpPriceNum,
-                        status: 'Available',
-                        timestamp: Date.now()
-                    });
-                });
+                }
 
                 if (itemsToUpload.length === 0) {
                     if (resultBox) {
@@ -8804,7 +9221,7 @@
                             <div style="margin-top:4px; font-weight:600;">
                                 • දැනටමත් Inventory එකේ ඇති නිසා මඟහැරිය (Skipped Existing IMEIs): <b>${skippedExistingImeis.length}</b><br>
                                 • Excel ගොනුව තුළම දෙවරක් තිබූ (Skipped Duplicates in File): <b>${skippedFileDuplicateImeis.length}</b><br>
-                                ${invalidRowCount > 0 ? `• Model හෝ IMEI නොමැති පේළි (Missing Model/IMEI): <b>${invalidRowCount}</b> (Excel හි Model තීරුවක් නැත්නම් පහත Phone Model කොටුවේ නම ටයිප් කර Upload කරන්න)` : ''}
+                                ${invalidRowCount > 0 ? `• Model හෝ IMEI නොමැති පේළි (Missing Model/IMEI): <b>${invalidRowCount}</b> (Excel හි Model තීරුවක් නැත්නම් ඉහත Dropdown එකෙන් Phone Model එක තෝරා හෝ පහත Phone Model කොටුවේ නම ටයිප් කර Upload කරන්න)` : ''}
                             </div>
                         `;
                     }
@@ -8824,6 +9241,10 @@
                     await batch.commit();
                 }
 
+                const modelBreakdownHtml = Object.entries(uploadedByModelCounts)
+                    .map(([mName, cnt]) => `<span style="display:inline-block; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; border-radius:6px; padding:2px 8px; font-size:0.75rem; margin:2px 4px 2px 0;">📱 ${mName}: <b>${cnt}</b></span>`)
+                    .join('');
+
                 if (resultBox) {
                     resultBox.style.background = '#ecfdf5';
                     resultBox.style.border = '1px solid #10b981';
@@ -8832,6 +9253,7 @@
                         <div>✅ <b>Excel Stock Upload සාර්ථකයි!</b></div>
                         <div style="margin-top:4px; font-weight:600;">
                             • අලුතින් Inventory එකට ඇතුළත් කළ ගණන (Newly Uploaded): <b style="color:#059669; font-size:0.9rem;">${itemsToUpload.length} Items</b><br>
+                            ${modelBreakdownHtml ? `<div style="margin:4px 0;">${modelBreakdownHtml}</div>` : ''}
                             • දැනටමත් Inventory එකේ තිබූ නිසා ඉවත් කළ ගණන (Skipped Existing IMEIs): <b style="color:#d97706;">${skippedExistingImeis.length}</b>
                             ${skippedFileDuplicateImeis.length > 0 ? `<br>• Excel ගොනුව තුළම දෙවරක් තිබූ නිසා ඉවත් කළ ගණන: <b>${skippedFileDuplicateImeis.length}</b>` : ''}
                             ${invalidRowCount > 0 ? `<br>• අසම්පූර්ණ පේළි (Skipped Missing Model/IMEI): <b>${invalidRowCount}</b>` : ''}
