@@ -1415,16 +1415,16 @@
                                     <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
                                 </div>
                                 
-                                <!-- Dropdown Selector -->
-                                <select id="mainSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'HO')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem;">
+                                <!-- Dropdown Selector Only (External Pills Hidden) -->
+                                <select id="mainSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'HO')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem;">
                                     <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
                                 </select>
 
-                                <!-- Quick 1-Click Pill Buttons -->
-                                <div id="mainStaffPills" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.45rem;"></div>
+                                <!-- Hidden container so existing code references don't break -->
+                                <div id="mainStaffPills" style="display: none !important;"></div>
 
-                                <!-- Autocomplete Input for Custom Names -->
-                                <input type="text" id="mainSaleStaffName" list="activatorDatalist" placeholder="Or type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'HO')" style="width: 100%;">
+                                <!-- Input only appears if user selects '+ Type New Staff Name...' from dropdown -->
+                                <input type="text" id="mainSaleStaffName" list="activatorDatalist" placeholder="Type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'HO')" style="display: none; width: 100%; margin-top: 0.4rem;">
                             </div>
 
                             <div style="margin-bottom: 1.2rem;">
@@ -1479,16 +1479,16 @@
                                     <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
                                 </div>
 
-                                <!-- Dropdown Selector -->
-                                <select id="lpSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'LP')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem;">
+                                <!-- Dropdown Selector Only (External Pills Hidden) -->
+                                <select id="lpSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'LP')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem;">
                                     <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
                                 </select>
 
-                                <!-- Quick 1-Click Pill Buttons -->
-                                <div id="lpStaffPills" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.45rem;"></div>
+                                <!-- Hidden container so existing code references don't break -->
+                                <div id="lpStaffPills" style="display: none !important;"></div>
 
-                                <!-- Autocomplete Input for Custom Names -->
-                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Or type staff name (leave blank for Direct/Owner)..." autocomplete="off" oninput="handleStaffInput(this.value, 'LP')" style="width: 100%;">
+                                <!-- Input only appears if user selects '+ Type New Staff Name...' from dropdown -->
+                                <input type="text" id="lpSaleActivator" list="activatorDatalist" placeholder="Type new staff name..." autocomplete="off" oninput="handleStaffInput(this.value, 'LP')" style="display: none; width: 100%; margin-top: 0.4rem;">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
@@ -1533,9 +1533,8 @@
                         <input type="text" id="mainShopSearch" placeholder="Search IMEI, NIC, SP, Customer..." style="width: 100%; max-width: 250px;" oninput="renderMainShopProfitView()">
                     </div>
 
-                    <!-- History Date & Time Filter Toolbar -->
-                    <div style="background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.95); border-radius: 12px; padding: 0.75rem 0.9rem; margin-bottom: 0.9rem; display: flex; flex-direction: column; gap: 0.6rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-                        <!-- Row 1: Quick Period Filter Buttons & Sorting -->
+                    <!-- History Date & Time Filter Toolbar (With Clickable Custom Date Range Calendar Popover) -->
+                    <div style="position: relative; background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.95); border-radius: 12px; padding: 0.75rem 0.9rem; margin-bottom: 0.9rem; display: flex; flex-direction: column; gap: 0.55rem; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                             <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;" id="historyDateQuickPills">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 View:</span>
@@ -1544,8 +1543,14 @@
                                 <button type="button" class="history-date-btn" id="btnHistDateWeek" onclick="setHistoryDateFilter('week')">This Week (සතිය)</button>
                                 <button type="button" class="history-date-btn" id="btnHistDateMonth" onclick="setHistoryDateFilter('month')">This Month (මාසය)</button>
                                 <button type="button" class="history-date-btn" id="btnHistDateAll" onclick="setHistoryDateFilter('all')">All Time (සියල්ල)</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateCustom" onclick="toggleHistoryCustomDatePopover()" style="display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #93c5fd; color: #1e40af; background: #eff6ff;">
+                                    📅 <span id="btnHistDateCustomLabel">Custom Date Range</span> ▾
+                                </button>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                <div id="historyFilterSummaryPill" style="font-size: 0.76rem; font-weight: 700; color: #0f766e; background: #ccfbf1; padding: 4px 10px; border-radius: 6px; border: 1px solid #99f6e4;">
+                                    <span id="histSummaryCount">0</span> Sales | Net Profit: <span id="histSummaryProfit">Rs. 0.00</span>
+                                </div>
                                 <button type="button" id="btnHistSortOrder" onclick="toggleHistorySortOrder()" style="background: white; border: 1px solid #cbd5e1; padding: 0.35rem 0.7rem; border-radius: 7px; font-size: 0.76rem; font-weight: 700; color: #334155; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Toggle between Newest First and Oldest First">
                                     ⏱️ Latest First ⬇️
                                 </button>
@@ -1554,20 +1559,31 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Row 2: Specific Date Picker, Date Range & Summary Badge -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 0.76rem; color: #64748b; font-weight: 600;">Specific Date:</span>
-                                <input type="date" id="historySpecificDate" onchange="setHistorySpecificDate(this.value)" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
-                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 600;">or Range:</span>
-                                <input type="date" id="historyStartDate" onchange="setHistoryCustomDateRange()" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
-                                <span style="font-size: 0.74rem; color: #94a3b8;">to</span>
-                                <input type="date" id="historyEndDate" onchange="setHistoryCustomDateRange()" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
-                                <button type="button" onclick="resetHistoryDateFilter()" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.3rem 0.55rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer;" title="Reset Date Filter to All Time">↺ Reset</button>
+
+                        <!-- Calendar Date Range Picker Popover (Opens only when 'Custom Date Range' is clicked) -->
+                        <div id="historyCustomDatePopover" style="display: none; background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; padding: 0.85rem 1rem; margin-top: 0.25rem; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                                <span style="font-size: 0.82rem; font-weight: 800; color: #1e3a8a;">📅 Select Custom Date Range (දින පරාසය තෝරන්න)</span>
+                                <button type="button" onclick="closeHistoryCustomDatePopover()" style="background: transparent; border: none; color: #64748b; font-weight: 800; font-size: 1rem; cursor: pointer;">✕</button>
                             </div>
-                            <!-- Live summary stats for current filter -->
-                            <div id="historyFilterSummaryPill" style="font-size: 0.76rem; font-weight: 700; color: #0f766e; background: #ccfbf1; padding: 3px 9px; border-radius: 6px; border: 1px solid #99f6e4;">
-                                <span id="histSummaryCount">0</span> Sales | Net Profit: <span id="histSummaryProfit">Rs. 0.00</span>
+                            <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">From Date (ආරම්භක දිනය)</label>
+                                    <input type="date" id="historyStartDate" onclick="if(this.showPicker) this.showPicker();" onchange="handleHistoryPopoverDateChange('start')" style="width: 100%; padding: 0.48rem 0.65rem; font-size: 0.84rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #93c5fd; background: #f8fafc; color: #1e293b; cursor: pointer;">
+                                </div>
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">To Date (අවසාන දිනය)</label>
+                                    <input type="date" id="historyEndDate" onclick="if(this.showPicker) this.showPicker();" onchange="handleHistoryPopoverDateChange('end')" style="width: 100%; padding: 0.48rem 0.65rem; font-size: 0.84rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #93c5fd; background: #f8fafc; color: #1e293b; cursor: pointer;">
+                                </div>
+                                <input type="hidden" id="historySpecificDate" value="">
+                                <div style="display: flex; gap: 6px;">
+                                    <button type="button" onclick="applyHistoryCustomDatePopover()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; padding: 0.52rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.25);">
+                                        ✅ Apply Dates
+                                    </button>
+                                    <button type="button" onclick="resetHistoryDateFilter()" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #dc2626; padding: 0.52rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
+                                        ↺ Reset
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2299,7 +2315,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.75rem;">
                 <h3 style="font-size: 1.1rem; color: var(--text-main); margin: 0;">Activation History</h3>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     <button class="staff-filter-btn active" id="btnStaffFilterAll" onclick="filterStaffHistory('All')">All Activations (<span id="staffFilterCountAll">0</span>)</button>
@@ -2307,10 +2323,32 @@
                     <button class="staff-filter-btn" id="btnStaffFilterPaid" onclick="filterStaffHistory('Paid')" style="color: var(--success);">Paid / Complete (<span id="staffFilterCountPaid">0</span>)</button>
                 </div>
             </div>
+
+            <!-- Bulk Tick & Complete Payment Bar -->
+            <div id="staffBulkPaymentBar" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 0.65rem 0.95rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 800; color: #065f46; cursor: pointer; margin: 0;">
+                        <input type="checkbox" id="staffBulkBarSelectAll" onchange="toggleSelectAllPendingStaffActivations(this.checked)" style="width: 17px; height: 17px; cursor: pointer; accent-color: #10b981;">
+                        ☑️ Select All Pending
+                    </label>
+                    <span id="staffBulkSelectedSummary" style="font-size: 0.8rem; font-weight: 700; color: #1e3a8a; background: #ffffff; border: 1px solid #cbd5e1; padding: 3px 10px; border-radius: 999px;">
+                        0 Selected | Total: Rs. 0
+                    </span>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <button type="button" id="btnStaffBulkMarkPaid" onclick="openBulkStaffPaymentModal()" disabled style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.48rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; opacity: 0.5; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25); display: inline-flex; align-items: center; gap: 5px;">
+                        💰 Complete Bulk Payment (<span id="btnStaffBulkCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                 <table>
                     <thead>
                         <tr>
+                            <th style="width: 38px; text-align: center;">
+                                <input type="checkbox" id="staffSelectAllPendingCheckbox" onchange="toggleSelectAllPendingStaffActivations(this.checked)" title="Select All Pending Activations" style="width: 17px; height: 17px; cursor: pointer; accent-color: #10b981;">
+                            </th>
                             <th>Activation Date</th>
                             <th>Customer & Device</th>
                             <th>Fee Amount</th>
@@ -5687,8 +5725,14 @@
             const hoSel = document.getElementById('mainSaleStaffSelect');
             const lpSel = document.getElementById('lpSaleStaffSelect');
 
-            if (hoInput) hoInput.value = formatted;
-            if (lpInput) lpInput.value = formatted;
+            if (hoInput) {
+                hoInput.value = formatted;
+                hoInput.style.display = 'none';
+            }
+            if (lpInput) {
+                lpInput.value = formatted;
+                lpInput.style.display = 'none';
+            }
             if (hoSel) hoSel.value = formatted;
             if (lpSel) lpSel.value = formatted;
 
@@ -5696,28 +5740,25 @@
         };
 
         window.handleStaffSelectChange = function(val, mode) {
+            const input = document.getElementById(mode === 'HO' ? 'mainSaleStaffName' : 'lpSaleActivator');
             if (!val) {
-                if (mode === 'HO') {
-                    const input = document.getElementById('mainSaleStaffName');
-                    if (input) input.value = '';
-                } else {
-                    const input = document.getElementById('lpSaleActivator');
-                    if (input) input.value = '';
+                if (input) {
+                    input.value = '';
+                    input.style.display = 'none';
                 }
                 highlightActiveStaffPill('');
                 return;
             }
             if (val === '__custom__') {
-                if (mode === 'HO') {
-                    const input = document.getElementById('mainSaleStaffName');
-                    if (input) { input.value = ''; input.focus(); }
-                } else {
-                    const input = document.getElementById('lpSaleActivator');
-                    if (input) { input.value = ''; input.focus(); }
+                if (input) {
+                    input.value = '';
+                    input.style.display = 'block';
+                    input.focus();
                 }
                 highlightActiveStaffPill('');
                 return;
             }
+            if (input) input.style.display = 'none';
             selectStaffQuick(val);
         };
 
@@ -5729,11 +5770,11 @@
                 const lpSel = document.getElementById('lpSaleStaffSelect');
                 if (hoSel) {
                     const exists = Array.from(hoSel.options).some(o => o.value === formatted);
-                    hoSel.value = exists ? formatted : '';
+                    if (exists) hoSel.value = formatted;
                 }
                 if (lpSel) {
                     const exists = Array.from(lpSel.options).some(o => o.value === formatted);
-                    lpSel.value = exists ? formatted : '';
+                    if (exists) lpSel.value = formatted;
                 }
                 highlightActiveStaffPill(formatted);
             }
@@ -5764,7 +5805,7 @@
                 });
             }
 
-            // 2. Update Select Dropdowns
+            // 2. Update Select Dropdowns (Clean Dropdown Only)
             ['mainSaleStaffSelect', 'lpSaleStaffSelect'].forEach(selId => {
                 const sel = document.getElementById(selId);
                 if (sel) {
@@ -5787,20 +5828,12 @@
                 }
             });
 
-            // 3. Update Quick Pill Bars
+            // 3. Keep external pill containers empty & hidden
             ['mainStaffPills', 'lpStaffPills'].forEach(pillContainerId => {
                 const container = document.getElementById(pillContainerId);
                 if (container) {
                     container.innerHTML = '';
-                    staffList.forEach(name => {
-                        const pill = document.createElement('button');
-                        pill.type = 'button';
-                        pill.className = 'staff-quick-pill';
-                        pill.dataset.staffName = name;
-                        pill.innerHTML = `<span>👤</span> ${name}`;
-                        pill.onclick = () => selectStaffQuick(name);
-                        container.appendChild(pill);
-                    });
+                    container.style.display = 'none';
                 }
             });
 
@@ -5811,15 +5844,16 @@
                 const lpInput = document.getElementById('lpSaleActivator');
                 if (hoInput && !hoInput.value) {
                     hoInput.value = lastStaff;
+                    hoInput.style.display = 'none';
                     const hoSel = document.getElementById('mainSaleStaffSelect');
                     if (hoSel) hoSel.value = lastStaff;
                 }
                 if (lpInput && !lpInput.value) {
                     lpInput.value = lastStaff;
+                    lpInput.style.display = 'none';
                     const lpSel = document.getElementById('lpSaleStaffSelect');
                     if (lpSel) lpSel.value = lastStaff;
                 }
-                highlightActiveStaffPill(lastStaff);
             }
         }
 
@@ -5902,7 +5936,7 @@
                 updateAddedBillProductCardDisplay('LP');
             }
 
-            // Retain the Activator Staff Name & Active Pill
+            // Retain the Activator Staff Name & Dropdown
             if (keepStaffName) {
                 selectStaffQuick(keepStaffName);
             }
@@ -5947,8 +5981,52 @@
             return '';
         }
 
-        // Date Range Filtering for Main Shop
+        // Date Range Filtering for Main Shop (With Clickable Custom Date Range Calendar Popover)
         window.currentHistorySortOrder = 'desc';
+
+        window.toggleHistoryCustomDatePopover = function() {
+            const pop = document.getElementById('historyCustomDatePopover');
+            if (!pop) return;
+            if (pop.style.display === 'none' || !pop.style.display) {
+                pop.style.display = 'block';
+                const sDate = document.getElementById('historyStartDate');
+                if (sDate) {
+                    setTimeout(() => {
+                        sDate.focus();
+                        if (typeof sDate.showPicker === 'function') {
+                            try { sDate.showPicker(); } catch (e) {}
+                        }
+                    }, 60);
+                }
+            } else {
+                pop.style.display = 'none';
+            }
+        };
+
+        window.closeHistoryCustomDatePopover = function() {
+            const pop = document.getElementById('historyCustomDatePopover');
+            if (pop) pop.style.display = 'none';
+        };
+
+        window.handleHistoryPopoverDateChange = function(which) {
+            const sDate = document.getElementById('historyStartDate');
+            const eDate = document.getElementById('historyEndDate');
+            if (which === 'start' && sDate && sDate.value && eDate && !eDate.value) {
+                eDate.value = sDate.value;
+                setTimeout(() => {
+                    eDate.focus();
+                    if (typeof eDate.showPicker === 'function') {
+                        try { eDate.showPicker(); } catch (e) {}
+                    }
+                }, 80);
+            }
+            setHistoryCustomDateRange();
+        };
+
+        window.applyHistoryCustomDatePopover = function() {
+            setHistoryCustomDateRange();
+            closeHistoryCustomDatePopover();
+        };
 
         window.setHistoryDateFilter = function(rangeType) {
             currentProfitRange = rangeType;
@@ -5960,6 +6038,10 @@
             if (specDate) specDate.value = '';
             if (sDate) sDate.value = '';
             if (eDate) eDate.value = '';
+
+            const customLabel = document.getElementById('btnHistDateCustomLabel');
+            if (customLabel) customLabel.innerText = 'Custom Date Range';
+            closeHistoryCustomDatePopover();
 
             const topDropdown = document.getElementById('mainProfitDateDropdown');
             if (topDropdown) {
@@ -5980,20 +6062,11 @@
 
         window.setHistorySpecificDate = function(dateStr) {
             if (!dateStr) return;
-            currentProfitRange = 'custom';
-            
-            const startInput = document.getElementById('profitStartDate');
-            const endInput = document.getElementById('profitEndDate');
-            if (startInput) startInput.value = dateStr;
-            if (endInput) endInput.value = dateStr;
-
             const sDate = document.getElementById('historyStartDate');
             const eDate = document.getElementById('historyEndDate');
             if (sDate) sDate.value = dateStr;
             if (eDate) eDate.value = dateStr;
-
-            document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
-            renderMainShopProfitView();
+            setHistoryCustomDateRange();
         };
 
         window.setHistoryCustomDateRange = function() {
@@ -6005,12 +6078,23 @@
             const startInput = document.getElementById('profitStartDate');
             const endInput = document.getElementById('profitEndDate');
             if (startInput) startInput.value = start;
-            if (endInput) endInput.value = end;
+            if (endInput) endInput.value = end || start;
 
             const specDate = document.getElementById('historySpecificDate');
             if (specDate) specDate.value = '';
 
             document.querySelectorAll('.history-date-btn').forEach(btn => btn.classList.remove('active'));
+            const customBtn = document.getElementById('btnHistDateCustom');
+            if (customBtn) customBtn.classList.add('active');
+            const customLabel = document.getElementById('btnHistDateCustomLabel');
+            if (customLabel) {
+                if (start && end && start !== end) {
+                    customLabel.innerText = `${start} ➔ ${end}`;
+                } else {
+                    customLabel.innerText = start || end;
+                }
+            }
+
             renderMainShopProfitView();
         };
 
@@ -7098,19 +7182,126 @@
         // Inventory Logic
         let allInventoryItems = [];
 
+        // Normalize Phone Model Name & Storage so duplicate entries with embedded storage or case/space differences merge into 1 clean Model + Storage
+        window.normalizePhoneModelAndStorage = function(rawModel, rawStorage) {
+            let modelStr = String(rawModel ?? '').trim();
+            let storageStr = String(rawStorage ?? '').trim();
+
+            const cleanStorageToken = (tok) => {
+                if (!tok) return '';
+                let s = String(tok).toUpperCase().trim();
+                s = s.replace(/\s+/g, '').replace(/\//g, '+');
+                const ramRomMatch = s.match(/^(\d{1,2})(?:GB|G)?\+(\d{2,4})(GB|G|TB)?$/);
+                if (ramRomMatch) {
+                    const ram = ramRomMatch[1];
+                    const rom = ramRomMatch[2];
+                    const unit = (ramRomMatch[3] === 'TB' || rom === '1024') ? (rom === '1024' ? 'GB' : 'TB') : 'GB';
+                    return `${ram}+${rom}${unit}`;
+                }
+                const romOnlyMatch = s.match(/^(16|32|64|128|256|512|1024)(GB|G)?$/);
+                if (romOnlyMatch) {
+                    return `${romOnlyMatch[1]}GB`;
+                }
+                const tbMatch = s.match(/^([12])(TB|T)$/);
+                if (tbMatch) {
+                    return `${tbMatch[1]}TB`;
+                }
+                if (/^\d+\+\d+$/.test(s)) return s + 'GB';
+                if (/^\d+G$/.test(s)) return s + 'B';
+                return s;
+            };
+
+            let extractedStorageFromModel = '';
+
+            // 1. Extract and strip RAM+ROM expressions embedded inside the model name (e.g. '4+64 GB', '4+128', '8+256GB', '8/256 GB')
+            const ramRomRegex = /\(?\b(\d{1,2})\s*(?:GB|G)?\s*[+/]\s*(16|32|64|128|256|512|1024)\s*(?:GB|G|TB)?\b\)?/gi;
+            modelStr = modelStr.replace(ramRomRegex, (fullMatch, ram, rom) => {
+                if (!extractedStorageFromModel) {
+                    extractedStorageFromModel = `${ram}+${rom}GB`;
+                }
+                return ' ';
+            });
+
+            // 2. Extract and strip standalone ROM expressions embedded inside the model name (e.g. '64GB', '128 GB', '256GB')
+            const romOnlyRegex = /\(?\b(16|32|64|128|256|512)\s*(?:GB|G)\b\)?/gi;
+            modelStr = modelStr.replace(romOnlyRegex, (fullMatch, rom) => {
+                if (!extractedStorageFromModel) {
+                    extractedStorageFromModel = `${rom}GB`;
+                }
+                return ' ';
+            });
+
+            // 3. Clean up model string: remove empty brackets/trailing punctuation, normalize word+number spacing, uppercase
+            modelStr = modelStr
+                .replace(/\(\s*\)/g, ' ')
+                .replace(/\[\s*\]/g, ' ')
+                .replace(/^[\s\-–—/+,|]+|[\s\-–—/+,|]+$/g, '')
+                .toUpperCase();
+
+            // Separate 3+ letter words stuck directly to model numbers (e.g. 'NOTE60' -> 'NOTE 60', 'SMART20' -> 'SMART 20', 'HOT60I' -> 'HOT 60I')
+            modelStr = modelStr.replace(/\b([A-Z]{3,})(\d)/g, '$1 $2');
+            // Separate model numbers stuck directly to common tier words (e.g. '60PRO' -> '60 PRO', '20PLUS' -> '20 PLUS')
+            modelStr = modelStr.replace(/(\d)(PRO|PLUS|MAX|LITE|ULTRA|MINI|NEO|PLAY|FE)\b/g, '$1 $2');
+            modelStr = modelStr.replace(/\s+/g, ' ').trim();
+
+            // 4. Determine final normalized storage
+            let normGivenStorage = cleanStorageToken(storageStr);
+            let normExtractedStorage = cleanStorageToken(extractedStorageFromModel);
+
+            let finalStorage = normGivenStorage || normExtractedStorage || '128GB';
+            if (normExtractedStorage && normExtractedStorage.includes('+') && (!normGivenStorage || !normGivenStorage.includes('+'))) {
+                finalStorage = normExtractedStorage;
+            }
+
+            return {
+                model: modelStr || String(rawModel ?? '').trim().toUpperCase(),
+                storage: finalStorage
+            };
+        };
+
         function loadInventoryData() {
             const q = query(collection(db, "inventory"));
             onSnapshot(q, (snapshot) => {
                 allInventoryItems = [];
                 const datalist = document.getElementById('shopDatalist');
                 const uniqueLocations = new Set();
+                const docsToNormalize = [];
                 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     data.id = docSnap.id;
+                    if (data.model || data.storage) {
+                        const norm = window.normalizePhoneModelAndStorage(data.model, data.storage);
+                        if (norm.model && (data.model !== norm.model || data.storage !== norm.storage)) {
+                            docsToNormalize.push({ id: docSnap.id, model: norm.model, storage: norm.storage });
+                            data.model = norm.model;
+                            data.storage = norm.storage;
+                        }
+                    }
                     allInventoryItems.push(data);
                     if (data.shop) uniqueLocations.add(data.shop.trim());
                 });
+
+                if (docsToNormalize.length > 0 && !window._isNormalizingInventoryDocs) {
+                    window._isNormalizingInventoryDocs = true;
+                    (async () => {
+                        try {
+                            const chunkSize = 400;
+                            for (let i = 0; i < docsToNormalize.length; i += chunkSize) {
+                                const chunk = docsToNormalize.slice(i, i + chunkSize);
+                                const batch = writeBatch(db);
+                                chunk.forEach(u => {
+                                    batch.update(doc(db, "inventory", u.id), { model: u.model, storage: u.storage });
+                                });
+                                await batch.commit();
+                            }
+                        } catch (normErr) {
+                            console.warn("Auto-normalize inventory warning:", normErr);
+                        } finally {
+                            window._isNormalizingInventoryDocs = false;
+                        }
+                    })();
+                }
 
                 allInventoryItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
@@ -7261,7 +7452,7 @@
                 modelDatalist.innerHTML = Array.from(uniqueModels).map(m => `<option value="${m}"></option>`).join('');
             }
             if (storageDatalist) {
-                const defaultStorages = ['4+64 GB', '4+128 GB', '6+128 GB', '8+128 GB', '8+256 GB', '12+256 GB', '512 GB'];
+                const defaultStorages = ['4+64GB', '4+128GB', '6+128GB', '8+128GB', '8+256GB', '12+256GB', '512GB'];
                 defaultStorages.forEach(s => uniqueStorages.add(s));
                 storageDatalist.innerHTML = Array.from(uniqueStorages).map(s => `<option value="${s}"></option>`).join('');
             }
@@ -9241,31 +9432,35 @@
                                 continue;
                             }
 
+                            const rawStorageCell = (colMap.storage !== undefined && String(rowArr[colMap.storage] ?? '').trim() !== '')
+                                ? String(rowArr[colMap.storage]).trim()
+                                : '';
+                            const normPair = window.normalizePhoneModelAndStorage(rowModel, rawStorageCell || defaultStorage || '');
+                            rowModel = normPair.model;
+
                             // Check if this model matches an existing model preset in inventory
                             let matchedPreset = null;
                             if (rowModel && window.excelModelPresetsMap) {
                                 for (const p of window.excelModelPresetsMap.values()) {
-                                    if (p.model.toLowerCase() === rowModel.toLowerCase()) {
+                                    if (p.model.toLowerCase() === rowModel.toLowerCase() && (!normPair.storage || p.storage.toLowerCase() === normPair.storage.toLowerCase())) {
                                         matchedPreset = p;
                                         break;
                                     }
                                 }
-                            }
-
-                            // Determine Storage (from Storage column -> or extracted from Product Name like '4+64GB' / '128GB' -> or preset -> or form default)
-                            let storageVal = (colMap.storage !== undefined && String(rowArr[colMap.storage] ?? '').trim() !== '')
-                                ? String(rowArr[colMap.storage]).trim()
-                                : '';
-                            if (!storageVal) {
-                                const storageMatch = rowModel.match(/\b(\d+\s*[+/]\s*\d+\s*(?:GB|TB)|\d+\s*(?:GB|TB))\b/i);
-                                if (storageMatch) {
-                                    storageVal = storageMatch[1].toUpperCase().replace(/\s+/g, '');
-                                } else if (matchedPreset && matchedPreset.storage) {
-                                    storageVal = matchedPreset.storage;
-                                } else {
-                                    storageVal = defaultStorage || '128GB';
+                                if (!matchedPreset) {
+                                    for (const p of window.excelModelPresetsMap.values()) {
+                                        if (p.model.toLowerCase() === rowModel.toLowerCase()) {
+                                            matchedPreset = p;
+                                            break;
+                                        }
+                                    }
                                 }
                             }
+
+                            let storageVal = normPair.storage || (matchedPreset && matchedPreset.storage) || defaultStorage || '128GB';
+                            const finalNorm = window.normalizePhoneModelAndStorage(rowModel, storageVal);
+                            rowModel = finalNorm.model;
+                            storageVal = finalNorm.storage;
 
                             const shopVal = (colMap.shop !== undefined && String(rowArr[colMap.shop] ?? '').trim() !== '')
                                 ? String(rowArr[colMap.shop]).trim()
@@ -9455,8 +9650,8 @@
             e.preventDefault();
             const btn = document.getElementById('invSubmitBtn');
             const category = document.getElementById('invCategory').value;
-            const model = document.getElementById('invModel').value.trim();
-            const storage = document.getElementById('invStorage').value.trim();
+            const rawModel = document.getElementById('invModel').value.trim();
+            const rawStorage = document.getElementById('invStorage').value.trim();
             const shop = document.getElementById('invShop').value.trim();
 
             addImeiFromInput();
@@ -9466,7 +9661,10 @@
             const mrpPrice = parseFloat(document.getElementById('invMrpPrice').value) || 0;
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
-            if (!model || !storage || !shop) return showToast("Please fill all required fields (Model, Storage, Target Location)", "warning");
+            if (!rawModel || !shop) return showToast("Please fill all required fields (Model, Storage, Target Location)", "warning");
+            const normItem = window.normalizePhoneModelAndStorage(rawModel, rawStorage);
+            const model = normItem.model;
+            const storage = normItem.storage;
 
             btn.disabled = true;
             btn.innerText = `Adding ${scannedImeiList.length} Stock Item(s)...`;
@@ -9874,9 +10072,13 @@
             setMainStaffDateFilter('all');
         };
 
+        window.selectedStaffPaymentIds = new Set();
+        window.currentDisplayedPendingStaffSales = [];
+
         // Staff Profile Detailed Modal Logic
         window.viewStaffProfile = function(name, sales, totalCount, totalPaid, totalPending) {
             currentStaffActiveName = name;
+            if (window.selectedStaffPaymentIds) window.selectedStaffPaymentIds.clear();
             
             // Fetch all sales for this specific staff member so the modal's date filter can search any period
             const allStaffSales = (allMainShopSales || []).filter(s => {
@@ -10022,12 +10224,104 @@
             applyStaffModalFilters();
         };
 
+        window.toggleStaffPaymentRowSelect = function(docId, isChecked) {
+            if (!window.selectedStaffPaymentIds) window.selectedStaffPaymentIds = new Set();
+            if (isChecked) {
+                window.selectedStaffPaymentIds.add(docId);
+            } else {
+                window.selectedStaffPaymentIds.delete(docId);
+            }
+            const tr = document.getElementById('staffHistRow_' + docId);
+            if (tr && !tr.dataset.isDupe) {
+                tr.style.background = isChecked ? '#ecfdf5' : '';
+            }
+            updateStaffBulkPaymentBarUI();
+        };
+
+        window.toggleSelectAllPendingStaffActivations = function(isChecked) {
+            if (!window.selectedStaffPaymentIds) window.selectedStaffPaymentIds = new Set();
+            const pendingList = window.currentDisplayedPendingStaffSales || [];
+            pendingList.forEach(s => {
+                if (isChecked) {
+                    window.selectedStaffPaymentIds.add(s.id);
+                } else {
+                    window.selectedStaffPaymentIds.delete(s.id);
+                }
+            });
+            document.querySelectorAll('.staff-row-select-cb').forEach(cb => {
+                cb.checked = isChecked;
+                const rowId = cb.dataset.id;
+                const tr = document.getElementById('staffHistRow_' + rowId);
+                if (tr && !tr.dataset.isDupe) {
+                    tr.style.background = isChecked ? '#ecfdf5' : '';
+                }
+            });
+            updateStaffBulkPaymentBarUI();
+        };
+
+        window.updateStaffBulkPaymentBarUI = function() {
+            if (!window.selectedStaffPaymentIds) window.selectedStaffPaymentIds = new Set();
+            const validPendingMap = new Map();
+            (currentStaffSales || []).forEach(s => {
+                if (s.staffPaymentStatus !== 'Paid') {
+                    validPendingMap.set(s.id, s);
+                }
+            });
+
+            // Remove any IDs that are no longer pending
+            Array.from(window.selectedStaffPaymentIds).forEach(id => {
+                if (!validPendingMap.has(id)) {
+                    window.selectedStaffPaymentIds.delete(id);
+                }
+            });
+
+            let selectedCount = 0;
+            let selectedAmount = 0;
+            window.selectedStaffPaymentIds.forEach(id => {
+                const s = validPendingMap.get(id);
+                if (s) {
+                    selectedCount++;
+                    selectedAmount += (parseFloat(s.staffFee) || 0);
+                }
+            });
+
+            const countEl = document.getElementById('staffBulkSelectedCount');
+            const amountEl = document.getElementById('staffBulkSelectedAmount');
+            if (countEl) countEl.innerText = selectedCount;
+            if (amountEl) amountEl.innerText = selectedAmount.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+            const bulkBtn = document.getElementById('btnStaffBulkMarkPaid');
+            if (bulkBtn) {
+                bulkBtn.disabled = (selectedCount === 0);
+                bulkBtn.style.opacity = selectedCount > 0 ? '1' : '0.5';
+                bulkBtn.style.cursor = selectedCount > 0 ? 'pointer' : 'not-allowed';
+                bulkBtn.innerHTML = selectedCount > 0
+                    ? `💰 Complete Bulk Payment (${selectedCount} Selected - Rs. ${selectedAmount.toLocaleString()})`
+                    : `💰 Complete Bulk Payment (තෝරාගත් ගෙවීම් එකවර සම්පූර්ණ කරන්න)`;
+            }
+
+            const displayedPending = window.currentDisplayedPendingStaffSales || [];
+            const allDisplayedChecked = displayedPending.length > 0 && displayedPending.every(s => window.selectedStaffPaymentIds.has(s.id));
+
+            const thCb = document.getElementById('staffSelectAllPendingCheckbox');
+            const barCb = document.getElementById('staffSelectAllPendingBarCb');
+            if (thCb) {
+                thCb.checked = allDisplayedChecked;
+                thCb.disabled = (displayedPending.length === 0);
+            }
+            if (barCb) {
+                barCb.checked = allDisplayedChecked;
+                barCb.disabled = (displayedPending.length === 0);
+            }
+        };
+
         function renderStaffHistoryTableContent(salesList, duplicateDocIds = new Set()) {
             const tbody = document.getElementById('staffHistoryTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
 
             const sortedSales = [...salesList].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            window.currentDisplayedPendingStaffSales = sortedSales.filter(s => s.staffPaymentStatus !== 'Paid');
 
             if (sortedSales.length === 0) {
                 const periodNameMap = {
@@ -10041,21 +10335,29 @@
                 const msg = currentStaffFilter === 'All' 
                     ? `No activation records found for ${pName}.` 
                     : `No ${currentStaffFilter.toLowerCase()} activation records found for ${pName}.`;
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">${msg}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">${msg}</td></tr>`;
+                updateStaffBulkPaymentBarUI();
                 return;
             }
 
             sortedSales.forEach(s => {
                 const isDupe = duplicateDocIds && duplicateDocIds.has(s.id);
+                const isPaid = (s.staffPaymentStatus === 'Paid');
+                const isSelected = !isPaid && window.selectedStaffPaymentIds && window.selectedStaffPaymentIds.has(s.id);
+
                 const tr = document.createElement('tr');
+                tr.id = 'staffHistRow_' + s.id;
+                if (isDupe) tr.dataset.isDupe = '1';
                 tr.style.cursor = 'pointer';
                 tr.title = "Click to view more details";
                 if (isDupe) {
                     tr.style.background = '#fff5f5';
                     tr.style.borderLeft = '3.5px solid #ef4444';
+                } else if (isSelected) {
+                    tr.style.background = '#ecfdf5';
                 }
                 tr.onclick = function(e) {
-                    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'INPUT' || e.target.closest('input')) return;
                     const detailsRow = this.nextElementSibling;
                     if (detailsRow && detailsRow.classList.contains('staff-details-row')) {
                         if (detailsRow.style.display === 'none') {
@@ -10063,12 +10365,12 @@
                             this.style.background = isDupe ? '#fee2e2' : 'rgba(255,255,255,0.05)';
                         } else {
                             detailsRow.style.display = 'none';
-                            this.style.background = isDupe ? '#fff5f5' : '';
+                            const currentlySelected = window.selectedStaffPaymentIds && window.selectedStaffPaymentIds.has(s.id);
+                            this.style.background = isDupe ? '#fff5f5' : (currentlySelected ? '#ecfdf5' : '');
                         }
                     }
                 };
 
-                const isPaid = (s.staffPaymentStatus === 'Paid');
                 const fee = parseFloat(s.staffFee) || 0;
 
                 // Format payment date and time for display
@@ -10148,7 +10450,12 @@
 
                 const dupeBadge = isDupe ? `<br><span style="background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px;">⚠️ DUPLICATE ENTRY</span>` : '';
 
+                const checkboxCellHtml = isPaid
+                    ? `<input type="checkbox" checked disabled style="width: 17px; height: 17px; accent-color: #10b981; opacity: 0.45; cursor: not-allowed;" title="Already Paid">`
+                    : `<input type="checkbox" class="staff-row-select-cb" data-id="${s.id}" ${isSelected ? 'checked' : ''} onchange="toggleStaffPaymentRowSelect('${s.id}', this.checked)" style="width: 18px; height: 18px; accent-color: #059669; cursor: pointer;" title="Tick to select for Bulk Payment">`;
+
                 tr.innerHTML = `
+                    <td style="text-align: center;" onclick="event.stopPropagation();">${checkboxCellHtml}</td>
                     <td><strong>${s.date || '-'}</strong></td>
                     <td><strong>${s.custName || '-'}</strong><br><span style="color:var(--text-muted)">${s.model || '-'}</span>${dupeBadge}</td>
                     <td style="font-weight: 600; color: var(--text-main);">Rs. ${fee.toLocaleString()}</td>
@@ -10163,7 +10470,7 @@
                 detailsTr.style.display = 'none';
                 detailsTr.style.background = isDupe ? '#fef2f2' : 'rgba(0,0,0,0.03)';
                 detailsTr.innerHTML = `
-                    <td colspan="5" style="padding: 1.2rem; border-bottom: 1px solid var(--border-color);">
+                    <td colspan="6" style="padding: 1.2rem; border-bottom: 1px solid var(--border-color);">
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.9rem; font-size: 0.85rem;">
                             <div>
                                 <p style="color: var(--text-muted); margin: 0 0 0.3rem 0;">Customer NIC</p>
@@ -10210,6 +10517,8 @@
                 `;
                 tbody.appendChild(detailsTr);
             });
+
+            updateStaffBulkPaymentBarUI();
         }
 
         window.closeStaffModal = function() {
@@ -10228,6 +10537,41 @@
             const timeInput = document.getElementById('staffPaymentTimeInput');
             if (dateInput) dateInput.value = `${y}-${m}-${d}`;
             if (timeInput) timeInput.value = `${hr}:${min}`;
+        };
+
+        window.openBulkStaffPaymentModal = function() {
+            if (!window.selectedStaffPaymentIds || window.selectedStaffPaymentIds.size === 0) {
+                return showToast("කරුණාකර ගෙවීම සම්පූර්ණ කිරීමට අවම වශයෙන් එක් Activation එකක් හෝ Tick කරන්න!", "warning");
+            }
+
+            const selectedSales = (currentStaffSales || []).filter(s =>
+                window.selectedStaffPaymentIds.has(s.id) && s.staffPaymentStatus !== 'Paid'
+            );
+
+            if (selectedSales.length === 0) {
+                return showToast("තෝරාගත් Pending Activations කිසිවක් නොමැත!", "warning");
+            }
+
+            const totalBulkFee = selectedSales.reduce((sum, s) => sum + (parseFloat(s.staffFee) || 0), 0);
+            const dates = selectedSales.map(s => s.date).filter(Boolean).sort();
+            const dateRangeLabel = dates.length > 1 && dates[0] !== dates[dates.length - 1]
+                ? `${dates[0]} to ${dates[dates.length - 1]}`
+                : (dates[0] || '-');
+
+            document.getElementById('markStaffPaymentDocId').value = '__BULK__';
+            document.getElementById('markStaffItemStaffName').innerText = currentStaffActiveName || '-';
+            document.getElementById('markStaffItemCustomerDevice').innerText = `📦 Bulk Payment (${selectedSales.length} Activations Selected)`;
+            document.getElementById('markStaffItemActivationDate').innerText = dateRangeLabel;
+            document.getElementById('markStaffItemFee').innerText = 'Rs. ' + totalBulkFee.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+            const titleEl = document.getElementById('markStaffPaymentModalTitle');
+            const submitBtn = document.getElementById('saveStaffPaymentBtn');
+            if (titleEl) titleEl.innerText = `💰 Complete Bulk Payment (${selectedSales.length} Items)`;
+            if (submitBtn) submitBtn.innerText = `✅ Confirm & Mark ${selectedSales.length} Items as Paid`;
+
+            setStaffPaymentToNow();
+            document.getElementById('staffPaymentNoteInput').value = '';
+            document.getElementById('markStaffPaymentModal').style.display = 'flex';
         };
 
         window.openMarkStaffPaidModal = function(docId) {
@@ -10308,23 +10652,56 @@
                 staffPaidUpdatedAt: Date.now()
             };
 
-            try {
-                await updateDoc(doc(db, "main_shop_sales", docId), payload);
-                showToast("Payment date & time saved successfully!", "success");
+            const applyToMemoryItem = (item) => {
+                if (item) {
+                    item.staffPaymentStatus = 'Paid';
+                    item.staffPaidDate = paidDate;
+                    item.staffPaidTime = formatted12Hr;
+                    item.staffPaidTime24 = paidTime;
+                    item.staffPaidDateTime = displayDateTime;
+                    item.staffPaidNote = paidNote || '';
+                    item.staffPaidAt = paidTimestamp;
+                }
+            };
 
-                const updateItem = (item) => {
-                    if (item) {
-                        item.staffPaymentStatus = 'Paid';
-                        item.staffPaidDate = paidDate;
-                        item.staffPaidTime = formatted12Hr;
-                        item.staffPaidTime24 = paidTime;
-                        item.staffPaidDateTime = displayDateTime;
-                        item.staffPaidNote = paidNote || '';
-                        item.staffPaidAt = paidTimestamp;
+            try {
+                if (docId === '__BULK__') {
+                    const targetIds = Array.from(window.selectedStaffPaymentIds || []).filter(id => {
+                        const s = (currentStaffSales || []).find(item => item.id === id);
+                        return s && s.staffPaymentStatus !== 'Paid';
+                    });
+
+                    if (targetIds.length === 0) {
+                        showToast("No pending items selected.", "warning");
+                        closeMarkStaffPaymentModal();
+                        return;
                     }
-                };
-                updateItem(currentStaffSales.find(s => s.id === docId));
-                updateItem(allMainShopSales.find(s => s.id === docId));
+
+                    const chunkSize = 400;
+                    for (let i = 0; i < targetIds.length; i += chunkSize) {
+                        const chunk = targetIds.slice(i, i + chunkSize);
+                        const batch = writeBatch(db);
+                        chunk.forEach(id => {
+                            batch.update(doc(db, "main_shop_sales", id), payload);
+                        });
+                        await batch.commit();
+                    }
+
+                    targetIds.forEach(id => {
+                        applyToMemoryItem(currentStaffSales.find(s => s.id === id));
+                        applyToMemoryItem(allMainShopSales.find(s => s.id === id));
+                    });
+
+                    window.selectedStaffPaymentIds.clear();
+                    showToast(`✅ සාර්ථකයි! තෝරාගත් Activations ${targetIds.length} ක ගෙවීම් එකවර සම්පූර්ණ කරන ලදී!`, "success");
+                } else {
+                    await updateDoc(doc(db, "main_shop_sales", docId), payload);
+                    showToast("Payment date & time saved successfully!", "success");
+
+                    applyToMemoryItem(currentStaffSales.find(s => s.id === docId));
+                    applyToMemoryItem(allMainShopSales.find(s => s.id === docId));
+                    if (window.selectedStaffPaymentIds) window.selectedStaffPaymentIds.delete(docId);
+                }
 
                 closeMarkStaffPaymentModal();
                 applyStaffModalFilters();
@@ -10923,8 +11300,11 @@
             btn.innerText = 'Saving...';
 
             const id = document.getElementById('editInvId').value;
-            const model = document.getElementById('editInvModel').value.trim();
-            const storage = document.getElementById('editInvStorage').value.trim();
+            const rawModel = document.getElementById('editInvModel').value.trim();
+            const rawStorage = document.getElementById('editInvStorage').value.trim();
+            const normEdit = window.normalizePhoneModelAndStorage(rawModel, rawStorage);
+            const model = normEdit.model;
+            const storage = normEdit.storage;
             const category = document.getElementById('editInvCategory').value;
             const buyPriceRaw = document.getElementById('editInvBuyPrice').value;
             const mrpRaw = document.getElementById('editInvMrp').value;
