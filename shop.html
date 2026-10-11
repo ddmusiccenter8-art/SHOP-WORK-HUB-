@@ -1266,7 +1266,11 @@
             }
             if (imeiInput) {
                 imeiInput.value = imei;
-                imeiInput.dispatchEvent(new Event('input'));
+                if (typeof window.lookupAndAutoFillByImei === 'function') {
+                    window.lookupAndAutoFillByImei(imei);
+                } else {
+                    imeiInput.dispatchEvent(new Event('input'));
+                }
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -1299,8 +1303,9 @@
         documentInput.addEventListener('input', calculateSettlement);
         loanAmountInput.addEventListener('input', calculateSettlement);
 
-        imeiInput.addEventListener('input', async (e) => {
-            const val = e.target.value.trim();
+        // Instant & Reliable Auto-Fill Mobile Details on IMEI Scan or Input
+        window.lookupAndAutoFillByImei = async function(rawVal) {
+            const val = (rawVal !== undefined ? String(rawVal) : (imeiInput ? imeiInput.value : '')).trim();
             if (val.length < 4) {
                 imeiStatus.innerText = '';
                 currentStockSource = 'Shop';
@@ -1308,40 +1313,69 @@
                 calculateSettlement();
                 return;
             }
-            
-            try {
-                const q = query(collection(db, "inventory"), where("imei", "==", val), where("status", "in", ["Available", "Transferred"]));
-                const snapshot = await getDocs(q);
-                
-                if (!snapshot.empty) {
-                    const invDoc = snapshot.docs[0];
-                    const data = invDoc.data();
-                    
-                    imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 600;">🟢 Head Office Stock (${myHoPercent}% Shop Profit)</span>`;
-                    if (data.model) modelInput.value = data.model;
-                    if (data.storage) storageInput.value = data.storage;
-                    if (data.mrp) {
-                        mrpInput.value = data.mrp;
-                        if (document.getElementById('shopSaleType').value === 'Cash') {
-                            document.getElementById('shopCashSellingPrice').value = data.mrp;
-                            if (!document.getElementById('shopCashCommission').value) {
-                                document.getElementById('shopCashCommission').value = Math.round(parseFloat(data.mrp) * (myHoPercent / 100)) || 1500;
-                            }
-                            calculateShopCashSaleDue();
-                        }
+
+            const normVal = val.replace(/[\s-]+/g, '').toLowerCase();
+            let matchedItem = null;
+
+            // 1. Instant lookup from live in-memory inventory cache
+            const allCached = [
+                ...(window.allAvailableInventoryCache || []),
+                ...(window.currentShopAllocatedItems || []),
+                ...(window.myShopHeldItems || [])
+            ];
+            matchedItem = allCached.find(item => item && item.imei && String(item.imei).trim().replace(/[\s-]+/g, '').toLowerCase() === normVal);
+
+            // 2. Fallback to Firestore query if not found in local cache
+            if (!matchedItem) {
+                try {
+                    const q = query(collection(db, "inventory"), where("imei", "==", val));
+                    const snapshot = await getDocs(q);
+                    if (!snapshot.empty) {
+                        const availDoc = snapshot.docs.find(d => {
+                            const st = (d.data().status || 'Available');
+                            return st === 'Available' || st === 'Transferred';
+                        }) || snapshot.docs[0];
+                        matchedItem = { id: availDoc.id, ...availDoc.data() };
                     }
-                    
-                    currentStockSource = 'HO';
-                    matchedInventoryDocId = invDoc.id;
-                } else {
-                    imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
-                    currentStockSource = 'Shop';
-                    matchedInventoryDocId = null;
+                } catch (err) {
+                    console.error("IMEI Firestore lookup error:", err);
                 }
-            } catch (err) {
-                console.error("IMEI check error:", err);
+            }
+
+            if (matchedItem && (matchedItem.status || 'Available') !== 'Sold') {
+                imeiStatus.innerHTML = `<span style="color: var(--success); font-weight: 700;">🟢 Head Office Stock Auto-Filled: ${matchedItem.model || ''} ${matchedItem.storage ? '(' + matchedItem.storage + ')' : ''} — (${myHoPercent}% Shop Profit)</span>`;
+                if (matchedItem.model) modelInput.value = matchedItem.model;
+                if (matchedItem.storage) storageInput.value = matchedItem.storage;
+                if (matchedItem.mrp !== undefined && matchedItem.mrp !== null && matchedItem.mrp !== '') {
+                    const mrpVal = parseFloat(matchedItem.mrp) || 0;
+                    if (mrpVal > 0) {
+                        mrpInput.value = mrpVal;
+                        const dp = parseFloat(downPaymentInput.value) || 0;
+                        loanAmountInput.value = Math.max(0, mrpVal - dp).toFixed(2);
+                    }
+                    if (document.getElementById('shopSaleType').value === 'Cash') {
+                        document.getElementById('shopCashSellingPrice').value = mrpVal > 0 ? mrpVal : '';
+                        if (mrpVal > 0) {
+                            document.getElementById('shopCashCommission').value = Math.round(mrpVal * (myHoPercent / 100)) || 1500;
+                        }
+                        calculateShopCashSaleDue();
+                    }
+                }
+                currentStockSource = 'HO';
+                matchedInventoryDocId = matchedItem.id;
+            } else {
+                imeiStatus.innerHTML = `<span style="color: #3b82f6; font-weight: 600;">🔵 Shop Own Stock (${myShopOwnPercent}% Shop Profit)</span>`;
+                currentStockSource = 'Shop';
+                matchedInventoryDocId = null;
             }
             calculateSettlement();
+        };
+
+        imeiInput.addEventListener('input', (e) => {
+            window.lookupAndAutoFillByImei(e.target.value);
+        });
+        imeiInput.addEventListener('change', (e) => {
+            window.lookupAndAutoFillByImei(e.target.value);
         });
 
         function calculateSettlement() {
@@ -2081,12 +2115,15 @@
 
                 window.currentShopAllocatedItems = [];
                 window.myShopHeldItems = [];
+                window.allAvailableInventoryCache = [];
 
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const docId = docSnap.id;
                     const itemShop = (data.shop || '').trim().toLowerCase();
                     const isItemHeadOffice = itemShop === 'main shop' || itemShop === 'head office' || itemShop === 'main';
+
+                    window.allAvailableInventoryCache.push({ id: docId, isHeadOffice: isItemHeadOffice, ...data });
 
                     // Track items specifically held by this shop's own branch
                     if (!isItemHeadOffice) {
@@ -2372,6 +2409,9 @@
                         inputEl.value = decodedText;
                         const event = new Event('input', { bubbles: true });
                         inputEl.dispatchEvent(event);
+                        if (currentScannerInputId === 'imeiInput' && typeof window.lookupAndAutoFillByImei === 'function') {
+                            window.lookupAndAutoFillByImei(decodedText);
+                        }
                     }
                     stopScanner();
                     showToast("Barcode Scanned: " + decodedText, "success");
@@ -2472,6 +2512,9 @@
                     inputEl.value = decodedText;
                     const event = new Event('input', { bubbles: true });
                     inputEl.dispatchEvent(event);
+                    if (currentScannerInputId === 'imeiInput' && typeof window.lookupAndAutoFillByImei === 'function') {
+                        window.lookupAndAutoFillByImei(decodedText);
+                    }
                 }
                 stopScanner();
                 showToast("Barcode Scanned: " + decodedText, "success");
@@ -2487,6 +2530,9 @@
                 inputEl.value = val;
                 const event = new Event('input', { bubbles: true });
                 inputEl.dispatchEvent(event);
+                if (currentScannerInputId === 'imeiInput' && typeof window.lookupAndAutoFillByImei === 'function') {
+                    window.lookupAndAutoFillByImei(val);
+                }
                 showToast("Entered manually: " + val, "success");
             }
             stopScanner();
