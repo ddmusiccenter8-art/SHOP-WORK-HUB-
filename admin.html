@@ -1626,27 +1626,27 @@
                         </button>
                     </div>
 
-                    <!-- Bulk & Model-Wise Excel Upload Box (Skips Existing IMEIs Automatically) -->
+                    <!-- POS Purchase / GRN Sheet & Model-Wise Excel Upload Box (Skips Existing IMEIs Automatically) -->
                     <div id="excelUploadBoxContainer" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px dashed rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 0.95rem 1rem; margin-bottom: 1.25rem; transition: all 0.25s;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem;">
                             <div style="font-weight: 800; font-size: 0.88rem; color: #065f46; display: flex; align-items: center; gap: 6px;">
-                                <span>📊</span> Excel Stock Upload (Model අනුව හෝ Bulk ලෙස)
+                                <span>📊</span> POS Purchase / GRN Sheet & Excel Stock Upload
                             </div>
                             <button type="button" onclick="downloadSampleInventoryExcel()" style="background: white; border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 3px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
-                                📥 Sample Excel
+                                📥 Sample GRN Excel
                             </button>
                         </div>
                         <p style="font-size: 0.75rem; color: #475569; margin: 0 0 0.6rem 0; line-height: 1.4;">
-                            එක් එක් <strong>Phone Model එක අනුව වෙන වෙනම Excel</strong> Upload කිරීමට පහතින් Model එක තෝරන්න (හෝ පහත Form එකේ Model/Cost/MRP පුරවන්න). <strong>කලින් Inventory එකේ ඇති IMEI ස්වයංක්‍රීයව Skip වී අලුත් IMEI පමණක් Upload වේ.</strong>
+                            ඔබගේ <strong>POS එකෙන් Download කරන Purchase / GRN Excel Sheet එක</strong> කෙලින්ම මෙතැනින් Upload කරන්න (එකම පේළියේ <code>IMEI / Serial Numbers</code> තීරුවේ කොමා මගින් වෙන් කර ඇති IMEI සියල්ල වෙන වෙනම හඳුනාගෙන Product Name, Unit Cost, Selling Price සමඟ ස්වයංක්‍රීයව Inventory එකට ඇතුළත් වේ). <strong>කලින් ඇතුළත් කළ IMEI ස්වයංක්‍රීයව Skip වේ.</strong>
                         </p>
 
                         <!-- Model-wise Selector Dropdown for Excel Upload -->
                         <div style="margin-bottom: 0.55rem;">
                             <label style="display: block; font-size: 0.73rem; font-weight: 800; color: #1e3a8a; margin-bottom: 3px;">
-                                📱 Select Phone Model for Excel Upload (Model එක තෝරන්න):
+                                📱 Optional — Select Phone Model (Excel එකේ Model නම නොමැති නම් පමණක් තෝරන්න):
                             </label>
                             <select id="excelModelPresetSelect" onchange="handleExcelModelPresetChange(this.value)" style="width: 100%; background: #ffffff; border: 1.5px solid #93c5fd; color: #1e3a8a; padding: 0.48rem 0.6rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">
-                                <option value="">➕ Custom / Use Form Fields Below (පහත Form එකේ හෝ Excel හි ඇති Model එක)</option>
+                                <option value="">➕ Auto-Detect from POS GRN Sheet / Use Form Fields Below</option>
                             </select>
                             <div id="excelActiveModelBadge" style="display: none; margin-top: 5px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 4px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700;"></div>
                         </div>
@@ -1654,7 +1654,7 @@
                         <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                             <input type="file" id="excelInventoryFileInput" accept=".xlsx,.xls,.csv" multiple style="flex: 1; min-width: 170px; font-size: 0.78rem; padding: 0.45rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px;">
                             <button type="button" id="excelUploadBtn" onclick="handleExcelInventoryUpload()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.55rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);">
-                                📤 Upload Excel
+                                📤 Upload GRN / Excel
                             </button>
                         </div>
                         <div id="excelUploadResultBox" style="display: none; margin-top: 0.65rem; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.78rem; line-height: 1.45;"></div>
@@ -8851,39 +8851,62 @@
             renderScannedImeiChips();
         };
 
-        // Download Sample Excel File for Bulk Inventory Upload
+        // Download Sample Excel File (Matches POS Purchase / GRN Sheet Format)
         window.downloadSampleInventoryExcel = function() {
             if (typeof XLSX === 'undefined') {
                 return showToast("Excel library is still loading. Please try again in a moment.", "warning");
             }
-            const sampleRows = [
-                {
-                    "IMEI": "351234567890001",
-                    "Model": "Samsung Galaxy A05",
-                    "Storage": "64GB",
-                    "Shop": "MAIN SHOP",
-                    "Category": "Main Shop (Own Buy)",
-                    "BuyPrice": 28500,
-                    "MRP": 34900
-                },
-                {
-                    "IMEI": "351234567890002",
-                    "Model": "Redmi 13C",
-                    "Storage": "128GB",
-                    "Shop": "MAIN SHOP",
-                    "Category": "Main Shop (Own Buy)",
-                    "BuyPrice": 35000,
-                    "MRP": 41900
-                }
+            const grnAoA = [
+                ["METHMI MOBILE (PVT) LTD - PURCHASE / GRN SHEET"],
+                ["Generated on 2026-10-11 04:26 PM | Branch: MAIN SHOP"],
+                [],
+                ["GRN No", "GRN-90922567", "Supplier Name", "INFINIX -", "Supplier Invoice", "0001"],
+                ["Purchase Date", "2026-09-14 18:28", "Purchase Status", "Received", "Payment Method", "Credit / Pay Later"],
+                ["Payment Terms", "21", "Entered By", "admin", "Payment Note", "-"],
+                [],
+                [
+                    "#",
+                    "Product / Item Name",
+                    "Category",
+                    "Unit (UoM)",
+                    "Batch / Lot #",
+                    "Expiry Date",
+                    "Purchase Qty",
+                    "Unit Cost (Rs.)",
+                    "Unit Discount",
+                    "Net Unit Cost (Rs.)",
+                    "Selling Price (Rs.)",
+                    "Profit Margin (%)",
+                    "Line Total (Rs.)",
+                    "IMEI / Serial Numbers"
+                ],
+                [
+                    1,
+                    "INFINIX NOTE 60 PRO",
+                    "Phone",
+                    "Pcs",
+                    "-",
+                    "-",
+                    2.00,
+                    154699.00,
+                    0.00,
+                    154699.00,
+                    169999.00,
+                    9.89,
+                    309398.00,
+                    "350711504274711, 350711504224302"
+                ]
             ];
-            const ws = XLSX.utils.json_to_sheet(sampleRows);
+            const ws = XLSX.utils.aoa_to_sheet(grnAoA);
             ws['!cols'] = [
-                { wch: 20 }, { wch: 24 }, { wch: 12 }, { wch: 18 }, { wch: 22 }, { wch: 14 }, { wch: 14 }
+                { wch: 5 }, { wch: 26 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 },
+                { wch: 13 }, { wch: 16 }, { wch: 13 }, { wch: 18 }, { wch: 18 }, { wch: 16 },
+                { wch: 16 }, { wch: 38 }
             ];
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Inventory_Upload");
-            XLSX.writeFile(wb, "Inventory_Upload_Template.xlsx");
-            showToast("📥 Sample Excel Template downloaded!", "info");
+            XLSX.utils.book_append_sheet(wb, ws, "Purchase GRN");
+            XLSX.writeFile(wb, "POS_Purchase_GRN_Sample.xlsx");
+            showToast("📥 POS Purchase / GRN Sample Excel downloaded!", "info");
         };
 
         // Handle selecting a Phone Model preset inside the Excel Upload Box
@@ -8966,14 +8989,15 @@
             showToast(`📤 Select the Excel file for ${model} (${storage})`, "info");
         };
 
-        // Bulk / Model-Wise Excel Inventory Upload (Supports single-model IMEI sheets, multi-model sheets & multiple files, skipping existing IMEIs)
+        // POS Purchase / GRN Sheet & Model-Wise Excel Inventory Upload
+        // Automatically splits comma/space/newline-separated IMEIs in 'IMEI / Serial Numbers' and skips any existing IMEIs
         window.handleExcelInventoryUpload = async function() {
             const fileInput = document.getElementById('excelInventoryFileInput');
             const resultBox = document.getElementById('excelUploadResultBox');
             const uploadBtn = document.getElementById('excelUploadBtn');
 
             if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                return showToast("කරුණාකර පළමුව Excel හෝ CSV ගොනුවක් තෝරන්න (Please select an Excel/CSV file first)!", "warning");
+                return showToast("කරුණාකර පළමුව POS GRN Excel හෝ CSV ගොනුවක් තෝරන්න (Please select an Excel/CSV file first)!", "warning");
             }
             if (typeof XLSX === 'undefined') {
                 return showToast("Excel library not loaded. Check your internet connection.", "error");
@@ -8989,7 +9013,7 @@
                 resultBox.style.background = '#eff6ff';
                 resultBox.style.border = '1px solid #93c5fd';
                 resultBox.style.color = '#1e3a8a';
-                resultBox.innerHTML = '⏳ Reading Excel file(s) and checking existing IMEIs...';
+                resultBox.innerHTML = '⏳ Reading POS GRN / Excel file(s) and extracting all scanned IMEIs...';
             }
 
             try {
@@ -9001,7 +9025,7 @@
                     }
                 });
 
-                // Fallback form values (used when uploading a Model-Specific Excel sheet)
+                // Fallback form values (used when a column is not in the Excel sheet)
                 const defaultCategory = (document.getElementById('invCategory')?.value || 'Main Shop (Own Buy)').trim();
                 const defaultModel = (document.getElementById('invModel')?.value || '').trim();
                 const defaultStorage = (document.getElementById('invStorage')?.value || '128GB').trim();
@@ -9016,40 +9040,101 @@
                 const seenInFileSet = new Set();
                 const uploadedByModelCounts = {};
 
-                const normHeader = (s) => String(s || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-                const imeiHeaderKeys = ['imei', 'imeinumber', 'imeino', 'serial', 'serialnumber', 'barcode', 'imeis'];
-                const modelHeaderKeys = ['model', 'phonemodel', 'modelname', 'item', 'itemname', 'device', 'product', 'handset'];
+                // Normalize header strings (strips '(Rs.)', '(LKR)', '(%)', '(UoM)' and non-alphanumeric chars)
+                const normHeader = (s) => String(s || '')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/\(rs\.?\)|\(lkr\)|\(%\)|\(uom\)/gi, '')
+                    .replace(/[^a-z0-9]/g, '');
+
+                const imeiHeaderKeys = [
+                    'imeiserialnumbers', 'imeiserialnumber', 'imeiserial', 'imeinos',
+                    'imei', 'imeinumber', 'imeino', 'serial', 'serialnumber', 'serialnumbers', 'barcode', 'imeis'
+                ];
+                const modelHeaderKeys = [
+                    'productitemname', 'productname', 'itemdescription', 'model', 'phonemodel',
+                    'modelname', 'item', 'itemname', 'device', 'product', 'handset', 'description'
+                ];
                 const storageHeaderKeys = ['storage', 'capacity', 'rom', 'ramstorage', 'memory', 'size', 'ramrom'];
                 const shopHeaderKeys = ['shop', 'branch', 'location', 'targetshop', 'store', 'shopname'];
                 const catHeaderKeys = ['category', 'stockcategory', 'type', 'source'];
-                const buyHeaderKeys = ['buyprice', 'buycost', 'cost', 'costprice', 'wholesaleprice', 'purchaseprice', 'dealerprice'];
-                const mrpHeaderKeys = ['mrp', 'sellingmrp', 'sellingprice', 'retailprice', 'price', 'saleprice', 'mrpprice'];
-                const allKnownHeaders = new Set([
-                    ...imeiHeaderKeys, ...modelHeaderKeys, ...storageHeaderKeys,
-                    ...shopHeaderKeys, ...catHeaderKeys, ...buyHeaderKeys, ...mrpHeaderKeys
-                ]);
-
-                const cleanImeiValue = (rawVal) => {
-                    if (rawVal === undefined || rawVal === null) return '';
-                    let str = String(rawVal).trim();
-                    if (!str) return '';
-                    // If numeric or scientific notation from Excel
-                    if (typeof rawVal === 'number') {
-                        str = Math.trunc(rawVal).toString();
-                    } else if (/^\d+\.0+$/.test(str)) {
-                        str = str.replace(/\.0+$/, '');
-                    } else if (/^\d+\.\d+e\+\d+$/i.test(str)) {
-                        const num = Number(str);
-                        if (!isNaN(num)) str = Math.round(num).toString();
-                    }
-                    return str.trim();
-                };
+                const netCostHeaderKeys = ['netunitcost', 'netunitcostrs', 'netcost', 'netcostrs'];
+                const unitCostHeaderKeys = [
+                    'unitcost', 'unitcostrs', 'buyprice', 'buycost', 'cost', 'costprice',
+                    'wholesaleprice', 'purchaseprice', 'dealerprice', 'buyingprice'
+                ];
+                const mrpHeaderKeys = [
+                    'sellingprice', 'sellingpricers', 'mrp', 'sellingmrp', 'retailprice',
+                    'retailpricers', 'price', 'saleprice', 'mrpprice', 'unitprice'
+                ];
 
                 const isLikelyImei = (valStr) => {
                     if (!valStr || valStr.length < 7 || valStr.length > 30) return false;
-                    // Must contain at least 6 digits and no spaces inside standard IMEI/Serial
                     const digitCount = (valStr.match(/\d/g) || []).length;
                     return digitCount >= 6 && !/\s{2,}/.test(valStr);
+                };
+
+                // Extract one OR multiple IMEIs from a single cell (e.g. POS GRN '350711504274711, 350711504224302')
+                const extractImeisFromCell = (rawVal) => {
+                    if (rawVal === undefined || rawVal === null) return [];
+                    let str = '';
+                    if (typeof rawVal === 'number') {
+                        str = Math.trunc(rawVal).toString();
+                    } else {
+                        str = String(rawVal).trim();
+                    }
+                    if (!str || str === '-') return [];
+
+                    // Split by comma, semicolon, pipe, slash, newline, or whitespace
+                    const rawTokens = str.split(/[\s,;|\n\r/]+/);
+                    const extracted = [];
+
+                    rawTokens.forEach(tok => {
+                        let cleaned = tok.trim().replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, '');
+                        if (!cleaned) return;
+
+                        if (/^\d+\.0+$/.test(cleaned)) {
+                            cleaned = cleaned.replace(/\.0+$/, '');
+                        } else if (/^\d+\.\d+e\+\d+$/i.test(cleaned)) {
+                            const num = Number(cleaned);
+                            if (!isNaN(num)) cleaned = Math.round(num).toString();
+                        }
+
+                        // If multiple 15-digit IMEIs were scanned continuously without a space/comma (e.g. 30, 45, 60 digits)
+                        if (/^\d+$/.test(cleaned) && cleaned.length >= 30 && cleaned.length % 15 === 0) {
+                            const chunks = cleaned.match(/\d{15}/g) || [];
+                            chunks.forEach(ch => {
+                                if (isLikelyImei(ch)) extracted.push(ch);
+                            });
+                            return;
+                        }
+
+                        // If multiple IMEIs were separated by hyphens (e.g. 350711504274711-350711504224302)
+                        if (cleaned.includes('-')) {
+                            const subParts = cleaned.split('-').map(p => p.trim()).filter(Boolean);
+                            if (subParts.length > 1 && subParts.every(p => isLikelyImei(p))) {
+                                subParts.forEach(p => extracted.push(p));
+                                return;
+                            }
+                        }
+
+                        if (isLikelyImei(cleaned)) {
+                            extracted.push(cleaned);
+                        }
+                    });
+
+                    return extracted;
+                };
+
+                // Helper to check if a row is a POS GRN summary/footer row (e.g. 'SUMMARY TOTALS', 'NET PURCHASE', 'Sub Total')
+                const isGrnSummaryOrFooterRow = (rowArr) => {
+                    const joinedText = rowArr.map(c => String(c ?? '').trim().toLowerCase()).filter(Boolean).join(' | ');
+                    if (!joinedText) return true;
+                    const footerMarkers = [
+                        'summary totals', 'total line items', 'net purchase', 'sub total (rs.)',
+                        '(+) shipping', '(-) global discount', 'amount paid', 'balance / credit'
+                    ];
+                    return footerMarkers.some(marker => joinedText.includes(marker));
                 };
 
                 for (const file of files) {
@@ -9062,33 +9147,42 @@
                         const rows2D = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
                         if (!rows2D || rows2D.length === 0) continue;
 
-                        // Detect if one of the first 5 non-empty rows is a header row
+                        // Scan up to the first 30 rows to detect the table header row (in POS GRN Sheet, header is at Row 8)
                         let headerRowIndex = -1;
                         let colMap = {};
                         let sheetTitleModel = '';
 
-                        for (let r = 0; r < Math.min(rows2D.length, 5); r++) {
+                        for (let r = 0; r < Math.min(rows2D.length, 30); r++) {
                             const rowArr = rows2D[r] || [];
                             const nonEmptyCells = rowArr.map(c => String(c ?? '').trim()).filter(Boolean);
                             if (nonEmptyCells.length === 0) continue;
 
-                            const matchedHeaders = rowArr.filter(cell => allKnownHeaders.has(normHeader(cell)));
-                            if (matchedHeaders.length > 0) {
+                            let tempMap = {};
+                            rowArr.forEach((cell, idx) => {
+                                const nh = normHeader(cell);
+                                if (!nh) return;
+                                if (imeiHeaderKeys.includes(nh) && tempMap.imei === undefined) tempMap.imei = idx;
+                                else if (modelHeaderKeys.includes(nh) && tempMap.model === undefined) tempMap.model = idx;
+                                else if (storageHeaderKeys.includes(nh) && tempMap.storage === undefined) tempMap.storage = idx;
+                                else if (shopHeaderKeys.includes(nh) && tempMap.shop === undefined) tempMap.shop = idx;
+                                else if (catHeaderKeys.includes(nh) && tempMap.category === undefined) tempMap.category = idx;
+                                else if (netCostHeaderKeys.includes(nh) && tempMap.netUnitCost === undefined) tempMap.netUnitCost = idx;
+                                else if (unitCostHeaderKeys.includes(nh) && tempMap.unitCost === undefined) tempMap.unitCost = idx;
+                                else if (mrpHeaderKeys.includes(nh) && tempMap.mrp === undefined) tempMap.mrp = idx;
+                            });
+
+                            // Accept as table header row if it has an IMEI header OR (a Model header + Price/Storage header) OR (row 0 with a Model header)
+                            const hasImeiCol = tempMap.imei !== undefined;
+                            const hasModelAndPrice = tempMap.model !== undefined && (tempMap.unitCost !== undefined || tempMap.netUnitCost !== undefined || tempMap.mrp !== undefined || tempMap.storage !== undefined);
+                            if (hasImeiCol || hasModelAndPrice || (r === 0 && tempMap.model !== undefined)) {
                                 headerRowIndex = r;
-                                rowArr.forEach((cell, idx) => {
-                                    const nh = normHeader(cell);
-                                    if (imeiHeaderKeys.includes(nh) && colMap.imei === undefined) colMap.imei = idx;
-                                    else if (modelHeaderKeys.includes(nh) && colMap.model === undefined) colMap.model = idx;
-                                    else if (storageHeaderKeys.includes(nh) && colMap.storage === undefined) colMap.storage = idx;
-                                    else if (shopHeaderKeys.includes(nh) && colMap.shop === undefined) colMap.shop = idx;
-                                    else if (catHeaderKeys.includes(nh) && colMap.category === undefined) colMap.category = idx;
-                                    else if (buyHeaderKeys.includes(nh) && colMap.buyPrice === undefined) colMap.buyPrice = idx;
-                                    else if (mrpHeaderKeys.includes(nh) && colMap.mrp === undefined) colMap.mrp = idx;
-                                });
+                                colMap = tempMap;
                                 break;
-                            } else if (r === 0 && nonEmptyCells.length === 1 && !isLikelyImei(cleanImeiValue(nonEmptyCells[0]))) {
-                                // E.g. Row 0 has a single title cell like "VIVO Y05 4+64GB" and rows below are IMEIs
-                                sheetTitleModel = nonEmptyCells[0];
+                            } else if (r === 0 && nonEmptyCells.length === 1 && extractImeisFromCell(nonEmptyCells[0]).length === 0) {
+                                const firstText = nonEmptyCells[0];
+                                if (!firstText.toLowerCase().includes('purchase / grn') && !firstText.toLowerCase().includes('generated on')) {
+                                    sheetTitleModel = firstText;
+                                }
                             }
                         }
 
@@ -9099,57 +9193,55 @@
                             const nonEmpty = rowArr.filter(c => String(c ?? '').trim() !== '');
                             if (nonEmpty.length === 0) continue;
 
-                            let imeiVal = '';
-                            if (colMap.imei !== undefined) {
-                                imeiVal = cleanImeiValue(rowArr[colMap.imei]);
+                            // Stop scanning this table if we hit the POS GRN 'SUMMARY TOTALS' section
+                            const rowJoinedLower = nonEmpty.map(c => String(c).toLowerCase()).join(' ');
+                            if (rowJoinedLower.includes('summary totals') && rowJoinedLower.includes('total line items')) {
+                                break;
                             }
-                            if (!imeiVal) {
-                                // Find the first cell in the row that looks like an IMEI/Serial number
+                            if (isGrnSummaryOrFooterRow(rowArr)) {
+                                continue;
+                            }
+
+                            // Extract all IMEIs for this row (supports multiple comma/space-separated IMEIs in one cell!)
+                            let rowImeis = [];
+                            if (colMap.imei !== undefined) {
+                                rowImeis = extractImeisFromCell(rowArr[colMap.imei]);
+                            }
+                            if (rowImeis.length === 0) {
+                                // Fallback: inspect other cells not mapped to model/prices/qty for IMEI numbers
                                 for (let c = 0; c < rowArr.length; c++) {
-                                    if (c === colMap.model || c === colMap.storage || c === colMap.shop || c === colMap.category || c === colMap.buyPrice || c === colMap.mrp) continue;
-                                    const candidate = cleanImeiValue(rowArr[c]);
-                                    if (isLikelyImei(candidate)) {
-                                        imeiVal = candidate;
+                                    if (c === colMap.model || c === colMap.storage || c === colMap.shop || c === colMap.category || c === colMap.unitCost || c === colMap.netUnitCost || c === colMap.mrp) continue;
+                                    const candidates = extractImeisFromCell(rowArr[c]);
+                                    if (candidates.length > 0) {
+                                        rowImeis = candidates;
                                         break;
                                     }
                                 }
                             }
 
-                            if (!imeiVal || !isLikelyImei(imeiVal)) {
-                                // If row 0 was a model title row, don't count it as an invalid IMEI row
+                            if (rowImeis.length === 0) {
                                 if (r === 0 && sheetTitleModel) continue;
                                 invalidRowCount++;
                                 continue;
                             }
 
-                            const normImei = imeiVal.toLowerCase();
-
-                            // 1. Skip if already in current inventory
-                            if (existingImeiSet.has(normImei)) {
-                                skippedExistingImeis.push(imeiVal);
-                                continue;
-                            }
-
-                            // 2. Skip if duplicate inside the same Excel upload
-                            if (seenInFileSet.has(normImei)) {
-                                skippedFileDuplicateImeis.push(imeiVal);
-                                continue;
-                            }
-                            seenInFileSet.add(normImei);
-
-                            // Determine Model Name:
-                            // Priority: Excel Model Column -> Form/Selected Model (#invModel) -> Sheet Title Cell -> Sheet Name (if custom) -> File Name (if multi-file)
+                            // Determine Model Name for this row:
                             let rowModel = (colMap.model !== undefined ? String(rowArr[colMap.model] ?? '').trim() : '');
                             if (!rowModel) rowModel = defaultModel;
                             if (!rowModel && sheetTitleModel) rowModel = sheetTitleModel;
-                            if (!rowModel && sheetName && !/^sheet\d*$/i.test(sheetName.trim()) && sheetName.trim().toLowerCase() !== 'inventory_upload') {
+                            if (!rowModel && sheetName && !/^sheet\d*$/i.test(sheetName.trim()) && !['inventory_upload', 'purchase grn'].includes(sheetName.trim().toLowerCase())) {
                                 rowModel = sheetName.trim();
                             }
-                            if (!rowModel && files.length > 1 && fileBaseName) {
+                            if (!rowModel && files.length > 1 && fileBaseName && !/^grn[-_]/i.test(fileBaseName)) {
                                 rowModel = fileBaseName;
                             }
 
-                            // Check if this model matches a known model preset when prices/storage weren't explicitly filled
+                            if (!rowModel) {
+                                invalidRowCount++;
+                                continue;
+                            }
+
+                            // Check if this model matches an existing model preset in inventory
                             let matchedPreset = null;
                             if (rowModel && window.excelModelPresetsMap) {
                                 for (const p of window.excelModelPresetsMap.values()) {
@@ -9160,53 +9252,85 @@
                                 }
                             }
 
-                            const storageVal = (colMap.storage !== undefined && String(rowArr[colMap.storage] ?? '').trim() !== '')
+                            // Determine Storage (from Storage column -> or extracted from Product Name like '4+64GB' / '128GB' -> or preset -> or form default)
+                            let storageVal = (colMap.storage !== undefined && String(rowArr[colMap.storage] ?? '').trim() !== '')
                                 ? String(rowArr[colMap.storage]).trim()
-                                : (defaultStorage || (matchedPreset ? matchedPreset.storage : '128GB'));
+                                : '';
+                            if (!storageVal) {
+                                const storageMatch = rowModel.match(/\b(\d+\s*[+/]\s*\d+\s*(?:GB|TB)|\d+\s*(?:GB|TB))\b/i);
+                                if (storageMatch) {
+                                    storageVal = storageMatch[1].toUpperCase().replace(/\s+/g, '');
+                                } else if (matchedPreset && matchedPreset.storage) {
+                                    storageVal = matchedPreset.storage;
+                                } else {
+                                    storageVal = defaultStorage || '128GB';
+                                }
+                            }
 
                             const shopVal = (colMap.shop !== undefined && String(rowArr[colMap.shop] ?? '').trim() !== '')
                                 ? String(rowArr[colMap.shop]).trim()
                                 : (defaultShop || 'MAIN SHOP');
 
-                            let categoryVal = (colMap.category !== undefined && String(rowArr[colMap.category] ?? '').trim() !== '')
-                                ? String(rowArr[colMap.category]).trim()
-                                : (defaultCategory || (matchedPreset ? matchedPreset.category : 'Main Shop (Own Buy)'));
-
-                            if (categoryVal.toLowerCase().includes('lesi') || categoryVal.toLowerCase().includes('dialog')) {
-                                categoryVal = 'Dialog Lesi Pay';
-                            } else {
-                                categoryVal = 'Main Shop (Own Buy)';
+                            // In POS GRN Sheet, Category column says 'Phone'. Only switch to Dialog Lesi Pay if cell or form explicitly specifies Lesi/Dialog.
+                            const rawCatCell = (colMap.category !== undefined ? String(rowArr[colMap.category] ?? '').trim() : '');
+                            let categoryVal = defaultCategory || (matchedPreset ? matchedPreset.category : 'Main Shop (Own Buy)');
+                            if (rawCatCell) {
+                                if (rawCatCell.toLowerCase().includes('lesi') || rawCatCell.toLowerCase().includes('dialog')) {
+                                    categoryVal = 'Dialog Lesi Pay';
+                                } else if (rawCatCell.toLowerCase().includes('main shop') || rawCatCell.toLowerCase().includes('own buy')) {
+                                    categoryVal = 'Main Shop (Own Buy)';
+                                }
                             }
 
-                            const rawBuy = colMap.buyPrice !== undefined ? String(rowArr[colMap.buyPrice] ?? '').trim() : '';
+                            // Parse Buy Cost: prefer Net Unit Cost (Rs.) if > 0, else Unit Cost (Rs.), else form/preset fallback
+                            const rawNetCost = colMap.netUnitCost !== undefined ? String(rowArr[colMap.netUnitCost] ?? '').trim() : '';
+                            const rawUnitCost = colMap.unitCost !== undefined ? String(rowArr[colMap.unitCost] ?? '').trim() : '';
+                            const parsedNetCost = rawNetCost !== '' ? (parseFloat(rawNetCost.replace(/,/g, '')) || 0) : 0;
+                            const parsedUnitCost = rawUnitCost !== '' ? (parseFloat(rawUnitCost.replace(/,/g, '')) || 0) : 0;
+                            const excelBuyCost = parsedNetCost > 0 ? parsedNetCost : parsedUnitCost;
+
                             const rawMrp = colMap.mrp !== undefined ? String(rowArr[colMap.mrp] ?? '').trim() : '';
+                            const parsedExcelMrp = rawMrp !== '' ? (parseFloat(rawMrp.replace(/,/g, '')) || 0) : 0;
 
                             const isLesi = (categoryVal === 'Dialog Lesi Pay');
                             const fallbackBuy = defaultBuyPrice > 0 ? defaultBuyPrice : (matchedPreset ? matchedPreset.buyPrice : 0);
                             const fallbackMrp = defaultMrpPrice > 0 ? defaultMrpPrice : (matchedPreset ? matchedPreset.mrp : 0);
 
-                            const buyPriceNum = isLesi ? 0 : (rawBuy !== '' ? (parseFloat(rawBuy.replace(/,/g, '')) || 0) : fallbackBuy);
-                            const mrpPriceNum = rawMrp !== '' ? (parseFloat(rawMrp.replace(/,/g, '')) || 0) : fallbackMrp;
+                            const buyPriceNum = isLesi ? 0 : (excelBuyCost > 0 ? excelBuyCost : fallbackBuy);
+                            const mrpPriceNum = parsedExcelMrp > 0 ? parsedExcelMrp : fallbackMrp;
 
-                            if (!rowModel) {
-                                invalidRowCount++;
-                                continue;
+                            // Process EVERY scanned IMEI inside this row's 'IMEI / Serial Numbers' cell!
+                            for (const imeiVal of rowImeis) {
+                                const normImei = imeiVal.toLowerCase();
+
+                                // 1. Skip if already in current inventory
+                                if (existingImeiSet.has(normImei)) {
+                                    skippedExistingImeis.push(imeiVal);
+                                    continue;
+                                }
+
+                                // 2. Skip if duplicate inside the same Excel upload
+                                if (seenInFileSet.has(normImei)) {
+                                    skippedFileDuplicateImeis.push(imeiVal);
+                                    continue;
+                                }
+                                seenInFileSet.add(normImei);
+
+                                const modelSummaryKey = `${rowModel} (${storageVal})`;
+                                uploadedByModelCounts[modelSummaryKey] = (uploadedByModelCounts[modelSummaryKey] || 0) + 1;
+
+                                itemsToUpload.push({
+                                    imei: imeiVal,
+                                    model: rowModel,
+                                    storage: storageVal,
+                                    shop: shopVal,
+                                    category: categoryVal,
+                                    buyPrice: buyPriceNum,
+                                    mrp: mrpPriceNum,
+                                    status: 'Available',
+                                    timestamp: Date.now()
+                                });
                             }
-
-                            const modelSummaryKey = `${rowModel} (${storageVal})`;
-                            uploadedByModelCounts[modelSummaryKey] = (uploadedByModelCounts[modelSummaryKey] || 0) + 1;
-
-                            itemsToUpload.push({
-                                imei: imeiVal,
-                                model: rowModel,
-                                storage: storageVal,
-                                shop: shopVal,
-                                category: categoryVal,
-                                buyPrice: buyPriceNum,
-                                mrp: mrpPriceNum,
-                                status: 'Available',
-                                timestamp: Date.now()
-                            });
                         }
                     }
                 }
@@ -9221,7 +9345,7 @@
                             <div style="margin-top:4px; font-weight:600;">
                                 • දැනටමත් Inventory එකේ ඇති නිසා මඟහැරිය (Skipped Existing IMEIs): <b>${skippedExistingImeis.length}</b><br>
                                 • Excel ගොනුව තුළම දෙවරක් තිබූ (Skipped Duplicates in File): <b>${skippedFileDuplicateImeis.length}</b><br>
-                                ${invalidRowCount > 0 ? `• Model හෝ IMEI නොමැති පේළි (Missing Model/IMEI): <b>${invalidRowCount}</b> (Excel හි Model තීරුවක් නැත්නම් ඉහත Dropdown එකෙන් Phone Model එක තෝරා හෝ පහත Phone Model කොටුවේ නම ටයිප් කර Upload කරන්න)` : ''}
+                                ${invalidRowCount > 0 ? `• Model හෝ IMEI නොමැති පේළි (Missing Model/IMEI): <b>${invalidRowCount}</b>` : ''}
                             </div>
                         `;
                     }
@@ -9242,7 +9366,7 @@
                 }
 
                 const modelBreakdownHtml = Object.entries(uploadedByModelCounts)
-                    .map(([mName, cnt]) => `<span style="display:inline-block; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; border-radius:6px; padding:2px 8px; font-size:0.75rem; margin:2px 4px 2px 0;">📱 ${mName}: <b>${cnt}</b></span>`)
+                    .map(([mName, cnt]) => `<span style="display:inline-block; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; border-radius:6px; padding:2px 8px; font-size:0.75rem; margin:2px 4px 2px 0;">📱 ${mName}: <b>${cnt} IMEI(s)</b></span>`)
                     .join('');
 
                 if (resultBox) {
@@ -9250,9 +9374,9 @@
                     resultBox.style.border = '1px solid #10b981';
                     resultBox.style.color = '#065f46';
                     resultBox.innerHTML = `
-                        <div>✅ <b>Excel Stock Upload සාර්ථකයි!</b></div>
+                        <div>✅ <b>POS GRN / Excel Stock Upload සාර්ථකයි!</b></div>
                         <div style="margin-top:4px; font-weight:600;">
-                            • අලුතින් Inventory එකට ඇතුළත් කළ ගණන (Newly Uploaded): <b style="color:#059669; font-size:0.9rem;">${itemsToUpload.length} Items</b><br>
+                            • අලුතින් Inventory එකට ඇතුළත් කළ මුළු IMEI ගණන (Newly Uploaded): <b style="color:#059669; font-size:0.9rem;">${itemsToUpload.length} Items</b><br>
                             ${modelBreakdownHtml ? `<div style="margin:4px 0;">${modelBreakdownHtml}</div>` : ''}
                             • දැනටමත් Inventory එකේ තිබූ නිසා ඉවත් කළ ගණන (Skipped Existing IMEIs): <b style="color:#d97706;">${skippedExistingImeis.length}</b>
                             ${skippedFileDuplicateImeis.length > 0 ? `<br>• Excel ගොනුව තුළම දෙවරක් තිබූ නිසා ඉවත් කළ ගණන: <b>${skippedFileDuplicateImeis.length}</b>` : ''}
@@ -9261,7 +9385,7 @@
                     `;
                 }
 
-                showToast(`✅ Uploaded ${itemsToUpload.length} new stock item(s)! (${skippedExistingImeis.length} existing skipped)`, "success");
+                showToast(`✅ Uploaded ${itemsToUpload.length} new stock item(s) from GRN/Excel! (${skippedExistingImeis.length} existing skipped)`, "success");
                 fileInput.value = '';
             } catch (err) {
                 console.error("Excel upload error:", err);
@@ -9275,7 +9399,7 @@
             } finally {
                 if (uploadBtn) {
                     uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = "<span>📤</span> Upload Excel Stock";
+                    uploadBtn.innerHTML = "📤 Upload GRN / Excel";
                 }
             }
         };
