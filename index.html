@@ -267,6 +267,20 @@
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
+        // Auto-fill email if passed in URL query parameter (?email=...)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            if (emailParam) {
+                const emailInput = document.getElementById('email');
+                if (emailInput) {
+                    emailInput.value = emailParam.trim();
+                    if (passwordInput) setTimeout(() => passwordInput.focus(), 150);
+                }
+            }
+        } catch(e) {}
+    
+
         // SECURITY: Always sign out when landing on login page
         // This ensures the link always shows the login form (never auto-redirects)
         signOut(auth).catch(() => {});
@@ -319,7 +333,8 @@
             if (isAdmin) {
                 window.location.replace('admin.html');
             } else {
-                window.location.replace('shop.html');
+                // Cashiers and Branch users redirect directly to dedicated Cashier POS
+                window.location.replace('pos.html');
             }
         }
 

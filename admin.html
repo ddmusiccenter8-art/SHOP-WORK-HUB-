@@ -852,6 +852,9 @@
                 <option value="si">Sinhala</option>
                 <option value="ta">Tamil</option>
             </select>
+            <a href="pos.html" target="_blank" style="text-decoration: none; padding: 0.45rem 1rem; background: rgba(37,99,235,0.12); border: 1.5px solid rgba(37,99,235,0.35); color: #2563eb; border-radius: 10px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" title="Open Cashier POS System">
+                🛒 Cashier POS
+            </a>
             <span id="connectionBadge" style="font-size: 0.8rem; padding: 0.4rem 0.95rem; border-radius: 999px; background: rgba(16,185,129,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #059669; border: 1px solid rgba(16,185,129,0.35); font-weight: 700; box-shadow: 0 2px 8px rgba(16,185,129,0.1);">🟢 Firebase Connected</span>
             <button id="logoutBtn" onclick="doLogout()" style="padding: 0.5rem 1.25rem; background: rgba(239, 68, 68, 0.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(239, 68, 68, 0.35); color: #dc2626; border-radius: 10px; cursor: pointer; font-weight: 700; transition: all 0.2s; box-shadow: 0 2px 8px rgba(239,68,68,0.1);">Logout</button>
         </div>
@@ -1308,7 +1311,7 @@
                     </div>
                     <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.12); color: #059669; padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.25);">Profit Intelligence</span>
                 </div>
-                <div style="position: relative; height: 230px; width: 100%;">
+                <div style="position: relative; height: 135px; width: 100%;">
                     <canvas id="mainProfitChart"></canvas>
                 </div>
             </div>
@@ -1428,7 +1431,10 @@
                             </div>
 
                             <div style="margin-bottom: 1.2rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Staff Activator Fee (ගෙවන මුදල)</label>
+                                <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">
+                                    <span>Staff Activator Fee (ගෙවන මුදල)</span>
+                                    <span id="brandSpecialCommBadge" style="display:none; font-size:0.72rem; background:rgba(139,92,246,0.15); color:#7c3aed; padding:1px 6px; border-radius:6px; font-weight:700;">✨ Special Brand Commission</span>
+                                </label>
                                 <input type="number" id="mainSaleStaffFee" step="1" value="500" placeholder="500" oninput="calculateMainShopLiveProfit()">
                             </div>
 
@@ -1722,14 +1728,24 @@
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
                             <div>
                                 <label id="invPriceLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Buy Price / Cost (Rs.) <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Cost)</span></label>
                                 <input type="number" id="invBuyPrice" placeholder="0.00" step="0.01" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
                             </div>
                             <div>
                                 <label id="invMrpLabel" style="display:block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Selling MRP (Rs.) <span style="font-size: 0.72rem; color: var(--info); font-weight: normal;">(Retail MRP)</span></label>
-                                <input type="number" id="invMrpPrice" placeholder="0.00" step="0.01" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                                <input type="number" id="invMrpPrice" placeholder="0.00" step="0.01" oninput="calculateInvSuggestedCommission()" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="display:block; margin-bottom: 0.4rem; color: #7c3aed; font-size: 0.84rem; font-weight: 700;">Brand / Special API Price (Rs.) <span style="font-size: 0.70rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
+                                <input type="number" id="invApiPrice" placeholder="e.g. 45000.00" step="0.01" oninput="calculateInvSuggestedCommission()" style="width: 100%; background: rgba(237,233,254,0.45); border: 1.5px solid rgba(139,92,246,0.35); color: var(--text-main); padding: 0.8rem; border-radius: 10px;" title="Special API base price for this brand/model">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom: 0.4rem; color: #059669; font-size: 0.84rem; font-weight: 700;">Special Activator Commission (Rs.)</label>
+                                <input type="number" id="invCustomCommission" placeholder="e.g. 1000.00" step="1" style="width: 100%; background: rgba(240,253,244,0.75); border: 1.5px solid rgba(16,185,129,0.35); color: var(--text-main); padding: 0.8rem; border-radius: 10px;" title="Custom commission for this phone/brand (replaces fixed Rs. 500)">
                             </div>
                         </div>
                         
@@ -2172,47 +2188,79 @@
         </div>
     </div>
 
-    <!-- Add New Shop Profile Modal -->
+    <!-- Add New Shop / Cashier Profile Modal -->
     <div id="addShopModal" class="modal">
-        <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-content" style="max-width: 490px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
             <span class="modal-close" onclick="closeAddShopModal()">&times;</span>
-            <h2 id="addShopModalTitle" style="font-size: 1.25rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Register New Shop / Branch</h2>
+            <h2 id="addShopModalTitle" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+                <span>👤</span> Register New Account (Cashier / Shop)
+            </h2>
             <form id="addShopForm">
                 <input type="hidden" id="editingShopDocId" value="">
-                <div style="margin-bottom: 1rem;">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop / Branch Name</label>
-                    <input type="text" id="newShopName" placeholder="e.g. PULASTHIGAMA POLONNARUWA" required>
+
+                <!-- ROLE SELECTOR: Head Office Cashier vs Sub Shop -->
+                <div style="margin-bottom: 1.15rem; background: #f8fafc; padding: 0.85rem; border-radius: 14px; border: 1.5px solid var(--border-color);">
+                    <label style="color: var(--text-main); font-size: 0.85rem; font-weight: 800; display: block; margin-bottom: 0.5rem;">
+                        📌 Select Account Type / කාර්යභාරය: *
+                    </label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+                        <label id="roleLabelHOCashier" style="border: 2px solid #2563eb; background: rgba(37,99,235,0.08); padding: 0.7rem 0.8rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.85rem; color: #1e3a8a; transition: all 0.2s;">
+                            <input type="radio" name="newShopRole" value="headoffice_cashier" onchange="handleAccountRoleChange('headoffice_cashier')" checked style="accent-color: #2563eb; width: 17px; height: 17px;">
+                            <span>🏢 Head Office Cashier</span>
+                        </label>
+                        <label id="roleLabelSubShop" style="border: 2px solid var(--border-color); background: #ffffff; padding: 0.7rem 0.8rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem; color: var(--text-main); transition: all 0.2s;">
+                            <input type="radio" name="newShopRole" value="sub_shop" onchange="handleAccountRoleChange('sub_shop')" style="accent-color: #2563eb; width: 17px; height: 17px;">
+                            <span>🏪 Sub Shop / Branch</span>
+                        </label>
+                    </div>
+                    <div id="roleHelpNotice" style="font-size: 0.74rem; color: #2563eb; font-weight: 600; margin-top: 6px;">
+                        ⚡ Head Office Cashiers log directly into the Cashier POS with Head Office stock.
+                    </div>
                 </div>
+
                 <div style="margin-bottom: 1rem;">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Shop Login Email</label>
-                    <input type="email" id="newShopEmail" placeholder="e.g. pulasthigama@methmi.com" required>
+                    <label id="newShopNameLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Full Name (කැෂියර් නම) *</label>
+                    <input type="text" id="newShopName" placeholder="e.g. Kasun (HO Cashier 1)" required style="font-weight: 600;">
                 </div>
+
                 <div style="margin-bottom: 1rem;">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Contact Number</label>
+                    <label id="newShopEmailLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Login Email (විද්‍යුත් තැපෑල) *</label>
+                    <input type="email" id="newShopEmail" placeholder="e.g. cashier1@methmi.com" required style="font-weight: 600;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Contact Number (දුරකථන අංකය)</label>
                     <input type="text" id="newShopPhone" placeholder="e.g. 0771234567">
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">City / Location</label>
-                    <input type="text" id="newShopLocation" placeholder="e.g. Polonnaruwa">
+
+                <div style="margin-bottom: 1rem;" id="newShopLocationGroup">
+                    <label id="newShopLocationLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Location / Branch (ස්ථානය)</label>
+                    <input type="text" id="newShopLocation" value="HEAD OFFICE / MAIN SHOP" placeholder="e.g. HEAD OFFICE" style="font-weight: 700;">
                 </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.35rem;">Login Password</label>
-                    <input type="text" id="newShopPassword" value="1234" required placeholder="Default 1234">
+
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Login Password (මුරපදය) *</label>
+                    <input type="text" id="newShopPassword" value="1234" required placeholder="Default 1234" style="font-weight: 700; font-family: monospace; font-size: 1rem;">
                 </div>
-                <div style="margin-bottom: 1rem; padding: 0.8rem; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
-                    <label style="color: #10b981; font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">📊 Shop Profit Percentage Settings</label>
+
+                <!-- Sub Shop Commission Settings (Hidden for Head Office Cashiers) -->
+                <div id="shopProfitSettingsContainer" style="display: none; margin-bottom: 1.2rem; padding: 0.85rem; background: rgba(16,185,129,0.06); border: 1.5px solid rgba(16,185,129,0.3); border-radius: 12px;">
+                    <label style="color: #047857; font-size: 0.85rem; font-weight: 800; display: block; margin-bottom: 0.5rem;">📊 Sub-Shop Commission Percentages</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
                         <div>
-                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem;">HO Stock Profit %</label>
-                            <input type="number" id="newShopHoPercent" value="4" step="0.1" min="0" max="50" placeholder="4" style="font-weight: 700; color: #10b981;">
+                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem; font-weight: 600;">HO Stock Profit %</label>
+                            <input type="number" id="newShopHoPercent" value="4" step="0.1" min="0" max="50" placeholder="4" style="font-weight: 800; color: #10b981;">
                         </div>
                         <div>
-                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem;">Shop Own Stock Profit %</label>
-                            <input type="number" id="newShopOwnPercent" value="6" step="0.1" min="0" max="50" placeholder="6" style="font-weight: 700; color: #3b82f6;">
+                            <label style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-bottom: 0.25rem; font-weight: 600;">Shop Own Stock Profit %</label>
+                            <input type="number" id="newShopOwnPercent" value="6" step="0.1" min="0" max="50" placeholder="6" style="font-weight: 800; color: #3b82f6;">
                         </div>
                     </div>
                 </div>
-                <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: var(--primary);">Register Shop</button>
+
+                <button type="submit" id="saveShopBtn" class="action-btn" style="width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #b91c1c 100%); padding: 0.85rem; font-size: 1rem; font-weight: 800; border-radius: 10px; box-shadow: 0 4px 14px rgba(229,0,0,0.3);">
+                    Register Head Office Cashier
+                </button>
             </form>
         </div>
     </div>
@@ -2807,8 +2855,8 @@
                 </div>
             </div>
 
-            <!-- Bulk Selection & Transfer Bar (Clean Dropdown Only) -->
-            <div id="batchModalBulkTransferToolbar" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px solid #38bdf8; border-radius: 14px; padding: 0.85rem 1.1rem; margin-bottom: 1.1rem; box-shadow: 0 4px 14px rgba(56,189,248,0.12);">
+            <!-- Bulk Selection, Transfer & Delete Bar (Sticky when scrolling batches) -->
+            <div id="batchModalBulkTransferToolbar" style="position: sticky; top: 0; z-index: 25; background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px solid #38bdf8; border-radius: 14px; padding: 0.85rem 1.1rem; margin-bottom: 1.1rem; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <label style="display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-weight: 800; font-size: 0.88rem; color: #0369a1; user-select: none; background: white; padding: 5px 12px; border-radius: 8px; border: 1.5px solid #7dd3fc; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
@@ -2832,6 +2880,9 @@
                         </button>
                         <button type="button" id="bulkRecallSubmitBtn" onclick="executeBulkRecallSelectedToHeadOffice()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.84rem; font-weight: 700; padding: 0.5rem 1.05rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(16,185,129,0.3); transition: all 0.2s;" title="Recall selected branch phones to Head Office">
                             🔄 Recall Selected to Head Office
+                        </button>
+                        <button type="button" id="bulkDeleteSubmitBtn" onclick="executeBulkImeiDelete()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; font-size: 0.84rem; font-weight: 700; padding: 0.5rem 1.05rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 8px rgba(239,68,68,0.35); transition: all 0.2s; opacity: 0.6;" title="Delete all ticked IMEI items from inventory">
+                            🗑️ Delete Selected (<span id="bulkDeleteBtnCount">0</span>)
                         </button>
                     </div>
                 </div>
@@ -2912,7 +2963,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc, writeBatch } 
+        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc, writeBatch, setDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -3142,7 +3193,7 @@
 
             if (!isAdmin) {
                 // Logged-in as a non-admin shop -> redirect to shop.html
-                window.location.replace('shop.html');
+                window.location.replace('pos.html');
                 return;
             }
 
@@ -3791,10 +3842,12 @@
                     const safeEmail = (regInfo.email || '').replace(/'/g, "\\'");
                     const safePhone = (regInfo.phone || '').replace(/'/g, "\\'");
                     const safeLoc = (regInfo.location || '').replace(/'/g, "\\'");
+                    const safePassword = (regInfo.password || '').replace(/'/g, "\\'");
                     actionsHTML = `
-                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; gap: 0.5rem; justify-content: center;">
+                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color); display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
                             <button onclick="event.stopPropagation(); editShop('${regInfo.id}', '${safeName}', '${safeEmail}', '${safePhone}', '${safeLoc}')" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--success); padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">✏️ Edit</button>
                             <button onclick="event.stopPropagation(); deleteShop('${regInfo.id}', '${safeName}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--danger); padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">🗑️ Delete</button>
+                            <button onclick="event.stopPropagation(); copyBranchCashierLogin('${safeEmail}', '${safePassword}', '${safeName}')" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;" title="Copy Cashier Login Link & Credentials">🔗 Cashier Link</button>
                         </div>
                     `;
                 } else {
@@ -3854,10 +3907,51 @@
             });
         }
 
+        window.handleAccountRoleChange = function(role) {
+            const isHOCashier = role === 'headoffice_cashier';
+            const labelHO = document.getElementById('roleLabelHOCashier');
+            const labelSub = document.getElementById('roleLabelSubShop');
+            const notice = document.getElementById('roleHelpNotice');
+            const title = document.getElementById('addShopModalTitle');
+            const nameLabel = document.getElementById('newShopNameLabel');
+            const nameInput = document.getElementById('newShopName');
+            const emailLabel = document.getElementById('newShopEmailLabel');
+            const emailInput = document.getElementById('newShopEmail');
+            const locInput = document.getElementById('newShopLocation');
+            const locGroup = document.getElementById('newShopLocationGroup');
+            const profitContainer = document.getElementById('shopProfitSettingsContainer');
+            const saveBtn = document.getElementById('saveShopBtn');
+
+            if (isHOCashier) {
+                if (labelHO) { labelHO.style.borderColor = '#2563eb'; labelHO.style.background = 'rgba(37,99,235,0.08)'; labelHO.style.color = '#1e3a8a'; }
+                if (labelSub) { labelSub.style.borderColor = 'var(--border-color)'; labelSub.style.background = '#ffffff'; labelSub.style.color = 'var(--text-main)'; }
+                if (notice) notice.innerText = '⚡ Head Office Cashiers log directly into the Cashier POS with Head Office stock.';
+                if (title) title.innerHTML = '<span>🏢</span> Register Head Office Cashier';
+                if (nameLabel) nameLabel.innerText = 'Cashier Full Name (කැෂියර් නම) *';
+                if (nameInput) nameInput.placeholder = 'e.g. Kasun (HO Cashier 1)';
+                if (emailLabel) emailLabel.innerText = 'Cashier Login Email (විද්‍යුත් තැපෑල) *';
+                if (emailInput) emailInput.placeholder = 'e.g. cashier1@methmi.com';
+                if (locInput) { locInput.value = 'HEAD OFFICE / MAIN SHOP'; locInput.readOnly = true; }
+                if (profitContainer) profitContainer.style.display = 'none';
+                if (saveBtn) saveBtn.innerText = 'Register Head Office Cashier';
+            } else {
+                if (labelSub) { labelSub.style.borderColor = '#2563eb'; labelSub.style.background = 'rgba(37,99,235,0.08)'; labelSub.style.color = '#1e3a8a'; }
+                if (labelHO) { labelHO.style.borderColor = 'var(--border-color)'; labelHO.style.background = '#ffffff'; labelHO.style.color = 'var(--text-main)'; }
+                if (notice) notice.innerText = '🏪 Sub Shops / Branches submit loans and receive stock allocations from Head Office.';
+                if (title) title.innerHTML = '<span>🏪</span> Register Sub Shop / Branch';
+                if (nameLabel) nameLabel.innerText = 'Shop / Branch Name *';
+                if (nameInput) nameInput.placeholder = 'e.g. PULASTHIGAMA POLONNARUWA';
+                if (emailLabel) emailLabel.innerText = 'Shop Login Email (විද්‍යුත් තැපෑල) *';
+                if (emailInput) emailInput.placeholder = 'e.g. pulasthigama@methmi.com';
+                if (locInput) { if (locInput.value === 'HEAD OFFICE / MAIN SHOP') locInput.value = ''; locInput.readOnly = false; }
+                if (profitContainer) profitContainer.style.display = 'block';
+                if (saveBtn) saveBtn.innerText = 'Register Shop';
+            }
+        };
+
         window.quickRegisterShop = function(email) {
             document.getElementById('addShopForm').reset();
             document.getElementById('editingShopDocId').value = '';
-            document.getElementById('addShopModalTitle').innerText = 'Register Shop Profile';
             document.getElementById('newShopEmail').value = email;
             document.getElementById('newShopEmail').readOnly = false;
             document.getElementById('newShopName').value = email.split('@')[0].toUpperCase();
@@ -3866,19 +3960,28 @@
             document.getElementById('newShopPassword').value = '1234';
             document.getElementById('newShopHoPercent').value = '4';
             document.getElementById('newShopOwnPercent').value = '6';
-            document.getElementById('saveShopBtn').innerText = 'Register Shop';
+
+            // Select sub shop by default
+            const radio = document.querySelector('input[name="newShopRole"][value="sub_shop"]');
+            if (radio) radio.checked = true;
+            handleAccountRoleChange('sub_shop');
+
             document.getElementById('addShopModal').style.display = 'flex';
         };
 
         window.openAddShopModal = function() {
             document.getElementById('addShopForm').reset();
             document.getElementById('editingShopDocId').value = '';
-            document.getElementById('addShopModalTitle').innerText = 'Register New Shop / Branch';
             document.getElementById('newShopEmail').readOnly = false;
             document.getElementById('newShopPassword').value = '1234';
             document.getElementById('newShopHoPercent').value = '4';
             document.getElementById('newShopOwnPercent').value = '6';
-            document.getElementById('saveShopBtn').innerText = 'Register Shop';
+
+            // Select Head Office Cashier by default
+            const radio = document.querySelector('input[name="newShopRole"][value="headoffice_cashier"]');
+            if (radio) radio.checked = true;
+            handleAccountRoleChange('headoffice_cashier');
+
             document.getElementById('addShopModal').style.display = 'flex';
         };
 
@@ -3889,52 +3992,72 @@
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveShopBtn');
+            const originalBtnText = btn.innerText;
             btn.disabled = true;
-            btn.innerText = 'Saving...';
+            btn.innerText = 'Registering & Creating Credentials...';
 
             const editId = document.getElementById('editingShopDocId')?.value || '';
+            const role = document.querySelector('input[name="newShopRole"]:checked')?.value || 'headoffice_cashier';
             const name = document.getElementById('newShopName').value.trim();
             const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
             const phone = document.getElementById('newShopPhone').value.trim();
-            const location = document.getElementById('newShopLocation').value.trim();
+            const location = (role === 'headoffice_cashier') ? 'HEAD OFFICE / MAIN SHOP' : (document.getElementById('newShopLocation').value.trim() || 'Head Office');
             const password = document.getElementById('newShopPassword').value || '1234';
             const hoP = parseFloat(document.getElementById('newShopHoPercent').value) || 4;
             const ownP = parseFloat(document.getElementById('newShopOwnPercent').value) || 6;
 
             try {
-                const targetId = editId || (registeredShopsList.find(r => (r.email || '').toLowerCase() === email)?.id);
-                if (targetId) {
-                    await updateDoc(doc(db, "registered_shops", targetId), {
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        location: location,
-                        password: password,
-                        hoPercent: hoP,
-                        shopOwnPercent: ownP,
-                        updatedAt: Date.now()
-                    });
-                    showToast("Shop profile updated successfully!", "success");
-                } else {
-                    await addDoc(collection(db, "registered_shops"), {
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        location: location,
-                        password: password,
-                        hoPercent: hoP,
-                        shopOwnPercent: ownP,
-                        createdAt: Date.now()
-                    });
-                    showToast("Shop registered successfully!", "success");
+                // 1. Create Cloud Firebase Auth User using secondaryAuth (so admin session is not interrupted)
+                try {
+                    await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                    console.log("Firebase Auth account created for:", email);
+                } catch (authErr) {
+                    if (authErr.code !== 'auth/email-already-in-use') {
+                        console.warn("Secondary auth creation note:", authErr.message);
+                    }
                 }
+
+                // 2. Save or Update in Firestore registered_shops collection
+                const targetId = editId || (registeredShopsList.find(r => (r.email || '').toLowerCase() === email)?.id);
+                const payload = {
+                    role: role,
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    location: location,
+                    password: password,
+                    hoPercent: hoP,
+                    shopOwnPercent: ownP,
+                    isCashier: role === 'headoffice_cashier',
+                    updatedAt: Date.now()
+                };
+
+                if (targetId) {
+                    await updateDoc(doc(db, "registered_shops", targetId), payload);
+                    showToast("Account updated successfully!", "success");
+                } else {
+                    payload.createdAt = Date.now();
+                    await addDoc(collection(db, "registered_shops"), payload);
+                    showToast(role === 'headoffice_cashier' ? "✨ Head Office Cashier registered successfully!" : "Shop registered successfully!", "success");
+                }
+
                 closeAddShopModal();
+
+                // 3. If Cashier was registered, show immediate info prompt with option to test / launch POS
+                if (role === 'headoffice_cashier') {
+                    setTimeout(() => {
+                        if (confirm(`✅ Head Office Cashier Registered Successfully!\n\n👤 Name: ${name}\n📧 Email: ${email}\n🔑 Password: ${password}\n\nWould you like to open the Cashier Sale POS screen now?`)) {
+                            window.open('pos.html', '_blank');
+                        }
+                    }, 400);
+                }
+
             } catch(err) {
-                console.error("Shop registration failed:", err);
-                showToast("Failed to register shop: " + err.message, "error");
+                console.error("Registration failed:", err);
+                showToast("Failed to register: " + err.message, "error");
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Register Shop';
+                btn.innerText = originalBtnText;
             }
         });
 
@@ -5290,6 +5413,28 @@
                             mrpInput.value = found.mrp;
                         }
                     }
+                    // Auto-apply Special Brand Commission or API Price Commission
+                    const feeInput = document.getElementById('mainSaleStaffFee');
+                    const commBadge = document.getElementById('brandSpecialCommBadge');
+                    if (feeInput) {
+                        if (found.customCommission && parseFloat(found.customCommission) > 0) {
+                            feeInput.value = parseFloat(found.customCommission).toFixed(0);
+                            if (commBadge) {
+                                commBadge.style.display = 'inline-block';
+                                commBadge.innerText = '✨ Brand Comm: Rs. ' + parseFloat(found.customCommission).toLocaleString();
+                            }
+                        } else if (found.apiPrice && parseFloat(found.apiPrice) > 0 && found.mrp && (parseFloat(found.mrp) - parseFloat(found.apiPrice) > 0)) {
+                            const calcComm = parseFloat(found.mrp) - parseFloat(found.apiPrice);
+                            feeInput.value = calcComm.toFixed(0);
+                            if (commBadge) {
+                                commBadge.style.display = 'inline-block';
+                                commBadge.innerText = '✨ API Comm: Rs. ' + calcComm.toLocaleString();
+                            }
+                        } else {
+                            feeInput.value = '500';
+                            if (commBadge) commBadge.style.display = 'none';
+                        }
+                    }
                     if (hoManual) hoManual.style.display = 'none';
                     updateAddedBillProductCardDisplay('HO');
                     calculateMainShopLiveProfit();
@@ -5658,13 +5803,18 @@
         function getKnownStaffList() {
             const staffMap = new Map();
             
+            const deletedStaffSet = new Set(getDeletedStaffList().map(n => n.toUpperCase().trim()));
+
             // 1. From allMainShopSales history
             (allMainShopSales || []).forEach(s => {
                 const raw = (s.staffName || '').trim();
                 if (raw) {
-                    const key = raw.toLowerCase().replace(/\s+/g, ' ');
-                    if (!staffMap.has(key)) {
-                        staffMap.set(key, raw.toUpperCase());
+                    const norm = normalizeStaffName(raw);
+                    if (!deletedStaffSet.has(norm)) {
+                        const key = norm.toLowerCase();
+                        if (!staffMap.has(key)) {
+                            staffMap.set(key, norm);
+                        }
                     }
                 }
             });
@@ -5895,7 +6045,7 @@
             const hoLease = document.getElementById('mainSaleLeasePercent');
             if (hoLease) hoLease.value = '2.0';
             const hoFee = document.getElementById('mainSaleStaffFee');
-            if (hoFee) hoFee.value = '500';
+            if (hoFee) hoFee.value = '500'; const bComm = document.getElementById('brandSpecialCommBadge'); if (bComm) bComm.style.display = 'none';
 
             // Reset Dialog Lesi Pay inputs
             const lpImei = document.getElementById('lpSaleImei');
@@ -6935,7 +7085,31 @@
                             setTimeout(function() { window.print(); }, 400);
                         };
                     <\/script>
-                </body>
+                
+    <!-- Staff Delete Password Modal (Admin Auth Required) -->
+    <div id="staffDeletePasswordModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); z-index:99999; align-items:center; justify-content:center; padding:1.2rem;" onclick="if(event.target===this)closeStaffDeleteModal()">
+        <div style="background:#ffffff; border-radius:20px; padding:2rem 2.2rem; max-width:440px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.28); border:1px solid rgba(226,232,240,0.95); text-align:center;">
+            <div style="width:58px; height:58px; border-radius:50%; background:rgba(239,68,68,0.12); color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:1.7rem; margin:0 auto 1.1rem auto;">
+                🗑️
+            </div>
+            <h3 style="margin:0 0 0.5rem; font-size:1.3rem; font-weight:800; color:#0f172a;">Staff Member ඉවත් කිරීම</h3>
+            <p style="color:#64748b; font-size:0.88rem; margin-bottom:1.2rem; line-height:1.45;">
+                <strong id="staffDeleteTargetName" style="color:#dc2626; font-size:1.02rem;"></strong> සාමාජිකයා ඉවත් කිරීමට තහවුරු කරන්න.<br>
+                <span style="font-size:0.78rem; color:#94a3b8;">(කලින් සිදුකළ Sales හා Payments වාර්තා සියල්ල සුරක්ෂිතව පවතී)</span>
+            </p>
+            <div style="text-align:left; margin-bottom:1.1rem;">
+                <label style="display:block; font-size:0.83rem; font-weight:700; color:#334155; margin-bottom:0.4rem;">Admin Password ඇතුළත් කරන්න:</label>
+                <input type="password" id="staffDeleteAdminPassword" placeholder="Enter admin password (1234)" style="width:100%; padding:0.75rem 1rem; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.95rem; outline:none;" onkeydown="if(event.key==='Enter')executeStaffDelete()">
+                <div id="staffDeleteErrorMsg" style="color:#dc2626; font-size:0.82rem; font-weight:700; min-height:1.2rem; margin-top:0.4rem;"></div>
+            </div>
+            <div style="display:flex; gap:0.75rem;">
+                <button type="button" onclick="closeStaffDeleteModal()" style="flex:1; padding:0.78rem; background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.88rem;">Cancel</button>
+                <button type="button" onclick="executeStaffDelete()" style="flex:1; padding:0.78rem; background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border:none; color:white; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.88rem; box-shadow:0 4px 14px rgba(239,68,68,0.35);">🗑️ ඉවත් කරන්න</button>
+            </div>
+        </div>
+    </div>
+
+</body>
                 </html>
             `);
             printWin.document.close();
@@ -7316,6 +7490,11 @@
                 if (typeof currentViewingShopEmail !== 'undefined' && currentViewingShopEmail) {
                     const refreshedSales = allSales.filter(s => (s.shopId || '').toLowerCase() === currentViewingShopEmail.toLowerCase());
                     viewShopProfile(currentViewingShopEmail, refreshedSales);
+                }
+                if (window.currentOpenGroupKey && document.getElementById('stockBatchModal')?.style.display === 'flex') {
+                    if (typeof window.refreshActiveStockBatchModal === 'function') {
+                        window.refreshActiveStockBatchModal();
+                    }
                 }
             }, (err) => {
                 console.error("Inventory error:", err);
@@ -8014,6 +8193,44 @@
             }
         };
 
+        window.refreshActiveStockBatchModal = function() {
+            const groupKey = window.currentOpenGroupKey;
+            if (!groupKey) return;
+            const modalEl = document.getElementById('stockBatchModal');
+            if (!modalEl || modalEl.style.display !== 'flex') return;
+
+            const parts = groupKey.split('___');
+            const mTarget = parts[0];
+            const sTarget = parts[1] || '';
+
+            const matchedItems = (allInventoryItems || []).filter(i =>
+                (i.model || '').trim().toLowerCase() === mTarget &&
+                (i.storage || '').trim().toLowerCase() === sTarget
+            );
+
+            if (matchedItems.length === 0) {
+                closeStockBatchModal();
+                return;
+            }
+
+            const availCount = matchedItems.filter(i => i.status === 'Available').length;
+            const sldCount = matchedItems.filter(i => i.status !== 'Available').length;
+            const availBadge = document.getElementById('batchModalAvailableBadge');
+            if (availBadge) {
+                availBadge.innerText = `${availCount} Available (${sldCount} Sold)`;
+            }
+
+            // Prune any deleted IDs from window.selectedBatchImeis
+            if (window.selectedBatchImeis) {
+                const existingIdSet = new Set(matchedItems.map(i => i.id));
+                Array.from(window.selectedBatchImeis).forEach(id => {
+                    if (!existingIdSet.has(id)) window.selectedBatchImeis.delete(id);
+                });
+            }
+
+            renderBatchModalContent(groupKey);
+        };
+
         // Render Batches and IMEIs content based on inner search/filter
         window.renderBatchModalContent = function(groupKey) {
             const parts = groupKey.split('___');
@@ -8021,22 +8238,28 @@
                 (i.model || '').trim().toLowerCase() === parts[0] &&
                 (i.storage || '').trim().toLowerCase() === (parts[1] || '')
             );
-            let grp = null;
-            if (matchedItems.length > 0) {
-                const first = matchedItems[0];
-                grp = {
-                    key: groupKey,
-                    model: (first.model || 'Unknown').trim(),
-                    storage: (first.storage || 'Standard').trim(),
-                    category: first.category || 'Main Shop (Own Buy)',
-                    items: matchedItems,
-                    availableItems: matchedItems.filter(i => i.status === 'Available'),
-                    soldItems: matchedItems.filter(i => i.status !== 'Available')
-                };
-            } else if (window.currentModelGroupsMap) {
-                grp = window.currentModelGroupsMap.get(groupKey);
+            if (matchedItems.length === 0) {
+                const batchesContainer = document.getElementById('batchModalBatchesList');
+                if (batchesContainer) {
+                    batchesContainer.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); padding: 2.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                            All items in this model group have been removed.
+                        </div>
+                    `;
+                }
+                return;
             }
-            if (!grp) return;
+
+            const first = matchedItems[0];
+            const grp = {
+                key: groupKey,
+                model: (first.model || 'Unknown').trim(),
+                storage: (first.storage || 'Standard').trim(),
+                category: first.category || 'Main Shop (Own Buy)',
+                items: matchedItems,
+                availableItems: matchedItems.filter(i => i.status === 'Available'),
+                soldItems: matchedItems.filter(i => i.status !== 'Available')
+            };
 
             const batchesContainer = document.getElementById('batchModalBatchesList');
             if (!batchesContainer) return;
@@ -8170,11 +8393,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
                                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                                     <div style="display: flex; align-items: center; gap: 7px;">
-                                        ${isAvail ? `
-                                            <input type="checkbox" class="batch-imei-checkbox" data-id="${item.id}" data-imei="${safeImei}" data-shop="${iShop}" ${window.selectedBatchImeis && window.selectedBatchImeis.has(item.id) ? 'checked' : ''} onchange="onBatchImeiCheckboxChange(this, '${item.id}')" style="width: 19px; height: 19px; cursor: pointer; accent-color: #0284c7;" title="Select for Bulk Transfer">
-                                        ` : `
-                                            <input type="checkbox" disabled style="width: 19px; height: 19px; opacity: 0.35; cursor: not-allowed;" title="Sold item cannot be transferred">
-                                        `}
+                                        <input type="checkbox" class="batch-imei-checkbox" data-id="${item.id}" data-imei="${safeImei}" data-shop="${iShop}" data-avail="${isAvail ? '1' : '0'}" ${window.selectedBatchImeis && window.selectedBatchImeis.has(item.id) ? 'checked' : ''} onchange="onBatchImeiCheckboxChange(this, '${item.id}')" style="width: 19px; height: 19px; cursor: pointer; accent-color: #0284c7;" title="Select for Bulk Transfer or Bulk Delete">
                                         <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
                                         <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
                                     </div>
@@ -8197,7 +8416,7 @@
 
                                     <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Edit Item Details">✏️</button>
 
-                                    <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #ef4444; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Delete Item">🗑️</button>
+                                    <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #dc2626; padding: 0.35rem 0.65rem; border-radius: 7px; font-size: 0.8rem; font-weight: 700; cursor: pointer;" title="Delete Item (මෙම දුරකථනය ඉවත් කරන්න)">🗑️</button>
                                 </div>
                             </div>
 
@@ -8227,6 +8446,8 @@
                     `;
                 });
 
+                const batchItemIdsCsv = filteredBatchItems.map(i => i.id).join(',');
+
                 batchCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); padding-bottom: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
@@ -8234,10 +8455,16 @@
                             <span style="font-size: 0.76rem; background: rgba(59,130,246,0.1); color: #2563eb; padding: 2px 8px; border-radius: 999px; font-weight: 700;">${b.category}</span>
                             <span style="font-size: 0.76rem; color: #059669; font-weight: 700; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 999px;">${locBadgeSummary}</span>
                         </div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669;">${filteredBatchItems.length} Matching Items</span>
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669; margin-right: 4px;">${filteredBatchItems.length} Matching Items</span>
+                            <button type="button" onclick="toggleSelectSpecificBatch('${batchItemIdsCsv}')" style="background: rgba(2,132,199,0.1); border: 1px solid rgba(2,132,199,0.3); color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;" title="Tick / Untick all items in this batch">
+                                ☑️ Select Batch
+                            </button>
                             <button type="button" onclick="openEditBatchPriceModal('${safeModel}', '${safeStorage}', '${b.buyPrice}', '${b.mrp}', '${safeCategory}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;" title="Update prices for this entire batch">
                                 ✏️ Edit Batch Price
+                            </button>
+                            <button type="button" onclick="deleteSpecificBatchItems('${batchItemIdsCsv}', ${bIdx + 1})" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #dc2626; padding: 3px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;" title="Delete ticked items in this batch or entire batch">
+                                🗑️ Delete Batch
                             </button>
                         </div>
                     </div>
@@ -8273,7 +8500,7 @@
             }
         };
 
-        // Bulk Selection & Transfer Logic for Stock Batch Modal
+        // Bulk Selection, Transfer & Delete Logic for Stock Batch Modal
         window.selectedBatchImeis = new Set();
 
         window.onBatchImeiCheckboxChange = function(cb, docId) {
@@ -8283,6 +8510,24 @@
             } else {
                 window.selectedBatchImeis.delete(docId);
             }
+            updateBulkTransferUIState();
+        };
+
+        window.toggleSelectSpecificBatch = function(idsCsv) {
+            if (!idsCsv) return;
+            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
+            const ids = idsCsv.split(',').filter(Boolean);
+            const allAlreadySelected = ids.every(id => window.selectedBatchImeis.has(id));
+            ids.forEach(id => {
+                if (allAlreadySelected) {
+                    window.selectedBatchImeis.delete(id);
+                } else {
+                    window.selectedBatchImeis.add(id);
+                }
+            });
+            document.querySelectorAll('.batch-imei-checkbox').forEach(cb => {
+                cb.checked = window.selectedBatchImeis.has(cb.dataset.id);
+            });
             updateBulkTransferUIState();
         };
 
@@ -8335,6 +8580,9 @@
             const btnCount = document.getElementById('bulkTransferBtnCount');
             if (btnCount) btnCount.innerText = count;
 
+            const delCount = document.getElementById('bulkDeleteBtnCount');
+            if (delCount) delCount.innerText = count;
+
             const transferBtn = document.getElementById('bulkTransferSubmitBtn');
             if (transferBtn) {
                 if (count > 0) {
@@ -8343,6 +8591,17 @@
                 } else {
                     transferBtn.style.opacity = '0.6';
                     transferBtn.style.boxShadow = 'none';
+                }
+            }
+
+            const deleteBtn = document.getElementById('bulkDeleteSubmitBtn');
+            if (deleteBtn) {
+                if (count > 0) {
+                    deleteBtn.style.opacity = '1';
+                    deleteBtn.style.boxShadow = '0 4px 12px rgba(239,68,68,0.4)';
+                } else {
+                    deleteBtn.style.opacity = '0.6';
+                    deleteBtn.style.boxShadow = 'none';
                 }
             }
 
@@ -8373,6 +8632,99 @@
                     }
                 }
             });
+        };
+
+        window.executeBulkImeiDelete = async function() {
+            if (!window.selectedBatchImeis || window.selectedBatchImeis.size === 0) {
+                return showToast("කරුණාකර Delete කිරීමට අවම වශයෙන් එක් IMEI අංකයක් හෝ Tick කරන්න! (Please select at least 1 IMEI to delete)", "warning");
+            }
+
+            const selectedIds = Array.from(window.selectedBatchImeis);
+            const count = selectedIds.length;
+
+            const confirmMsg = `Are you sure you want to permanently DELETE ${count} selected phone(s) from Inventory?\n\nතෝරාගත් දුරකථන (IMEI) ${count} ක් Inventory එකෙන් ස්ථිරවම ඉවත් කිරීමට (Delete) තහවුරු කරන්න.`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('bulkDeleteSubmitBtn');
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `⏳ Deleting ${count}...`;
+            }
+
+            try {
+                const chunkSize = 400;
+                for (let i = 0; i < selectedIds.length; i += chunkSize) {
+                    const chunk = selectedIds.slice(i, i + chunkSize);
+                    const batch = writeBatch(db);
+                    chunk.forEach(docId => {
+                        batch.delete(doc(db, "inventory", docId));
+                    });
+                    await batch.commit();
+                }
+
+                const deletedSet = new Set(selectedIds);
+                allInventoryItems = (allInventoryItems || []).filter(i => !deletedSet.has(i.id));
+                window.selectedBatchImeis.clear();
+
+                showToast(`🗑️ සාර්ථකයි! තෝරාගත් දුරකථන (IMEI) ${count} ක් Inventory එකෙන් ඉවත් කරන ලදී!`, "warning");
+
+                updateStockModelFilterDropdowns();
+                filterInventoryTable();
+                refreshActiveStockBatchModal();
+            } catch (err) {
+                console.error("Bulk delete error:", err);
+                showToast("Bulk delete failed: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `🗑️ Delete Selected (<span id="bulkDeleteBtnCount">${window.selectedBatchImeis ? window.selectedBatchImeis.size : 0}</span>)`;
+                }
+            }
+        };
+
+        window.deleteSpecificBatchItems = async function(idsCsv, batchNum) {
+            if (!idsCsv) return;
+            const batchIds = idsCsv.split(',').filter(Boolean);
+            if (batchIds.length === 0) return;
+
+            // If user has ticked specific items inside this batch, ask to delete those ticked items; otherwise delete the whole batch
+            const tickedInBatch = batchIds.filter(id => window.selectedBatchImeis && window.selectedBatchImeis.has(id));
+            const targetIds = tickedInBatch.length > 0 ? tickedInBatch : batchIds;
+            const isPartial = tickedInBatch.length > 0 && tickedInBatch.length < batchIds.length;
+
+            const confirmMsg = isPartial
+                ? `Delete ${targetIds.length} ticked phone(s) in Batch #${batchNum}?\n\nBatch #${batchNum} හි ඔබ Tick කර ඇති දුරකථන ${targetIds.length} ක් Inventory එකෙන් ඉවත් කිරීමට (Delete) තහවුරු කරන්න.`
+                : `Delete all ${targetIds.length} phone(s) in Batch #${batchNum}?\n\nBatch #${batchNum} හි ඇති දුරකථන ${targetIds.length} ම Inventory එකෙන් ඉවත් කිරීමට (Delete) තහවුරු කරන්න.`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const chunkSize = 400;
+                for (let i = 0; i < targetIds.length; i += chunkSize) {
+                    const chunk = targetIds.slice(i, i + chunkSize);
+                    const batch = writeBatch(db);
+                    chunk.forEach(docId => {
+                        batch.delete(doc(db, "inventory", docId));
+                    });
+                    await batch.commit();
+                }
+
+                const deletedSet = new Set(targetIds);
+                allInventoryItems = (allInventoryItems || []).filter(i => !deletedSet.has(i.id));
+                if (window.selectedBatchImeis) {
+                    targetIds.forEach(id => window.selectedBatchImeis.delete(id));
+                }
+
+                showToast(`🗑️ සාර්ථකයි! Batch #${batchNum} හි දුරකථන ${targetIds.length} ක් ඉවත් කරන ලදී!`, "warning");
+
+                updateStockModelFilterDropdowns();
+                filterInventoryTable();
+                refreshActiveStockBatchModal();
+            } catch (err) {
+                console.error("Batch delete error:", err);
+                showToast("Failed to delete batch items: " + err.message, "error");
+            }
         };
 
         window.executeBulkImeiTransfer = async function() {
@@ -8968,10 +9320,32 @@
         };
 
         window.deleteInventoryItem = async function(id, imei) {
+            // If user ticked multiple items in Batch Modal and clicked the trash icon on one of the ticked rows, run bulk delete
+            if (window.selectedBatchImeis && window.selectedBatchImeis.size > 1 && window.selectedBatchImeis.has(id)) {
+                return window.executeBulkImeiDelete();
+            }
+
             if (!confirm(`Delete stock item with IMEI ${imei}?`)) return;
             try {
                 await deleteDoc(doc(db, "inventory", id));
-                showToast(`Inventory item ${imei} deleted`, "warning");
+
+                // Immediately update local state and UI so item disappears right away
+                if (Array.isArray(allInventoryItems)) {
+                    allInventoryItems = allInventoryItems.filter(item => item.id !== id);
+                }
+                if (window.selectedBatchImeis) {
+                    window.selectedBatchImeis.delete(id);
+                }
+                const cardEl = document.getElementById(`batchImeiCard_${id}`);
+                if (cardEl) cardEl.remove();
+
+                updateStockModelFilterDropdowns();
+                filterInventoryTable();
+                if (typeof window.refreshActiveStockBatchModal === 'function') {
+                    window.refreshActiveStockBatchModal();
+                }
+
+                showToast(`🗑️ Inventory item ${imei} deleted`, "warning");
             } catch (e) {
                 showToast("Failed to delete stock item: " + e.message, "error");
             }
@@ -9659,6 +10033,8 @@
             const isLesi = (category === 'Dialog Lesi Pay');
             const buyPrice = isLesi ? 0 : (parseFloat(document.getElementById('invBuyPrice').value) || 0);
             const mrpPrice = parseFloat(document.getElementById('invMrpPrice').value) || 0;
+            const apiPrice = parseFloat(document.getElementById('invApiPrice')?.value) || 0;
+            const customCommission = parseFloat(document.getElementById('invCustomCommission')?.value) || 0;
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
             if (!rawModel || !shop) return showToast("Please fill all required fields (Model, Storage, Target Location)", "warning");
@@ -9679,6 +10055,8 @@
                         category: category,
                         buyPrice: buyPrice,
                         mrp: mrpPrice,
+                        apiPrice: apiPrice,
+                        customCommission: customCommission,
                         status: 'Available',
                         timestamp: Date.now()
                     });
@@ -9699,6 +10077,11 @@
 
         // Completely Reset & Empty the Add Stock Form
         window.resetInventoryForm = function() {
+            const invApiEl = document.getElementById('invApiPrice');
+            if (invApiEl) invApiEl.value = '';
+            const invCommEl = document.getElementById('invCustomCommission');
+            if (invCommEl) invCommEl.value = '';
+    
             scannedImeiList = [];
             renderScannedImeiChips();
 
@@ -9926,11 +10309,18 @@
                 matchesPeriodFilter(s.date, currentMainStaffDateFilter, currentMainStaffStartDate, currentMainStaffEndDate)
             );
 
-            // Keep track of all known staff names so cards remain accessible
+            // Keep track of all known staff names so cards remain accessible (exclude deleted staff)
             const allKnownNames = new Set();
+            const deletedStaffSet = new Set(getDeletedStaffList().map(n => n.toUpperCase().trim()));
+
             (allMainShopSales || []).forEach(s => {
                 const rawName = (s.staffName || '').trim();
-                if (rawName) allKnownNames.add(normalizeStaffName(rawName));
+                if (rawName) {
+                    const norm = normalizeStaffName(rawName);
+                    if (!deletedStaffSet.has(norm)) {
+                        allKnownNames.add(norm);
+                    }
+                }
             });
 
             allKnownNames.forEach(name => {
@@ -9949,6 +10339,7 @@
                 if (!rawName) return;
                 
                 const name = normalizeStaffName(rawName);
+                if (deletedStaffSet.has(name)) return;
                 const lowerName = name.toLowerCase();
                 if (!staffMap[lowerName]) {
                     staffMap[lowerName] = {
@@ -10031,13 +10422,145 @@
                         </div>
                     </div>
                     
-                    <button class="action-btn" style="width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; color: white; padding: 0.65rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);">View Payments & History ➔</button>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <button class="action-btn" style="flex: 1; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; color: white; padding: 0.65rem 0.9rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);">View Payments & History ➔</button>
+                        <button type="button" onclick="event.stopPropagation(); promptDeleteStaff('${staff.originalName.replace(/'/g, "\\'")}')" style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.35); color: #dc2626; padding: 0.65rem 0.85rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.2s;" title="Delete Staff Member (Admin Password Required)">🗑️</button>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
         // Main Staff Profiles Period Filter Handlers
+        
+        // Cashier Login Link Copy Helper
+        window.copyBranchCashierLogin = function(email, password, shopName) {
+            let base = window.location.href.split('?')[0].split('#')[0];
+            let loginUrl = base.replace(/admin\.html$/i, 'index.html');
+            if (email) {
+                loginUrl += '?email=' + encodeURIComponent(email);
+            }
+            const infoText = '🏪 *' + (shopName || 'Branch') + ' - Cashier Login Info*\n' +
+                             '🌐 Login Link: ' + loginUrl + '\n' +
+                             '📧 Email: ' + email + '\n' +
+                             (password ? ('🔑 Password: ' + password + '\n') : '') +
+                             '\n(Open the link to login. Head Office buy prices are hidden from cashiers for full business security)';
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(infoText).then(() => {
+                    showToast('📋 Copied Cashier Login Info for "' + shopName + '"!', 'success');
+                }).catch(() => {
+                    prompt('Copy login details:', infoText);
+                });
+            } else {
+                prompt('Copy login details:', infoText);
+            }
+        };
+
+        
+        window.calculateInvSuggestedCommission = function() {
+            const mrp = parseFloat(document.getElementById('invMrpPrice')?.value) || 0;
+            const api = parseFloat(document.getElementById('invApiPrice')?.value) || 0;
+            const commInput = document.getElementById('invCustomCommission');
+            if (commInput && mrp > 0 && api > 0) {
+                const diff = Math.max(0, mrp - api);
+                commInput.value = diff.toFixed(0);
+            }
+        };
+
+        
+        // ===== STAFF DELETE SYSTEM WITH ADMIN PASSWORD (1234) =====
+        let targetStaffToDelete = null;
+
+        window.getDeletedStaffList = function() {
+            try {
+                return JSON.parse(localStorage.getItem('deletedStaffNames') || '[]');
+            } catch(e) {
+                return [];
+            }
+        };
+
+        window.saveDeletedStaffName = async function(name) {
+            const norm = (name || '').trim().replace(/\s+/g, ' ').toUpperCase();
+            if (!norm) return;
+            const list = getDeletedStaffList();
+            if (!list.includes(norm)) {
+                list.push(norm);
+                localStorage.setItem('deletedStaffNames', JSON.stringify(list));
+            }
+            // Sync to Firestore app_settings/deleted_staff for multi-device sync
+            try {
+                await setDoc(doc(db, "app_settings", "deleted_staff"), {
+                    names: list,
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch(e) {
+                console.warn("Could not sync deleted staff to firestore:", e);
+            }
+        };
+
+        window.promptDeleteStaff = function(staffName) {
+            targetStaffToDelete = staffName;
+            const modal = document.getElementById('staffDeletePasswordModal');
+            const targetEl = document.getElementById('staffDeleteTargetName');
+            const pwInput = document.getElementById('staffDeleteAdminPassword');
+            const errEl = document.getElementById('staffDeleteErrorMsg');
+
+            if (targetEl) targetEl.innerText = staffName;
+            if (pwInput) pwInput.value = '';
+            if (errEl) errEl.innerText = '';
+            if (modal) modal.style.display = 'flex';
+            setTimeout(() => { if (pwInput) pwInput.focus(); }, 120);
+        };
+
+        window.closeStaffDeleteModal = function() {
+            const modal = document.getElementById('staffDeletePasswordModal');
+            if (modal) modal.style.display = 'none';
+            targetStaffToDelete = null;
+        };
+
+        window.executeStaffDelete = async function() {
+            const pwInput = document.getElementById('staffDeleteAdminPassword');
+            const errEl = document.getElementById('staffDeleteErrorMsg');
+            const entered = pwInput ? pwInput.value.trim() : '';
+
+            const ADMIN_SECRET = '1234';
+            if (entered !== ADMIN_SECRET) {
+                if (errEl) errEl.innerText = '❌ වැරදි Admin Password එකකි! (Password: 1234)';
+                if (pwInput) { pwInput.value = ''; pwInput.focus(); }
+                return;
+            }
+
+            if (!targetStaffToDelete) {
+                closeStaffDeleteModal();
+                return;
+            }
+
+            const removedName = targetStaffToDelete;
+            await saveDeletedStaffName(removedName);
+            closeStaffDeleteModal();
+
+            showToast('🗑️ සාර්ථකයි! Staff සාමාජික "' + removedName + '" ඉවත් කරන ලදී!', 'warning');
+
+            // Instantly refresh UI
+            renderStaffProfiles();
+            updateActivatorDatalist();
+        };
+
+        // Real-time Firestore sync for deleted staff list
+        try {
+            onSnapshot(doc(db, "app_settings", "deleted_staff"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (Array.isArray(data.names)) {
+                        localStorage.setItem('deletedStaffNames', JSON.stringify(data.names));
+                        renderStaffProfiles();
+                        updateActivatorDatalist();
+                    }
+                }
+            });
+        } catch(e) {}
+
         window.setMainStaffDateFilter = function(period) {
             currentMainStaffDateFilter = period;
             document.querySelectorAll('#staffProfilesView .staff-date-filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -11235,7 +11758,6 @@
             const regData = (registeredShopsList || []).find(r => r.id === shopId);
             document.getElementById('addShopForm').reset();
             document.getElementById('editingShopDocId').value = shopId;
-            document.getElementById('addShopModalTitle').innerText = 'Edit Shop Profile - ' + name;
             document.getElementById('newShopName').value = name || '';
             document.getElementById('newShopEmail').value = email || '';
             document.getElementById('newShopEmail').readOnly = true;
@@ -11244,6 +11766,14 @@
             document.getElementById('newShopPassword').value = regData?.password || '1234';
             document.getElementById('newShopHoPercent').value = regData?.hoPercent ?? 4;
             document.getElementById('newShopOwnPercent').value = regData?.shopOwnPercent ?? 6;
+
+            const isHOCashier = regData?.role === 'headoffice_cashier' || (location || '').toUpperCase().includes('HEAD OFFICE');
+            const targetRole = isHOCashier ? 'headoffice_cashier' : 'sub_shop';
+            const radio = document.querySelector(`input[name="newShopRole"][value="${targetRole}"]`);
+            if (radio) radio.checked = true;
+            handleAccountRoleChange(targetRole);
+
+            document.getElementById('addShopModalTitle').innerText = 'Edit ' + (isHOCashier ? 'Cashier Profile - ' : 'Shop Profile - ') + name;
             document.getElementById('saveShopBtn').innerText = 'Save Changes';
             document.getElementById('addShopModal').style.display = 'flex';
         };

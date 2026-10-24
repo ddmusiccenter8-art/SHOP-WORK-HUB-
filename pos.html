@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methmi Work Hub | Cashier POS</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e50000">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Sinhala:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        :root {
+            --primary: #e50000;
+            --primary-hover: #cc0000;
+            --primary-light: rgba(229, 0, 0, 0.08);
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            --info: #2563eb;
+            --info-light: rgba(37, 99, 235, 0.08);
+            --danger: #ef4444;
+            --purple: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Header */
+        .header {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 0.75rem 1.4rem;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), #ff3333);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(229, 0, 0, 0.35);
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .brand-title h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-title h1 span.pos-tag {
+            background: var(--primary);
+            color: white;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge-branch {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--info-light);
+            border: 1.5px solid rgba(37, 99, 235, 0.3);
+            color: var(--info);
+            padding: 0.4rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .badge-connection {
+            font-size: 0.78rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            background: var(--success-light);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1.5px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+            padding: 0.45rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            margin-bottom: 1.2rem;
+            display: flex;
+            gap: 0.6rem;
+            width: 100%;
+            max-width: 1400px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 2px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.6rem;
+            background: #ffffff;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.92rem;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background: #f8fafc;
+            color: var(--text-main);
+        }
+
+        .tab.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            border-top: 3px solid var(--primary);
+            box-shadow: 0 -4px 12px rgba(229, 0, 0, 0.08);
+        }
+
+        .tab-badge {
+            background: #f1f5f9;
+            color: var(--text-main);
+            font-size: 0.72rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+
+        .tab.active .tab-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* POS Grid Layout */
+        .pos-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 1.4rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .pos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Panel */
+        .panel {
+            background: var(--card-bg);
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.2rem;
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        /* Form Inputs */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.72rem 0.9rem;
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.92rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229, 0, 0, 0.12);
+        }
+
+        /* IMEI Scan & Verification Card */
+        .imei-box {
+            background: linear-gradient(135deg, rgba(229, 0, 0, 0.04) 0%, rgba(37, 99, 235, 0.04) 100%);
+            border: 2px dashed rgba(229, 0, 0, 0.35);
+            border-radius: 14px;
+            padding: 1.1rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .imei-input-wrap {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+        }
+
+        .imei-input-wrap input {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            font-size: 1.05rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            border: 2px solid #93c5fd;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-scan {
+            background: linear-gradient(135deg, var(--info), #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0 1.2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-scan:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .verified-card {
+            margin-top: 0.8rem;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1.5px solid var(--success);
+            padding: 0.85rem 1.1rem;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .verified-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .verified-badge {
+            background: var(--success-light);
+            color: #047857;
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .verified-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .verified-price {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #059669;
+        }
+
+        .rejection-banner {
+            margin-top: 0.65rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1.5px solid rgba(239, 68, 68, 0.35);
+            color: #dc2626;
+            padding: 0.65rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Payment Summary Box */
+        .payment-box {
+            background: #f8fafc;
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .pay-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            font-size: 0.92rem;
+        }
+
+        .pay-row.total {
+            border-top: 2px dashed #cbd5e1;
+            padding-top: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+
+        .pay-row.change {
+            background: rgba(16, 185, 129, 0.12);
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            font-weight: 800;
+            color: #047857;
+            margin-bottom: 0;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit-sale {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(229, 0, 0, 0.35);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit-sale:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(229, 0, 0, 0.45);
+        }
+
+        .btn-submit-sale:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Stock Quick-Select Cards (Right Column) */
+        .stock-search-wrap {
+            margin-bottom: 0.9rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .stock-search-wrap input {
+            flex: 1;
+            padding: 0.65rem 0.85rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.88rem;
+        }
+
+        .stock-list-container {
+            max-height: 580px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .stock-item-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.65rem;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stock-item-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(229, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .stock-item-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .stock-item-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .stock-item-meta code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f5f9;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .btn-pick-sale {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.55rem 0.95rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-pick-sale:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Stock Table View (Tab 2) */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th {
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            border: 1.5px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card h3 {
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card p.stat-val {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .stat-card span.stat-sub {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 1.8rem;
+            position: relative;
+        }
+
+        /* Printable Receipt Styles (Both Screen & Thermal 80mm Print) */
+        .receipt-container {
+            font-family: 'JetBrains Mono', 'Inter', monospace;
+            color: #000;
+            padding: 1rem;
+            background: #fff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            margin-bottom: 1.2rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 0.8rem;
+        }
+
+        .receipt-header h2 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+            color: #000;
+        }
+
+        .receipt-meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+        }
+
+        .receipt-table {
+            width: 100%;
+            margin: 0.8rem 0;
+            border-collapse: collapse;
+        }
+
+        .receipt-table th {
+            border-bottom: 1px solid #000;
+            border-top: 1px solid #000;
+            padding: 4px 0;
+            font-size: 0.78rem;
+            text-align: left;
+            color: #000;
+        }
+
+        .receipt-table td {
+            padding: 6px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.82rem;
+            color: #000;
+        }
+
+        .receipt-totals {
+            margin-top: 0.6rem;
+            border-top: 1px dashed #000;
+            padding-top: 0.6rem;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 1rem;
+            border-top: 1px dashed #000;
+            padding-top: 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableReceiptArea, #printableReceiptArea * {
+                visibility: visible;
+            }
+            #printableReceiptArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 78mm;
+                max-width: 100%;
+                margin: 0;
+                padding: 4mm;
+                border: none;
+                box-shadow: none;
+                font-size: 11px;
+                color: #000;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 0.85rem 1.4rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .toast.success { background: #059669; }
+        .toast.warning { background: #d97706; }
+        .toast.error { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <div class="header">
+        <div class="brand-block">
+            <div class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+            </div>
+            <div class="brand-title">
+                <h1>METHMI WORK HUB <span class="pos-tag">CASHIER POS</span></h1>
+                <div class="brand-subtitle">Point of Sale & Stock Invoicing Portal (කැෂියර් පද්ධතිය)</div>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <!-- Branch Location Selector -->
+            <div class="badge-branch" id="headerBranchBadge">
+                <span>🏪</span>
+                <span id="cashierBranchText">Loading Branch...</span>
+            </div>
+
+            <!-- Firebase Online Badge -->
+            <div class="badge-connection" id="headerFirebaseBadge">
+                🟢 Firebase Connected
+            </div>
+
+            <!-- Cashier User Display -->
+            <div style="font-size: 0.84rem; font-weight: 700; color: #475569;" id="cashierEmailDisplay">
+                user@methmi.com
+            </div>
+
+            <!-- Optional Link to Loan Portal -->
+            <a href="shop.html" style="text-decoration:none; padding: 0.45rem 0.95rem; background: rgba(124, 58, 237, 0.1); border: 1.5px solid rgba(124, 58, 237, 0.3); color: #7c3aed; border-radius: 10px; font-weight: 700; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px;" title="Switch to Loan Submissions Portal">
+                📑 Loan Portal
+            </a>
+
+            <!-- Logout -->
+            <button class="logout-btn" onclick="doLogout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="pos" onclick="switchTab('pos')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            Sale Counter (විකුණුම් කවුන්ටරය)
+        </div>
+
+        <div class="tab" data-tab="stock" onclick="switchTab('stock')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            Branch Stock (ශාඛාවේ ඇති තොගය)
+            <span class="tab-badge" id="tabStockCountBadge">0</span>
+        </div>
+
+        <div class="tab" data-tab="shift" onclick="switchTab('shift')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            Today's Shift Sales (අද දවසේ බිල්පත්)
+            <span class="tab-badge" id="tabShiftCountBadge">0</span>
+        </div>
+    </div>
+
+    <!-- VIEW 1: SALE COUNTER / CASHIER POS -->
+    <div id="posView" class="view active">
+        <!-- Location Switcher Bar -->
+        <div style="background: white; border-radius: 14px; border: 1.5px solid var(--border-color); padding: 0.75rem 1.2rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <label for="posBranchSelector" style="font-weight: 800; font-size: 0.88rem; color: #1e3a8a; display: flex; align-items: center; gap: 6px;">
+                    🏬 Current Stock Location:
+                </label>
+                <select id="posBranchSelector" onchange="handleBranchChange(this.value)" style="background: #f8fafc; border: 1.5px solid #93c5fd; color: #1e3a8a; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; outline: none; cursor: pointer;">
+                    <option value="LOADING">Loading branches...</option>
+                </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="posStockAvailableBadge" style="font-size: 0.84rem; font-weight: 800; background: var(--success-light); color: #047857; border: 1px solid rgba(16,185,129,0.35); padding: 0.35rem 0.85rem; border-radius: 999px;">
+                    📦 Available: 0 Phones
+                </span>
+            </div>
+        </div>
+
+        <!-- POS 2-Column Split Grid -->
+        <div class="pos-grid">
+            
+            <!-- Left Column: Primary Billing Form -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <span>🧾</span> New Sale & Invoice (නව බිල්පතක් නිකුත් කිරීම)
+                    </span>
+                    <button type="button" onclick="resetPosForm()" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #dc2626; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
+                        🧹 Reset Form
+                    </button>
+                </div>
+
+                <form id="cashierSaleForm" onsubmit="handleSaleSubmit(event)">
+                    
+                    <!-- 1. IMEI SCAN & VERIFICATION BOX -->
+                    <div class="imei-box">
+                        <label style="font-size: 0.82rem; font-weight: 800; color: #1e3a8a; display: flex; align-items: center; justify-content: space-between;">
+                            <span>🔍 Step 1: Scan or Type Phone IMEI (දුරකථන IMEI අංකය) *</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">(Auto-detects device details)</span>
+                        </label>
+                        
+                        <div class="imei-input-wrap">
+                            <input type="text" id="posImeiInput" placeholder="Scan barcode or type IMEI..." autocomplete="off" oninput="handleImeiLookup(this.value)" onchange="handleImeiLookup(this.value)">
+                            <button type="button" class="btn-scan" onclick="startCameraScanner('posImeiInput')">
+                                📷 Camera Scan
+                            </button>
+                        </div>
+
+                        <!-- Error Banner -->
+                        <div id="posImeiRejectionBanner" class="rejection-banner">
+                            <span>⚠️</span> <span id="posImeiRejectionText">IMEI not found in available stock!</span>
+                        </div>
+
+                        <!-- Auto-Verified Device Card -->
+                        <div id="posVerifiedCard" class="verified-card" style="display: none;">
+                            <div class="verified-header">
+                                <span class="verified-badge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    STOCK VERIFIED IN LOCATION
+                                </span>
+                                <span id="verifiedCategoryBadge" style="font-size: 0.75rem; font-weight: 700; color: #7c3aed; background: rgba(124,58,237,0.1); padding: 2px 7px; border-radius: 6px;">Normal Stock</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <div class="verified-title" id="verifiedModelName">Samsung Galaxy A15 5G</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;">
+                                        Storage: <span id="verifiedStorage" style="color: #2563eb; font-weight: 700;">128GB</span> &bull;
+                                        IMEI: <span id="verifiedImeiDisplay" style="font-family: 'JetBrains Mono'; font-weight: 700;">354892112345678</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Retail Price (MRP)</div>
+                                    <div class="verified-price" id="verifiedMrpDisplay">Rs. 0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. SALE TYPE & INVOICE REFERENCE -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posSaleType">Sale Process Type (විකුණුම් ආකාරය) *</label>
+                            <select id="posSaleType" onchange="handleSaleTypeToggle()">
+                                <option value="Direct Cash/Card Sale" selected>💰 Direct Sale (Cash / Card / Bank)</option>
+                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Activation</option>
+                                <option value="Loan / Leasing Sale">📑 Loan / Leasing Submission</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="posInvoiceNo">Invoice / SP Reference Number *</label>
+                            <input type="text" id="posInvoiceNo" required readonly style="background: #f8fafc; font-weight: 700;">
+                        </div>
+                    </div>
+
+                    <!-- 3. DATE & TIME -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posSaleDate">Sale Date (දිනය) *</label>
+                            <input type="date" id="posSaleDate" required>
+                        </div>
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                                <label for="posSaleTime" style="margin: 0;">Sale Time (වේලාව) *</label>
+                                <span onclick="setCurrentTimeToField()" style="font-size: 0.73rem; color: #2563eb; cursor: pointer; font-weight: 700;">⚡ Set to Now</span>
+                            </div>
+                            <input type="time" id="posSaleTime" required>
+                        </div>
+                    </div>
+
+                    <!-- 4. CUSTOMER DETAILS -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posCustName">Customer Full Name (පාරිභෝගික නම) *</label>
+                            <input type="text" id="posCustName" placeholder="e.g. Kasun Perera" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="posCustPhone">Customer Contact Number (දුරකථන අංකය) *</label>
+                            <input type="tel" id="posCustPhone" placeholder="e.g. 0771234567" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posCustNic">Customer NIC (ජාතික හැඳුනුම්පත් අංකය)</label>
+                            <input type="text" id="posCustNic" placeholder="e.g. 199512345678 or 951234567V">
+                        </div>
+                        <div class="form-group">
+                            <label for="posWarranty">Warranty Period (වගකීම් කාලය) *</label>
+                            <select id="posWarranty">
+                                <option value="1 Year Company Warranty" selected>🛡️ 1 Year Company Warranty</option>
+                                <option value="6 Months Warranty">🛡️ 6 Months Warranty</option>
+                                <option value="3 Months Warranty">🛡️ 3 Months Warranty</option>
+                                <option value="1 Month Checking Warranty">🛡️ 1 Month Checking Warranty</option>
+                                <option value="7 Days Checking Warranty">🛡️ 7 Days Checking Warranty</option>
+                                <option value="No Warranty">⚠️ No Warranty</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 5. CASHIER / ACTIVATOR STAFF -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="posStaffName">Cashier / Activator Staff (විකිණූ අයගේ නම) *</label>
+                            <select id="posStaffSelect" onchange="handleStaffChange(this.value)">
+                                <option value="">-- Select Staff Name --</option>
+                            </select>
+                            <input type="text" id="posStaffNameManual" placeholder="Or type new staff name..." style="display: none; margin-top: 6px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="posPaymentMethod">Payment Method (ගෙවීම් ක්‍රමය) *</label>
+                            <select id="posPaymentMethod" onchange="calculatePosAmounts()">
+                                <option value="Cash" selected>💵 Cash (මුදලින්)</option>
+                                <option value="Card">💳 Credit / Debit Card (කාඩ්පත)</option>
+                                <option value="Bank Transfer">🏦 Bank Transfer / Online (බැංකු තැන්පතු)</option>
+                                <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
+                                <option value="Leasing / Loan">📑 Leasing / Loan Installment</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 6. PRICING & CHANGE CALCULATOR -->
+                    <div class="payment-box">
+                        <div class="pay-row">
+                            <span style="font-weight: 700; color: var(--text-muted);">Selling Price (MRP):</span>
+                            <div style="width: 140px;">
+                                <input type="number" id="posSellingPrice" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()" style="text-align: right; font-weight: 800; font-size: 1.05rem;" required>
+                            </div>
+                        </div>
+
+                        <div class="pay-row">
+                            <span style="font-weight: 700; color: var(--text-muted);">Special Discount (Rs.):</span>
+                            <div style="width: 140px;">
+                                <input type="number" id="posDiscount" step="0.01" value="0" placeholder="0.00" oninput="calculatePosAmounts()" style="text-align: right; font-weight: 700; color: #dc2626;">
+                            </div>
+                        </div>
+
+                        <div class="pay-row total">
+                            <span>Net Payable Total (අයවිය යුතු මුදල):</span>
+                            <span id="posNetPayableDisplay" style="color: #047857; font-size: 1.45rem;">Rs. 0.00</span>
+                        </div>
+
+                        <div class="pay-row" style="margin-top: 0.8rem;">
+                            <span style="font-weight: 700; color: #1e3a8a;">Cash / Tendered Received (ලැබුණු මුදල):</span>
+                            <div style="width: 140px;">
+                                <input type="number" id="posAmountReceived" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()" style="text-align: right; font-weight: 800; font-size: 1.05rem; border-color: #3b82f6;">
+                            </div>
+                        </div>
+
+                        <div class="pay-row change" id="posChangeRow">
+                            <span id="posChangeLabel">Balance to Return (ඉතිරි මුදල):</span>
+                            <span id="posChangeDisplay" style="font-size: 1.25rem;">Rs. 0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="form-group">
+                        <label for="posRemarks">Notes / Bill Remarks (අමතර සටහන්)</label>
+                        <input type="text" id="posRemarks" placeholder="Optional notes for customer receipt...">
+                    </div>
+
+                    <!-- Hidden Fields -->
+                    <input type="hidden" id="posInventoryDocId">
+                    <input type="hidden" id="posPhoneModel">
+                    <input type="hidden" id="posPhoneStorage">
+                    <input type="hidden" id="posPhoneCategory">
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit-sale" id="btnSubmitSale">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>⚡ Complete Sale & Print Bill (විකිණීම සම්පූර්ණ කරන්න)</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Quick Available Stock Selector -->
+            <div>
+                <div class="panel">
+                    <div class="panel-title">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <span>📦</span> Available in Location (විකිණීමට ඇති තොගය)
+                        </span>
+                        <span id="quickStockBadgeCount" style="font-size: 0.78rem; font-weight: 800; background: var(--info-light); color: var(--info); padding: 3px 8px; border-radius: 999px;">
+                            0 Items
+                        </span>
+                    </div>
+
+                    <div class="stock-search-wrap">
+                        <input type="text" id="quickStockSearchInput" placeholder="🔍 Search Model, IMEI, Storage..." oninput="filterQuickStock()">
+                        <select id="quickStockModelFilter" onchange="filterQuickStock()" style="max-width: 130px; font-size: 0.8rem; font-weight: 600; border-radius: 10px; border: 1.5px solid var(--border-color); background: white;">
+                            <option value="ALL">All Models</option>
+                        </select>
+                    </div>
+
+                    <div class="stock-list-container" id="quickStockList">
+                        <div style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading stock items...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- VIEW 2: BRANCH STOCK EXPLORER TABLE -->
+    <div id="stockView" class="view">
+        <div class="panel">
+            <div class="panel-title">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span>📦</span>
+                    <span>Dispatched Stock Inventory (ශාඛාවට එවන ලද දුරකථන තොග ලැයිස්තුව)</span>
+                    <span id="stockTableBadgeTotal" style="font-size: 0.78rem; font-weight: 800; background: var(--success-light); color: #047857; padding: 3px 9px; border-radius: 999px;">
+                        0 Available
+                    </span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <input type="text" id="fullStockSearch" placeholder="🔍 Search IMEI or Model..." oninput="renderFullStockTable()" style="padding: 0.45rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.82rem; min-width: 220px;">
+                    <select id="fullStockStatusFilter" onchange="renderFullStockTable()" style="padding: 0.45rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.82rem; font-weight: 600; background: white;">
+                        <option value="Available" selected>🟢 Available Only</option>
+                        <option value="Sold">🔴 Sold Items</option>
+                        <option value="ALL">All Items</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IMEI Number</th>
+                            <th>Device Model & Specs</th>
+                            <th>Stock Location</th>
+                            <th>Retail Price (MRP)</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fullStockTableBody">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading stock records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: TODAY'S SHIFT SALES -->
+    <div id="shiftView" class="view">
+        
+        <!-- Shift Overview Metric Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>📱 Phones Sold Today</h3>
+                <p class="stat-val" id="shiftPhonesCount">0</p>
+                <span class="stat-sub">Completed transactions</span>
+            </div>
+            <div class="stat-card">
+                <h3>💰 Total Sales Revenue</h3>
+                <p class="stat-val" id="shiftTotalRevenue" style="color: #059669;">Rs. 0.00</p>
+                <span class="stat-sub">Total billed value</span>
+            </div>
+            <div class="stat-card">
+                <h3>💵 Cash Collected</h3>
+                <p class="stat-val" id="shiftCashTotal" style="color: #2563eb;">Rs. 0.00</p>
+                <span class="stat-sub">Physical cash in drawer</span>
+            </div>
+            <div class="stat-card">
+                <h3>💳 Card & Bank / Lesi Pay</h3>
+                <p class="stat-val" id="shiftCardBankTotal" style="color: #7c3aed;">Rs. 0.00</p>
+                <span class="stat-sub">Digital / transfer settlements</span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <span>📋</span> Today's Completed Bills (අද දින නිකුත් කළ බිල්පත් ලැයිස්තුව)
+                </span>
+                <input type="text" id="shiftSalesSearch" placeholder="🔍 Search Invoice, Customer, IMEI..." oninput="renderShiftSalesTable()" style="padding: 0.45rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.82rem; min-width: 220px;">
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Invoice / SP</th>
+                            <th>Customer Name & Phone</th>
+                            <th>Device & IMEI</th>
+                            <th>Billed Price</th>
+                            <th>Payment</th>
+                            <th>Cashier</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftSalesTableBody">
+                        <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales completed today yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE RECEIPT MODAL -->
+    <div id="receiptModal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;" class="no-print">
+                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                    <span>🧾</span> Customer Bill / Receipt
+                </h3>
+                <button type="button" onclick="closeReceiptModal()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Printable Bill Paper Area (Thermal 80mm & A4) -->
+            <div id="printableReceiptArea" class="receipt-container">
+                <div class="receipt-header">
+                    <h2>METHMI MOBILE (PVT) LTD</h2>
+                    <div style="font-weight: 700; font-size: 0.78rem;">Smartphones & Accessories Specialists</div>
+                    <div id="receiptStoreBranch" style="font-weight: 600; font-size: 0.75rem; margin-top: 2px;">Main Showroom & Head Office</div>
+                    <div style="font-size: 0.72rem; color: #475569;">Hotline: 077-1234567 / 081-2233445</div>
+                </div>
+
+                <div class="receipt-meta-row">
+                    <span><strong>INVOICE:</strong> <span id="rInvoiceNo">INV-0001</span></span>
+                    <span><strong>DATE:</strong> <span id="rDate">2026-10-24</span></span>
+                </div>
+                <div class="receipt-meta-row">
+                    <span><strong>TIME:</strong> <span id="rTime">12:30 PM</span></span>
+                    <span><strong>CASHIER:</strong> <span id="rCashier">Staff</span></span>
+                </div>
+                <div class="receipt-meta-row" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 4px;">
+                    <span><strong>CUSTOMER:</strong> <span id="rCustName">Kasun Perera</span></span>
+                </div>
+                <div class="receipt-meta-row">
+                    <span><strong>PHONE:</strong> <span id="rCustPhone">0771234567</span></span>
+                    <span id="rCustNicWrap"><strong>NIC:</strong> <span id="rCustNic">-</span></span>
+                </div>
+
+                <table class="receipt-table">
+                    <thead>
+                        <tr>
+                            <th>ITEM DESCRIPTION</th>
+                            <th style="text-align: right;">AMOUNT (RS.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong id="rModel">Samsung Galaxy A15</strong><br>
+                                <span style="font-size: 0.72rem;">Storage: <span id="rStorage">128GB</span></span><br>
+                                <span style="font-size: 0.72rem; font-weight: 700;">IMEI: <span id="rImei">354892112345678</span></span>
+                            </td>
+                            <td style="text-align: right; vertical-align: top; font-weight: 700;" id="rItemPrice">
+                                58,000.00
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="receipt-totals">
+                    <div class="receipt-meta-row">
+                        <span>SUB TOTAL:</span>
+                        <span id="rSubTotal">Rs. 58,000.00</span>
+                    </div>
+                    <div class="receipt-meta-row" id="rDiscountRow" style="display: none;">
+                        <span>DISCOUNT:</span>
+                        <span id="rDiscount" style="color: #dc2626;">-Rs. 0.00</span>
+                    </div>
+                    <div class="receipt-meta-row" style="font-weight: 900; font-size: 1rem; border-top: 1px dashed #000; padding-top: 4px; margin-top: 4px;">
+                        <span>GRAND TOTAL:</span>
+                        <span id="rGrandTotal">Rs. 58,000.00</span>
+                    </div>
+                    <div class="receipt-meta-row" style="margin-top: 4px;">
+                        <span>PAYMENT MODE:</span>
+                        <span id="rPaymentMethod" style="font-weight: 700;">Cash</span>
+                    </div>
+                    <div class="receipt-meta-row" id="rCashPaidRow">
+                        <span>CASH RECEIVED:</span>
+                        <span id="rCashReceived">Rs. 60,000.00</span>
+                    </div>
+                    <div class="receipt-meta-row" id="rCashChangeRow">
+                        <span>BALANCE RETURNED:</span>
+                        <span id="rCashChange" style="font-weight: 700;">Rs. 2,000.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 0.8rem; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 6px; border-radius: 6px; font-size: 0.72rem;">
+                    <strong>WARRANTY:</strong> <span id="rWarranty">1 Year Company Warranty</span><br>
+                    <span style="font-size: 0.68rem; color: #64748b;">* Warranty covers manufacturer defects only. Physical/water damages not covered. Please produce this receipt for all claims.</span>
+                </div>
+
+                <div class="receipt-footer">
+                    <strong>Thank You For Choosing Methmi Mobile!</strong><br>
+                    Goods once sold are not returnable without inspection.<br>
+                    *** End of Receipt ***
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons (Hidden on Print) -->
+            <div style="display: flex; gap: 10px; justify-content: flex-end;" class="no-print">
+                <button type="button" onclick="closeReceiptModal()" style="background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); padding: 0.65rem 1.2rem; border-radius: 10px; font-weight: 700; cursor: pointer;">
+                    Close
+                </button>
+                <button type="button" onclick="printCustomerReceipt()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.65rem 1.4rem; border-radius: 10px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    <span>🖨️ Print Receipt</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAMERA SCANNER MODAL -->
+    <div id="scannerModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 480px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                    <span>📷</span> Barcode / IMEI Scanner
+                </h3>
+                <button type="button" onclick="stopCameraScanner()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Video Preview Container -->
+            <div id="cameraPreview" style="width: 100%; min-height: 260px; background: #000; border-radius: 12px; overflow: hidden; position: relative;"></div>
+
+            <div style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <button type="button" id="btnToggleTorch" onclick="toggleScannerTorch()" style="background: #f1f5f9; border: 1px solid var(--border-color); padding: 0.45rem 0.9rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+                    💡 Flash Light
+                </button>
+                <button type="button" onclick="stopCameraScanner()" style="background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastMessage" class="toast">Action completed successfully</div>
+
+    <!-- Firebase SDK & Application Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, getDocs, query, where, doc, updateDoc, addDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdSMDIj4Tlt5sRB0Qjnmm1rQRTGKpN7zs",
+            authDomain: "methmi-work-hub.firebaseapp.com",
+            projectId: "methmi-work-hub",
+            storageBucket: "methmi-work-hub.firebasestorage.app",
+            messagingSenderId: "786539502768",
+            appId: "1:786539502768:web:171f0b674108a8555bef75"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Variables
+        let currentUser = null;
+        let registeredShopsList = [];
+        let activeBranchName = 'HEAD OFFICE';
+        let isHeadOfficeCashier = true;
+        let allAvailableInventory = [];
+        let locationInventory = [];
+        let allStaffProfiles = [];
+        let todayShiftSales = [];
+        let activeVerifiedItem = null;
+
+        // Camera Scanner variables
+        let html5QrCode = null;
+        let targetScannerInputId = null;
+        let isTorchOn = false;
+
+        // Audio Beep for successful scan
+        function playBeepSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(2200, ctx.currentTime);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch(e) {}
+        }
+
+        // Authentication State Listener
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.replace('index.html');
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('cashierEmailDisplay').innerText = user.email;
+
+            // Load registered shops to determine branch affiliation
+            await loadRegisteredShopsAndSetupProfile();
+            
+            // Listen to real-time inventory
+            listenToInventory();
+
+            // Listen to real-time sales for today's shift
+            listenToTodaySales();
+
+            // Listen to staff members for activator dropdown
+            listenToStaffProfiles();
+
+            // Initialize default date & invoice
+            initFormDefaults();
+        });
+
+        // Resolve Cashier Branch Profile
+        async function loadRegisteredShopsAndSetupProfile() {
+            try {
+                const snap = await getDocs(collection(db, "registered_shops"));
+                registeredShopsList = [];
+                snap.forEach(d => registeredShopsList.push({ id: d.id, ...d.data() }));
+
+                const email = (currentUser.email || '').toLowerCase().trim();
+                const adminEmails = [
+                    'admin@methmi.com', 
+                    'methmimobilepvtltd@gmail.com', 
+                    'ddmusiccenter8@gmail.com'
+                ];
+                const isAdmin = email.includes('admin') || adminEmails.includes(email);
+
+                // Match with registered shop
+                const matchedShop = registeredShopsList.find(s => (s.email || '').toLowerCase().trim() === email);
+
+                const selector = document.getElementById('posBranchSelector');
+                selector.innerHTML = '';
+
+                const isHOCashier = (matchedShop && (matchedShop.role === 'headoffice_cashier' || (matchedShop.location || '').toUpperCase().includes('HEAD OFFICE'))) || email.includes('cashier');
+
+                if (isAdmin || isHOCashier || email.includes('headoffice') || email.includes('methmi')) {
+                    isHeadOfficeCashier = true;
+                    activeBranchName = 'HEAD OFFICE';
+
+                    // Add Head office option as default
+                    const hoOpt = document.createElement('option');
+                    hoOpt.value = 'HEAD OFFICE';
+                    hoOpt.innerText = '🏢 HEAD OFFICE / MAIN SHOP (Main Stock)';
+                    hoOpt.selected = true;
+                    selector.appendChild(hoOpt);
+
+                    // Add all registered branch options for selection
+                    registeredShopsList.forEach(s => {
+                        if (s.role !== 'headoffice_cashier') {
+                            const opt = document.createElement('option');
+                            opt.value = s.name || s.email;
+                            opt.innerText = `🏪 ${s.name || s.email} (Branch Stock)`;
+                            selector.appendChild(opt);
+                        }
+                    });
+                } else if (matchedShop) {
+                    isHeadOfficeCashier = false;
+                    activeBranchName = matchedShop.name || email.split('@')[0].toUpperCase();
+
+                    // Branch Cashier Option
+                    const myOpt = document.createElement('option');
+                    myOpt.value = activeBranchName;
+                    myOpt.innerText = `🏪 ${activeBranchName} (My Branch Stock)`;
+                    myOpt.selected = true;
+                    selector.appendChild(myOpt);
+
+                    // Also allow viewing Head Office stock if needed
+                    const hoOpt = document.createElement('option');
+                    hoOpt.value = 'HEAD OFFICE';
+                    hoOpt.innerText = '🏢 HEAD OFFICE / MAIN SHOP (HO Stock)';
+                    selector.appendChild(hoOpt);
+                } else {
+                    const fallbackName = email.split('@')[0].toUpperCase();
+                    activeBranchName = fallbackName;
+                    const opt = document.createElement('option');
+                    opt.value = fallbackName;
+                    opt.innerText = `🏪 ${fallbackName}`;
+                    selector.appendChild(opt);
+                }
+
+                updateHeaderBranchBadge();
+            } catch (err) {
+                console.error("Error loading shops:", err);
+            }
+        }
+
+        function updateHeaderBranchBadge() {
+            const badge = document.getElementById('cashierBranchText');
+            if (activeBranchName === 'HEAD OFFICE' || activeBranchName === 'MAIN SHOP') {
+                badge.innerText = '🏢 HEAD OFFICE (Cashier)';
+            } else {
+                badge.innerText = '🏪 ' + activeBranchName;
+            }
+        }
+
+        window.handleBranchChange = function(selectedVal) {
+            activeBranchName = selectedVal;
+            updateHeaderBranchBadge();
+            filterInventoryForActiveBranch();
+        };
+
+        // Realtime Inventory Listener
+        function listenToInventory() {
+            const q = query(collection(db, "inventory"));
+            onSnapshot(q, (snapshot) => {
+                allAvailableInventory = [];
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    allAvailableInventory.push({ id: docSnap.id, ...d });
+                });
+                filterInventoryForActiveBranch();
+            }, (err) => {
+                console.error("Inventory error:", err);
+            });
+        }
+
+        // Filter Inventory specifically for current branch location
+        function filterInventoryForActiveBranch() {
+            const isHO = activeBranchName === 'HEAD OFFICE' || activeBranchName === 'MAIN SHOP';
+            const branchLow = (activeBranchName || '').toLowerCase().trim();
+
+            locationInventory = allAvailableInventory.filter(item => {
+                const itemShop = (item.shop || '').trim().toLowerCase();
+                const isItemHO = itemShop === 'main shop' || itemShop === 'head office' || itemShop === 'main';
+
+                if (isHO) {
+                    return isItemHO;
+                } else {
+                    return itemShop === branchLow || itemShop.includes(branchLow) || branchLow.includes(itemShop);
+                }
+            });
+
+            // Available only count
+            const availableInLoc = locationInventory.filter(i => (i.status || '').toLowerCase() === 'available');
+
+            // Update Badges
+            document.getElementById('posStockAvailableBadge').innerText = `📦 Available: ${availableInLoc.length} Phones`;
+            document.getElementById('tabStockCountBadge').innerText = availableInLoc.length;
+            document.getElementById('quickStockBadgeCount').innerText = `${availableInLoc.length} Items`;
+            document.getElementById('stockTableBadgeTotal').innerText = `${availableInLoc.length} Available`;
+
+            // Populate Model Filter in Quick Selector
+            updateQuickStockModelDropdown(availableInLoc);
+
+            // Render Quick Stock List & Full Stock Table
+            filterQuickStock();
+            renderFullStockTable();
+        }
+
+        function updateQuickStockModelDropdown(items) {
+            const select = document.getElementById('quickStockModelFilter');
+            const models = new Set();
+            items.forEach(i => { if (i.model) models.add(i.model.trim()); });
+            
+            const curVal = select.value;
+            let html = '<option value="ALL">All Models</option>';
+            Array.from(models).sort().forEach(m => {
+                html += `<option value="${m}">${m}</option>`;
+            });
+            select.innerHTML = html;
+            if (curVal && Array.from(models).includes(curVal)) {
+                select.value = curVal;
+            }
+        }
+
+        // Quick Stock List Filtering (Right Column)
+        window.filterQuickStock = function() {
+            const container = document.getElementById('quickStockList');
+            const searchVal = (document.getElementById('quickStockSearchInput')?.value || '').toLowerCase().trim();
+            const modelFilter = document.getElementById('quickStockModelFilter')?.value || 'ALL';
+
+            let items = locationInventory.filter(i => (i.status || '').toLowerCase() === 'available');
+
+            if (modelFilter !== 'ALL') {
+                items = items.filter(i => (i.model || '').toLowerCase().trim() === modelFilter.toLowerCase().trim());
+            }
+
+            if (searchVal) {
+                items = items.filter(i => 
+                    (i.imei || '').toLowerCase().includes(searchVal) ||
+                    (i.model || '').toLowerCase().includes(searchVal) ||
+                    (i.storage || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (items.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.85rem;">No available stock matching your filter.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            items.forEach(phone => {
+                const card = document.createElement('div');
+                card.className = 'stock-item-card';
+
+                const mrpVal = parseFloat(phone.mrp) || 0;
+                const formattedPrice = mrpVal > 0 ? `Rs. ${mrpVal.toLocaleString(undefined, {minimumFractionDigits: 2})}` : 'Rs. -';
+
+                card.innerHTML = `
+                    <div class="stock-item-info">
+                        <h4>${phone.model || 'Unknown Model'}</h4>
+                        <div class="stock-item-meta">
+                            <span>Storage: <strong>${phone.storage || '-'}</strong></span>
+                            <span>&bull;</span>
+                            <span>IMEI: <code>${phone.imei || '-'}</code></span>
+                        </div>
+                        <div style="font-size: 0.95rem; font-weight: 800; color: #059669; margin-top: 4px;">
+                            ${formattedPrice}
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-pick-sale" onclick="pickPhoneForSale('${phone.imei}')">
+                            ⚡ Sell
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        // Pick phone directly from card list
+        window.pickPhoneForSale = function(imei) {
+            const input = document.getElementById('posImeiInput');
+            input.value = imei;
+            handleImeiLookup(imei);
+            switchTab('pos');
+            setTimeout(() => {
+                document.getElementById('posCustName').focus();
+            }, 100);
+        };
+
+        // Realtime IMEI Lookup & Auto-fill
+        window.handleImeiLookup = function(rawImei) {
+            const imei = (rawImei || '').trim();
+            const rejectionBanner = document.getElementById('posImeiRejectionBanner');
+            const verifiedCard = document.getElementById('posVerifiedCard');
+
+            if (!imei) {
+                rejectionBanner.style.display = 'none';
+                verifiedCard.style.display = 'none';
+                activeVerifiedItem = null;
+                return;
+            }
+
+            // Find matching item in all inventory
+            const match = allAvailableInventory.find(item => item.imei && item.imei.trim().toLowerCase() === imei.toLowerCase());
+
+            if (!match) {
+                rejectionBanner.style.display = 'flex';
+                document.getElementById('posImeiRejectionText').innerText = `IMEI "${imei}" not found in inventory!`;
+                verifiedCard.style.display = 'none';
+                activeVerifiedItem = null;
+                return;
+            }
+
+            if ((match.status || '').toLowerCase() !== 'available') {
+                rejectionBanner.style.display = 'flex';
+                document.getElementById('posImeiRejectionText').innerText = `IMEI "${imei}" is already marked as "${match.status}" (Sold)!`;
+                verifiedCard.style.display = 'none';
+                activeVerifiedItem = null;
+                return;
+            }
+
+            // Successfully Verified
+            rejectionBanner.style.display = 'none';
+            verifiedCard.style.display = 'block';
+            activeVerifiedItem = match;
+
+            // Populate Card
+            document.getElementById('verifiedModelName').innerText = match.model || 'Unknown Model';
+            document.getElementById('verifiedStorage').innerText = match.storage || 'Standard';
+            document.getElementById('verifiedImeiDisplay').innerText = match.imei;
+            document.getElementById('verifiedCategoryBadge').innerText = match.category || 'Standard Stock';
+
+            const mrp = parseFloat(match.mrp) || 0;
+            document.getElementById('verifiedMrpDisplay').innerText = `Rs. ${mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            // Populate Form Fields
+            document.getElementById('posSellingPrice').value = mrp > 0 ? mrp : '';
+            document.getElementById('posPhoneModel').value = match.model || '';
+            document.getElementById('posPhoneStorage').value = match.storage || '';
+            document.getElementById('posPhoneCategory').value = match.category || '';
+            document.getElementById('posInventoryDocId').value = match.id;
+
+            calculatePosAmounts();
+        };
+
+        // Pricing & Change Calculation
+        window.calculatePosAmounts = function() {
+            const sellingPrice = parseFloat(document.getElementById('posSellingPrice')?.value) || 0;
+            const discount = parseFloat(document.getElementById('posDiscount')?.value) || 0;
+            const netPayable = Math.max(0, sellingPrice - discount);
+
+            document.getElementById('posNetPayableDisplay').innerText = `Rs. ${netPayable.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const amountReceived = parseFloat(document.getElementById('posAmountReceived')?.value) || 0;
+            const changeRow = document.getElementById('posChangeRow');
+            const changeLabel = document.getElementById('posChangeLabel');
+            const changeDisplay = document.getElementById('posChangeDisplay');
+
+            if (amountReceived >= netPayable && netPayable > 0) {
+                const change = amountReceived - netPayable;
+                changeRow.style.background = 'rgba(16, 185, 129, 0.12)';
+                changeLabel.innerText = 'Balance to Return (ඉතිරි මුදල):';
+                changeDisplay.style.color = '#047857';
+                changeDisplay.innerText = `Rs. ${change.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } else if (amountReceived > 0 && amountReceived < netPayable) {
+                const due = netPayable - amountReceived;
+                changeRow.style.background = 'rgba(239, 68, 68, 0.1)';
+                changeLabel.innerText = '⚠️ Underpaid Due (තව අයවිය යුතු මුදල):';
+                changeDisplay.style.color = '#dc2626';
+                changeDisplay.innerText = `Rs. ${due.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } else {
+                changeDisplay.innerText = 'Rs. 0.00';
+            }
+        };
+
+        // Staff Profiles Dropdown
+        function listenToStaffProfiles() {
+            onSnapshot(collection(db, "main_shop_sales"), (snap) => {
+                const staffSet = new Set();
+                snap.forEach(d => {
+                    const s = d.data().staffName;
+                    if (s && s.trim() && s !== 'DIRECT / OWNER') staffSet.add(s.trim());
+                });
+
+                const select = document.getElementById('posStaffSelect');
+                select.innerHTML = '<option value="">-- Choose Cashier / Staff --</option>';
+                
+                // Add current user name
+                const myName = (currentUser?.email || '').split('@')[0].toUpperCase();
+                select.innerHTML += `<option value="${myName}" selected>👤 ${myName} (Current Cashier)</option>`;
+
+                Array.from(staffSet).sort().forEach(staff => {
+                    if (staff !== myName) {
+                        select.innerHTML += `<option value="${staff}">👤 ${staff}</option>`;
+                    }
+                });
+                select.innerHTML += '<option value="__MANUAL__">➕ Type New Staff Name...</option>';
+            });
+        }
+
+        window.handleStaffChange = function(val) {
+            const manualInput = document.getElementById('posStaffNameManual');
+            if (val === '__MANUAL__') {
+                manualInput.style.display = 'block';
+                manualInput.required = true;
+                manualInput.focus();
+            } else {
+                manualInput.style.display = 'none';
+                manualInput.required = false;
+            }
+        };
+
+        // Generate Clean Unique Invoice ID
+        function generateInvoiceNumber() {
+            const now = new Date();
+            const yy = String(now.getFullYear()).slice(-2);
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const random = Math.floor(1000 + Math.random() * 9000);
+            return `INV-${yy}${mm}${dd}-${random}`;
+        }
+
+        function initFormDefaults() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('posSaleDate').value = todayStr;
+            setCurrentTimeToField();
+            document.getElementById('posInvoiceNo').value = generateInvoiceNumber();
+        }
+
+        window.setCurrentTimeToField = function() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('posSaleTime').value = `${hours}:${mins}`;
+        };
+
+        // Full Stock Explorer Table (Tab 2)
+        window.renderFullStockTable = function() {
+            const tbody = document.getElementById('fullStockTableBody');
+            const searchVal = (document.getElementById('fullStockSearch')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('fullStockStatusFilter')?.value || 'Available';
+
+            let items = [...locationInventory];
+
+            if (statusFilter !== 'ALL') {
+                items = items.filter(i => (i.status || '').toLowerCase() === statusFilter.toLowerCase());
+            }
+
+            if (searchVal) {
+                items = items.filter(i => 
+                    (i.imei || '').toLowerCase().includes(searchVal) ||
+                    (i.model || '').toLowerCase().includes(searchVal) ||
+                    (i.storage || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching stock records found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            items.forEach(phone => {
+                const tr = document.createElement('tr');
+                const isAvail = (phone.status || '').toLowerCase() === 'available';
+                const statusBadge = isAvail
+                    ? '<span style="background: var(--success-light); color: #047857; font-weight: 700; font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">🟢 Available</span>'
+                    : '<span style="background: rgba(239,68,68,0.1); color: #dc2626; font-weight: 700; font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">🔴 Sold</span>';
+
+                const mrpVal = parseFloat(phone.mrp) || 0;
+                const formattedPrice = mrpVal > 0 ? `Rs. ${mrpVal.toLocaleString(undefined, {minimumFractionDigits: 2})}` : '-';
+
+                const actionHtml = isAvail
+                    ? `<button type="button" class="btn-pick-sale" onclick="pickPhoneForSale('${phone.imei}')">⚡ Sell Now</button>`
+                    : `<span style="font-size: 0.78rem; color: var(--text-muted);">Sold on ${phone.soldDate || '-'}</span>`;
+
+                tr.innerHTML = `
+                    <td><strong style="font-family: 'JetBrains Mono';">${phone.imei || '-'}</strong></td>
+                    <td><strong>${phone.model || '-'}</strong> <span style="color: #2563eb; font-weight: 700;">(${phone.storage || '-'})</span></td>
+                    <td><span style="font-weight: 700; color: #475569;">${phone.shop || activeBranchName}</span></td>
+                    <td><strong style="color: #059669;">${formattedPrice}</strong></td>
+                    <td><span style="font-size: 0.78rem; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${phone.category || 'Standard'}</span></td>
+                    <td>${statusBadge}</td>
+                    <td>${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // SUBMIT SALE (Execute transaction & print receipt)
+        window.handleSaleSubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitSale');
+
+            const imei = document.getElementById('posImeiInput').value.trim();
+            if (!imei) return showToast("Please scan or enter an IMEI number!", "warning");
+
+            if (!activeVerifiedItem) {
+                return showToast("Please enter a verified available stock IMEI!", "error");
+            }
+
+            const model = document.getElementById('posPhoneModel').value || activeVerifiedItem.model;
+            const storage = document.getElementById('posPhoneStorage').value || activeVerifiedItem.storage;
+            const sellingPrice = parseFloat(document.getElementById('posSellingPrice').value) || 0;
+            const discount = parseFloat(document.getElementById('posDiscount').value) || 0;
+            const netAmount = Math.max(0, sellingPrice - discount);
+            const amountReceived = parseFloat(document.getElementById('posAmountReceived').value) || netAmount;
+            const changeGiven = Math.max(0, amountReceived - netAmount);
+
+            const custName = document.getElementById('posCustName').value.trim();
+            const custPhone = document.getElementById('posCustPhone').value.trim();
+            const custNic = document.getElementById('posCustNic').value.trim();
+            const warranty = document.getElementById('posWarranty').value;
+            const paymentMethod = document.getElementById('posPaymentMethod').value;
+            const saleType = document.getElementById('posSaleType').value;
+            const invoiceNo = document.getElementById('posInvoiceNo').value.trim();
+            const saleDate = document.getElementById('posSaleDate').value;
+            const saleTime = document.getElementById('posSaleTime').value;
+            const remarks = document.getElementById('posRemarks').value.trim();
+
+            let staffName = document.getElementById('posStaffSelect').value;
+            if (staffName === '__MANUAL__') {
+                staffName = document.getElementById('posStaffNameManual').value.trim();
+            }
+            if (!staffName) staffName = (currentUser?.email || '').split('@')[0].toUpperCase();
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Processing Sale...</span>';
+
+            try {
+                const saleTimestamp = Date.now();
+
+                // 1. Create Sale Payload
+                const salePayload = {
+                    invoiceNo: invoiceNo,
+                    spNumber: invoiceNo,
+                    date: saleDate,
+                    time: saleTime,
+                    imei: imei,
+                    model: model,
+                    storage: storage,
+                    mrp: sellingPrice,
+                    sellingPrice: netAmount,
+                    discount: discount,
+                    amountReceived: amountReceived,
+                    changeGiven: changeGiven,
+                    paymentMethod: paymentMethod,
+                    custName: custName,
+                    custPhone: custPhone,
+                    custNic: custNic || '-',
+                    warranty: warranty,
+                    staffName: staffName,
+                    branch: activeBranchName,
+                    source: 'Cashier POS',
+                    category: activeVerifiedItem.category || 'Main Shop (Own Buy)',
+                    remarks: remarks,
+                    cashierEmail: currentUser.email,
+                    timestamp: saleTimestamp,
+                    createdAt: saleTimestamp
+                };
+
+                // Add to main_shop_sales
+                const saleDocRef = await addDoc(collection(db, "main_shop_sales"), salePayload);
+
+                // 2. Mark Inventory Item as Sold
+                if (activeVerifiedItem.id) {
+                    await updateDoc(doc(db, "inventory", activeVerifiedItem.id), {
+                        status: 'Sold',
+                        soldAt: saleTimestamp,
+                        soldDate: saleDate,
+                        soldPrice: netAmount,
+                        soldBy: currentUser.email,
+                        soldByBranch: activeBranchName,
+                        soldInvoiceNo: invoiceNo,
+                        soldType: saleType,
+                        salesSource: 'Cashier POS'
+                    });
+                }
+
+                playBeepSound();
+                showToast("✨ Sale Completed Successfully!", "success");
+
+                // 3. Open Receipt Modal for immediate printing
+                openReceiptModal(salePayload);
+
+                // 4. Reset form for next entry
+                resetPosForm();
+
+            } catch (err) {
+                console.error("Sale submission error:", err);
+                showToast("Failed to process sale: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>⚡ Complete Sale & Print Bill (විකිණීම සම්පූර්ණ කරන්න)</span>
+                `;
+            }
+        };
+
+        window.resetPosForm = function() {
+            document.getElementById('cashierSaleForm').reset();
+            document.getElementById('posVerifiedCard').style.display = 'none';
+            document.getElementById('posImeiRejectionBanner').style.display = 'none';
+            activeVerifiedItem = null;
+            initFormDefaults();
+            calculatePosAmounts();
+        };
+
+        // Realtime Today's Shift Sales Listener
+        function listenToTodaySales() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const q = query(collection(db, "main_shop_sales"), orderBy("timestamp", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                todayShiftSales = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.date === todayStr) {
+                        todayShiftSales.push({ id: docSnap.id, ...data });
+                    }
+                });
+
+                updateShiftMetrics();
+                renderShiftSalesTable();
+            });
+        }
+
+        function updateShiftMetrics() {
+            let totalRevenue = 0;
+            let cashTotal = 0;
+            let cardBankTotal = 0;
+
+            todayShiftSales.forEach(sale => {
+                const amt = parseFloat(sale.sellingPrice || sale.mrp) || 0;
+                totalRevenue += amt;
+
+                const method = (sale.paymentMethod || '').toLowerCase();
+                if (method.includes('cash')) {
+                    cashTotal += amt;
+                } else {
+                    cardBankTotal += amt;
+                }
+            });
+
+            document.getElementById('shiftPhonesCount').innerText = todayShiftSales.length;
+            document.getElementById('shiftTotalRevenue').innerText = `Rs. ${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('shiftCashTotal').innerText = `Rs. ${cashTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('shiftCardBankTotal').innerText = `Rs. ${cardBankTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('tabShiftCountBadge').innerText = todayShiftSales.length;
+        }
+
+        window.renderShiftSalesTable = function() {
+            const tbody = document.getElementById('shiftSalesTableBody');
+            const searchVal = (document.getElementById('shiftSalesSearch')?.value || '').toLowerCase().trim();
+
+            let sales = [...todayShiftSales];
+            if (searchVal) {
+                sales = sales.filter(s => 
+                    (s.invoiceNo || '').toLowerCase().includes(searchVal) ||
+                    (s.custName || '').toLowerCase().includes(searchVal) ||
+                    (s.custPhone || '').toLowerCase().includes(searchVal) ||
+                    (s.imei || '').toLowerCase().includes(searchVal) ||
+                    (s.model || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (sales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales matching search today.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            sales.forEach(sale => {
+                const tr = document.createElement('tr');
+                const amt = parseFloat(sale.sellingPrice || sale.mrp) || 0;
+
+                tr.innerHTML = `
+                    <td><strong>${sale.time || '-'}</strong></td>
+                    <td><strong style="color: #2563eb;">${sale.invoiceNo || sale.spNumber || '-'}</strong></td>
+                    <td><strong>${sale.custName || '-'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${sale.custPhone || '-'}</span></td>
+                    <td><strong>${sale.model || '-'}</strong><br><code style="font-size: 0.75rem;">${sale.imei || '-'}</code></td>
+                    <td><strong style="color: #059669;">Rs. ${amt.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+                    <td><span style="font-weight: 700; font-size: 0.78rem; background: #f1f5f9; padding: 2px 7px; border-radius: 4px;">${sale.paymentMethod || 'Cash'}</span></td>
+                    <td><span style="font-size: 0.8rem; font-weight: 600;">${sale.staffName || '-'}</span></td>
+                    <td>
+                        <button type="button" onclick='reprintPreviousSale(${JSON.stringify(sale).replace(/'/g, "&#39;")})' style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); color: #2563eb; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                            🖨️ Re-Print
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.reprintPreviousSale = function(saleData) {
+            openReceiptModal(saleData);
+        };
+
+        // Open Receipt Modal
+        function openReceiptModal(sale) {
+            document.getElementById('rInvoiceNo').innerText = sale.invoiceNo || sale.spNumber || '-';
+            document.getElementById('rDate').innerText = sale.date || '';
+            document.getElementById('rTime').innerText = sale.time || '';
+            document.getElementById('rCashier').innerText = sale.staffName || (currentUser?.email || '').split('@')[0];
+            document.getElementById('receiptStoreBranch').innerText = `${sale.branch || activeBranchName} Branch Showroom`;
+
+            document.getElementById('rCustName').innerText = sale.custName || 'Valued Customer';
+            document.getElementById('rCustPhone').innerText = sale.custPhone || '-';
+            
+            const nicWrap = document.getElementById('rCustNicWrap');
+            if (sale.custNic && sale.custNic !== '-') {
+                nicWrap.style.display = 'inline';
+                document.getElementById('rCustNic').innerText = sale.custNic;
+            } else {
+                nicWrap.style.display = 'none';
+            }
+
+            document.getElementById('rModel').innerText = sale.model || '-';
+            document.getElementById('rStorage').innerText = sale.storage || '-';
+            document.getElementById('rImei').innerText = sale.imei || '-';
+
+            const mrp = parseFloat(sale.mrp) || parseFloat(sale.sellingPrice) || 0;
+            const netAmt = parseFloat(sale.sellingPrice) || mrp;
+            const disc = parseFloat(sale.discount) || 0;
+            const rec = parseFloat(sale.amountReceived) || netAmt;
+            const chg = parseFloat(sale.changeGiven) || 0;
+
+            document.getElementById('rItemPrice').innerText = mrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('rSubTotal').innerText = `Rs. ${mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const discRow = document.getElementById('rDiscountRow');
+            if (disc > 0) {
+                discRow.style.display = 'flex';
+                document.getElementById('rDiscount').innerText = `-Rs. ${disc.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } else {
+                discRow.style.display = 'none';
+            }
+
+            document.getElementById('rGrandTotal').innerText = `Rs. ${netAmt.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('rPaymentMethod').innerText = sale.paymentMethod || 'Cash';
+            document.getElementById('rCashReceived').innerText = `Rs. ${rec.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('rCashChange').innerText = `Rs. ${chg.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('rWarranty').innerText = sale.warranty || '1 Year Company Warranty';
+
+            document.getElementById('receiptModal').style.display = 'flex';
+        }
+
+        window.closeReceiptModal = function() {
+            document.getElementById('receiptModal').style.display = 'none';
+        };
+
+        window.printCustomerReceipt = function() {
+            window.print();
+        };
+
+        // CAMERA BARCODE / QR SCANNER
+        window.startCameraScanner = async function(targetInputId) {
+            targetScannerInputId = targetInputId;
+            document.getElementById('scannerModal').style.display = 'flex';
+
+            try {
+                if (html5QrCode) {
+                    await html5QrCode.stop().catch(() => {});
+                }
+
+                html5QrCode = new Html5Qrcode("cameraPreview");
+                const config = { 
+                    fps: 15, 
+                    qrbox: { width: 280, height: 180 },
+                    aspectRatio: 1.0
+                };
+
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText) => {
+                        playBeepSound();
+                        const cleanCode = decodedText.trim();
+                        if (targetScannerInputId) {
+                            const inp = document.getElementById(targetScannerInputId);
+                            if (inp) {
+                                inp.value = cleanCode;
+                                handleImeiLookup(cleanCode);
+                            }
+                        }
+                        stopCameraScanner();
+                    },
+                    (errorMessage) => {
+                        // ignore scan frame errors
+                    }
+                );
+            } catch (err) {
+                console.error("Camera scanner error:", err);
+                showToast("Could not access camera. Please enter IMEI manually.", "warning");
+                stopCameraScanner();
+            }
+        };
+
+        window.stopCameraScanner = async function() {
+            if (html5QrCode) {
+                try {
+                    await html5QrCode.stop();
+                } catch(e) {}
+                html5QrCode = null;
+            }
+            document.getElementById('scannerModal').style.display = 'none';
+        };
+
+        window.toggleScannerTorch = async function() {
+            if (!html5QrCode) return;
+            try {
+                isTorchOn = !isTorchOn;
+                await html5QrCode.applyVideoConstraints({
+                    advanced: [{ torch: isTorchOn }]
+                });
+            } catch(e) {
+                showToast("Torch is not supported on this device.", "info");
+            }
+        };
+
+        // Tab Switching
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+
+            const activeTabBtn = document.querySelector(`.tab[data-tab="${tabName}"]`);
+            if (activeTabBtn) activeTabBtn.classList.add('active');
+
+            const viewEl = document.getElementById(`${tabName}View`);
+            if (viewEl) viewEl.classList.add('active');
+
+            if (tabName === 'stock') renderFullStockTable();
+            if (tabName === 'shift') renderShiftSalesTable();
+        };
+
+        // Toast Messages
+        window.showToast = function(msg, type = "info") {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = msg;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3500);
+        };
+
+        // Logout
+        window.doLogout = async function() {
+            try {
+                await signOut(auth);
+                window.location.replace('index.html');
+            } catch(e) {
+                window.location.replace('index.html');
+            }
+        };
+    </script>
+</body>
+</html>
