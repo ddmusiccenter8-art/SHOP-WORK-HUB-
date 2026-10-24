@@ -811,11 +811,18 @@
             </div>
             <div class="brand-title">
                 <h1>METHMI WORK HUB <span class="pos-tag">CASHIER POS</span></h1>
-                <div class="brand-subtitle">Point of Sale & Stock Invoicing Portal (කැෂියර් පද්ධතිය)</div>
+                <div class="brand-subtitle">Point of Sale & Invoicing Portal</div>
             </div>
         </div>
 
         <div class="header-controls">
+            <!-- Language Switcher (English by default) -->
+            <select id="posLangSwitcher" onchange="changePosLanguage(this.value)" style="background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border-color); color: var(--text-main); font-weight: 700; padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.82rem; cursor: pointer; outline: none;">
+                <option value="en" selected>English</option>
+                <option value="si">Sinhala</option>
+                <option value="ta">Tamil</option>
+            </select>
+
             <!-- Branch Location Selector -->
             <div class="badge-branch" id="headerBranchBadge">
                 <span>🏪</span>
@@ -824,7 +831,7 @@
 
             <!-- Firebase Online Badge -->
             <div class="badge-connection" id="headerFirebaseBadge">
-                🟢 Firebase Connected
+                🟢 Connected
             </div>
 
             <!-- Cashier User Display -->
@@ -856,14 +863,14 @@
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                 <line x1="2" y1="10" x2="22" y2="10"></line>
             </svg>
-            Sale Counter (විකුණුම් කවුන්ටරය)
+            Sale Counter
         </div>
 
         <div class="tab" data-tab="stock" onclick="switchTab('stock')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
             </svg>
-            Branch Stock (ශාඛාවේ ඇති තොගය)
+            Branch Stock
             <span class="tab-badge" id="tabStockCountBadge">0</span>
         </div>
 
@@ -874,7 +881,7 @@
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
-            Today's Shift Sales (අද දවසේ බිල්පත්)
+            Today's Shift Sales
             <span class="tab-badge" id="tabShiftCountBadge">0</span>
         </div>
     </div>
@@ -905,7 +912,7 @@
             <div class="panel">
                 <div class="panel-title">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span>🧾</span> New Sale & Invoice (නව බිල්පතක් නිකුත් කිරීම)
+                        <span>🧾</span> New Sale & Invoice
                     </span>
                     <button type="button" onclick="resetPosForm()" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #dc2626; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
                         🧹 Reset Form
@@ -917,7 +924,7 @@
                     <!-- 1. IMEI SCAN & VERIFICATION BOX -->
                     <div class="imei-box">
                         <label style="font-size: 0.82rem; font-weight: 800; color: #1e3a8a; display: flex; align-items: center; justify-content: space-between;">
-                            <span>🔍 Step 1: Scan or Type Phone IMEI (දුරකථන IMEI අංකය) *</span>
+                            <span>🔍 Step 1: Scan or Type Phone IMEI *</span>
                             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">(Auto-detects device details)</span>
                         </label>
                         
@@ -961,7 +968,7 @@
                     <!-- 2. SALE TYPE & INVOICE REFERENCE -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posSaleType">Sale Process Type (විකුණුම් ආකාරය) *</label>
+                            <label for="posSaleType">Sale Process Type *</label>
                             <select id="posSaleType" onchange="handleSaleTypeToggle()">
                                 <option value="Direct Cash/Card Sale" selected>💰 Direct Sale (Cash / Card / Bank)</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Activation</option>
@@ -977,12 +984,12 @@
                     <!-- 3. DATE & TIME -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posSaleDate">Sale Date (දිනය) *</label>
+                            <label for="posSaleDate">Sale Date *</label>
                             <input type="date" id="posSaleDate" required>
                         </div>
                         <div class="form-group">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                                <label for="posSaleTime" style="margin: 0;">Sale Time (වේලාව) *</label>
+                                <label for="posSaleTime" style="margin: 0;">Sale Time *</label>
                                 <span onclick="setCurrentTimeToField()" style="font-size: 0.73rem; color: #2563eb; cursor: pointer; font-weight: 700;">⚡ Set to Now</span>
                             </div>
                             <input type="time" id="posSaleTime" required>
@@ -992,22 +999,22 @@
                     <!-- 4. CUSTOMER DETAILS -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posCustName">Customer Full Name (පාරිභෝගික නම) *</label>
+                            <label for="posCustName">Customer Full Name *</label>
                             <input type="text" id="posCustName" placeholder="e.g. Kasun Perera" required>
                         </div>
                         <div class="form-group">
-                            <label for="posCustPhone">Customer Contact Number (දුරකථන අංකය) *</label>
+                            <label for="posCustPhone">Customer Contact Number *</label>
                             <input type="tel" id="posCustPhone" placeholder="e.g. 0771234567" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posCustNic">Customer NIC (ජාතික හැඳුනුම්පත් අංකය)</label>
+                            <label for="posCustNic">Customer NIC</label>
                             <input type="text" id="posCustNic" placeholder="e.g. 199512345678 or 951234567V">
                         </div>
                         <div class="form-group">
-                            <label for="posWarranty">Warranty Period (වගකීම් කාලය) *</label>
+                            <label for="posWarranty">Warranty Period *</label>
                             <select id="posWarranty">
                                 <option value="1 Year Company Warranty" selected>🛡️ 1 Year Company Warranty</option>
                                 <option value="6 Months Warranty">🛡️ 6 Months Warranty</option>
@@ -1022,18 +1029,18 @@
                     <!-- 5. CASHIER / ACTIVATOR STAFF -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posStaffName">Cashier / Activator Staff (විකිණූ අයගේ නම) *</label>
+                            <label for="posStaffName">Cashier / Activator Staff *</label>
                             <select id="posStaffSelect" onchange="handleStaffChange(this.value)">
                                 <option value="">-- Select Staff Name --</option>
                             </select>
                             <input type="text" id="posStaffNameManual" placeholder="Or type new staff name..." style="display: none; margin-top: 6px;">
                         </div>
                         <div class="form-group">
-                            <label for="posPaymentMethod">Payment Method (ගෙවීම් ක්‍රමය) *</label>
+                            <label for="posPaymentMethod">Payment Method *</label>
                             <select id="posPaymentMethod" onchange="calculatePosAmounts()">
-                                <option value="Cash" selected>💵 Cash (මුදලින්)</option>
-                                <option value="Card">💳 Credit / Debit Card (කාඩ්පත)</option>
-                                <option value="Bank Transfer">🏦 Bank Transfer / Online (බැංකු තැන්පතු)</option>
+                                <option value="Cash" selected>💵 Cash</option>
+                                <option value="Card">💳 Credit / Debit Card</option>
+                                <option value="Bank Transfer">🏦 Bank Transfer / Online</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
                                 <option value="Leasing / Loan">📑 Leasing / Loan Installment</option>
                             </select>
@@ -1057,26 +1064,26 @@
                         </div>
 
                         <div class="pay-row total">
-                            <span>Net Payable Total (අයවිය යුතු මුදල):</span>
+                            <span>Net Payable Total:</span>
                             <span id="posNetPayableDisplay" style="color: #047857; font-size: 1.45rem;">Rs. 0.00</span>
                         </div>
 
                         <div class="pay-row" style="margin-top: 0.8rem;">
-                            <span style="font-weight: 700; color: #1e3a8a;">Cash / Tendered Received (ලැබුණු මුදල):</span>
+                            <span style="font-weight: 700; color: #1e3a8a;">Cash Received:</span>
                             <div style="width: 140px;">
                                 <input type="number" id="posAmountReceived" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()" style="text-align: right; font-weight: 800; font-size: 1.05rem; border-color: #3b82f6;">
                             </div>
                         </div>
 
                         <div class="pay-row change" id="posChangeRow">
-                            <span id="posChangeLabel">Balance to Return (ඉතිරි මුදල):</span>
+                            <span id="posChangeLabel">Balance to Return:</span>
                             <span id="posChangeDisplay" style="font-size: 1.25rem;">Rs. 0.00</span>
                         </div>
                     </div>
 
                     <!-- Remarks -->
                     <div class="form-group">
-                        <label for="posRemarks">Notes / Bill Remarks (අමතර සටහන්)</label>
+                        <label for="posRemarks">Notes / Bill Remarks</label>
                         <input type="text" id="posRemarks" placeholder="Optional notes for customer receipt...">
                     </div>
 
@@ -1091,7 +1098,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        <span>⚡ Complete Sale & Print Bill (විකිණීම සම්පූර්ණ කරන්න)</span>
+                        <span>⚡ Complete Sale & Print Bill</span>
                     </button>
                 </form>
             </div>
@@ -1101,7 +1108,7 @@
                 <div class="panel">
                     <div class="panel-title">
                         <span style="display: flex; align-items: center; gap: 8px;">
-                            <span>📦</span> Available in Location (විකිණීමට ඇති තොගය)
+                            <span>📦</span> Available in Location
                         </span>
                         <span id="quickStockBadgeCount" style="font-size: 0.78rem; font-weight: 800; background: var(--info-light); color: var(--info); padding: 3px 8px; border-radius: 999px;">
                             0 Items
@@ -1130,7 +1137,7 @@
             <div class="panel-title">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <span>📦</span>
-                    <span>Dispatched Stock Inventory (ශාඛාවට එවන ලද දුරකථන තොග ලැයිස්තුව)</span>
+                    <span>Dispatched Stock Inventory</span>
                     <span id="stockTableBadgeTotal" style="font-size: 0.78rem; font-weight: 800; background: var(--success-light); color: #047857; padding: 3px 9px; border-radius: 999px;">
                         0 Available
                     </span>
@@ -1196,7 +1203,7 @@
         <div class="panel">
             <div class="panel-title">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span>📋</span> Today's Completed Bills (අද දින නිකුත් කළ බිල්පත් ලැයිස්තුව)
+                    <span>📋</span> Today's Completed Bills
                 </span>
                 <input type="text" id="shiftSalesSearch" placeholder="🔍 Search Invoice, Customer, IMEI..." oninput="renderShiftSalesTable()" style="padding: 0.45rem 0.8rem; border-radius: 8px; border: 1.5px solid var(--border-color); font-size: 0.82rem; min-width: 220px;">
             </div>
@@ -1731,13 +1738,13 @@
             if (amountReceived >= netPayable && netPayable > 0) {
                 const change = amountReceived - netPayable;
                 changeRow.style.background = 'rgba(16, 185, 129, 0.12)';
-                changeLabel.innerText = 'Balance to Return (ඉතිරි මුදල):';
+                changeLabel.innerText = 'Balance to Return:';
                 changeDisplay.style.color = '#047857';
                 changeDisplay.innerText = `Rs. ${change.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             } else if (amountReceived > 0 && amountReceived < netPayable) {
                 const due = netPayable - amountReceived;
                 changeRow.style.background = 'rgba(239, 68, 68, 0.1)';
-                changeLabel.innerText = '⚠️ Underpaid Due (තව අයවිය යුතු මුදල):';
+                changeLabel.innerText = '⚠️ Amount Due:';
                 changeDisplay.style.color = '#dc2626';
                 changeDisplay.innerText = `Rs. ${due.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             } else {
@@ -1967,7 +1974,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span>⚡ Complete Sale & Print Bill (විකිණීම සම්පූර්ණ කරන්න)</span>
+                    <span>⚡ Complete Sale & Print Bill</span>
                 `;
             }
         };
@@ -2220,6 +2227,43 @@
         };
 
         // Logout
+        
+        // Language Dictionary & Translation Logic (English by default)
+        const posLangDict = {
+            "Sale Counter": { si: "විකුණුම් කවුන්ටරය", ta: "விற்பனை கவுண்டர்" },
+            "Branch Stock": { si: "ශාඛාවේ තොගය", ta: "கிளை பங்கு" },
+            "Today's Shift Sales": { si: "අද දවසේ බිල්පත්", ta: "இன்றைய விற்பனை" },
+            "New Sale & Invoice": { si: "නව බිල්පතක් නිකුත් කිරීම", ta: "புதிய விற்பனை பில்" },
+            "Scan or Type Phone IMEI *": { si: "දුරකථන IMEI අංකය ලබා දෙන්න *", ta: "IMEI எண்ணை உள்ளிடவும் *" },
+            "Sale Process Type *": { si: "විකුණුම් ආකාරය *", ta: "விற்பனை வகை *" },
+            "Customer Full Name *": { si: "පාරිභෝගික නම *", ta: "வாடிக்கையாளர் பெயர் *" },
+            "Customer Contact Number *": { si: "දුරකථන අංකය *", ta: "தொலைபேசி எண் *" },
+            "Customer NIC": { si: "ජාතික හැඳුනුම්පත් අංකය", ta: "தேசிய அடையாள அட்டை" },
+            "Warranty Period *": { si: "වගකීම් කාලය *", ta: "உத்தரவாத காலம் *" },
+            "Cashier / Activator Staff *": { si: "කැෂියර්ගේ නම *", ta: "பணியாளர் பெயர் *" },
+            "Payment Method *": { si: "ගෙවීම් ක්‍රමය *", ta: "கட்டண முறை *" },
+            "Net Payable Total:": { si: "අයවිය යුතු මුදල:", ta: "மொத்த தொகை:" },
+            "Cash Received:": { si: "ලැබුණු මුදල:", ta: "பெறப்பட்ட பணம்:" },
+            "Balance to Return:": { si: "ඉතිරි මුදල:", ta: "மீதி தொகை:" },
+            "Complete Sale & Print Bill": { si: "විකිණීම සම්පූර්ණ කරන්න", ta: "விற்பனையை முடிக்க" }
+        };
+
+        window.changePosLanguage = function(lang) {
+            localStorage.setItem('pos_preferred_lang', lang);
+            if (lang === 'en') {
+                // Reload clean English
+                window.location.reload();
+                return;
+            }
+            // Apply translations dynamically if Sinhala or Tamil chosen
+            document.querySelectorAll('label, th, h2, h3, button span, select option').forEach(el => {
+                const text = el.innerText.trim();
+                if (posLangDict[text] && posLangDict[text][lang]) {
+                    el.innerText = posLangDict[text][lang];
+                }
+            });
+        };
+
         window.doLogout = async function() {
             try {
                 await signOut(auth);

@@ -911,28 +911,28 @@
                 </div>
             </div>
 
-            <!-- Stats Summary Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem; margin-bottom: 2rem;">
-                <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.4rem; border-radius: 18px; border: 1px solid rgba(59, 130, 246, 0.25); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.07); transition: transform 0.25s ease;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                        <h3 style="color: #3b82f6; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Total Loans Issued</h3>
-                        <span style="font-size: 1.2rem;">💳</span>
+            <!-- Compact Stats Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.2rem;">
+                <div style="background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <h3 style="color: #3b82f6; font-size: 0.72rem; font-weight: 800; text-transform: uppercase;">Total Loans Issued</h3>
+                        <span style="font-size: 0.95rem;">💳</span>
                     </div>
-                    <p style="font-size: 1.85rem; font-weight: 800; color: #1d4ed8;" id="totalLoanVal">Rs. 0.00</p>
+                    <p style="font-size: 1.35rem; font-weight: 800; color: #1d4ed8; margin: 0;" id="totalLoanVal">Rs. 0.00</p>
                 </div>
-                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.4rem; border-radius: 18px; border: 1px solid rgba(16, 185, 129, 0.25); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.07); transition: transform 0.25s ease;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                        <h3 style="color: #059669; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Settlement (Paid)</h3>
-                        <span style="font-size: 1.2rem;">✅</span>
+                <div style="background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <h3 style="color: #059669; font-size: 0.72rem; font-weight: 800; text-transform: uppercase;">Settlement (Paid)</h3>
+                        <span style="font-size: 0.95rem;">✅</span>
                     </div>
-                    <p style="font-size: 1.85rem; font-weight: 800; color: #047857;" id="totalPaidVal">Rs. 0.00</p>
+                    <p style="font-size: 1.35rem; font-weight: 800; color: #047857; margin: 0;" id="totalPaidVal">Rs. 0.00</p>
                 </div>
-                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 1.4rem; border-radius: 18px; border: 1px solid rgba(245, 158, 11, 0.25); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.07); transition: transform 0.25s ease;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                        <h3 style="color: #d97706; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Settlement (Pending)</h3>
-                        <span style="font-size: 1.2rem;">⏳</span>
+                <div style="background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <h3 style="color: #d97706; font-size: 0.72rem; font-weight: 800; text-transform: uppercase;">Settlement (Pending)</h3>
+                        <span style="font-size: 0.95rem;">⏳</span>
                     </div>
-                    <p style="font-size: 1.85rem; font-weight: 800; color: #b45309;" id="totalPendingVal">Rs. 0.00</p>
+                    <p style="font-size: 1.35rem; font-weight: 800; color: #b45309; margin: 0;" id="totalPendingVal">Rs. 0.00</p>
                 </div>
             </div>
 
@@ -1083,7 +1083,7 @@
                         <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(37,99,235,0.32); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
                                 <span style="font-size: 1.2rem;">📤</span>
-                                <span style="font-size: 0.74rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">3. HO Owes to Agent (අපෙන් නියෝජිතයාට)</span>
+                                <span style="font-size: 0.74rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">3. HO Owes to Agent</span>
                             </div>
                             <p style="font-size: 1.45rem; font-weight: 900; color: #2563eb; margin: 0;" id="adminHOOwesAgentVal">Rs. 0.00</p>
                             <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="adminHOOwesAgentDesc">Submitted Loan Settlements Pending</span>
@@ -1093,7 +1093,7 @@
                         <div style="background: rgba(255,255,255,0.92); border-radius: 14px; padding: 1.1rem 1.2rem; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
                             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
                                 <span style="font-size: 1.2rem;">💰</span>
-                                <span style="font-size: 0.74rem; font-weight: 800; color: #047857; text-transform: uppercase;">4. Agent's Total Profit (නියෝජිතයාගේ මුළු ලාභය)</span>
+                                <span style="font-size: 0.74rem; font-weight: 800; color: #047857; text-transform: uppercase;">4. Agent's Total Profit</span>
                             </div>
                             <p style="font-size: 1.45rem; font-weight: 900; color: #059669; margin: 0;" id="adminShopCommissionEarnedVal">Rs. 0.00</p>
                             <span style="font-size: 0.74rem; color: var(--text-muted); font-weight: 600;" id="adminShopCommissionDesc">Total earned commission</span>
@@ -1106,10 +1106,10 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
                             <div>
                                 <div style="font-size: 0.85rem; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px;">
-                                    💎 FINAL NET SETTLEMENT WITH THIS AGENT (අවසාන ශුද්ධ ගිණුම් බේරුම)
+                                    💎 FINAL NET SETTLEMENT WITH THIS AGENT
                                 </div>
                                 <div style="font-size: 0.78rem; color: var(--text-muted);">
-                                    [අපෙන් නියෝජිතයාට: <span id="adminShopSummaryStockVal" style="font-weight: 700; color: #2563eb;">Rs. 0.00</span>] − [Direct Cash: <span id="adminShopSummaryCashVal" style="font-weight: 700; color: #dc2626;">Rs. 0.00</span> + HO DP & Doc: <span id="adminShopSummaryHODpDocVal" style="font-weight: 700; color: #d97706;">Rs. 0.00</span>]
+                                    [HO Owes Agent: <span id="adminShopSummaryStockVal" style="font-weight: 700; color: #2563eb;">Rs. 0.00</span>] − [Direct Cash: <span id="adminShopSummaryCashVal" style="font-weight: 700; color: #dc2626;">Rs. 0.00</span> + HO DP & Doc: <span id="adminShopSummaryHODpDocVal" style="font-weight: 700; color: #d97706;">Rs. 0.00</span>]
                                 </div>
                             </div>
                             <div style="text-align: right;">
@@ -1182,7 +1182,7 @@
                             <span style="font-size: 0.75rem; color: var(--text-muted);">Shop's Retained Earnings</span>
                         </div>
                         <div style="background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(10px); padding: 1.1rem; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);">
-                            <h4 style="color: #065f46; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Due to Head Office (අපේ මුදල)</h4>
+                            <h4 style="color: #065f46; font-size: 0.72rem; text-transform: uppercase; font-weight: 800;">Due to Head Office</h4>
                             <p style="font-size: 1.5rem; font-weight: 900; color: #047857; margin-top: 0.2rem;" id="shopAllocatedHeadOfficeDueTotal">Rs. 0.00</p>
                             <span style="font-size: 0.75rem; color: var(--text-muted);" id="shopAllocatedHeadOfficeProfit">Profit: Rs. 0.00</span>
                         </div>
@@ -1229,13 +1229,13 @@
                 <h2 style="font-size: 1.15rem; color: var(--text-main); margin: 0; font-weight: 700;">🛒 Sale & Profit Accounting</h2>
                 <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="mainProfitDateFilters">
                     <select id="mainProfitDateDropdown" onchange="handleMainProfitDateSelection(this.value)" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(203, 213, 225, 0.9); color: var(--text-main); font-weight: 600; padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.88rem; outline: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                        <option value="today">Today (අද)</option>
-                        <option value="yesterday">Yesterday (ඊයේ)</option>
-                        <option value="week">This Week (සතිය)</option>
-                        <option value="month">This Month (මාසය)</option>
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
                         <option value="3months">3 Months</option>
                         <option value="year">This Year</option>
-                        <option value="all">All Time (සියල්ල)</option>
+                        <option value="all">All Time</option>
                         <option value="custom">Custom Range...</option>
                     </select>
 
@@ -1249,54 +1249,35 @@
                 </div>
             </div>
 
-            <!-- Financial Summary Cards -->
-            <div style="background: linear-gradient(120deg, rgba(224, 195, 252, 0.6) 0%, rgba(142, 197, 252, 0.6) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), 0 10px 30px rgba(0,0,0,0.06);">
-                
-                <div style="background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); padding: 1.2rem; border-radius: 18px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">📱</div>
-                    <h3 style="color: #334155; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 0.4rem;">Total Phones Sold</h3>
-                    <p style="font-size: 1.8rem; font-weight: 800; color: #0f172a;" id="mainTotalPhonesSold">0</p>
+            <!-- Compact Financial Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.65rem; margin-bottom: 1rem;">
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #475569; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Phones Sold</h3>
+                    <p style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0;" id="mainTotalPhonesSold">0</p>
                 </div>
-                
-                <div style="background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); padding: 1.2rem; border-radius: 18px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">💰</div>
-                    <h3 style="color: #334155; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 0.4rem;">Total Sales (MRP)</h3>
-                    <p style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" id="mainTotalMrp">Rs. 0.00</p>
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #475569; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Sales (MRP)</h3>
+                    <p style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;" id="mainTotalMrp">Rs. 0.00</p>
                 </div>
-
-                <div style="background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(225, 29, 72, 0.08); padding: 1.2rem; border-radius: 18px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">📉</div>
-                    <h3 style="color: #be123c; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; margin-bottom: 0.4rem;">Phone Cost (Buy Price)</h3>
-                    <p style="font-size: 1.5rem; font-weight: 800; color: #9f1239;" id="mainTotalBuyPrice">Rs. 0.00</p>
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid rgba(225, 29, 72, 0.2); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #be123c; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Phone Cost (Buy)</h3>
+                    <p style="font-size: 1.15rem; font-weight: 800; color: #9f1239; margin: 0;" id="mainTotalBuyPrice">Rs. 0.00</p>
                 </div>
-
-                <div style="background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(217, 119, 6, 0.08); padding: 1.2rem; border-radius: 18px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">🏦</div>
-                    <h3 style="color: #b45309; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; margin-bottom: 0.4rem;">Leasing Fees (2% MRP)</h3>
-                    <p style="font-size: 1.5rem; font-weight: 800; color: #92400e;" id="mainTotalLeasingFees">Rs. 0.00</p>
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid rgba(217, 119, 6, 0.2); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #b45309; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Leasing Fees (2%)</h3>
+                    <p style="font-size: 1.15rem; font-weight: 800; color: #92400e; margin: 0;" id="mainTotalLeasingFees">Rs. 0.00</p>
                 </div>
-
-                <div style="background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(124, 58, 237, 0.08); padding: 1.2rem; border-radius: 18px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">👥</div>
-                    <h3 style="color: #6d28d9; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; margin-bottom: 0.4rem;">Staff Fees (Rs. 500)</h3>
-                    <p style="font-size: 1.5rem; font-weight: 800; color: #5b21b6;" id="mainTotalStaffFees">Rs. 0.00</p>
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid rgba(124, 58, 237, 0.2); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #6d28d9; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Staff Fees (Rs. 500)</h3>
+                    <p style="font-size: 1.15rem; font-weight: 800; color: #5b21b6; margin: 0;" id="mainTotalStaffFees">Rs. 0.00</p>
                 </div>
-
-                <div style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 32px 0 rgba(37, 99, 235, 0.12); padding: 1.2rem; border-radius: 16px; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: -10px; right: -10px; font-size: 4rem; opacity: 0.15;">🔵</div>
-                    <h3 style="color: #1d4ed8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; margin-bottom: 0.4rem;">DIALOG LESI PAY PROFIT</h3>
-                    <p style="font-size: 1.6rem; font-weight: 900; color: #1e3a8a; margin: 0;" id="mainDialogLesiPayProfit">Rs. 0.00</p>
-                    <span id="mainDialogLesiPaySub" style="font-size: 0.75rem; color: #2563eb; font-weight: 700; display: block; margin-top: 4px;">7% Profit from Dialog</span>
+                <div style="background: rgba(255,255,255,0.85); padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.2); box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                    <h3 style="color: #1d4ed8; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 2px;">Dialog Lesi Pay</h3>
+                    <p style="font-size: 1.15rem; font-weight: 800; color: #1e3a8a; margin: 0;" id="mainDialogLesiPayProfit">Rs. 0.00</p>
                 </div>
-
-                <div style="grid-column: 1 / -1; background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 12px 40px 0 rgba(16, 185, 129, 0.2); padding: 1.8rem; border-radius: 20px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; margin-top: 0.5rem;">
-                    <div style="position: absolute; right: 10px; top: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(-15deg);">💎</div>
-                    <div style="z-index: 1;">
-                        <h3 style="color: #065f46; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="background: rgba(16, 185, 129, 0.2); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; color: #064e3b;">TOTAL</span> NET PROFIT (ශුද්ධ ලාභය)
-                        </h3>
-                        <p style="font-size: 2.8rem; font-weight: 900; color: #064e3b; margin: 0; text-shadow: 0 2px 10px rgba(255,255,255,0.5);" id="mainTotalNetProfit">Rs. 0.00</p>
-                    </div>
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%); padding: 0.75rem 1rem; border-radius: 12px; border: 1.5px solid rgba(16, 185, 129, 0.4); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
+                    <h3 style="color: #065f46; font-size: 0.72rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2px;">Total Net Profit</h3>
+                    <p style="font-size: 1.45rem; font-weight: 900; color: #047857; margin: 0;" id="mainTotalNetProfit">Rs. 0.00</p>
                 </div>
             </div>
 
@@ -1330,7 +1311,7 @@
                     </div>
                     <form id="mainSaleForm">
                         <div style="margin-bottom: 0.85rem;">
-                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">Sale Type / Source (විකුණුම් වර්ගය)</label>
+                            <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">Sale Type / Source</label>
                             <select id="mainSaleType" onchange="toggleMainSaleFormType()" style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); color: var(--text-main); padding: 0.7rem; border-radius: 8px; font-weight: 700;">
                                 <option value="Head Office Direct Sale" selected>🏢 Direct Sale / Billing</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Sale / Activation</option>
@@ -1353,7 +1334,7 @@
 
                                 <!-- ADDED PRODUCT BILL ITEM CARD (Populated automatically when IMEI is scanned) -->
                                 <div id="hoAddedProductBillCard" style="margin-top: 0.65rem; background: rgba(255, 255, 255, 0.9); border: 1px dashed #cbd5e1; border-radius: 10px; padding: 0.65rem 0.8rem; font-size: 0.8rem; color: #64748b; text-align: center;">
-                                    📱 IMEI එක Scan කළ විට හෝ තේරූ විට Product එක මෙතැනට Add වේ (Scan IMEI to add product to bill)
+                                    📱 Scan IMEI or pick stock to add product to bill
                                 </div>
 
                                 <!-- Hidden Product Detail Inputs (Auto-filled from Inventory; keeps profit math 100% intact) -->
@@ -1378,12 +1359,12 @@
                             <!-- STEP 2: REMAINING BILLING DETAILS TO FILL -->
                             <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.6rem; margin-bottom: 0.9rem;">
                                 <div>
-                                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">📅 Date (දිනය)</label>
+                                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">📅 Date</label>
                                     <input type="date" id="mainSaleDate" required style="width: 100%;">
                                 </div>
                                 <div>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                                        <label style="color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">⏰ Time (වේලාව)</label>
+                                        <label style="color: var(--text-muted); font-size: 0.82rem; font-weight: 700;">⏰ Time</label>
                                         <span onclick="setMainSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;" title="Set to current time">⚡ Now</span>
                                     </div>
                                     <input type="time" id="mainSaleTime" style="width: 100%;">
@@ -1414,13 +1395,13 @@
 
                             <div style="margin-bottom: 0.9rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Staff Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Staff Name</label>
                                     <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
                                 </div>
                                 
                                 <!-- Dropdown Selector Only (External Pills Hidden) -->
                                 <select id="mainSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'HO')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem;">
-                                    <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
+                                    <option value="">-- Choose Activator Staff --</option>
                                 </select>
 
                                 <!-- Hidden container so existing code references don't break -->
@@ -1432,7 +1413,7 @@
 
                             <div style="margin-bottom: 1.2rem;">
                                 <label style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">
-                                    <span>Staff Activator Fee (ගෙවන මුදල)</span>
+                                    <span>Staff Activator Fee</span>
                                     <span id="brandSpecialCommBadge" style="display:none; font-size:0.72rem; background:rgba(139,92,246,0.15); color:#7c3aed; padding:1px 6px; border-radius:6px; font-weight:700;">✨ Special Brand Commission</span>
                                 </label>
                                 <input type="number" id="mainSaleStaffFee" step="1" value="500" placeholder="500" oninput="calculateMainShopLiveProfit()">
@@ -1460,34 +1441,34 @@
 
                                 <!-- ADDED PRODUCT BILL ITEM CARD (LP) -->
                                 <div id="lpAddedProductBillCard" style="margin-top: 0.65rem; background: rgba(255, 255, 255, 0.9); border: 1px dashed #cbd5e1; border-radius: 10px; padding: 0.65rem 0.8rem; font-size: 0.8rem; color: #64748b; text-align: center;">
-                                    📱 IMEI එක Scan කළ විට Product එක මෙතැනට Add වේ
+                                    📱 Scan IMEI to add product to bill
                                 </div>
 
                                 <div id="lpManualProductInputs" style="display: none; margin-top: 0.6rem;">
-                                    <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Model Name (දුරකථන මාදිලිය)</label>
+                                    <label style="display:block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.76rem; font-weight: 700;">Model Name</label>
                                     <input type="text" id="lpSaleModel" placeholder="e.g. Redmi 14C / Honor X5b (Auto-filled from stock)" oninput="updateAddedBillProductCardDisplay('LP')">
                                 </div>
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP (විකුණුම් මිල රු.) <span style="font-size: 0.74rem; color: #2563eb; font-weight: 700;">(Required)</span></label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Selling Price MRP <span style="font-size: 0.74rem; color: #2563eb; font-weight: 700;">(Required)</span></label>
                                 <input type="number" id="lpSaleMrp" step="0.01" placeholder="e.g. 56990.00" oninput="calculateLesiPayLiveProfit(); updateAddedBillProductCardDisplay('LP');">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Down Payment (මූලික ගෙවීම රු.) <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if full loan)</span></label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Down Payment <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if full loan)</span></label>
                                 <input type="number" id="lpSaleDp" step="0.01" placeholder="e.g. 19600.00" oninput="calculateLesiPayLiveProfit()">
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Name (ඇක්ටිව් කළ අයගේ නම)</label>
+                                    <label style="color: var(--text-muted); font-size: 0.82rem; margin: 0; font-weight: 700;">Activator Name</label>
                                     <span style="font-size: 0.73rem; color: #3b82f6; font-weight: 700; cursor: pointer;" onclick="switchTab('staffProfiles')">👥 View Profiles</span>
                                 </div>
 
                                 <!-- Dropdown Selector Only (External Pills Hidden) -->
                                 <select id="lpSaleStaffSelect" onchange="handleStaffSelectChange(this.value, 'LP')" style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.65rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem;">
-                                    <option value="">-- Choose Activator Staff (තෝරන්න) --</option>
+                                    <option value="">-- Choose Activator Staff --</option>
                                 </select>
 
                                 <!-- Hidden container so existing code references don't break -->
@@ -1498,7 +1479,7 @@
                             </div>
 
                             <div style="margin-bottom: 0.9rem;">
-                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Commission (කොමිස් මුදල රු.) <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if direct sale)</span></label>
+                                <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.82rem;">Activator Commission <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Optional - 0 if direct sale)</span></label>
                                 <input type="number" id="lpSaleComm" step="1" value="0" placeholder="0" oninput="calculateLesiPayLiveProfit()">
                             </div>
 
@@ -1544,11 +1525,11 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                             <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;" id="historyDateQuickPills">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 View:</span>
-                                <button type="button" class="history-date-btn active" id="btnHistDateToday" onclick="setHistoryDateFilter('today')">Today (අද)</button>
-                                <button type="button" class="history-date-btn" id="btnHistDateYesterday" onclick="setHistoryDateFilter('yesterday')">Yesterday (ඊයේ)</button>
-                                <button type="button" class="history-date-btn" id="btnHistDateWeek" onclick="setHistoryDateFilter('week')">This Week (සතිය)</button>
-                                <button type="button" class="history-date-btn" id="btnHistDateMonth" onclick="setHistoryDateFilter('month')">This Month (මාසය)</button>
-                                <button type="button" class="history-date-btn" id="btnHistDateAll" onclick="setHistoryDateFilter('all')">All Time (සියල්ල)</button>
+                                <button type="button" class="history-date-btn active" id="btnHistDateToday" onclick="setHistoryDateFilter('today')">Today</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateYesterday" onclick="setHistoryDateFilter('yesterday')">Yesterday</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateWeek" onclick="setHistoryDateFilter('week')">This Week</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateMonth" onclick="setHistoryDateFilter('month')">This Month</button>
+                                <button type="button" class="history-date-btn" id="btnHistDateAll" onclick="setHistoryDateFilter('all')">All Time</button>
                                 <button type="button" class="history-date-btn" id="btnHistDateCustom" onclick="toggleHistoryCustomDatePopover()" style="display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #93c5fd; color: #1e40af; background: #eff6ff;">
                                     📅 <span id="btnHistDateCustomLabel">Custom Date Range</span> ▾
                                 </button>
@@ -1569,16 +1550,16 @@
                         <!-- Calendar Date Range Picker Popover (Opens only when 'Custom Date Range' is clicked) -->
                         <div id="historyCustomDatePopover" style="display: none; background: #ffffff; border: 1.5px solid #3b82f6; border-radius: 12px; padding: 0.85rem 1rem; margin-top: 0.25rem; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
-                                <span style="font-size: 0.82rem; font-weight: 800; color: #1e3a8a;">📅 Select Custom Date Range (දින පරාසය තෝරන්න)</span>
+                                <span style="font-size: 0.82rem; font-weight: 800; color: #1e3a8a;">📅 Select Custom Date Range</span>
                                 <button type="button" onclick="closeHistoryCustomDatePopover()" style="background: transparent; border: none; color: #64748b; font-weight: 800; font-size: 1rem; cursor: pointer;">✕</button>
                             </div>
                             <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;">
                                 <div style="flex: 1; min-width: 150px;">
-                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">From Date (ආරම්භක දිනය)</label>
+                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">From Date</label>
                                     <input type="date" id="historyStartDate" onclick="if(this.showPicker) this.showPicker();" onchange="handleHistoryPopoverDateChange('start')" style="width: 100%; padding: 0.48rem 0.65rem; font-size: 0.84rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #93c5fd; background: #f8fafc; color: #1e293b; cursor: pointer;">
                                 </div>
                                 <div style="flex: 1; min-width: 150px;">
-                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">To Date (අවසාන දිනය)</label>
+                                    <label style="display: block; font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 3px;">To Date</label>
                                     <input type="date" id="historyEndDate" onclick="if(this.showPicker) this.showPicker();" onchange="handleHistoryPopoverDateChange('end')" style="width: 100%; padding: 0.48rem 0.65rem; font-size: 0.84rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #93c5fd; background: #f8fafc; color: #1e293b; cursor: pointer;">
                                 </div>
                                 <input type="hidden" id="historySpecificDate" value="">
@@ -1790,7 +1771,7 @@
                         <div>
                             <label style="display: block; font-size: 0.72rem; color: #059669; font-weight: 800; margin-bottom: 3px;">🏪 Select Shop / Branch</label>
                             <select id="stockFilterShop" onchange="updateStockModelFilterDropdowns(); filterInventoryTable();" style="width: 100%; background: #ffffff; border: 1.5px solid rgba(16, 185, 129, 0.45); color: #065f46; padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.82rem; font-weight: 800;">
-                                <option value="ALL">🏪 All Shops (සියලුම ශාඛා)</option>
+                                <option value="ALL">🏪 All Shops</option>
                                 <option value="MAIN SHOP">🏢 Head Office (MAIN SHOP)</option>
                             </select>
                         </div>
@@ -1865,11 +1846,11 @@
             <!-- Staff Profiles Overview Period Filter -->
             <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 0.85rem 1.1rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                    <span style="font-size: 0.82rem; font-weight: 700; color: #475569; margin-right: 4px;">📅 Period (කාලය):</span>
-                    <button type="button" class="staff-date-filter-btn active" id="btnMainStaffDateAll" onclick="setMainStaffDateFilter('all')">All Time (සියල්ල)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateToday" onclick="setMainStaffDateFilter('today')">Today (අද)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateWeek" onclick="setMainStaffDateFilter('week')">This Week (සතිය)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateMonth" onclick="setMainStaffDateFilter('month')">This Month (මාසය)</button>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #475569; margin-right: 4px;">📅 Period:</span>
+                    <button type="button" class="staff-date-filter-btn active" id="btnMainStaffDateAll" onclick="setMainStaffDateFilter('all')">All Time</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateToday" onclick="setMainStaffDateFilter('today')">Today</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateWeek" onclick="setMainStaffDateFilter('week')">This Week</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnMainStaffDateMonth" onclick="setMainStaffDateFilter('month')">This Month</button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <input type="date" id="mainStaffFilterStartDate" onchange="setMainStaffCustomDateRange()" style="padding: 0.38rem 0.6rem; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff;">
@@ -2054,7 +2035,7 @@
 
             <div style="margin-bottom: 1.4rem;">
                 <label style="color: var(--text-main); font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.4rem;">
-                    Reason for Cancellation / NIC Clear (අවලංගු කිරීමට හේතුව) <span style="color: #ef4444;">*</span>
+                    Reason for Cancellation / NIC Clear <span style="color: #ef4444;">*</span>
                 </label>
                 <textarea id="reqNicReasonInput" placeholder="e.g. Document error / Signature mismatch / Rejected by Fintrex, waiting for NIC clearance" rows="3" style="width: 100%; padding: 0.65rem; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 0.85rem; resize: vertical;" required></textarea>
             </div>
@@ -2173,7 +2154,7 @@
                     <!-- Filled dynamically with SP, Customer Name, and NIC -->
                 </div>
                 <label style="display: block; font-weight: 700; color: #334155; font-size: 0.85rem; margin-bottom: 0.4rem;">
-                    🔑 Enter Admin Password (පාස්වර්ඩ් එක ඇතුළත් කරන්න):
+                    🔑 Enter Admin Password:
                 </label>
                 <input type="password" id="deleteNicAdminPassword" placeholder="Enter password (1234)" style="width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 1rem; margin-bottom: 1.2rem; text-align: center; letter-spacing: 3px; font-weight: 800;" onkeyup="if(event.key==='Enter') confirmDeleteNicClearRecord();">
                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
@@ -2199,47 +2180,41 @@
                 <input type="hidden" id="editingShopDocId" value="">
 
                 <!-- ROLE SELECTOR: Head Office Cashier vs Sub Shop -->
-                <div style="margin-bottom: 1.15rem; background: #f8fafc; padding: 0.85rem; border-radius: 14px; border: 1.5px solid var(--border-color);">
-                    <label style="color: var(--text-main); font-size: 0.85rem; font-weight: 800; display: block; margin-bottom: 0.5rem;">
-                        📌 Select Account Type / කාර්යභාරය: *
+                <div style="margin-bottom: 1.1rem;">
+                    <label style="color: var(--text-main); font-size: 0.85rem; font-weight: 800; display: block; margin-bottom: 0.4rem;">
+                        Account Category / Role: *
                     </label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
-                        <label id="roleLabelHOCashier" style="border: 2px solid #2563eb; background: rgba(37,99,235,0.08); padding: 0.7rem 0.8rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.85rem; color: #1e3a8a; transition: all 0.2s;">
-                            <input type="radio" name="newShopRole" value="headoffice_cashier" onchange="handleAccountRoleChange('headoffice_cashier')" checked style="accent-color: #2563eb; width: 17px; height: 17px;">
-                            <span>🏢 Head Office Cashier</span>
-                        </label>
-                        <label id="roleLabelSubShop" style="border: 2px solid var(--border-color); background: #ffffff; padding: 0.7rem 0.8rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem; color: var(--text-main); transition: all 0.2s;">
-                            <input type="radio" name="newShopRole" value="sub_shop" onchange="handleAccountRoleChange('sub_shop')" style="accent-color: #2563eb; width: 17px; height: 17px;">
-                            <span>🏪 Sub Shop / Branch</span>
-                        </label>
-                    </div>
+                    <select id="newShopRole" onchange="handleAccountRoleChange(this.value)" style="width: 100%; background: #ffffff; border: 1.5px solid #3b82f6; padding: 0.65rem 0.85rem; border-radius: 10px; font-weight: 700; font-size: 0.9rem; color: #1e3a8a; cursor: pointer;">
+                        <option value="headoffice_cashier" selected>🏢 Head Office Own Branch / Cashier</option>
+                        <option value="sub_shop">🏪 Sub-Branch / Partner Agent (SPM, VR, etc.)</option>
+                    </select>
                     <div id="roleHelpNotice" style="font-size: 0.74rem; color: #2563eb; font-weight: 600; margin-top: 6px;">
-                        ⚡ Head Office Cashiers log directly into the Cashier POS with Head Office stock.
+                        Head Office Cashiers log directly into the Cashier POS with Head Office stock.
                     </div>
                 </div>
 
                 <div style="margin-bottom: 1rem;">
-                    <label id="newShopNameLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Full Name (කැෂියර් නම) *</label>
+                    <label id="newShopNameLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Full Name *</label>
                     <input type="text" id="newShopName" placeholder="e.g. Kasun (HO Cashier 1)" required style="font-weight: 600;">
                 </div>
 
                 <div style="margin-bottom: 1rem;">
-                    <label id="newShopEmailLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Login Email (විද්‍යුත් තැපෑල) *</label>
+                    <label id="newShopEmailLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Cashier Login Email *</label>
                     <input type="email" id="newShopEmail" placeholder="e.g. cashier1@methmi.com" required style="font-weight: 600;">
                 </div>
 
                 <div style="margin-bottom: 1rem;">
-                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Contact Number (දුරකථන අංකය)</label>
+                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Contact Number</label>
                     <input type="text" id="newShopPhone" placeholder="e.g. 0771234567">
                 </div>
 
                 <div style="margin-bottom: 1rem;" id="newShopLocationGroup">
-                    <label id="newShopLocationLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Location / Branch (ස්ථානය)</label>
+                    <label id="newShopLocationLabel" style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Location / Branch</label>
                     <input type="text" id="newShopLocation" value="HEAD OFFICE / MAIN SHOP" placeholder="e.g. HEAD OFFICE" style="font-weight: 700;">
                 </div>
 
                 <div style="margin-bottom: 1.2rem;">
-                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Login Password (මුරපදය) *</label>
+                    <label style="color: var(--text-muted); font-size: 0.84rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">Login Password *</label>
                     <input type="text" id="newShopPassword" value="1234" required placeholder="Default 1234" style="font-weight: 700; font-family: monospace; font-size: 1rem;">
                 </div>
 
@@ -2287,8 +2262,8 @@
                     
                     <label style="color: var(--text-muted); font-size: 0.85rem;">Shop Settlement Status</label>
                     <select id="paymentStatusSelect" style="width: 100%; background: #f3f4f6; border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem; border-radius: 8px; margin-top: 0.5rem;">
-                        <option value="Pending">Pending (ගෙවීමට ඇත)</option>
-                        <option value="Paid">Paid (ගෙව්වා)</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
                     </select>
                 </div>
             </div>
@@ -2332,11 +2307,11 @@
             <!-- Staff Modal Period / Date Range Filter Toolbar -->
             <div style="background: rgba(248, 250, 252, 0.95); border: 1px solid rgba(226, 232, 240, 0.95); border-radius: 14px; padding: 0.75rem 1rem; margin-bottom: 1.2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 Period (කාලය):</span>
-                    <button type="button" class="staff-date-filter-btn active" id="btnStaffDateAll" onclick="setStaffDateFilter('all')">All Time (සියල්ල)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateToday" onclick="setStaffDateFilter('today')">Today (අද)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateWeek" onclick="setStaffDateFilter('week')">This Week (සතිය)</button>
-                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateMonth" onclick="setStaffDateFilter('month')">This Month (මාසය)</button>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #475569; margin-right: 2px;">📅 Period:</span>
+                    <button type="button" class="staff-date-filter-btn active" id="btnStaffDateAll" onclick="setStaffDateFilter('all')">All Time</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateToday" onclick="setStaffDateFilter('today')">Today</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateWeek" onclick="setStaffDateFilter('week')">This Week</button>
+                    <button type="button" class="staff-date-filter-btn" id="btnStaffDateMonth" onclick="setStaffDateFilter('month')">This Month</button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                     <input type="date" id="staffFilterStartDate" onchange="setStaffCustomDateRange()" style="padding: 0.35rem 0.55rem; font-size: 0.78rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main);">
@@ -2451,13 +2426,13 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                     <div>
                         <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
-                            📅 Payment Date (දිනය)
+                            📅 Payment Date
                         </label>
                         <input type="date" id="staffPaymentDateInput" required style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem; font-weight: 600;">
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
-                            ⏰ Payment Time (වේලාව)
+                            ⏰ Payment Time
                         </label>
                         <input type="time" id="staffPaymentTimeInput" required style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem; font-weight: 600;">
                     </div>
@@ -2465,13 +2440,13 @@
 
                 <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
                     <button type="button" onclick="setStaffPaymentToNow()" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #2563eb; padding: 0.3rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
-                        ⚡ Set to Current Date & Time (දැන් වෙලාව)
+                        ⚡ Set to Current Date & Time
                     </button>
                 </div>
 
                 <div style="margin-bottom: 1.4rem;">
                     <label style="display: block; margin-bottom: 0.35rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
-                        📝 Note / Payment Reference (විකල්ප සටහනක්)
+                        📝 Note / Payment Reference
                     </label>
                     <input type="text" id="staffPaymentNoteInput" placeholder="e.g. Paid in Cash, Bank Transfer, Handed over by..." style="width: 100%; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: var(--text-main); font-size: 0.85rem;">
                 </div>
@@ -2499,7 +2474,7 @@
                     </div>
                 </div>
                 <button type="button" id="btnCleanAllDupesModal" onclick="cleanAllDuplicateSalesNow()" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.55rem 1.1rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
-                    🗑️ Clean All Duplicates (සියල්ල ඉවත් කරන්න)
+                    🗑️ Clean All Duplicates
                 </button>
             </div>
 
@@ -2528,12 +2503,12 @@
 
                 <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">📅 Sale Date (දිනය)</label>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">📅 Sale Date</label>
                         <input type="date" id="editSaleDate" required style="width: 100%;">
                     </div>
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">⏰ Sale Time (වේලාව)</label>
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">⏰ Sale Time</label>
                             <span onclick="setEditSaleTimeToNow()" style="font-size: 0.72rem; color: #2563eb; cursor: pointer; font-weight: 700;">⚡ Now</span>
                         </div>
                         <input type="time" id="editSaleTime" style="width: 100%;">
@@ -2569,11 +2544,11 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Selling Price MRP (රු.)</label>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Selling Price MRP</label>
                         <input type="number" id="editSaleMrp" step="0.01" style="width: 100%;">
                     </div>
                     <div id="editSaleBuyPriceContainer">
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Buy Price / Cost (රු.)</label>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Buy Price / Cost</label>
                         <input type="number" id="editSaleBuyPrice" step="0.01" style="width: 100%;">
                     </div>
                 </div>
@@ -2584,7 +2559,7 @@
                         <input type="text" id="editSaleStaffName" list="activatorDatalist" style="width: 100%;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Staff Fee / Comm (රු.)</label>
+                        <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">Staff Fee / Comm</label>
                         <input type="number" id="editSaleStaffFee" step="1" style="width: 100%;">
                     </div>
                 </div>
@@ -2648,7 +2623,7 @@
 
             <!-- Zoom & Focus Quick Controls for Mobile -->
             <div id="scannerZoomControls" style="display: flex; justify-content: space-between; align-items: center; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 10px; padding: 0.45rem 0.8rem; margin-bottom: 0.75rem;">
-                <span style="font-size: 0.78rem; color: #1e3a8a; font-weight: 700;">🔍 Camera Zoom (විශාලනය):</span>
+                <span style="font-size: 0.78rem; color: #1e3a8a; font-weight: 700;">🔍 Camera Zoom:</span>
                 <div style="display: flex; gap: 5px;">
                     <button type="button" onclick="setScannerZoom(1.0)" class="zoom-btn" style="padding: 3px 9px; font-size: 0.76rem; border-radius: 6px; border: 1px solid rgba(59,130,246,0.3); background: white; color: #2563eb; font-weight: 800; cursor: pointer;">1.0x</button>
                     <button type="button" onclick="setScannerZoom(1.5)" class="zoom-btn" style="padding: 3px 9px; font-size: 0.76rem; border-radius: 6px; border: 1px solid rgba(59,130,246,0.3); background: white; color: #2563eb; font-weight: 800; cursor: pointer;">1.5x</button>
@@ -2662,7 +2637,7 @@
             </div>
             
             <div style="text-align: left; margin-bottom: 0.8rem;">
-                <label style="display:block; margin-bottom: 0.3rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">Or Type Manually (අතින් ඇතුළත් කරන්න)</label>
+                <label style="display:block; margin-bottom: 0.3rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">Or Type Manually</label>
                 <div style="display: flex; gap: 0.5rem;">
                     <input type="text" id="manualScannerInput" placeholder="Type 15-digit IMEI number..." onkeydown="if(event.key==='Enter'){event.preventDefault();submitManualScan();}" style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-main); font-weight: 700; font-family: monospace;">
                     <button onclick="submitManualScan()" style="background: var(--primary); color: white; border: none; padding: 0 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 700;">OK</button>
@@ -2780,11 +2755,11 @@
                         <strong id="liveShopCommission" style="color: #6d28d9;">- Rs. 0.00</strong>
                     </div>
                     <div style="border-top: 1px dashed rgba(16, 185, 129, 0.4); margin: 0.5rem 0; padding-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: #065f46; font-weight: 800; font-size: 0.95rem;">🏦 Head Office Amount (අපට ලැබිය යුතු මුදල):</span>
+                        <span style="color: #065f46; font-weight: 800; font-size: 0.95rem;">🏦 Head Office Amount:</span>
                         <strong id="liveHeadOfficeDue" style="color: #047857; font-size: 1.2rem; font-weight: 900;">Rs. 0.00</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 0.3rem; font-size: 0.82rem;">
-                        <span style="color: var(--text-muted);">💎 Head Office Net Profit (අපේ ලාභය):</span>
+                        <span style="color: var(--text-muted);">💎 Head Office Net Profit:</span>
                         <strong id="liveHeadOfficeProfit" style="color: #059669; font-weight: 800;">Rs. 0.00</strong>
                     </div>
                 </div>
@@ -2836,7 +2811,7 @@
                 <div style="display: flex; align-items: center; gap: 8px; flex: 1.2; min-width: 240px;">
                     <span style="font-size: 0.82rem; font-weight: 800; color: #059669; white-space: nowrap;">🏪 Shop Filter:</span>
                     <select id="batchModalLocationFilter" onchange="filterBatchModalItems()" style="flex: 1; border: 1.5px solid rgba(16, 185, 129, 0.45); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.84rem; font-weight: 800; color: #065f46; background: #fff;">
-                        <option value="ALL">🏪 All Shops / Locations (සියල්ල)</option>
+                        <option value="ALL">🏪 All Shops / Locations</option>
                         <option value="MAIN SHOP">🏢 Head Office (MAIN SHOP)</option>
                         <option value="BRANCHES">📍 All Branches Combined</option>
                     </select>
@@ -2910,12 +2885,12 @@
                 <input type="hidden" id="editBatchCatVal">
 
                 <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Buy Price / Cost (අපේ මිලදී ගත් මිල රු.)</label>
+                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Buy Price / Cost</label>
                     <input type="number" id="editBatchNewBuyPrice" step="0.01" required style="width: 100%; font-weight: 700;">
                 </div>
 
                 <div style="margin-bottom: 1.3rem;">
-                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Selling MRP (විකුණුම් මිල රු.)</label>
+                    <label style="display:block; margin-bottom: 0.35rem; color: var(--text-muted); font-size: 0.84rem; font-weight: 600;">New Selling MRP</label>
                     <input type="number" id="editBatchNewMrpPrice" step="0.01" required style="width: 100%; font-weight: 700;">
                 </div>
 
@@ -3909,8 +3884,9 @@
 
         window.handleAccountRoleChange = function(role) {
             const isHOCashier = role === 'headoffice_cashier';
-            const labelHO = document.getElementById('roleLabelHOCashier');
-            const labelSub = document.getElementById('roleLabelSubShop');
+            const roleSelect = document.getElementById('newShopRole');
+            if (roleSelect && roleSelect.value !== role) roleSelect.value = role;
+
             const notice = document.getElementById('roleHelpNotice');
             const title = document.getElementById('addShopModalTitle');
             const nameLabel = document.getElementById('newShopNameLabel');
@@ -3918,34 +3894,29 @@
             const emailLabel = document.getElementById('newShopEmailLabel');
             const emailInput = document.getElementById('newShopEmail');
             const locInput = document.getElementById('newShopLocation');
-            const locGroup = document.getElementById('newShopLocationGroup');
             const profitContainer = document.getElementById('shopProfitSettingsContainer');
             const saveBtn = document.getElementById('saveShopBtn');
 
             if (isHOCashier) {
-                if (labelHO) { labelHO.style.borderColor = '#2563eb'; labelHO.style.background = 'rgba(37,99,235,0.08)'; labelHO.style.color = '#1e3a8a'; }
-                if (labelSub) { labelSub.style.borderColor = 'var(--border-color)'; labelSub.style.background = '#ffffff'; labelSub.style.color = 'var(--text-main)'; }
-                if (notice) notice.innerText = '⚡ Head Office Cashiers log directly into the Cashier POS with Head Office stock.';
+                if (notice) notice.innerText = 'Head Office Cashiers log directly into the Cashier POS with Head Office stock.';
                 if (title) title.innerHTML = '<span>🏢</span> Register Head Office Cashier';
-                if (nameLabel) nameLabel.innerText = 'Cashier Full Name (කැෂියර් නම) *';
-                if (nameInput) nameInput.placeholder = 'e.g. Kasun (HO Cashier 1)';
-                if (emailLabel) emailLabel.innerText = 'Cashier Login Email (විද්‍යුත් තැපෑල) *';
+                if (nameLabel) nameLabel.innerText = 'Cashier Full Name *';
+                if (nameInput) nameInput.placeholder = 'e.g. Kasun (Branch 1)';
+                if (emailLabel) emailLabel.innerText = 'Cashier Login Email *';
                 if (emailInput) emailInput.placeholder = 'e.g. cashier1@methmi.com';
                 if (locInput) { locInput.value = 'HEAD OFFICE / MAIN SHOP'; locInput.readOnly = true; }
                 if (profitContainer) profitContainer.style.display = 'none';
                 if (saveBtn) saveBtn.innerText = 'Register Head Office Cashier';
             } else {
-                if (labelSub) { labelSub.style.borderColor = '#2563eb'; labelSub.style.background = 'rgba(37,99,235,0.08)'; labelSub.style.color = '#1e3a8a'; }
-                if (labelHO) { labelHO.style.borderColor = 'var(--border-color)'; labelHO.style.background = '#ffffff'; labelHO.style.color = 'var(--text-main)'; }
-                if (notice) notice.innerText = '🏪 Sub Shops / Branches submit loans and receive stock allocations from Head Office.';
-                if (title) title.innerHTML = '<span>🏪</span> Register Sub Shop / Branch';
+                if (notice) notice.innerText = 'Sub-Branches and Partner Agents (SPM, VR) manage separate loan files and commission rates.';
+                if (title) title.innerHTML = '<span>🏪</span> Register Sub-Branch / Partner Agent';
                 if (nameLabel) nameLabel.innerText = 'Shop / Branch Name *';
-                if (nameInput) nameInput.placeholder = 'e.g. PULASTHIGAMA POLONNARUWA';
-                if (emailLabel) emailLabel.innerText = 'Shop Login Email (විද්‍යුත් තැපෑල) *';
-                if (emailInput) emailInput.placeholder = 'e.g. pulasthigama@methmi.com';
+                if (nameInput) nameInput.placeholder = 'e.g. SPM SOLUTION';
+                if (emailLabel) emailLabel.innerText = 'Shop Login Email *';
+                if (emailInput) emailInput.placeholder = 'e.g. spm@methmi.com';
                 if (locInput) { if (locInput.value === 'HEAD OFFICE / MAIN SHOP') locInput.value = ''; locInput.readOnly = false; }
                 if (profitContainer) profitContainer.style.display = 'block';
-                if (saveBtn) saveBtn.innerText = 'Register Shop';
+                if (saveBtn) saveBtn.innerText = 'Register Sub-Branch';
             }
         };
 
@@ -3962,8 +3933,6 @@
             document.getElementById('newShopOwnPercent').value = '6';
 
             // Select sub shop by default
-            const radio = document.querySelector('input[name="newShopRole"][value="sub_shop"]');
-            if (radio) radio.checked = true;
             handleAccountRoleChange('sub_shop');
 
             document.getElementById('addShopModal').style.display = 'flex';
@@ -3978,8 +3947,6 @@
             document.getElementById('newShopOwnPercent').value = '6';
 
             // Select Head Office Cashier by default
-            const radio = document.querySelector('input[name="newShopRole"][value="headoffice_cashier"]');
-            if (radio) radio.checked = true;
             handleAccountRoleChange('headoffice_cashier');
 
             document.getElementById('addShopModal').style.display = 'flex';
@@ -3997,7 +3964,7 @@
             btn.innerText = 'Registering & Creating Credentials...';
 
             const editId = document.getElementById('editingShopDocId')?.value || '';
-            const role = document.querySelector('input[name="newShopRole"]:checked')?.value || 'headoffice_cashier';
+            const role = document.getElementById('newShopRole')?.value || 'headoffice_cashier';
             const name = document.getElementById('newShopName').value.trim();
             const email = document.getElementById('newShopEmail').value.trim().toLowerCase();
             const phone = document.getElementById('newShopPhone').value.trim();
@@ -5070,7 +5037,7 @@
                 if (!imeiVal && !modelVal) {
                     cardEl.style.background = 'rgba(255, 255, 255, 0.9)';
                     cardEl.style.border = '1px dashed #cbd5e1';
-                    cardEl.innerHTML = '📱 IMEI එක Scan කළ විට හෝ තේරූ විට Product එක මෙතැනට Add වේ (Scan IMEI to add product to bill)';
+                    cardEl.innerHTML = '📱 Scan IMEI or pick stock to add product to bill';
                     return;
                 }
 
@@ -5113,7 +5080,7 @@
                 if (!imeiVal && !modelVal) {
                     cardEl.style.background = 'rgba(255, 255, 255, 0.9)';
                     cardEl.style.border = '1px dashed #cbd5e1';
-                    cardEl.innerHTML = '📱 IMEI එක Scan කළ විට Product එක මෙතැනට Add වේ';
+                    cardEl.innerHTML = '📱 Scan IMEI to add product to bill';
                     return;
                 }
 
@@ -5960,7 +5927,7 @@
                 const sel = document.getElementById(selId);
                 if (sel) {
                     const currentVal = sel.value;
-                    sel.innerHTML = '<option value="">-- Choose Activator Staff (තෝරන්න) --</option>';
+                    sel.innerHTML = '<option value="">-- Choose Activator Staff --</option>';
                     staffList.forEach(name => {
                         const opt = document.createElement('option');
                         opt.value = name;
@@ -10849,9 +10816,9 @@
             if (sortedSales.length === 0) {
                 const periodNameMap = {
                     'all': 'All Time',
-                    'today': 'Today (අද)',
-                    'week': 'This Week (සතිය)',
-                    'month': 'This Month (මාසය)',
+                    'today': 'Today',
+                    'week': 'This Week',
+                    'month': 'This Month',
                     'custom': 'Custom Range (තෝරාගත් කාලය)'
                 };
                 const pName = periodNameMap[currentStaffDateFilter] || 'selected period';
@@ -11769,8 +11736,6 @@
 
             const isHOCashier = regData?.role === 'headoffice_cashier' || (location || '').toUpperCase().includes('HEAD OFFICE');
             const targetRole = isHOCashier ? 'headoffice_cashier' : 'sub_shop';
-            const radio = document.querySelector(`input[name="newShopRole"][value="${targetRole}"]`);
-            if (radio) radio.checked = true;
             handleAccountRoleChange(targetRole);
 
             document.getElementById('addShopModalTitle').innerText = 'Edit ' + (isHOCashier ? 'Cashier Profile - ' : 'Shop Profile - ') + name;
