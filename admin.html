@@ -835,6 +835,131 @@
             background-color: #fee2e2 !important;
             box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.35) !important;
         }
+    
+        /* Compact Smart Model Stock Cards */
+        .model-stock-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 10px;
+            padding: 0.55rem 0.85rem;
+            margin-bottom: 0.42rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .model-stock-card:hover {
+            border-color: rgba(59, 130, 246, 0.45);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* Shop Category Sections inside Batch & IMEI Modal */
+        .shop-stock-section {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.95);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .shop-section-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.5rem 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .shop-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .shop-section-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+        .shop-section-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .shop-imei-list {
+            padding: 0.4rem 0.6rem;
+        }
+        .shop-imei-row {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            padding: 0.35rem 0.55rem;
+            margin-bottom: 0.28rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+        .shop-imei-row:hover {
+            background: #f8fafc;
+            border-color: #93c5fd;
+        }
+        .shop-imei-row.sold {
+            background: #f1f5f9;
+            opacity: 0.7;
+        }
+        .shop-imei-row-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 0.82rem;
+        }
+        .shop-imei-row-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .btn-act {
+            border: none;
+            padding: 0.25rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-act.recall {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .btn-act.transfer {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+        }
+        .btn-act.edit {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .btn-act.delete {
+            background: rgba(239, 68, 68, 0.12);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
     </style>
 </head>
 <body style="display: none;">
@@ -1630,37 +1755,30 @@
                     </div>
 
                     <!-- POS Purchase / GRN Sheet & Model-Wise Excel Upload Box (Skips Existing IMEIs Automatically) -->
-                    <div id="excelUploadBoxContainer" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px dashed rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 0.95rem 1rem; margin-bottom: 1.25rem; transition: all 0.25s;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem;">
-                            <div style="font-weight: 800; font-size: 0.88rem; color: #065f46; display: flex; align-items: center; gap: 6px;">
-                                <span>📊</span> POS Purchase / GRN Sheet & Excel Stock Upload
+                    <div id="excelUploadBoxContainer" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1.5px dashed rgba(16, 185, 129, 0.45); border-radius: 12px; padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; transition: all 0.25s;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 0.4rem;">
+                            <div style="font-weight: 800; font-size: 0.82rem; color: #065f46; display: flex; align-items: center; gap: 6px;">
+                                <span>📊</span> POS GRN & Excel Stock Upload
                             </div>
-                            <button type="button" onclick="downloadSampleInventoryExcel()" style="background: white; border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 3px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;">
-                                📥 Sample GRN Excel
+                            <button type="button" onclick="downloadSampleInventoryExcel()" style="background: white; border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">
+                                📥 Sample Excel
                             </button>
                         </div>
-                        <p style="font-size: 0.75rem; color: #475569; margin: 0 0 0.6rem 0; line-height: 1.4;">
-                            ඔබගේ <strong>POS එකෙන් Download කරන Purchase / GRN Excel Sheet එක</strong> කෙලින්ම මෙතැනින් Upload කරන්න (එකම පේළියේ <code>IMEI / Serial Numbers</code> තීරුවේ කොමා මගින් වෙන් කර ඇති IMEI සියල්ල වෙන වෙනම හඳුනාගෙන Product Name, Unit Cost, Selling Price සමඟ ස්වයංක්‍රීයව Inventory එකට ඇතුළත් වේ). <strong>කලින් ඇතුළත් කළ IMEI ස්වයංක්‍රීයව Skip වේ.</strong>
-                        </p>
-
-                        <!-- Model-wise Selector Dropdown for Excel Upload -->
-                        <div style="margin-bottom: 0.55rem;">
-                            <label style="display: block; font-size: 0.73rem; font-weight: 800; color: #1e3a8a; margin-bottom: 3px;">
-                                📱 Optional — Select Phone Model (Excel එකේ Model නම නොමැති නම් පමණක් තෝරන්න):
-                            </label>
-                            <select id="excelModelPresetSelect" onchange="handleExcelModelPresetChange(this.value)" style="width: 100%; background: #ffffff; border: 1.5px solid #93c5fd; color: #1e3a8a; padding: 0.48rem 0.6rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">
+                        
+                        <div style="margin-bottom: 0.4rem;">
+                            <select id="excelModelPresetSelect" onchange="handleExcelModelPresetChange(this.value)" style="width: 100%; background: #ffffff; border: 1px solid #93c5fd; color: #1e3a8a; padding: 0.38rem 0.6rem; border-radius: 7px; font-size: 0.78rem; font-weight: 700;">
                                 <option value="">➕ Auto-Detect from POS GRN Sheet / Use Form Fields Below</option>
                             </select>
-                            <div id="excelActiveModelBadge" style="display: none; margin-top: 5px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 4px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700;"></div>
+                            <div id="excelActiveModelBadge" style="display: none; margin-top: 4px; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;"></div>
                         </div>
 
-                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                            <input type="file" id="excelInventoryFileInput" accept=".xlsx,.xls,.csv" multiple style="flex: 1; min-width: 170px; font-size: 0.78rem; padding: 0.45rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px;">
-                            <button type="button" id="excelUploadBtn" onclick="handleExcelInventoryUpload()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.55rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; white-space: nowrap; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);">
-                                📤 Upload GRN / Excel
+                        <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+                            <input type="file" id="excelInventoryFileInput" accept=".xlsx,.xls,.csv" multiple style="flex: 1; min-width: 140px; font-size: 0.75rem; padding: 0.35rem; background: white; border: 1px solid #cbd5e1; border-radius: 7px;">
+                            <button type="button" id="excelUploadBtn" onclick="handleExcelInventoryUpload()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.42rem 0.85rem; border-radius: 7px; font-weight: 800; font-size: 0.76rem; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);">
+                                📤 Upload GRN
                             </button>
                         </div>
-                        <div id="excelUploadResultBox" style="display: none; margin-top: 0.65rem; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.78rem; line-height: 1.45;"></div>
+                        <div id="excelUploadResultBox" style="display: none; margin-top: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 7px; font-size: 0.76rem; line-height: 1.4;"></div>
                     </div>
 
                     <form id="inventoryForm">
@@ -7941,54 +8059,41 @@
                 card.onclick = function() { openModelBatchModal(grp.key); };
 
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.65rem;">
-                        <div>
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">
-                                    📱 ${grp.model}
-                                </h3>
-                                <span style="background: rgba(124, 58, 237, 0.12); color: #6d28d9; border: 1px solid rgba(124, 58, 237, 0.3); font-weight: 800; font-size: 0.78rem; padding: 2px 10px; border-radius: 999px;">
-                                    💾 ${grp.storage}
-                                </span>
-                                ${isDialogLesi ? '<span style="background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 700; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">Dialog Lesi Pay</span>' : '<span style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">Head Office Stock</span>'}
-                                ${batches.length > 1 ? '<span style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 800; font-size: 0.74rem; padding: 2px 8px; border-radius: 999px;">⚡ ' + batches.length + ' Batches</span>' : ''}
-                            </div>
-                            
-                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 0.45rem; flex-wrap: wrap; font-size: 0.85rem;">
-                                <span style="color: #ef4444; font-weight: 700;">${costLabel}</span>
-                                <span style="color: #cbd5e1;">|</span>
-                                <span style="color: #2563eb; font-weight: 700;">${mrpLabel}</span>
-                            </div>
-
-                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 0.45rem; flex-wrap: wrap;">
-                                ${branchTags.length > 0 ? branchTags.join(' ') : '<span style="font-size:0.75rem; color:var(--text-muted);">No active stock</span>'}
-                            </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                            <strong style="font-size: 0.98rem; font-weight: 800; color: var(--text-main);">
+                                📱 ${grp.model}
+                            </strong>
+                            <span style="background: rgba(124, 58, 237, 0.12); color: #6d28d9; border: 1px solid rgba(124, 58, 237, 0.3); font-weight: 800; font-size: 0.72rem; padding: 1px 7px; border-radius: 999px;">
+                                ${grp.storage}
+                            </span>
+                            ${isDialogLesi ? '<span style="background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 700; font-size: 0.7rem; padding: 1px 6px; border-radius: 999px;">Dialog Lesi</span>' : '<span style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.7rem; padding: 1px 6px; border-radius: 999px;">HO Stock</span>'}
+                            ${batches.length > 1 ? '<span style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 800; font-size: 0.7rem; padding: 1px 6px; border-radius: 999px;">⚡ ' + batches.length + ' Batches</span>' : ''}
                         </div>
-
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="text-align: right;">
-                                <span style="display: inline-block; background: ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}; border: 1px solid ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}; color: ${grp.availableCount > 0 ? '#059669' : '#dc2626'}; font-weight: 800; font-size: 0.92rem; padding: 0.32rem 0.85rem; border-radius: 999px;">
-                                    ${grp.availableCount} Available
-                                </span>
-                                ${grp.soldCount > 0 ? `<span style="display: block; font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">(${grp.soldCount} Sold / Out)</span>` : ''}
-                            </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="background: ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}; border: 1px solid ${grp.availableCount > 0 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}; color: ${grp.availableCount > 0 ? '#059669' : '#dc2626'}; font-weight: 800; font-size: 0.82rem; padding: 2px 8px; border-radius: 999px;">
+                                ${grp.availableCount} Available
+                            </span>
+                            ${grp.soldCount > 0 ? `<span style="font-size: 0.7rem; color: var(--text-muted);">(${grp.soldCount} Sold)</span>` : ''}
                         </div>
                     </div>
 
-                    <!-- Actions Strip -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(226, 232, 240, 0.9); padding-top: 0.65rem; margin-top: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <span style="font-size: 0.78rem; color: #2563eb; font-weight: 700;">
-                            👉 Click to view ${grp.availableCount} IMEIs, Filter by Shop & Transfer ➔
-                        </span>
-                        <div style="display: flex; gap: 6px; flex-wrap: wrap;" onclick="event.stopPropagation();">
-                            <button type="button" onclick="quickExcelUploadForModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-weight: 800; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Upload an Excel sheet of IMEIs specifically for this phone model">
-                                📤 Excel Upload
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 0.78rem;">
+                            <span style="color: #ef4444; font-weight: 700;">${costLabel}</span>
+                            <span style="color: #cbd5e1;">|</span>
+                            <span style="color: #2563eb; font-weight: 700;">${mrpLabel}</span>
+                            <span style="display: inline-flex; gap: 4px; margin-left: 4px; align-items: center;">${branchTags.length > 0 ? branchTags.join(' ') : '<span style="font-size:0.72rem; color:var(--text-muted);">No active stock</span>'}</span>
+                        </div>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;" onclick="event.stopPropagation();">
+                            <button type="button" onclick="quickExcelUploadForModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-weight: 800; font-size: 0.72rem; padding: 0.22rem 0.55rem; border-radius: 6px; cursor: pointer;" title="Upload Excel">
+                                📤 Excel
                             </button>
-                            <button type="button" onclick="quickAddBatchToModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.75rem; border-radius: 8px; cursor: pointer;" title="Add new batch for this phone model">
-                                ➕ Add New Batch
+                            <button type="button" onclick="quickAddBatchToModel('${safeModel}', '${safeStorage}', '${safeCat}')" style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-weight: 700; font-size: 0.72rem; padding: 0.22rem 0.55rem; border-radius: 6px; cursor: pointer;" title="Add Batch">
+                                ➕ Batch
                             </button>
-                            <button type="button" onclick="openModelBatchModal('${safeModelKey}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; font-weight: 700; font-size: 0.76rem; padding: 0.35rem 0.85rem; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.3);">
-                                👁️ View IMEIs & Shops (${grp.availableCount})
+                            <button type="button" onclick="openModelBatchModal('${safeModelKey}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; font-weight: 700; font-size: 0.72rem; padding: 0.25rem 0.7rem; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
+                                👁️ View IMEIs (${grp.availableCount})
                             </button>
                         </div>
                     </div>
@@ -8205,15 +8310,15 @@
                 (i.model || '').trim().toLowerCase() === parts[0] &&
                 (i.storage || '').trim().toLowerCase() === (parts[1] || '')
             );
+            const batchesContainer = document.getElementById('batchModalBatchesList');
+            if (!batchesContainer) return;
+
             if (matchedItems.length === 0) {
-                const batchesContainer = document.getElementById('batchModalBatchesList');
-                if (batchesContainer) {
-                    batchesContainer.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); padding: 2.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                            All items in this model group have been removed.
-                        </div>
-                    `;
-                }
+                batchesContainer.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                        All items in this model group have been removed.
+                    </div>
+                `;
                 return;
             }
 
@@ -8223,56 +8328,47 @@
                 model: (first.model || 'Unknown').trim(),
                 storage: (first.storage || 'Standard').trim(),
                 category: first.category || 'Main Shop (Own Buy)',
-                items: matchedItems,
-                availableItems: matchedItems.filter(i => i.status === 'Available'),
-                soldItems: matchedItems.filter(i => i.status !== 'Available')
+                items: matchedItems
             };
-
-            const batchesContainer = document.getElementById('batchModalBatchesList');
-            if (!batchesContainer) return;
-            batchesContainer.innerHTML = '';
 
             const searchVal = (document.getElementById('batchModalSearchInput')?.value || '').toLowerCase().trim();
             const locFilter = document.getElementById('batchModalLocationFilter')?.value || 'ALL';
             const statusFilter = document.getElementById('batchModalStatusFilter')?.value || 'ALL';
 
-            // Rebuild batch structure from all items
-            const batchMap = new Map();
-            (grp.items || []).forEach(item => {
-                const buyPrice = parseFloat(item.buyPrice || 0);
-                const mrp = parseFloat(item.mrp || 0);
-                const cat = item.category || 'Main Shop (Own Buy)';
-                const bKey = `${buyPrice}_${mrp}_${cat}`;
+            // Filter items based on modal controls
+            const filteredItems = matchedItems.filter(item => {
+                const iShop = (item.shop || 'MAIN SHOP').trim();
+                const isMainShop = (iShop.toUpperCase() === 'MAIN SHOP');
 
-                if (!batchMap.has(bKey)) {
-                    batchMap.set(bKey, {
-                        batchKey: bKey,
-                        buyPrice: buyPrice,
-                        mrp: mrp,
-                        category: cat,
-                        items: [],
-                        availableCount: 0,
-                        soldCount: 0,
-                        locations: new Set()
-                    });
+                if (locFilter === 'MAIN SHOP' && !isMainShop) return false;
+                if (locFilter === 'BRANCHES' && isMainShop) return false;
+                if (locFilter !== 'ALL' && locFilter !== 'MAIN SHOP' && locFilter !== 'BRANCHES' && iShop.toLowerCase() !== locFilter.toLowerCase()) {
+                    return false;
                 }
 
-                const b = batchMap.get(bKey);
-                b.items.push(item);
-                if (item.status === 'Available') b.availableCount++;
-                else b.soldCount++;
-                if (item.shop) b.locations.add(item.shop.trim());
+                if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
+
+                if (searchVal) {
+                    const imeiStr = (item.imei || '').toLowerCase();
+                    const shopStr = iShop.toLowerCase();
+                    const statusStr = (item.status || '').toLowerCase();
+                    if (!imeiStr.includes(searchVal) && !shopStr.includes(searchVal) && !statusStr.includes(searchVal)) {
+                        return false;
+                    }
+                }
+                return true;
             });
 
-            const batches = Array.from(batchMap.values());
-            let totalMatchingItems = 0;
+            if (filteredItems.length === 0) {
+                batchesContainer.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; font-size: 0.85rem;">
+                        No matching phone records found for the selected Shop or filter.
+                    </div>
+                `;
+                return;
+            }
 
-            const safeModelKey = grp.key ? grp.key.replace(/'/g, "\\'") : groupKey.replace(/'/g, "\\'");
-            const safeModel = grp.model.replace(/'/g, "\\'");
-            const safeStorage = grp.storage.replace(/'/g, "\\'");
-            const safeCategory = (grp.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
-
-            // Collect unique shop destinations for transfer dropdown
+            // Gather all available shops for inline transfer destination
             const availableShopsSet = new Set();
             if (Array.isArray(registeredShopsList)) {
                 registeredShopsList.forEach(s => {
@@ -8290,315 +8386,262 @@
             }
             const availableShops = ['MAIN SHOP', ...Array.from(availableShopsSet).sort((a, b) => a.localeCompare(b))];
 
-            batches.forEach((b, bIdx) => {
-                // Filter items in this batch
-                const filteredBatchItems = b.items.filter(item => {
-                    const iShop = (item.shop || 'MAIN SHOP').trim();
-                    const isMainShop = (iShop.toUpperCase() === 'MAIN SHOP');
+            // GROUP BY SHOP / LOCATION (Categorized by Shop as user requested!)
+            const shopMap = new Map();
 
-                    // Location filter
-                    if (locFilter === 'MAIN SHOP' && !isMainShop) return false;
-                    if (locFilter === 'BRANCHES' && isMainShop) return false;
-                    if (locFilter !== 'ALL' && locFilter !== 'MAIN SHOP' && locFilter !== 'BRANCHES' && iShop.toLowerCase() !== locFilter.toLowerCase()) {
-                        return false;
-                    }
-
-                    // Status filter
-                    if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
-
-                    // Search input filter
-                    if (searchVal) {
-                        const imeiStr = (item.imei || '').toLowerCase();
-                        const shopStr = iShop.toLowerCase();
-                        const statusStr = (item.status || '').toLowerCase();
-                        if (!imeiStr.includes(searchVal) && !shopStr.includes(searchVal) && !statusStr.includes(searchVal)) {
-                            return false;
-                        }
-                    }
-
-                    return true;
+            // First, check if MAIN SHOP has items
+            const mainShopItems = filteredItems.filter(i => (i.shop || 'MAIN SHOP').trim().toUpperCase() === 'MAIN SHOP');
+            if (mainShopItems.length > 0) {
+                shopMap.set('MAIN SHOP', {
+                    shopName: 'MAIN SHOP',
+                    isMain: true,
+                    items: mainShopItems
                 });
+            }
 
-                if (filteredBatchItems.length === 0) return;
-                totalMatchingItems += filteredBatchItems.length;
+            // Then group all other branch shops
+            filteredItems.forEach(item => {
+                const s = (item.shop || 'MAIN SHOP').trim();
+                if (s.toUpperCase() === 'MAIN SHOP') return;
+                if (!shopMap.has(s)) {
+                    shopMap.set(s, {
+                        shopName: s,
+                        isMain: false,
+                        items: []
+                    });
+                }
+                shopMap.get(s).items.push(item);
+            });
 
-                const batchCard = document.createElement('div');
-                batchCard.className = 'batch-card';
+            const safeModelKey = grp.key.replace(/'/g, "\\'");
+            const safeModel = grp.model.replace(/'/g, "\\'");
+            const safeStorage = grp.storage.replace(/'/g, "\\'");
+            const safeCategory = (grp.category || 'Main Shop (Own Buy)').replace(/'/g, "\\'");
 
-                const buyStr = b.category === 'Dialog Lesi Pay' ? 'Rs. 0 (Lesi Pay)' : (b.buyPrice > 0 ? `Rs. ${b.buyPrice.toLocaleString()}` : '-');
-                const mrpStr = (b.mrp && b.mrp > 0) ? `Rs. ${b.mrp.toLocaleString()}` : (b.category === 'Dialog Lesi Pay' ? 'Manual at Sale (7% Profit)' : '-');
-                const locBadgeSummary = (locFilter !== 'ALL')
-                    ? `🏪 ${locFilter}`
-                    : (b.locations.size <= 1 ? `📍 ${Array.from(b.locations)[0] || 'MAIN SHOP'}` : `🏪 ${b.locations.size} Locations`);
+            batchesContainer.innerHTML = '';
 
-                let imeiListHtml = '';
-                filteredBatchItems.forEach(item => {
+            Array.from(shopMap.values()).forEach(shopGroup => {
+                const sName = shopGroup.shopName;
+                const isMain = shopGroup.isMain;
+                const sItems = shopGroup.items;
+                const safeSName = sName.replace(/'/g, "\\'");
+                const domSafeId = sName.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+                const availCount = sItems.filter(i => i.status === 'Available').length;
+                const soldCount = sItems.filter(i => i.status !== 'Available').length;
+
+                const shopSection = document.createElement('div');
+                shopSection.className = 'shop-stock-section';
+                shopSection.id = 'shopSection_' + domSafeId;
+
+                let shopHeaderHtml = `
+                    <div class="shop-section-header">
+                        <div class="shop-section-title">
+                            <span>${isMain ? '🏢' : '🏪'}</span>
+                            <span>${isMain ? 'Head Office (MAIN SHOP)' : 'Branch: ' + sName}</span>
+                            <span class="shop-section-badge" style="background: rgba(16, 185, 129, 0.15); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                ${availCount} Available ${soldCount > 0 ? '(' + soldCount + ' Sold)' : ''}
+                            </span>
+                        </div>
+                        <div class="shop-section-actions">
+                            ${!isMain && availCount > 0 ? `
+                                <button type="button" onclick="recallAllItemsFromShop('${safeSName}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.74rem; font-weight: 700; padding: 0.28rem 0.65rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(16,185,129,0.25);" title="Recall all available phones in this shop back to Head Office">
+                                    🔄 Recall All (${availCount}) to HO
+                                </button>
+                            ` : ''}
+                            <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.74rem; font-weight: 700; color: #475569; cursor: pointer; user-select: none;">
+                                <input type="checkbox" onchange="toggleSelectAllInShop(this, '${safeSName}')" style="accent-color: #0284c7; width: 16px; height: 16px;"> Select All
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                // Build line-by-line IMEI rows under this shop
+                let imeiListHtml = '<div class="shop-imei-list">';
+                sItems.forEach(item => {
                     const isAvail = (item.status === 'Available');
                     const safeImei = (item.imei || '').replace(/'/g, "\\'");
-                    const iShop = (item.shop || 'MAIN SHOP').trim();
-                    const isBranchItem = (iShop.toUpperCase() !== 'MAIN SHOP');
+                    const buyPrice = parseFloat(item.buyPrice || 0);
+                    const mrpPrice = parseFloat(item.mrp || 0);
 
-                    let locBadge = isBranchItem
-                        ? `<span style="background: rgba(245, 158, 11, 0.15); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800; font-size: 0.8rem; padding: 3px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">🏪 ${iShop}</span>`
-                        : `<span style="background: rgba(16, 185, 129, 0.12); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.8rem; padding: 3px 9px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">🏢 MAIN SHOP (Head Office)</span>`;
+                    const statusBadge = isAvail
+                        ? '<span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.72rem; padding: 2px 7px; border-radius: 5px;">Available</span>'
+                        : '<span style="background: #fee2e2; color: #dc2626; font-weight: 700; font-size: 0.72rem; padding: 2px 7px; border-radius: 5px;">' + (item.status || 'Sold') + '</span>';
 
-                    let statusBadge = isAvail
-                        ? `<span style="background: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">Available</span>`
-                        : `<span style="background: #f1f5f9; color: #64748b; font-weight: 600; font-size: 0.76rem; padding: 2px 8px; border-radius: 6px;">${item.status || 'Sold'}</span>`;
-
-                    // Generate clean shop dropdown options for inline transfer
+                    // Options for inline transfer
                     let shopOptionsHtml = '<option value="" disabled selected>-- Select Destination Shop --</option>';
-                    availableShops.forEach(sName => {
-                        const isCurrent = (sName.toLowerCase() === iShop.toLowerCase());
-                        const safeSName = sName.replace(/'/g, "\\'");
-                        const label = (sName === 'MAIN SHOP') ? '🏢 Head Office (MAIN SHOP)' : '🏪 ' + sName;
-                        shopOptionsHtml += `<option value="${safeSName}" ${isCurrent ? 'disabled' : ''}>${label}${isCurrent ? ' (Current)' : ''}</option>`;
+                    availableShops.forEach(dest => {
+                        const isCurrent = (dest.toLowerCase() === sName.toLowerCase());
+                        const safeDest = dest.replace(/'/g, "\\'");
+                        const label = (dest === 'MAIN SHOP') ? '🏢 Head Office (MAIN SHOP)' : '🏪 ' + dest;
+                        shopOptionsHtml += `<option value="${safeDest}" ${isCurrent ? 'disabled' : ''}>${label}${isCurrent ? ' (Current)' : ''}</option>`;
                     });
 
                     imeiListHtml += `
-                        <div class="batch-imei-card ${!isAvail ? 'sold' : ''}" id="batchImeiCard_${item.id}" style="flex-direction: column; align-items: stretch;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
-                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                    <div style="display: flex; align-items: center; gap: 7px;">
-                                        <input type="checkbox" class="batch-imei-checkbox" data-id="${item.id}" data-imei="${safeImei}" data-shop="${iShop}" data-avail="${isAvail ? '1' : '0'}" ${window.selectedBatchImeis && window.selectedBatchImeis.has(item.id) ? 'checked' : ''} onchange="onBatchImeiCheckboxChange(this, '${item.id}')" style="width: 19px; height: 19px; cursor: pointer; accent-color: #0284c7;" title="Select for Bulk Transfer or Bulk Delete">
-                                        <span style="font-family: monospace; font-weight: 800; font-size: 0.92rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
-                                        <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; padding:0; font-size:0.85rem;" title="Copy IMEI">📋</button>
-                                    </div>
-                                    <div>${locBadge}</div>
-                                    <div>${statusBadge}</div>
-                                </div>
-
-                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    ${isBranchItem && isAvail ? `
-                                        <button type="button" onclick="recallInventoryItemToHeadOffice('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(16,185,129,0.25);" title="නැවත අපේ Head Office (MAIN SHOP) වෙත ගෙන්වා ගන්න">
-                                            🔄 Recall to Head Office
-                                        </button>
-                                    ` : ''}
-
-                                    ${isAvail ? `
-                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; font-size: 0.78rem; font-weight: 700; padding: 0.38rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(37,99,235,0.25);" title="මෙම Phone එක වෙනත් Branch එකකට Transfer කරන්න">
-                                            ➡️ Transfer
-                                        </button>
-                                    ` : ''}
-
-                                    <button type="button" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 0.35rem 0.6rem; border-radius: 7px; font-size: 0.8rem; cursor: pointer;" title="Edit Item Details">✏️</button>
-
-                                    <button type="button" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #dc2626; padding: 0.35rem 0.65rem; border-radius: 7px; font-size: 0.8rem; font-weight: 700; cursor: pointer;" title="Delete Item (මෙම දුරකථනය ඉවත් කරන්න)">🗑️</button>
+                        <div class="shop-imei-row ${!isAvail ? 'sold' : ''}" id="batchImeiCard_${item.id}">
+                            <div class="shop-imei-row-left">
+                                <input type="checkbox" class="batch-imei-checkbox" data-id="${item.id}" data-imei="${safeImei}" data-shop="${sName}" data-avail="${isAvail ? '1' : '0'}" ${window.selectedBatchImeis && window.selectedBatchImeis.has(item.id) ? 'checked' : ''} onchange="onBatchImeiCheckboxChange(this, '${item.id}')" style="accent-color: #0284c7; width: 16px; height: 16px; cursor: pointer;">
+                                <span style="font-family: monospace; font-weight: 800; font-size: 0.88rem; color: #0f172a; letter-spacing: 0.5px;">${item.imei}</span>
+                                <button type="button" onclick="copyImeiToClipboard('${safeImei}')" style="background:none; border:none; cursor:pointer; font-size:0.8rem; padding:0;" title="Copy IMEI">📋</button>
+                                <span style="color: #ef4444; font-weight: 700; font-size: 0.76rem;">Cost: Rs. ${buyPrice.toLocaleString()}</span>
+                                <span style="color: #cbd5e1; font-size: 0.74rem;">|</span>
+                                <span style="color: #2563eb; font-weight: 700; font-size: 0.76rem;">MRP: Rs. ${mrpPrice.toLocaleString()}</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="shop-imei-row-actions">
+                                ${!isMain && isAvail ? `
+                                    <button type="button" class="btn-act recall" onclick="recallInventoryItemToHeadOffice('${item.id}', '${safeImei}', '${safeModelKey}')" title="Recall back to Head Office">
+                                        🔄 Recall
+                                    </button>
+                                ` : ''}
+                                ${isAvail ? `
+                                    <button type="button" class="btn-act transfer" onclick="toggleInlineTransfer('${item.id}')" title="Transfer to Branch">
+                                        ➡️ Transfer
+                                    </button>
+                                ` : ''}
+                                <button type="button" class="btn-act edit" onclick="openEditInventoryModal('${item.id}', '${safeImei}', '${safeModel}', '${safeStorage}', '${safeCategory}', '${item.buyPrice || ''}', '${item.mrp || ''}')" title="Edit Price / Details">
+                                    ✏️
+                                </button>
+                                <button type="button" class="btn-act delete" onclick="deleteInventoryItem('${item.id}', '${safeImei}')" title="Delete Item">
+                                    🗑️
+                                </button>
+                            </div>
+                            <!-- Inline Transfer Form -->
+                            <div id="inlineTransfer_${item.id}" style="display: none; width: 100%; margin-top: 8px; padding: 10px 12px; background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 8px; box-sizing: border-box;">
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <span style="font-size: 0.8rem; font-weight: 700; color: #1e40af;">Transfer to:</span>
+                                    <select id="inlineTargetShop_${item.id}" style="flex: 1; min-width: 180px; padding: 5px 8px; border-radius: 6px; border: 1px solid #93c5fd; font-size: 0.8rem; font-weight: 700; background: white;">
+                                        ${shopOptionsHtml}
+                                    </select>
+                                    <button type="button" onclick="confirmInlineTransfer('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: #2563eb; color: white; border: none; padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                                        Confirm
+                                    </button>
+                                    <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: none; border: 1px solid #cbd5e1; padding: 5px 8px; border-radius: 6px; font-size: 0.78rem; cursor: pointer;">
+                                        Cancel
+                                    </button>
                                 </div>
                             </div>
-
-                            ${isAvail ? `
-                                <div id="inlineTransfer_${item.id}" style="display: none; width: 100%; flex-basis: 100%; margin-top: 10px; padding: 12px 14px; background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 10px; box-shadow: 0 4px 12px rgba(37,99,235,0.08);">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <div style="font-weight: 700; font-size: 0.84rem; color: #1e40af; display: flex; align-items: center; gap: 6px;">
-                                            <span>➡️ Transfer IMEI <strong style="font-family: monospace; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfdbfe;">${item.imei}</strong> to Shop:</span>
-                                        </div>
-                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: none; border: none; color: #64748b; font-size: 1.1rem; cursor: pointer; font-weight: bold; line-height: 1;" title="Close Transfer">✕</button>
-                                    </div>
-
-                                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                        <select id="inlineTargetShop_${item.id}" style="flex: 1; min-width: 200px; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #93c5fd; font-size: 0.84rem; background: white; font-weight: 700; color: #1e293b;">
-                                            ${shopOptionsHtml}
-                                        </select>
-                                        <button type="button" id="inlineConfirmBtn_${item.id}" onclick="confirmInlineTransfer('${item.id}', '${safeImei}', '${safeModelKey}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 7px 16px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(16,185,129,0.35);">
-                                            ✅ Confirm Transfer
-                                        </button>
-                                        <button type="button" onclick="toggleInlineTransfer('${item.id}')" style="background: #e2e8f0; color: #475569; border: none; padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 0.82rem; cursor: pointer;">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            ` : ''}
                         </div>
                     `;
                 });
+                imeiListHtml += '</div>';
 
-                const batchItemIdsCsv = filteredBatchItems.map(i => i.id).join(',');
-
-                batchCard.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); padding-bottom: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <span style="font-weight: 800; font-size: 0.95rem; color: #1e293b;">📦 Batch #${bIdx + 1}</span>
-                            <span style="font-size: 0.76rem; background: rgba(59,130,246,0.1); color: #2563eb; padding: 2px 8px; border-radius: 999px; font-weight: 700;">${b.category}</span>
-                            <span style="font-size: 0.76rem; color: #059669; font-weight: 700; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 999px;">${locBadgeSummary}</span>
-                        </div>
-                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                            <span style="font-size: 0.82rem; font-weight: 700; color: #059669; margin-right: 4px;">${filteredBatchItems.length} Matching Items</span>
-                            <button type="button" onclick="toggleSelectSpecificBatch('${batchItemIdsCsv}')" style="background: rgba(2,132,199,0.1); border: 1px solid rgba(2,132,199,0.3); color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;" title="Tick / Untick all items in this batch">
-                                ☑️ Select Batch
-                            </button>
-                            <button type="button" onclick="openEditBatchPriceModal('${safeModel}', '${safeStorage}', '${b.buyPrice}', '${b.mrp}', '${safeCategory}')" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #d97706; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer;" title="Update prices for this entire batch">
-                                ✏️ Edit Batch Price
-                            </button>
-                            <button type="button" onclick="deleteSpecificBatchItems('${batchItemIdsCsv}', ${bIdx + 1})" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #dc2626; padding: 3px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 700; cursor: pointer;" title="Delete ticked items in this batch or entire batch">
-                                🗑️ Delete Batch
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 15px; margin-bottom: 0.8rem; font-size: 0.85rem; flex-wrap: wrap;">
-                        <div style="background: rgba(239, 68, 68, 0.08); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                            <span style="color: var(--text-muted); font-size: 0.75rem;">Buy Cost (අපේ මිල):</span> <strong style="color: #dc2626;">${buyStr}</strong>
-                        </div>
-                        <div style="background: rgba(37, 99, 235, 0.08); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2);">
-                            <span style="color: var(--text-muted); font-size: 0.75rem;">Selling MRP (විකුණුම් මිල):</span> <strong style="color: #2563eb;">${mrpStr}</strong>
-                        </div>
-                    </div>
-
-                    <!-- IMEIs List in this Batch -->
-                    <div style="max-height: 340px; overflow-y: auto; padding-right: 2px;">
-                        ${imeiListHtml}
-                    </div>
-                `;
-
-                batchesContainer.appendChild(batchCard);
+                shopSection.innerHTML = shopHeaderHtml + imeiListHtml;
+                batchesContainer.appendChild(shopSection);
             });
+        };
 
-            if (totalMatchingItems === 0) {
-                batchesContainer.innerHTML = `
-                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                        No IMEI numbers matching your filter / search criteria.
-                    </div>
-                `;
+        window.recallAllItemsFromShop = async function(shopName, groupKey) {
+            if (!shopName || shopName === 'MAIN SHOP') return;
+            const parts = (groupKey || '').split('___');
+            const mTarget = parts[0];
+            const sTarget = parts[1] || '';
+
+            const branchItems = (allInventoryItems || []).filter(i => 
+                (i.model || '').trim().toLowerCase() === mTarget &&
+                (i.storage || '').trim().toLowerCase() === sTarget &&
+                (i.shop || '').trim().toLowerCase() === shopName.trim().toLowerCase() &&
+                i.status === 'Available'
+            );
+
+            if (branchItems.length === 0) {
+                return showToast("No available phones found in " + shopName + " to recall.", "info");
             }
 
-            if (typeof updateBulkTransferUIState === 'function') {
-                updateBulkTransferUIState();
+            if (!confirm(`Recall all ${branchItems.length} phones of ${mTarget} from "${shopName}" back to Head Office (MAIN SHOP)?`)) return;
+
+            try {
+                const batch = writeBatch(db);
+                branchItems.forEach(item => {
+                    batch.update(doc(db, "inventory", item.id), {
+                        shop: "MAIN SHOP",
+                        recalledDate: new Date().toISOString(),
+                        lastTransferDate: new Date().toISOString()
+                    });
+                    item.shop = "MAIN SHOP";
+                });
+                await batch.commit();
+
+                showToast(`🔄 Successfully recalled ${branchItems.length} phones from ${shopName} to Head Office!`, "success");
+                filterInventoryTable();
+                if (typeof window.refreshActiveStockBatchModal === 'function') {
+                    window.refreshActiveStockBatchModal();
+                }
+            } catch (err) {
+                console.error("Shop recall error:", err);
+                showToast("Failed to recall items: " + err.message, "error");
             }
         };
 
-        // Bulk Selection, Transfer & Delete Logic for Stock Batch Modal
-        window.selectedBatchImeis = new Set();
+        window.toggleSelectAllInShop = function(cb, shopName) {
+            const isChecked = cb.checked;
+            const domSafeId = shopName.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const container = document.getElementById('shopSection_' + domSafeId);
+            if (!container) return;
 
-        window.onBatchImeiCheckboxChange = function(cb, docId) {
+            const cbs = container.querySelectorAll('.batch-imei-checkbox');
+            cbs.forEach(box => {
+                box.checked = isChecked;
+                const id = box.dataset.id;
+                if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
+                if (isChecked) {
+                    window.selectedBatchImeis.add(id);
+                } else {
+                    window.selectedBatchImeis.delete(id);
+                }
+            });
+
+            // Update bulk buttons count
+            const cnt = window.selectedBatchImeis ? window.selectedBatchImeis.size : 0;
+            const cntEl = document.getElementById('bulkDeleteBtnCount');
+            if (cntEl) cntEl.innerText = cnt;
+            const transferCntEl = document.getElementById('bulkTransferBtnCount');
+            if (transferCntEl) transferCntEl.innerText = cnt;
+        };
+
+        window.onBatchImeiCheckboxChange = function(cb, id) {
             if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
             if (cb.checked) {
-                window.selectedBatchImeis.add(docId);
+                window.selectedBatchImeis.add(id);
             } else {
-                window.selectedBatchImeis.delete(docId);
+                window.selectedBatchImeis.delete(id);
             }
-            updateBulkTransferUIState();
+            const cnt = window.selectedBatchImeis.size;
+            const cntEl = document.getElementById('bulkDeleteBtnCount');
+            if (cntEl) cntEl.innerText = cnt;
+            const transferCntEl = document.getElementById('bulkTransferBtnCount');
+            if (transferCntEl) transferCntEl.innerText = cnt;
         };
 
-        window.toggleSelectSpecificBatch = function(idsCsv) {
-            if (!idsCsv) return;
-            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
-            const ids = idsCsv.split(',').filter(Boolean);
-            const allAlreadySelected = ids.every(id => window.selectedBatchImeis.has(id));
-            ids.forEach(id => {
-                if (allAlreadySelected) {
-                    window.selectedBatchImeis.delete(id);
-                } else {
-                    window.selectedBatchImeis.add(id);
-                }
-            });
-            document.querySelectorAll('.batch-imei-checkbox').forEach(cb => {
-                cb.checked = window.selectedBatchImeis.has(cb.dataset.id);
-            });
-            updateBulkTransferUIState();
-        };
-
-        window.toggleSelectAllBatchImeis = function(isChecked) {
-            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
-            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
-            allCbs.forEach(cb => {
-                cb.checked = isChecked;
-                const docId = cb.dataset.id;
-                if (isChecked) {
-                    window.selectedBatchImeis.add(docId);
-                } else {
-                    window.selectedBatchImeis.delete(docId);
-                }
-            });
-            updateBulkTransferUIState();
-        };
-
-        window.clearBatchImeiSelections = function() {
-            if (window.selectedBatchImeis) window.selectedBatchImeis.clear();
-            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
-            allCbs.forEach(cb => cb.checked = false);
-            const selectAllCb = document.getElementById('selectAllBatchImeisCheckbox');
-            if (selectAllCb) selectAllCb.checked = false;
-            updateBulkTransferUIState();
-        };
-
-        window.setBulkTargetShop = function(shopName) {
-            const sel = document.getElementById('bulkTransferTargetShop');
-            if (sel) {
-                sel.value = shopName;
-                sel.style.borderColor = '#0284c7';
-                sel.style.backgroundColor = '#f0fdf4';
-                setTimeout(() => {
-                    if (sel) sel.style.backgroundColor = 'white';
-                }, 300);
+        window.toggleInlineTransfer = function(id) {
+            const el = document.getElementById('inlineTransfer_' + id);
+            if (el) {
+                el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
             }
         };
 
-        window.updateBulkTransferUIState = function() {
-            if (!window.selectedBatchImeis) window.selectedBatchImeis = new Set();
-            const count = window.selectedBatchImeis.size;
+        window.confirmInlineTransfer = async function(id, imei, groupKey) {
+            const selectEl = document.getElementById('inlineTargetShop_' + id);
+            const targetShop = selectEl ? selectEl.value : '';
+            if (!targetShop) return showToast("Please choose destination shop!", "warning");
 
-            const countBadge = document.getElementById('selectedImeisCountBadge');
-            if (countBadge) {
-                countBadge.innerText = `${count} Selected`;
-                countBadge.style.background = count > 0 ? '#0284c7' : '#94a3b8';
-            }
+            try {
+                await updateDoc(doc(db, "inventory", id), {
+                    shop: targetShop,
+                    lastTransferDate: new Date().toISOString()
+                });
+                const found = (allInventoryItems || []).find(i => i.id === id);
+                if (found) found.shop = targetShop;
 
-            const btnCount = document.getElementById('bulkTransferBtnCount');
-            if (btnCount) btnCount.innerText = count;
-
-            const delCount = document.getElementById('bulkDeleteBtnCount');
-            if (delCount) delCount.innerText = count;
-
-            const transferBtn = document.getElementById('bulkTransferSubmitBtn');
-            if (transferBtn) {
-                if (count > 0) {
-                    transferBtn.style.opacity = '1';
-                    transferBtn.style.boxShadow = '0 4px 12px rgba(2,132,199,0.4)';
-                } else {
-                    transferBtn.style.opacity = '0.6';
-                    transferBtn.style.boxShadow = 'none';
+                showToast(`✅ Transferred IMEI ${imei} to ${targetShop}!`, "success");
+                filterInventoryTable();
+                if (typeof window.refreshActiveStockBatchModal === 'function') {
+                    window.refreshActiveStockBatchModal();
                 }
+            } catch(e) {
+                console.error("Transfer error:", e);
+                showToast("Failed to transfer: " + e.message, "error");
             }
-
-            const deleteBtn = document.getElementById('bulkDeleteSubmitBtn');
-            if (deleteBtn) {
-                if (count > 0) {
-                    deleteBtn.style.opacity = '1';
-                    deleteBtn.style.boxShadow = '0 4px 12px rgba(239,68,68,0.4)';
-                } else {
-                    deleteBtn.style.opacity = '0.6';
-                    deleteBtn.style.boxShadow = 'none';
-                }
-            }
-
-            const clearBtn = document.getElementById('clearSelectionBtn');
-            if (clearBtn) {
-                clearBtn.style.display = count > 0 ? 'inline-block' : 'none';
-            }
-
-            const allCbs = document.querySelectorAll('.batch-imei-checkbox');
-            const selectAllCb = document.getElementById('selectAllBatchImeisCheckbox');
-            if (selectAllCb && allCbs.length > 0) {
-                const allChecked = Array.from(allCbs).every(cb => cb.checked);
-                selectAllCb.checked = allChecked;
-            } else if (selectAllCb) {
-                selectAllCb.checked = false;
-            }
-
-            // Visual feedback on the IMEI card when checked
-            allCbs.forEach(cb => {
-                const card = document.getElementById('batchImeiCard_' + cb.dataset.id);
-                if (card) {
-                    if (cb.checked) {
-                        card.style.background = '#f0f9ff';
-                        card.style.borderColor = '#7dd3fc';
-                    } else {
-                        card.style.background = '#ffffff';
-                        card.style.borderColor = 'rgba(226, 232, 240, 0.95)';
-                    }
-                }
-            });
         };
 
         window.executeBulkImeiDelete = async function() {
@@ -10445,6 +10488,56 @@
             } catch(e) {
                 return [];
             }
+        };
+
+        window.saveDeletedStaffName = async function(name) {
+            const norm = (name || '').trim().replace(/\s+/g, ' ').toUpperCase();
+            if (!norm) return;
+            const list = getDeletedStaffList();
+            if (!list.includes(norm)) {
+                list.push(norm);
+                localStorage.setItem('deletedStaffNames', JSON.stringify(list));
+            }
+            // Sync to Firestore app_settings/deleted_staff for multi-device sync
+            try {
+                await setDoc(doc(db, "app_settings", "deleted_staff"), {
+                    names: list,
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch(e) {
+                console.warn("Could not sync deleted staff to firestore:", e);
+            }
+        };
+
+        window.promptDeleteStaff = function(staffName) {
+            targetStaffToDelete = staffName;
+            const modal = document.getElementById('staffDeletePasswordModal');
+            const targetEl = document.getElementById('staffDeleteTargetName');
+            if (targetEl) targetEl.innerText = staffName;
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeStaffDeleteModal = function() {
+            const modal = document.getElementById('staffDeletePasswordModal');
+            if (modal) modal.style.display = 'none';
+            targetStaffToDelete = null;
+        };
+
+        window.executeStaffDelete = async function() {
+            if (!targetStaffToDelete) {
+                closeStaffDeleteModal();
+                return;
+            }
+
+            const removedName = targetStaffToDelete;
+            await saveDeletedStaffName(removedName);
+            closeStaffDeleteModal();
+
+            showToast('🗑️ සාර්ථකයි! Staff සාමාජික "' + removedName + '" ඉවත් කරන ලදී!', 'warning');
+
+            // Instantly refresh UI
+            renderStaffProfiles();
+            updateActivatorDatalist();
         };
 
         window.saveDeletedStaffName = async function(name) {
