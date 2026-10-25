@@ -1700,12 +1700,13 @@
                     </div>
 
                     <div class="inv-branch-right">
-                        <h1 class="inv-branch-title" id="invBranchName">SPM SOLUTION</h1>
-                        <div class="inv-branch-line">Branch: <span id="invBranchSub">SPM SOLUTION</span></div>
+                        <h1 class="inv-branch-title" id="invBranchName">METHMI MOBILE PVT LTD</h1>
+                        <div class="inv-branch-line">Branch: <span id="invBranchSub">PERIYAPALM , SERUNUWARA</span></div>
                         <div class="inv-branch-line">BR No: <span id="invBrNo">PV 00352350</span></div>
                         <div class="inv-branch-line">Email: <span id="invEmail">Methmimobile2014@gmail.com</span></div>
-                        <div class="inv-branch-line">Tel: <span id="invTel">0773705309, 0752335533</span></div>
-                        <div class="inv-branch-line" id="invAddress">MAIN STREET MUTUR 07</div>
+                        <div class="inv-branch-line">WEB SITE : <a href="https://methmimobilepvtltd.lk/" target="_blank" id="invWebSite" style="color: inherit; text-decoration: none;">https://methmimobilepvtltd.lk/</a></div>
+                        <div class="inv-branch-line">Tel: <span id="invTel">0752335533, 0753020100, 0768364413</span></div>
+                        <div class="inv-branch-line"><span id="invOwner" style="font-weight: 700;">OWNER 0773705309</span> &bull; <span id="invAddress">MAIN STREET MUTUR 07</span></div>
                     </div>
                 </div>
 
@@ -1832,7 +1833,7 @@
                 </div>
 
                 <div class="inv-footer-note">
-                    Thank you for doing business with <span id="invFooterBranchName">SPM SOLUTION</span>!
+                    Thank you for doing business with <span id="invFooterBranchName">METHMI MOBILE PVT LTD</span>!
                 </div>
             </div>
 
@@ -2600,7 +2601,7 @@
                     custNic: custNic || '-',
                     warranty: warranty,
                     staffName: staffName,
-                    branch: activeBranchName || 'SPM SOLUTION',
+                    branch: activeBranchName || 'PERIYAPALM , SERUNUWARA',
                     source: 'Cashier POS',
                     category: activeVerifiedItem.category || 'Main Shop (Own Buy)',
                     remarks: remarks,
@@ -2785,14 +2786,20 @@
             openReceiptModal(saleData);
         };
 
-        // Open Official TAX INVOICE Modal (Matching SPM SOLUTION Format)
+        // Open Official TAX INVOICE Modal (Matching METHMI MOBILE Format)
         function openReceiptModal(sale) {
-            const branchName = sale.branch || activeBranchName || 'SPM SOLUTION';
+            const branchName = sale.branch || activeBranchName || 'PERIYAPALM , SERUNUWARA';
             
             // Header Info
-            document.getElementById('invBranchName').innerText = branchName;
-            document.getElementById('invBranchSub').innerText = branchName;
-            document.getElementById('invFooterBranchName').innerText = branchName;
+            document.getElementById('invBranchName').innerText = 'METHMI MOBILE PVT LTD';
+            document.getElementById('invBranchSub').innerText = (branchName && branchName !== 'SPM SOLUTION') ? branchName : 'PERIYAPALM , SERUNUWARA';
+            document.getElementById('invFooterBranchName').innerText = 'METHMI MOBILE PVT LTD';
+            document.getElementById('invBrNo').innerText = 'PV 00352350';
+            document.getElementById('invEmail').innerText = 'Methmimobile2014@gmail.com';
+            if (document.getElementById('invWebSite')) document.getElementById('invWebSite').innerText = 'https://methmimobilepvtltd.lk/';
+            document.getElementById('invTel').innerText = '0752335533, 0753020100, 0768364413';
+            if (document.getElementById('invOwner')) document.getElementById('invOwner').innerText = 'OWNER 0773705309';
+            document.getElementById('invAddress').innerText = 'MAIN STREET MUTUR 07';
             
             // Meta Info
             document.getElementById('invInvoiceNo').innerText = sale.invoiceNo || sale.spNumber || 'INV-04451998';
