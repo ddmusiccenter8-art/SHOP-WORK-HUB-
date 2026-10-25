@@ -792,105 +792,352 @@
         .modal-card {
             background: #ffffff;
             border-radius: 16px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
+            max-width: 820px;
+            width: 96%;
+            max-height: 92vh;
             overflow-y: auto;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
-            padding: 1.4rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.35);
+            padding: 1.25rem 1.5rem;
             position: relative;
         }
 
-        /* Printable Receipt Styles (Both Screen & Thermal 80mm Print) */
-        .receipt-container {
-            font-family: 'JetBrains Mono', 'Inter', monospace;
-            color: #000;
-            padding: 0.85rem;
-            background: #fff;
-            border: 1px dashed #cbd5e1;
+        /* Printable Tax Invoice Styles (Matching Official SPM Solution & Methmi Mobile Format) */
+        .tax-invoice-container {
+            background: #ffffff;
+            color: #111827;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 1.2rem 1.4rem;
             border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.82rem;
-            line-height: 1.35;
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        .receipt-header {
-            text-align: center;
-            margin-bottom: 0.75rem;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 0.6rem;
-        }
-
-        .receipt-header h2 {
-            font-size: 1.15rem;
-            font-weight: 900;
-            margin-bottom: 2px;
-            color: #000;
-        }
-
-        .receipt-meta-row {
+        .inv-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 2px;
-            font-size: 0.76rem;
+            align-items: flex-start;
+            gap: 1.5rem;
         }
 
-        .receipt-table {
-            width: 100%;
-            margin: 0.6rem 0;
-            border-collapse: collapse;
+        .inv-brand-left {
+            display: flex;
+            align-items: center;
         }
 
-        .receipt-table th {
-            border-bottom: 1px solid #000;
-            border-top: 1px solid #000;
-            padding: 3px 0;
-            font-size: 0.74rem;
-            text-align: left;
-            color: #000;
+        .inv-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .receipt-table td {
-            padding: 4px 0;
-            border-bottom: 1px dashed #e2e8f0;
+        .inv-brand-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        .inv-brand-tagline {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.8px;
+            margin-top: 2px;
+        }
+
+        .inv-branch-right {
+            text-align: right;
             font-size: 0.78rem;
-            color: #000;
+            line-height: 1.35;
+            color: #1e293b;
         }
 
-        .receipt-totals {
-            margin-top: 0.5rem;
-            border-top: 1px dashed #000;
-            padding-top: 0.5rem;
+        .inv-branch-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #000000;
+            margin: 0 0 2px 0;
+            letter-spacing: -0.2px;
         }
 
-        .receipt-footer {
-            text-align: center;
-            margin-top: 0.75rem;
-            border-top: 1px dashed #000;
-            padding-top: 0.6rem;
+        .inv-branch-line {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .inv-divider {
+            height: 1px;
+            background: #cbd5e1;
+            margin: 0.9rem 0;
+        }
+
+        .inv-meta-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1.5rem;
+        }
+
+        .inv-billed-to {
+            flex: 1;
+        }
+
+        .inv-section-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748b;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .inv-cust-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.25;
+            margin-bottom: 3px;
+        }
+
+        .inv-cust-detail {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .inv-invoice-details {
+            text-align: right;
+            min-width: 200px;
+        }
+
+        .inv-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .inv-detail-row {
+            font-size: 0.82rem;
+            margin-bottom: 2px;
+        }
+
+        .inv-detail-row .inv-label {
+            font-weight: 600;
+            color: #64748b;
+            margin-right: 4px;
+        }
+
+        .inv-detail-row .inv-val {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .inv-detail-row .inv-red {
+            color: #dc2626;
+            font-weight: 800;
+        }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.82rem;
+        }
+
+        .inv-table th {
+            border-top: 1.5px solid #0f172a;
+            border-bottom: 1.5px solid #0f172a;
+            padding: 6px 8px;
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 0.78rem;
+            text-transform: none;
+        }
+
+        .inv-table td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .inv-table tbody tr:last-child td {
+            border-bottom: 1.5px solid #0f172a;
+        }
+
+        .inv-summary-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .inv-notes-box {
+            flex: 1;
+            max-width: 340px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+
+        .inv-notes-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+
+        .inv-notes-body {
+            line-height: 1.4;
+            font-family: 'JetBrains Mono', 'Inter', monospace;
+        }
+
+        .inv-totals-wrap {
+            width: 330px;
+            text-align: right;
+            font-size: 0.84rem;
+        }
+
+        .inv-tot-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2.5px 0;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .inv-tot-divider {
+            height: 1px;
+            background: #0f172a;
+            margin: 4px 0;
+        }
+
+        .inv-grand-total {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #0f172a;
+            padding: 4px 0;
+        }
+
+        .inv-balance-due {
+            color: #dc2626 !important;
+            font-weight: 900 !important;
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .inv-footer-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+            padding-top: 0.8rem;
+        }
+
+        .inv-terms-col {
+            flex: 1.3;
             font-size: 0.72rem;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .inv-terms-title {
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+            text-decoration: underline;
+        }
+
+        .inv-terms-list {
+            margin: 0;
+            padding-left: 14px;
+        }
+
+        .inv-qr-col {
+            flex: 1;
+            text-align: center;
+        }
+
+        .inv-qr-img {
+            width: 72px;
+            height: 72px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+        }
+
+        .inv-qr-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.1;
+        }
+
+        .inv-qr-sub {
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .inv-signature-col {
+            width: 170px;
+            text-align: center;
+        }
+
+        .inv-sig-line {
+            border-bottom: 1.5px solid #0f172a;
+            height: 36px;
+            margin-bottom: 4px;
+        }
+
+        .inv-sig-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .inv-footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            font-style: italic;
+            font-weight: 600;
+            color: #475569;
+            margin-top: 1rem;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 0.6rem;
         }
 
         /* Print Media Styles */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 8mm 10mm;
+            }
             body * {
-                visibility: hidden;
+                visibility: hidden !important;
             }
             #printableReceiptArea, #printableReceiptArea * {
-                visibility: visible;
+                visibility: visible !important;
             }
             #printableReceiptArea {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 78mm;
-                max-width: 100%;
-                margin: 0;
-                padding: 4mm;
-                border: none;
-                box-shadow: none;
-                font-size: 11px;
-                color: #000;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+                color: black !important;
             }
             .no-print {
                 display: none !important;
@@ -1093,14 +1340,15 @@
                         <div class="form-group">
                             <label for="posSaleType">Sale Process Type *</label>
                             <select id="posSaleType" onchange="handleSaleTypeToggle()">
-                                <option value="Direct Cash/Card Sale" selected>💰 Direct Sale (Cash / Card / Bank)</option>
+                                <option value="Fintrex Finance Leasing" selected>📑 Fintrex Finance Leasing (Fintex Work Hub)</option>
+                                <option value="Direct Cash Sale">💰 Direct Cash Sale (Full Settlement)</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay Activation</option>
-                                <option value="Loan / Leasing Sale">📑 Loan / Leasing Submission</option>
+                                <option value="Credit Card Installment">💳 Credit / Debit Card Installment</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="posInvoiceNo">Invoice / SP Reference Number *</label>
-                            <input type="text" id="posInvoiceNo" required readonly style="background: #f8fafc; font-weight: 700;">
+                            <input type="text" id="posInvoiceNo" placeholder="e.g. SP202610-50847 or INV-04451998" required style="background: #f8fafc; font-weight: 700;">
                         </div>
                     </div>
 
@@ -1123,27 +1371,28 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="posCustName">Customer Full Name *</label>
-                            <input type="text" id="posCustName" placeholder="e.g. Kasun Perera" required>
+                            <input type="text" id="posCustName" placeholder="e.g. WEERAKOON MUDIYANSELAGE ISURU..." required>
                         </div>
                         <div class="form-group">
                             <label for="posCustPhone">Customer Contact Number *</label>
-                            <input type="tel" id="posCustPhone" placeholder="e.g. 0771234567" required>
+                            <input type="tel" id="posCustPhone" placeholder="e.g. 0775517991" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="posCustNic">Customer NIC</label>
+                            <label for="posCustNic">Customer NIC *</label>
                             <input type="text" id="posCustNic" placeholder="e.g. 199512345678 or 951234567V">
                         </div>
                         <div class="form-group">
                             <label for="posWarranty">Warranty Period *</label>
                             <select id="posWarranty">
-                                <option value="1 Year Company Warranty" selected>🛡️ 1 Year Company Warranty</option>
-                                <option value="6 Months Warranty">🛡️ 6 Months Warranty</option>
-                                <option value="3 Months Warranty">🛡️ 3 Months Warranty</option>
-                                <option value="1 Month Checking Warranty">🛡️ 1 Month Checking Warranty</option>
-                                <option value="7 Days Checking Warranty">🛡️ 7 Days Checking Warranty</option>
+                                <option value="1 Year" selected>🛡️ 1 Year Company Warranty</option>
+                                <option value="6 Months">🛡️ 6 Months Warranty</option>
+                                <option value="3 Months">🛡️ 3 Months Warranty</option>
+                                <option value="2 Years">🛡️ 2 Years Company Warranty</option>
+                                <option value="1 Month">🛡️ 1 Month Checking Warranty</option>
+                                <option value="7 Days">🛡️ 7 Days Checking Warranty</option>
                                 <option value="No Warranty">⚠️ No Warranty</option>
                             </select>
                         </div>
@@ -1159,23 +1408,93 @@
                             <input type="text" id="posStaffNameManual" placeholder="Or type new staff name..." style="display: none; margin-top: 6px;">
                         </div>
                         <div class="form-group">
-                            <label for="posPaymentMethod">Payment Method *</label>
+                            <label for="posPaymentMethod">Payment Mode *</label>
                             <select id="posPaymentMethod" onchange="calculatePosAmounts()">
-                                <option value="Cash" selected>💵 Cash</option>
+                                <option value="Multi/Cash" selected>💵 Fintrex Lease / Multi Cash</option>
+                                <option value="Cash">💵 Direct Cash</option>
                                 <option value="Card">💳 Credit / Debit Card</option>
-                                <option value="Bank Transfer">🏦 Bank Transfer / Online</option>
+                                <option value="Bank Transfer">🏦 Bank Online / Transfer</option>
                                 <option value="Dialog Lesi Pay">📱 Dialog Lesi Pay</option>
-                                <option value="Leasing / Loan">📑 Leasing / Loan Installment</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- 6. PRICING & CHANGE CALCULATOR -->
-                    <div class="payment-box">
+                    <!-- 6A. FINTREX / FINANCING PAYMENT & DOCUMENT CHARGE CONTAINER -->
+                    <div id="posFinancingFieldsContainer" class="payment-box">
+                        <div style="font-size: 0.8rem; font-weight: 800; color: #1e3a8a; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between;">
+                            <span>📑 Fintrex Leasing & Installment Calculator</span>
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Work Hub Financing</span>
+                        </div>
+
+                        <div class="pay-row">
+                            <span style="font-weight: 700; color: var(--text-muted);">Phone Retail Price (MRP):</span>
+                            <div class="pay-input-wrap">
+                                <input type="number" id="posSellingPrice" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()" required>
+                            </div>
+                        </div>
+
+                        <div class="pay-row">
+                            <span style="font-weight: 700; color: #2563eb;">Phone Down Payment (Rs.):</span>
+                            <div class="pay-input-wrap">
+                                <input type="number" id="posDownPayment" step="0.01" value="0" placeholder="e.g. 18000.00" oninput="calculatePosAmounts()" style="border-color: #93c5fd; font-weight: 800;">
+                            </div>
+                        </div>
+
+                        <div class="pay-row">
+                            <span style="font-weight: 700; color: #d97706;">Fintrex Document Fee (Rs.):</span>
+                            <div class="pay-input-wrap">
+                                <input type="number" id="posDocFee" step="0.01" value="2600" placeholder="2600.00" oninput="calculatePosAmounts()" style="border-color: #fcd34d; font-weight: 800; color: #b45309;">
+                            </div>
+                        </div>
+
+                        <!-- TOTAL CASH TO COLLECT NOW (Highlight Banner) -->
+                        <div style="background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(37,99,235,0.06)); border: 1.5px solid #10b981; border-radius: 9px; padding: 0.65rem 0.85rem; margin: 0.55rem 0 0.65rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                <div>
+                                    <span style="font-size: 0.72rem; text-transform: uppercase; font-weight: 800; color: #047857;">💵 Total Cash to Collect Now:</span>
+                                    <div style="font-size: 1.25rem; font-weight: 900; color: #047857;" id="posTotalCashToCollectDisplay">Rs. 2,600.00</div>
+                                    <div style="font-size: 0.7rem; color: #475569;" id="posTotalCashBreakdown">(Phone Down Payment: Rs. 0.00 + Document Fee: Rs. 2,600.00)</div>
+                                </div>
+                                <span style="background: #10b981; color: white; padding: 3px 9px; border-radius: 999px; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.5px;">COLLECT CASH</span>
+                            </div>
+                        </div>
+
+                        <div class="pay-row" style="background: #f1f5f9; padding: 0.35rem 0.55rem; border-radius: 6px;">
+                            <span style="font-weight: 700; color: #475569;">Financed Loan Amount:</span>
+                            <span id="posLoanAmountDisplay" style="font-weight: 800; color: #2563eb; font-size: 0.95rem;">Rs. 0.00</span>
+                        </div>
+
+                        <div class="form-row" style="margin-top: 0.5rem; margin-bottom: 0.3rem;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="posInstallmentMonths" style="font-size: 0.74rem;">Tenure (Months) *</label>
+                                <select id="posInstallmentMonths" onchange="calculatePosAmounts()" style="font-weight: 700; padding: 0.4rem 0.5rem;">
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="9">9 Months</option>
+                                    <option value="12" selected>12 Months</option>
+                                    <option value="15">15 Months</option>
+                                    <option value="18">18 Months</option>
+                                    <option value="24">24 Months</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="posMonthlyRental" style="font-size: 0.74rem;">Monthly Rental (Rs.) *</label>
+                                <input type="number" id="posMonthlyRental" step="0.01" placeholder="e.g. 4457.41" style="font-weight: 800; color: #1e3a8a; padding: 0.4rem 0.5rem;">
+                            </div>
+                        </div>
+
+                        <div class="pay-row total" style="margin-top: 0.5rem;">
+                            <span>Invoice Grand Total:</span>
+                            <span id="posGrandTotalDisplay" style="color: #047857; font-size: 1.15rem;">Rs. 0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- 6B. DIRECT CASH / STANDARD SALE PAYMENT BOX -->
+                    <div id="posDirectCashFieldsContainer" class="payment-box" style="display: none;">
                         <div class="pay-row">
                             <span style="font-weight: 700; color: var(--text-muted);">Selling Price (MRP):</span>
                             <div class="pay-input-wrap">
-                                <input type="number" id="posSellingPrice" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()" required>
+                                <input type="number" id="posDirectSellingPrice" step="0.01" placeholder="0.00" oninput="calculatePosAmounts()">
                             </div>
                         </div>
 
@@ -1221,7 +1540,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        <span>⚡ Complete Sale & Print Bill</span>
+                        <span>⚡ Complete Sale & Print Tax Invoice</span>
                     </button>
                 </form>
             </div>
@@ -1363,88 +1682,157 @@
                 <button type="button" onclick="closeReceiptModal()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
             </div>
 
-            <!-- Printable Bill Paper Area (Thermal 80mm & A4) -->
-            <div id="printableReceiptArea" class="receipt-container">
-                <div class="receipt-header">
-                    <h2>METHMI MOBILE (PVT) LTD</h2>
-                    <div style="font-weight: 700; font-size: 0.78rem;">Smartphones & Accessories Specialists</div>
-                    <div id="receiptStoreBranch" style="font-weight: 600; font-size: 0.75rem; margin-top: 2px;">Main Showroom & Head Office</div>
-                    <div style="font-size: 0.72rem; color: #475569;">Hotline: 077-1234567 / 081-2233445</div>
+            <!-- Printable Bill Paper Area (Official TAX INVOICE format) -->
+            <div id="printableReceiptArea" class="tax-invoice-container">
+                <!-- Top Header: Logo on Left, Branch Info on Right -->
+                <div class="inv-header">
+                    <div class="inv-brand-left">
+                        <div class="inv-logo-wrap">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e50000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                            </svg>
+                            <div>
+                                <h2 class="inv-brand-title">METHMI MOBILE <span style="font-size: 0.8em; font-weight: 700;">(PVT) LTD</span></h2>
+                                <div class="inv-brand-tagline">YOUR TRUSTED MOBILE PARTNER</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inv-branch-right">
+                        <h1 class="inv-branch-title" id="invBranchName">SPM SOLUTION</h1>
+                        <div class="inv-branch-line">Branch: <span id="invBranchSub">SPM SOLUTION</span></div>
+                        <div class="inv-branch-line">BR No: <span id="invBrNo">PV 00352350</span></div>
+                        <div class="inv-branch-line">Email: <span id="invEmail">Methmimobile2014@gmail.com</span></div>
+                        <div class="inv-branch-line">Tel: <span id="invTel">0773705309, 0752335533</span></div>
+                        <div class="inv-branch-line" id="invAddress">MAIN STREET MUTUR 07</div>
+                    </div>
                 </div>
 
-                <div class="receipt-meta-row">
-                    <span><strong>INVOICE:</strong> <span id="rInvoiceNo">INV-0001</span></span>
-                    <span><strong>DATE:</strong> <span id="rDate">2026-10-24</span></span>
-                </div>
-                <div class="receipt-meta-row">
-                    <span><strong>TIME:</strong> <span id="rTime">12:30 PM</span></span>
-                    <span><strong>CASHIER:</strong> <span id="rCashier">Staff</span></span>
-                </div>
-                <div class="receipt-meta-row" style="margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 4px;">
-                    <span><strong>CUSTOMER:</strong> <span id="rCustName">Kasun Perera</span></span>
-                </div>
-                <div class="receipt-meta-row">
-                    <span><strong>PHONE:</strong> <span id="rCustPhone">0771234567</span></span>
-                    <span id="rCustNicWrap"><strong>NIC:</strong> <span id="rCustNic">-</span></span>
+                <div class="inv-divider"></div>
+
+                <!-- Second Row: BILLED TO on Left, TAX INVOICE on Right -->
+                <div class="inv-meta-grid">
+                    <div class="inv-billed-to">
+                        <div class="inv-section-label">BILLED TO:</div>
+                        <div class="inv-cust-name" id="invCustName">WEERAKOON MUDIYANSELAGE ISURU PRABHATH RATHNAYAKA</div>
+                        <div class="inv-cust-detail">Phone: <span id="invCustPhone">0775517991</span></div>
+                        <div class="inv-cust-detail" id="invCustNicRow">NIC: <span id="invCustNic">199512345678</span></div>
+                    </div>
+
+                    <div class="inv-invoice-details">
+                        <h2 class="inv-title">TAX INVOICE</h2>
+                        <div class="inv-detail-row"><span class="inv-label">Invoice No:</span> <span class="inv-val inv-red" id="invInvoiceNo">INV-04451998</span></div>
+                        <div class="inv-detail-row"><span class="inv-label">Date:</span> <span class="inv-val" id="invDate">2026-10-25</span></div>
+                        <div class="inv-detail-row"><span class="inv-label">Time:</span> <span class="inv-val" id="invTime">10:31 AM</span></div>
+                        <div class="inv-detail-row"><span class="inv-label">Mode:</span> <span class="inv-val" id="invPaymentMode">Multi/Cash</span></div>
+                    </div>
                 </div>
 
-                <table class="receipt-table">
+                <!-- Items Table -->
+                <table class="inv-table">
                     <thead>
                         <tr>
-                            <th>ITEM DESCRIPTION</th>
-                            <th style="text-align: right;">AMOUNT (RS.)</th>
+                            <th style="width: 5%; text-align: center;">No</th>
+                            <th style="width: 38%; text-align: left;">Item Description</th>
+                            <th style="width: 22%; text-align: left;">IMEI / Serial No</th>
+                            <th style="width: 11%; text-align: center;">Warranty</th>
+                            <th style="width: 5%; text-align: center;">Qty</th>
+                            <th style="width: 9%; text-align: right;">Unit Price</th>
+                            <th style="width: 10%; text-align: right;">Total Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="invTableBody">
+                        <!-- Row 1: Phone Item -->
                         <tr>
-                            <td>
-                                <strong id="rModel">Samsung Galaxy A15</strong><br>
-                                <span style="font-size: 0.72rem;">Storage: <span id="rStorage">128GB</span></span><br>
-                                <span style="font-size: 0.72rem; font-weight: 700;">IMEI: <span id="rImei">354892112345678</span></span>
-                            </td>
-                            <td style="text-align: right; vertical-align: top; font-weight: 700;" id="rItemPrice">
-                                58,000.00
-                            </td>
+                            <td style="text-align: center;">1</td>
+                            <td><strong id="invItemDesc">HONOR X5C plus 4+128 GB</strong></td>
+                            <td><span style="font-family: 'JetBrains Mono', monospace;" id="invItemImei">867408088108987</span></td>
+                            <td style="text-align: center;" id="invItemWarranty">1 Year</td>
+                            <td style="text-align: center;">1</td>
+                            <td style="text-align: right;" id="invItemUnitPrice">59,999.00</td>
+                            <td style="text-align: right;" id="invItemTotal">59,999.00</td>
+                        </tr>
+                        <!-- Row 2: Document Charge (for Fintrex) -->
+                        <tr id="invDocFeeRow">
+                            <td style="text-align: center;">2</td>
+                            <td>Document charge for fintrex</td>
+                            <td>00001</td>
+                            <td style="text-align: center;">-</td>
+                            <td style="text-align: center;">1</td>
+                            <td style="text-align: right;" id="invDocFeeUnitPrice">2,600.00</td>
+                            <td style="text-align: right;" id="invDocFeeTotal">2,600.00</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <div class="receipt-totals">
-                    <div class="receipt-meta-row">
-                        <span>SUB TOTAL:</span>
-                        <span id="rSubTotal">Rs. 58,000.00</span>
+                <!-- Middle Split: Special Notes on Left, Totals on Right -->
+                <div class="inv-summary-grid">
+                    <div class="inv-notes-box">
+                        <div class="inv-notes-title">Special Note / Instructions:</div>
+                        <div class="inv-notes-body" id="invSpecialNotesBody">
+                            <div id="invNoteMonthlyRentel" style="font-weight: 800; font-size: 13px;">MONTHLY RENTEL: RS 4457.41</div>
+                            <div id="invNoteSpNumber" style="font-weight: 800; font-size: 13px;">SP202610-50847</div>
+                            <div id="invNoteCustom" style="font-size: 11.5px; color: #475569; margin-top: 4px; display: none;"></div>
+                        </div>
                     </div>
-                    <div class="receipt-meta-row" id="rDiscountRow" style="display: none;">
-                        <span>DISCOUNT:</span>
-                        <span id="rDiscount" style="color: #dc2626;">-Rs. 0.00</span>
-                    </div>
-                    <div class="receipt-meta-row" style="font-weight: 900; font-size: 1rem; border-top: 1px dashed #000; padding-top: 4px; margin-top: 4px;">
-                        <span>GRAND TOTAL:</span>
-                        <span id="rGrandTotal">Rs. 58,000.00</span>
-                    </div>
-                    <div class="receipt-meta-row" style="margin-top: 4px;">
-                        <span>PAYMENT MODE:</span>
-                        <span id="rPaymentMethod" style="font-weight: 700;">Cash</span>
-                    </div>
-                    <div class="receipt-meta-row" id="rCashPaidRow">
-                        <span>CASH RECEIVED:</span>
-                        <span id="rCashReceived">Rs. 60,000.00</span>
-                    </div>
-                    <div class="receipt-meta-row" id="rCashChangeRow">
-                        <span>BALANCE RETURNED:</span>
-                        <span id="rCashChange" style="font-weight: 700;">Rs. 2,000.00</span>
+
+                    <div class="inv-totals-wrap">
+                        <div class="inv-tot-row">
+                            <span>Sub Total:</span>
+                            <span id="invSubTotalDisplay">Rs. 62,599.00</span>
+                        </div>
+                        <div class="inv-tot-divider"></div>
+                        <div class="inv-tot-row inv-grand-total">
+                            <span>GRAND TOTAL:</span>
+                            <span id="invGrandTotalDisplay">Rs. 62,599.00</span>
+                        </div>
+                        
+                        <!-- Payment Breakdowns -->
+                        <div class="inv-tot-row" id="invPaidCashDocFeeRow">
+                            <span>Paid via Cash:</span>
+                            <span id="invPaidCashDocFeeDisplay">Rs. 2,600.00</span>
+                        </div>
+                        <div class="inv-tot-row" id="invPaidCashDownPaymentRow">
+                            <span>Paid via Cash:</span>
+                            <span id="invPaidCashDownPaymentDisplay">Rs. 18,000.00</span>
+                        </div>
+                        <div class="inv-tot-row" id="invPaidInstallmentRow">
+                            <span>Paid via <span id="invInstallmentMonthsLabel">12 Months</span> Installment:</span>
+                            <span id="invPaidInstallmentDisplay">Rs. 41,999.00</span>
+                        </div>
+                        <div class="inv-tot-row inv-balance-due" id="invBalanceDueRow">
+                            <span>Balance / Due (Credit):</span>
+                            <span id="invBalanceDueDisplay">Rs. 41,999.00</span>
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 0.8rem; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 6px; border-radius: 6px; font-size: 0.72rem;">
-                    <strong>WARRANTY:</strong> <span id="rWarranty">1 Year Company Warranty</span><br>
-                    <span style="font-size: 0.68rem; color: #64748b;">* Warranty covers manufacturer defects only. Physical/water damages not covered. Please produce this receipt for all claims.</span>
+                <!-- Footer: Terms on Left, QR in Center, Signature on Right -->
+                <div class="inv-footer-grid">
+                    <div class="inv-terms-col">
+                        <div class="inv-terms-title">Warranty Terms & Conditions:</div>
+                        <ol class="inv-terms-list">
+                            <li>Warranty is void without the original invoice.</li>
+                            <li>Physical damage, liquid damage, and display damages are not covered.</li>
+                            <li>Goods sold are not returnable or refundable.</li>
+                        </ol>
+                    </div>
+
+                    <div class="inv-qr-col">
+                        <img id="invQrCodeImg" src="" alt="Loyalty QR" class="inv-qr-img">
+                        <div class="inv-qr-label">Customer Loyalty QR</div>
+                        <div class="inv-qr-sub">Scan to select customer</div>
+                    </div>
+
+                    <div class="inv-signature-col">
+                        <div class="inv-sig-line"></div>
+                        <div class="inv-sig-label">Authorized Signature</div>
+                    </div>
                 </div>
 
-                <div class="receipt-footer">
-                    <strong>Thank You For Choosing Methmi Mobile!</strong><br>
-                    Goods once sold are not returnable without inspection.<br>
-                    *** End of Receipt ***
+                <div class="inv-footer-note">
+                    Thank you for doing business with <span id="invFooterBranchName">SPM SOLUTION</span>!
                 </div>
             </div>
 
@@ -1853,35 +2241,136 @@
             calculatePosAmounts();
         };
 
-        // Pricing & Change Calculation
-        window.calculatePosAmounts = function() {
-            const sellingPrice = parseFloat(document.getElementById('posSellingPrice')?.value) || 0;
-            const discount = parseFloat(document.getElementById('posDiscount')?.value) || 0;
-            const netPayable = Math.max(0, sellingPrice - discount);
+        // Handle Sale Process Type Switcher
+        window.handleSaleTypeToggle = function() {
+            const saleType = document.getElementById('posSaleType')?.value || 'Fintrex Finance Leasing';
+            const isFintrex = (saleType === 'Fintrex Finance Leasing');
+            const isDirectCash = (saleType === 'Direct Cash Sale');
+            const isLesi = (saleType === 'Dialog Lesi Pay');
 
-            document.getElementById('posNetPayableDisplay').innerText = `Rs. ${netPayable.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            const finBox = document.getElementById('posFinancingFieldsContainer');
+            const directBox = document.getElementById('posDirectCashFieldsContainer');
+            const payMethodSelect = document.getElementById('posPaymentMethod');
+            const invInput = document.getElementById('posInvoiceNo');
 
-            const amountReceived = parseFloat(document.getElementById('posAmountReceived')?.value) || 0;
-            const changeRow = document.getElementById('posChangeRow');
-            const changeLabel = document.getElementById('posChangeLabel');
-            const changeDisplay = document.getElementById('posChangeDisplay');
-
-            if (amountReceived >= netPayable && netPayable > 0) {
-                const change = amountReceived - netPayable;
-                changeRow.style.background = 'rgba(16, 185, 129, 0.12)';
-                changeLabel.innerText = 'Balance to Return:';
-                changeDisplay.style.color = '#047857';
-                changeDisplay.innerText = `Rs. ${change.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            } else if (amountReceived > 0 && amountReceived < netPayable) {
-                const due = netPayable - amountReceived;
-                changeRow.style.background = 'rgba(239, 68, 68, 0.1)';
-                changeLabel.innerText = '⚠️ Amount Due:';
-                changeDisplay.style.color = '#dc2626';
-                changeDisplay.innerText = `Rs. ${due.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            if (isFintrex) {
+                if (finBox) finBox.style.display = 'block';
+                if (directBox) directBox.style.display = 'none';
+                if (payMethodSelect) payMethodSelect.value = 'Multi/Cash';
+                if (invInput) {
+                    invInput.placeholder = 'e.g. SP202610-50847';
+                    if (invInput.value.startsWith('INV-')) invInput.value = '';
+                }
+            } else if (isDirectCash) {
+                if (finBox) finBox.style.display = 'none';
+                if (directBox) directBox.style.display = 'block';
+                if (payMethodSelect) payMethodSelect.value = 'Cash';
+                if (invInput) {
+                    invInput.placeholder = 'e.g. INV-04451998';
+                    if (!invInput.value || invInput.value.startsWith('SP')) {
+                        invInput.value = generateInvoiceNumber();
+                    }
+                }
+            } else if (isLesi) {
+                if (finBox) finBox.style.display = 'block';
+                if (directBox) directBox.style.display = 'none';
+                if (payMethodSelect) payMethodSelect.value = 'Dialog Lesi Pay';
+                if (invInput) invInput.placeholder = 'e.g. SP202610-LESI';
             } else {
-                changeDisplay.innerText = 'Rs. 0.00';
+                if (finBox) finBox.style.display = 'block';
+                if (directBox) directBox.style.display = 'none';
+                if (payMethodSelect) payMethodSelect.value = 'Card';
+            }
+
+            calculatePosAmounts();
+        };
+
+        // Live Pricing & Calculations (Down payment + Document Fee + Loan amounts)
+        window.calculatePosAmounts = function() {
+            const saleType = document.getElementById('posSaleType')?.value || 'Fintrex Finance Leasing';
+            const isFintrex = (saleType === 'Fintrex Finance Leasing' || saleType === 'Dialog Lesi Pay' || saleType === 'Credit Card Installment');
+
+            if (isFintrex) {
+                const mrp = parseFloat(document.getElementById('posSellingPrice')?.value) || 0;
+                const downPayment = parseFloat(document.getElementById('posDownPayment')?.value) || 0;
+                const docFee = parseFloat(document.getElementById('posDocFee')?.value) || 0;
+
+                // Total Upfront Cash collected at counter = Down Payment + Fintrex Document Fee
+                const totalCashToCollect = downPayment + docFee;
+                const loanAmount = Math.max(0, mrp - downPayment);
+                const months = parseInt(document.getElementById('posInstallmentMonths')?.value) || 12;
+
+                // Auto calculate Monthly Rental with consumer finance factor (~27.36% APR):
+                const interestFactor = 1 + (0.2736 * (months / 12));
+                const estimatedRental = months > 0 ? ((loanAmount * interestFactor) / months).toFixed(2) : '0.00';
+
+                const rentalInput = document.getElementById('posMonthlyRental');
+                if (rentalInput && (!rentalInput.value || rentalInput.dataset.autoCalc === "true")) {
+                    rentalInput.value = (loanAmount > 0) ? estimatedRental : '';
+                    rentalInput.dataset.autoCalc = "true";
+                }
+
+                // Grand Total of Invoice = Phone MRP + Document Fee
+                const grandTotal = mrp + docFee;
+
+                // Update UI Labels
+                const cashDisplay = document.getElementById('posTotalCashToCollectDisplay');
+                if (cashDisplay) cashDisplay.innerText = `Rs. ${totalCashToCollect.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                const breakdown = document.getElementById('posTotalCashBreakdown');
+                if (breakdown) {
+                    breakdown.innerText = `(Phone Down Payment: Rs. ${downPayment.toLocaleString(undefined, {minimumFractionDigits: 2})} + Document Fee: Rs. ${docFee.toLocaleString(undefined, {minimumFractionDigits: 2})})`;
+                }
+
+                const loanDisplay = document.getElementById('posLoanAmountDisplay');
+                if (loanDisplay) loanDisplay.innerText = `Rs. ${loanAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                const grandDisplay = document.getElementById('posGrandTotalDisplay');
+                if (grandDisplay) grandDisplay.innerText = `Rs. ${grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            } else {
+                // Direct Cash Sale
+                const sellingPrice = parseFloat(document.getElementById('posDirectSellingPrice')?.value || document.getElementById('posSellingPrice')?.value) || 0;
+                const discount = parseFloat(document.getElementById('posDiscount')?.value) || 0;
+                const netPayable = Math.max(0, sellingPrice - discount);
+
+                const netDisplay = document.getElementById('posNetPayableDisplay');
+                if (netDisplay) netDisplay.innerText = `Rs. ${netPayable.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                const amountReceived = parseFloat(document.getElementById('posAmountReceived')?.value) || 0;
+                const changeRow = document.getElementById('posChangeRow');
+                const changeLabel = document.getElementById('posChangeLabel');
+                const changeDisplay = document.getElementById('posChangeDisplay');
+
+                if (changeRow && changeLabel && changeDisplay) {
+                    if (amountReceived >= netPayable && netPayable > 0) {
+                        const change = amountReceived - netPayable;
+                        changeRow.style.background = 'rgba(16, 185, 129, 0.12)';
+                        changeLabel.innerText = 'Balance to Return:';
+                        changeDisplay.style.color = '#047857';
+                        changeDisplay.innerText = `Rs. ${change.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                    } else if (amountReceived > 0 && amountReceived < netPayable) {
+                        const due = netPayable - amountReceived;
+                        changeRow.style.background = 'rgba(239, 68, 68, 0.1)';
+                        changeLabel.innerText = '⚠️ Amount Due:';
+                        changeDisplay.style.color = '#dc2626';
+                        changeDisplay.innerText = `Rs. ${due.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                    } else {
+                        changeDisplay.innerText = 'Rs. 0.00';
+                    }
+                }
             }
         };
+
+        // Allow manual rental adjustment flag
+        document.addEventListener('DOMContentLoaded', () => {
+            const rentalInput = document.getElementById('posMonthlyRental');
+            if (rentalInput) {
+                rentalInput.addEventListener('input', () => {
+                    rentalInput.dataset.autoCalc = "false";
+                });
+            }
+        });
 
         // Staff Profiles Dropdown
         function listenToStaffProfiles() {
@@ -1893,6 +2382,7 @@
                 });
 
                 const select = document.getElementById('posStaffSelect');
+                if (!select) return;
                 select.innerHTML = '<option value="">-- Choose Cashier / Staff --</option>';
                 
                 // Add current user name
@@ -1932,21 +2422,24 @@
 
         function initFormDefaults() {
             const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('posSaleDate').value = todayStr;
+            const dateEl = document.getElementById('posSaleDate');
+            if (dateEl) dateEl.value = todayStr;
             setCurrentTimeToField();
-            document.getElementById('posInvoiceNo').value = generateInvoiceNumber();
+            handleSaleTypeToggle();
         }
 
         window.setCurrentTimeToField = function() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const mins = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('posSaleTime').value = `${hours}:${mins}`;
+            const timeEl = document.getElementById('posSaleTime');
+            if (timeEl) timeEl.value = `${hours}:${mins}`;
         };
 
         // Full Stock Explorer Table (Tab 2)
         window.renderFullStockTable = function() {
             const tbody = document.getElementById('fullStockTableBody');
+            if (!tbody) return;
             const searchVal = (document.getElementById('fullStockSearch')?.value || '').toLowerCase().trim();
             const statusFilter = document.getElementById('fullStockStatusFilter')?.value || 'Available';
 
@@ -1997,7 +2490,7 @@
             });
         };
 
-        // SUBMIT SALE (Execute transaction & print receipt)
+        // SUBMIT SALE (Execute transaction & print Tax Invoice)
         window.handleSaleSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitSale');
@@ -2009,23 +2502,25 @@
                 return showToast("Please enter a verified available stock IMEI!", "error");
             }
 
+            const saleType = document.getElementById('posSaleType').value;
+            const isFintrex = (saleType === 'Fintrex Finance Leasing' || saleType === 'Dialog Lesi Pay' || saleType === 'Credit Card Installment');
+
             const model = document.getElementById('posPhoneModel').value || activeVerifiedItem.model;
             const storage = document.getElementById('posPhoneStorage').value || activeVerifiedItem.storage;
-            const sellingPrice = parseFloat(document.getElementById('posSellingPrice').value) || 0;
-            const discount = parseFloat(document.getElementById('posDiscount').value) || 0;
-            const netAmount = Math.max(0, sellingPrice - discount);
-            const amountReceived = parseFloat(document.getElementById('posAmountReceived').value) || netAmount;
-            const changeGiven = Math.max(0, amountReceived - netAmount);
+            const mrp = parseFloat(document.getElementById('posSellingPrice').value) || 0;
 
+            let invoiceNo = document.getElementById('posInvoiceNo').value.trim();
+            if (!invoiceNo) {
+                invoiceNo = isFintrex ? `SP-${generateInvoiceNumber().replace('INV-', '')}` : generateInvoiceNumber();
+            }
+
+            const saleDate = document.getElementById('posSaleDate').value;
+            const saleTime = document.getElementById('posSaleTime').value;
             const custName = document.getElementById('posCustName').value.trim();
             const custPhone = document.getElementById('posCustPhone').value.trim();
             const custNic = document.getElementById('posCustNic').value.trim();
             const warranty = document.getElementById('posWarranty').value;
             const paymentMethod = document.getElementById('posPaymentMethod').value;
-            const saleType = document.getElementById('posSaleType').value;
-            const invoiceNo = document.getElementById('posInvoiceNo').value.trim();
-            const saleDate = document.getElementById('posSaleDate').value;
-            const saleTime = document.getElementById('posSaleTime').value;
             const remarks = document.getElementById('posRemarks').value.trim();
 
             let staffName = document.getElementById('posStaffSelect').value;
@@ -2034,13 +2529,51 @@
             }
             if (!staffName) staffName = (currentUser?.email || '').split('@')[0].toUpperCase();
 
+            // Financial Calculations
+            let downPayment = 0;
+            let docFee = 0;
+            let totalCashReceived = 0;
+            let loanAmount = 0;
+            let installmentMonths = 12;
+            let monthlyRental = 0;
+            let discount = 0;
+            let netAmount = mrp;
+            let amountReceived = mrp;
+            let changeGiven = 0;
+
+            const buyPrice = parseFloat(activeVerifiedItem.buyPrice) || 0;
+            let leaseFee = 0;
+            let netProfit = 0;
+
+            if (isFintrex) {
+                downPayment = parseFloat(document.getElementById('posDownPayment')?.value) || 0;
+                docFee = parseFloat(document.getElementById('posDocFee')?.value) || 2600;
+                totalCashReceived = downPayment + docFee;
+                loanAmount = Math.max(0, mrp - downPayment);
+                installmentMonths = parseInt(document.getElementById('posInstallmentMonths')?.value) || 12;
+                monthlyRental = parseFloat(document.getElementById('posMonthlyRental')?.value) || 0;
+                
+                // 2% Fintrex leasing service fee
+                leaseFee = mrp * 0.02;
+                netProfit = mrp - buyPrice - leaseFee;
+                netAmount = mrp + docFee;
+                amountReceived = totalCashReceived;
+            } else {
+                discount = parseFloat(document.getElementById('posDiscount')?.value) || 0;
+                netAmount = Math.max(0, mrp - discount);
+                amountReceived = parseFloat(document.getElementById('posAmountReceived')?.value) || netAmount;
+                changeGiven = Math.max(0, amountReceived - netAmount);
+                totalCashReceived = amountReceived;
+                netProfit = netAmount - buyPrice;
+            }
+
             btn.disabled = true;
-            btn.innerHTML = '<span>⏳ Processing Sale...</span>';
+            btn.innerHTML = '<span>⏳ Processing Sale & Generating Tax Invoice...</span>';
 
             try {
                 const saleTimestamp = Date.now();
 
-                // 1. Create Sale Payload
+                // 1. Create Sale Payload for main_shop_sales
                 const salePayload = {
                     invoiceNo: invoiceNo,
                     spNumber: invoiceNo,
@@ -2049,28 +2582,40 @@
                     imei: imei,
                     model: model,
                     storage: storage,
-                    mrp: sellingPrice,
+                    mrp: mrp,
                     sellingPrice: netAmount,
+                    downPayment: downPayment,
+                    docFee: docFee,
+                    totalCashReceived: totalCashReceived,
+                    loanAmount: loanAmount,
+                    installmentMonths: installmentMonths,
+                    monthlyRental: monthlyRental,
                     discount: discount,
                     amountReceived: amountReceived,
                     changeGiven: changeGiven,
-                    paymentMethod: paymentMethod,
+                    paymentMethod: isFintrex ? (paymentMethod || 'Multi/Cash') : paymentMethod,
+                    saleType: saleType,
                     custName: custName,
                     custPhone: custPhone,
                     custNic: custNic || '-',
                     warranty: warranty,
                     staffName: staffName,
-                    branch: activeBranchName,
+                    branch: activeBranchName || 'SPM SOLUTION',
                     source: 'Cashier POS',
                     category: activeVerifiedItem.category || 'Main Shop (Own Buy)',
                     remarks: remarks,
                     cashierEmail: currentUser.email,
+                    buyPrice: buyPrice,
+                    leasePercent: isFintrex ? 2.0 : 0,
+                    leaseFee: leaseFee,
+                    staffFee: 0,
+                    netProfit: netProfit,
                     timestamp: saleTimestamp,
                     createdAt: saleTimestamp
                 };
 
                 // Add to main_shop_sales
-                const saleDocRef = await addDoc(collection(db, "main_shop_sales"), salePayload);
+                await addDoc(collection(db, "main_shop_sales"), salePayload);
 
                 // 2. Mark Inventory Item as Sold
                 if (activeVerifiedItem.id) {
@@ -2078,7 +2623,7 @@
                         status: 'Sold',
                         soldAt: saleTimestamp,
                         soldDate: saleDate,
-                        soldPrice: netAmount,
+                        soldPrice: mrp,
                         soldBy: currentUser.email,
                         soldByBranch: activeBranchName,
                         soldInvoiceNo: invoiceNo,
@@ -2088,9 +2633,9 @@
                 }
 
                 playBeepSound();
-                showToast("✨ Sale Completed Successfully!", "success");
+                showToast("✨ Sale Completed Successfully! Loading Tax Invoice...", "success");
 
-                // 3. Open Receipt Modal for immediate printing
+                // 3. Open Official Tax Invoice Modal for immediate printing
                 openReceiptModal(salePayload);
 
                 // 4. Reset form for next entry
@@ -2105,7 +2650,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span>⚡ Complete Sale & Print Bill</span>
+                    <span>⚡ Complete Sale & Print Tax Invoice</span>
                 `;
             }
         };
@@ -2116,7 +2661,6 @@
             document.getElementById('posImeiRejectionBanner').style.display = 'none';
             activeVerifiedItem = null;
             initFormDefaults();
-            calculatePosAmounts();
         };
 
         // Realtime Today's Shift Sales Listener
@@ -2138,38 +2682,60 @@
             });
         }
 
+        // Shift Metrics (Counts, Drawer Cash including Down Payments + 2600 Doc Fees)
         function updateShiftMetrics() {
             let totalRevenue = 0;
-            let cashTotal = 0;
-            let cardBankTotal = 0;
+            let cashDrawerTotal = 0;
+            let loanVolumeTotal = 0;
 
             todayShiftSales.forEach(sale => {
-                const amt = parseFloat(sale.sellingPrice || sale.mrp) || 0;
-                totalRevenue += amt;
+                const mrp = parseFloat(sale.mrp) || 0;
+                const docFee = parseFloat(sale.docFee) || 0;
+                const downPayment = parseFloat(sale.downPayment) || 0;
+                const loanAmt = parseFloat(sale.loanAmount) || 0;
+                const grossBilled = (loanAmt > 0) ? (mrp + docFee) : (parseFloat(sale.sellingPrice) || mrp);
 
-                const method = (sale.paymentMethod || '').toLowerCase();
-                if (method.includes('cash')) {
-                    cashTotal += amt;
+                totalRevenue += grossBilled;
+
+                if (loanAmt > 0) {
+                    // Financed: Cash in drawer = Down Payment + Document Fee
+                    cashDrawerTotal += (downPayment + docFee);
+                    loanVolumeTotal += loanAmt;
                 } else {
-                    cardBankTotal += amt;
+                    // Direct Sale: Cash in drawer = amount received
+                    const method = (sale.paymentMethod || '').toLowerCase();
+                    if (method.includes('cash')) {
+                        cashDrawerTotal += parseFloat(sale.amountReceived || sale.sellingPrice || mrp) || 0;
+                    }
                 }
             });
 
-            document.getElementById('shiftPhonesCount').innerText = todayShiftSales.length;
-            document.getElementById('shiftTotalRevenue').innerText = `Rs. ${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('shiftCashTotal').innerText = `Rs. ${cashTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('shiftCardBankTotal').innerText = `Rs. ${cardBankTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('tabShiftCountBadge').innerText = todayShiftSales.length;
+            const countEl = document.getElementById('shiftPhonesCount');
+            if (countEl) countEl.innerText = todayShiftSales.length;
+
+            const revEl = document.getElementById('shiftTotalRevenue');
+            if (revEl) revEl.innerText = `Rs. ${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const cashEl = document.getElementById('shiftCashTotal');
+            if (cashEl) cashEl.innerText = `Rs. ${cashDrawerTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const loanEl = document.getElementById('shiftCardBankTotal');
+            if (loanEl) loanEl.innerText = `Rs. ${loanVolumeTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const badgeEl = document.getElementById('tabShiftCountBadge');
+            if (badgeEl) badgeEl.innerText = todayShiftSales.length;
         }
 
         window.renderShiftSalesTable = function() {
             const tbody = document.getElementById('shiftSalesTableBody');
+            if (!tbody) return;
             const searchVal = (document.getElementById('shiftSalesSearch')?.value || '').toLowerCase().trim();
 
             let sales = [...todayShiftSales];
             if (searchVal) {
                 sales = sales.filter(s => 
                     (s.invoiceNo || '').toLowerCase().includes(searchVal) ||
+                    (s.spNumber || '').toLowerCase().includes(searchVal) ||
                     (s.custName || '').toLowerCase().includes(searchVal) ||
                     (s.custPhone || '').toLowerCase().includes(searchVal) ||
                     (s.imei || '').toLowerCase().includes(searchVal) ||
@@ -2185,19 +2751,29 @@
             tbody.innerHTML = '';
             sales.forEach(sale => {
                 const tr = document.createElement('tr');
-                const amt = parseFloat(sale.sellingPrice || sale.mrp) || 0;
+                const mrp = parseFloat(sale.mrp) || 0;
+                const docFee = parseFloat(sale.docFee) || 0;
+                const downPayment = parseFloat(sale.downPayment) || 0;
+                const loanAmt = parseFloat(sale.loanAmount) || 0;
+                const totalGross = (loanAmt > 0) ? (mrp + docFee) : (parseFloat(sale.sellingPrice) || mrp);
+                const cashInHand = (loanAmt > 0) ? (downPayment + docFee) : (parseFloat(sale.amountReceived || sale.sellingPrice) || 0);
 
                 tr.innerHTML = `
                     <td><strong>${sale.time || '-'}</strong></td>
                     <td><strong style="color: #2563eb;">${sale.invoiceNo || sale.spNumber || '-'}</strong></td>
                     <td><strong>${sale.custName || '-'}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${sale.custPhone || '-'}</span></td>
                     <td><strong>${sale.model || '-'}</strong><br><code style="font-size: 0.75rem;">${sale.imei || '-'}</code></td>
-                    <td><strong style="color: #059669;">Rs. ${amt.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
-                    <td><span style="font-weight: 700; font-size: 0.78rem; background: #f1f5f9; padding: 2px 7px; border-radius: 4px;">${sale.paymentMethod || 'Cash'}</span></td>
+                    <td><strong style="color: #059669;">Rs. ${totalGross.toLocaleString(undefined, {minimumFractionDigits: 2})}</strong></td>
+                    <td>
+                        <span style="font-weight: 800; font-size: 0.78rem; background: #ecfdf5; color: #047857; padding: 2px 7px; border-radius: 4px; display: inline-block;">
+                            💵 Cash: Rs. ${cashInHand.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                        </span>
+                        ${loanAmt > 0 ? `<div style="font-size: 0.72rem; color: #2563eb; font-weight: 700; margin-top: 2px;">📑 Loan: Rs. ${loanAmt.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>` : ''}
+                    </td>
                     <td><span style="font-size: 0.8rem; font-weight: 600;">${sale.staffName || '-'}</span></td>
                     <td>
-                        <button type="button" onclick='reprintPreviousSale(${JSON.stringify(sale).replace(/'/g, "&#39;")})' style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); color: #2563eb; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
-                            🖨️ Re-Print
+                        <button type="button" onclick='reprintPreviousSale(${JSON.stringify(sale).replace(/'/g, "&#39;")})' style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); color: #2563eb; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
+                            🖨️ Tax Invoice
                         </button>
                     </td>
                 `;
@@ -2209,51 +2785,122 @@
             openReceiptModal(saleData);
         };
 
-        // Open Receipt Modal
+        // Open Official TAX INVOICE Modal (Matching SPM SOLUTION Format)
         function openReceiptModal(sale) {
-            document.getElementById('rInvoiceNo').innerText = sale.invoiceNo || sale.spNumber || '-';
-            document.getElementById('rDate').innerText = sale.date || '';
-            document.getElementById('rTime').innerText = sale.time || '';
-            document.getElementById('rCashier').innerText = sale.staffName || (currentUser?.email || '').split('@')[0];
-            document.getElementById('receiptStoreBranch').innerText = `${sale.branch || activeBranchName} Branch Showroom`;
-
-            document.getElementById('rCustName').innerText = sale.custName || 'Valued Customer';
-            document.getElementById('rCustPhone').innerText = sale.custPhone || '-';
+            const branchName = sale.branch || activeBranchName || 'SPM SOLUTION';
             
-            const nicWrap = document.getElementById('rCustNicWrap');
+            // Header Info
+            document.getElementById('invBranchName').innerText = branchName;
+            document.getElementById('invBranchSub').innerText = branchName;
+            document.getElementById('invFooterBranchName').innerText = branchName;
+            
+            // Meta Info
+            document.getElementById('invInvoiceNo').innerText = sale.invoiceNo || sale.spNumber || 'INV-04451998';
+            document.getElementById('invDate').innerText = sale.date || new Date().toISOString().split('T')[0];
+            document.getElementById('invTime').innerText = sale.time || '10:30 AM';
+            document.getElementById('invPaymentMode').innerText = sale.paymentMethod || ((parseFloat(sale.loanAmount) || 0) > 0 ? 'Multi/Cash' : 'Cash');
+
+            // Billed To
+            document.getElementById('invCustName').innerText = (sale.custName || 'Valued Customer').toUpperCase();
+            document.getElementById('invCustPhone').innerText = sale.custPhone || '-';
+
+            const nicRow = document.getElementById('invCustNicRow');
             if (sale.custNic && sale.custNic !== '-') {
-                nicWrap.style.display = 'inline';
-                document.getElementById('rCustNic').innerText = sale.custNic;
+                nicRow.style.display = 'block';
+                document.getElementById('invCustNic').innerText = sale.custNic;
             } else {
-                nicWrap.style.display = 'none';
+                nicRow.style.display = 'none';
             }
 
-            document.getElementById('rModel').innerText = sale.model || '-';
-            document.getElementById('rStorage').innerText = sale.storage || '-';
-            document.getElementById('rImei').innerText = sale.imei || '-';
-
+            // Phone Line Item
             const mrp = parseFloat(sale.mrp) || parseFloat(sale.sellingPrice) || 0;
-            const netAmt = parseFloat(sale.sellingPrice) || mrp;
-            const disc = parseFloat(sale.discount) || 0;
-            const rec = parseFloat(sale.amountReceived) || netAmt;
-            const chg = parseFloat(sale.changeGiven) || 0;
+            const modelText = `${sale.model || 'Smart Phone'} ${sale.storage ? sale.storage : ''}`.trim();
+            document.getElementById('invItemDesc').innerText = modelText;
+            document.getElementById('invItemImei').innerText = sale.imei || '-';
+            document.getElementById('invItemWarranty').innerText = sale.warranty || '1 Year';
+            document.getElementById('invItemUnitPrice').innerText = mrp.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('invItemTotal').innerText = mrp.toLocaleString(undefined, {minimumFractionDigits: 2});
 
-            document.getElementById('rItemPrice').innerText = mrp.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('rSubTotal').innerText = `Rs. ${mrp.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-
-            const discRow = document.getElementById('rDiscountRow');
-            if (disc > 0) {
-                discRow.style.display = 'flex';
-                document.getElementById('rDiscount').innerText = `-Rs. ${disc.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            // Document Charge Row (Fintrex)
+            const docFee = parseFloat(sale.docFee) || 0;
+            const docFeeRow = document.getElementById('invDocFeeRow');
+            if (docFee > 0) {
+                docFeeRow.style.display = 'table-row';
+                document.getElementById('invDocFeeUnitPrice').innerText = docFee.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById('invDocFeeTotal').innerText = docFee.toLocaleString(undefined, {minimumFractionDigits: 2});
             } else {
-                discRow.style.display = 'none';
+                docFeeRow.style.display = 'none';
             }
 
-            document.getElementById('rGrandTotal').innerText = `Rs. ${netAmt.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('rPaymentMethod').innerText = sale.paymentMethod || 'Cash';
-            document.getElementById('rCashReceived').innerText = `Rs. ${rec.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('rCashChange').innerText = `Rs. ${chg.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('rWarranty').innerText = sale.warranty || '1 Year Company Warranty';
+            // Totals
+            const grandTotal = mrp + docFee;
+            document.getElementById('invSubTotalDisplay').innerText = `Rs. ${grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('invGrandTotalDisplay').innerText = `Rs. ${grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            // Special Notes
+            const loanAmount = parseFloat(sale.loanAmount) || 0;
+            const monthlyRental = parseFloat(sale.monthlyRental) || 0;
+            const noteMonthly = document.getElementById('invNoteMonthlyRentel');
+            const noteSp = document.getElementById('invNoteSpNumber');
+            const noteCustom = document.getElementById('invNoteCustom');
+
+            if (loanAmount > 0) {
+                noteMonthly.style.display = 'block';
+                noteMonthly.innerText = `MONTHLY RENTEL: RS ${monthlyRental.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                noteSp.innerText = sale.spNumber || sale.invoiceNo || '';
+            } else {
+                noteMonthly.style.display = 'none';
+                noteSp.innerText = sale.invoiceNo || 'DIRECT SHOWROOM SALE';
+            }
+
+            if (sale.remarks) {
+                noteCustom.style.display = 'block';
+                noteCustom.innerText = `Note: ${sale.remarks}`;
+            } else {
+                noteCustom.style.display = 'none';
+            }
+
+            // Payment Breakdown Rows
+            const paidDocFeeRow = document.getElementById('invPaidCashDocFeeRow');
+            const paidDownPaymentRow = document.getElementById('invPaidCashDownPaymentRow');
+            const paidInstallmentRow = document.getElementById('invPaidInstallmentRow');
+            const balanceDueRow = document.getElementById('invBalanceDueRow');
+
+            if (docFee > 0) {
+                paidDocFeeRow.style.display = 'flex';
+                document.getElementById('invPaidCashDocFeeDisplay').innerText = `Rs. ${docFee.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } else {
+                paidDocFeeRow.style.display = 'none';
+            }
+
+            if (loanAmount > 0) {
+                paidDownPaymentRow.style.display = 'flex';
+                const downPayment = parseFloat(sale.downPayment) || 0;
+                document.getElementById('invPaidCashDownPaymentDisplay').innerText = `Rs. ${downPayment.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                paidInstallmentRow.style.display = 'flex';
+                const tenure = sale.installmentMonths || 12;
+                document.getElementById('invInstallmentMonthsLabel').innerText = `${tenure} Months`;
+                document.getElementById('invPaidInstallmentDisplay').innerText = `Rs. ${loanAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                balanceDueRow.style.display = 'flex';
+                document.getElementById('invBalanceDueDisplay').innerText = `Rs. ${loanAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } else {
+                paidDownPaymentRow.style.display = 'flex';
+                const directCash = parseFloat(sale.amountReceived || sale.sellingPrice || mrp) || 0;
+                document.getElementById('invPaidCashDownPaymentDisplay').innerText = `Rs. ${directCash.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+                paidInstallmentRow.style.display = 'none';
+                balanceDueRow.style.display = 'flex';
+                document.getElementById('invBalanceDueDisplay').innerText = `Rs. 0.00`;
+            }
+
+            // Real QR Code Generation (Customer Loyalty QR)
+            const qrSummary = `METHMI MOBILE | INV: ${sale.invoiceNo || sale.spNumber} | CUST: ${sale.custName || ''} | TEL: ${sale.custPhone || ''} | IMEI: ${sale.imei} | TOTAL: Rs. ${grandTotal.toFixed(2)}`;
+            const qrImg = document.getElementById('invQrCodeImg');
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrSummary)}`;
+            }
 
             document.getElementById('receiptModal').style.display = 'flex';
         }
