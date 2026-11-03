@@ -728,23 +728,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
-        .model-stock-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(226, 232, 240, 0.95);
-            border-radius: 16px;
-            padding: 1.1rem 1.25rem;
-            margin-bottom: 0.85rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
-        .model-stock-card:hover {
-            border-color: rgba(59, 130, 246, 0.45);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08);
-            transform: translateY(-1px);
-        }
+        /* Compact model-stock-card defined below */
 
         .batch-card {
             background: rgba(255, 255, 255, 0.9);
@@ -1541,7 +1525,7 @@
                                     <span>Staff Activator Fee</span>
                                     <span id="brandSpecialCommBadge" style="display:none; font-size:0.72rem; background:rgba(139,92,246,0.15); color:#7c3aed; padding:1px 6px; border-radius:6px; font-weight:700;">✨ Special Brand Commission</span>
                                 </label>
-                                <input type="number" id="mainSaleStaffFee" step="1" value="500" placeholder="500" oninput="calculateMainShopLiveProfit()">
+                                <input type="number" id="mainSaleStaffFee" step="1" value="0" placeholder="0" oninput="calculateMainShopLiveProfit()">
                             </div>
 
                             <!-- Live Calculated Net Profit Banner -->
@@ -1837,15 +1821,28 @@
                                 <input type="number" id="invMrpPrice" placeholder="0.00" step="0.01" oninput="calculateInvSuggestedCommission()" style="width: 100%; background: rgba(255,255,255,0.75); border: 1px solid rgba(203,213,225,0.85); color: var(--text-main); padding: 0.8rem; border-radius: 10px;">
                             </div>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+<div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0.8rem; margin-bottom: 1rem; background: rgba(124, 58, 237, 0.05); padding: 0.85rem; border-radius: 12px; border: 1.5px solid rgba(124, 58, 237, 0.25);">
                             <div>
-                                <label style="display:block; margin-bottom: 0.4rem; color: #7c3aed; font-size: 0.84rem; font-weight: 700;">Brand / Special API Price (Rs.) <span style="font-size: 0.70rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
-                                <input type="number" id="invApiPrice" placeholder="e.g. 45000.00" step="0.01" oninput="calculateInvSuggestedCommission()" style="width: 100%; background: rgba(237,233,254,0.45); border: 1.5px solid rgba(139,92,246,0.35); color: var(--text-main); padding: 0.8rem; border-radius: 10px;" title="Special API base price for this brand/model">
+                                <label style="display:block; margin-bottom: 0.4rem; color: #7c3aed; font-size: 0.84rem; font-weight: 700;">Special Brand Promotion <span style="font-size: 0.70rem; color: var(--text-muted); font-weight: normal;">(Optional)</span></label>
+                                <select id="invPromoBrand" style="width: 100%; background: #ffffff; border: 1.5px solid rgba(139,92,246,0.4); color: var(--text-main); padding: 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
+                                    <option value="">-- No Special Brand Promo --</option>
+                                    <option value="VIVO">✨ VIVO Special Promotion</option>
+                                    <option value="SAMSUNG">✨ SAMSUNG Special Promotion</option>
+                                    <option value="HONOR">✨ HONOR Special Promotion</option>
+                                    <option value="REDMI">✨ REDMI / XIAOMI Promotion</option>
+                                    <option value="OPPO">✨ OPPO Special Promotion</option>
+                                    <option value="TECNO">✨ TECNO Special Promotion</option>
+                                    <option value="INFINIX">✨ INFINIX Special Promotion</option>
+                                    <option value="REALME">✨ REALME Special Promotion</option>
+                                    <option value="OTHER">✨ Other Brand Promotion</option>
+                                </select>
+                                <input type="hidden" id="invApiPrice" value="0">
                             </div>
                             <div>
                                 <label style="display:block; margin-bottom: 0.4rem; color: #059669; font-size: 0.84rem; font-weight: 700;">Special Activator Commission (Rs.)</label>
-                                <input type="number" id="invCustomCommission" placeholder="e.g. 1000.00" step="1" style="width: 100%; background: rgba(240,253,244,0.75); border: 1.5px solid rgba(16,185,129,0.35); color: var(--text-main); padding: 0.8rem; border-radius: 10px;" title="Custom commission for this phone/brand (replaces fixed Rs. 500)">
+                                <input type="number" id="invCustomCommission" placeholder="0" step="1" style="width: 100%; background: #ffffff; border: 1.5px solid rgba(16,185,129,0.4); color: var(--text-main); padding: 0.75rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem;" title="Custom activator commission for this phone/brand (automatically applied on sale)">
                             </div>
+                        </div>
                         </div>
                         
                         <div style="margin-bottom: 1.5rem;">
@@ -2921,6 +2918,9 @@
                     <button type="button" id="batchModalAddMoreBtn" style="background: linear-gradient(135deg, var(--primary) 0%, #cc0000 100%); color: white; border: none; padding: 0.45rem 0.95rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 12px rgba(229,0,0,0.25);">
                         ➕ Add More Stock / Batch
                     </button>
+                    <button type="button" onclick="deleteEntireModelGroup(window.currentOpenGroupKey)" style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.4); color: #dc2626; padding: 0.45rem 0.95rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer;" title="Delete All Stock for this Model Group (Requires Admin PIN 1234)">
+                        🗑️ Delete Entire Model Stock
+                    </button>
                 </div>
             </div>
 
@@ -3286,7 +3286,7 @@
 
             if (!isAdmin) {
                 // Logged-in as a non-admin shop -> redirect to shop.html
-                window.location.replace('pos.html');
+                window.location.replace('shop.html');
                 return;
             }
 
@@ -5516,7 +5516,7 @@
                                 commBadge.innerText = '✨ API Comm: Rs. ' + calcComm.toLocaleString();
                             }
                         } else {
-                            feeInput.value = '500';
+                            feeInput.value = '0';
                             if (commBadge) commBadge.style.display = 'none';
                         }
                     }
@@ -5588,7 +5588,7 @@
             const mrp = parseFloat(document.getElementById('mainSaleMrp').value) || 0;
             const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
             const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
-            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+            const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 0;
 
             const leaseFee = mrp * (leasePct / 100);
             document.getElementById('leaseFeeDisplay').innerText = `Leasing Fee (${leasePct}%): Rs. ` + leaseFee.toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -5818,7 +5818,7 @@
                     const buyPrice = parseFloat(document.getElementById('mainSaleBuyPrice').value) || 0;
                     const leasePct = parseFloat(document.getElementById('mainSaleLeasePercent').value) || 2.0;
                     const leaseFee = mrp * (leasePct / 100);
-                    const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 500;
+                    const staffFee = parseFloat(document.getElementById('mainSaleStaffFee').value) || 0;
                     const rawStaffName = document.getElementById('mainSaleStaffName').value.trim();
                     const staffName = normalizeStaffName(rawStaffName);
                     const netProfit = mrp - buyPrice - leaseFee - staffFee;
@@ -6130,7 +6130,7 @@
             const hoLease = document.getElementById('mainSaleLeasePercent');
             if (hoLease) hoLease.value = '2.0';
             const hoFee = document.getElementById('mainSaleStaffFee');
-            if (hoFee) hoFee.value = '500'; const bComm = document.getElementById('brandSpecialCommBadge'); if (bComm) bComm.style.display = 'none';
+            if (hoFee) hoFee.value = '0'; const bComm = document.getElementById('brandSpecialCommBadge'); if (bComm) bComm.style.display = 'none';
 
             // Reset Dialog Lesi Pay inputs
             const lpImei = document.getElementById('lpSaleImei');
@@ -8095,6 +8095,9 @@
                             <button type="button" onclick="openModelBatchModal('${safeModelKey}')" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; font-weight: 700; font-size: 0.72rem; padding: 0.25rem 0.7rem; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
                                 👁️ View IMEIs (${grp.availableCount})
                             </button>
+                            <button type="button" onclick="deleteEntireModelGroup('${safeModelKey}')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; font-weight: 700; font-size: 0.72rem; padding: 0.22rem 0.5rem; border-radius: 6px; cursor: pointer;" title="Delete All Stock for this Model (Admin PIN 1234)">
+                                🗑️
+                            </button>
                         </div>
                     </div>
                 `;
@@ -8652,8 +8655,11 @@
             const selectedIds = Array.from(window.selectedBatchImeis);
             const count = selectedIds.length;
 
-            const confirmMsg = `Are you sure you want to permanently DELETE ${count} selected phone(s) from Inventory?\n\nතෝරාගත් දුරකථන (IMEI) ${count} ක් Inventory එකෙන් ස්ථිරවම ඉවත් කිරීමට (Delete) තහවුරු කරන්න.`;
-            if (!confirm(confirmMsg)) return;
+            const pin = prompt(`⚠️ Permanently DELETE ${count} selected phone(s) from Inventory?\n\nEnter Admin PIN (1234) to confirm:\n(තෝරාගත් දුරකථන ${count} මකාදැමීමට Admin PIN (1234) ඇතුලත් කරන්න):`);
+            if (pin === null) return;
+            if (pin.trim() !== '1234') {
+                return showToast("❌ Invalid Admin PIN! (වැරදි Admin PIN අංකයකි)", "error");
+            }
 
             const btn = document.getElementById('bulkDeleteSubmitBtn');
             const originalText = btn ? btn.innerHTML : '';
@@ -8690,6 +8696,66 @@
                     btn.disabled = false;
                     btn.innerHTML = `🗑️ Delete Selected (<span id="bulkDeleteBtnCount">${window.selectedBatchImeis ? window.selectedBatchImeis.size : 0}</span>)`;
                 }
+            }
+        };
+
+        
+        // Delete Entire Model Group / Batch with Admin PIN 1234
+        window.deleteEntireModelGroup = async function(groupKey) {
+            if (!groupKey) {
+                groupKey = window.currentOpenGroupKey;
+            }
+            if (!groupKey) return;
+            const parts = groupKey.toLowerCase().split('___');
+            const mTarget = parts[0];
+            const sTarget = parts[1] || '';
+
+            const matchingItems = (allInventoryItems || []).filter(i => 
+                (i.model || '').trim().toLowerCase() === mTarget &&
+                (i.storage || '').trim().toLowerCase() === sTarget
+            );
+
+            if (matchingItems.length === 0) {
+                return showToast("No items found to delete for this model.", "info");
+            }
+
+            const count = matchingItems.length;
+            const modelDisplay = (matchingItems[0].model || mTarget) + (matchingItems[0].storage ? ' (' + matchingItems[0].storage + ')' : '');
+
+            const pin = prompt(`⚠️ WARNING: Permanently delete ALL ${count} units of ${modelDisplay}?\n\nEnter Admin PIN (1234) to confirm:\n(${modelDisplay} හි දුරකථන ${count} ම සම්පූර්ණයෙන්ම Delete කිරීමට Admin PIN (1234) ඇතුලත් කරන්න):`);
+            if (pin === null) return;
+            if (pin.trim() !== '1234') {
+                return showToast("❌ Invalid Admin PIN! (වැරදි Admin PIN අංකයකි)", "error");
+            }
+
+            try {
+                const itemIds = matchingItems.map(i => i.id);
+                const chunkSize = 400;
+                for (let i = 0; i < itemIds.length; i += chunkSize) {
+                    const chunk = itemIds.slice(i, i + chunkSize);
+                    const batch = writeBatch(db);
+                    chunk.forEach(docId => {
+                        batch.delete(doc(db, "inventory", docId));
+                    });
+                    await batch.commit();
+                }
+
+                const deletedSet = new Set(itemIds);
+                allInventoryItems = (allInventoryItems || []).filter(i => !deletedSet.has(i.id));
+                if (window.selectedBatchImeis) {
+                    itemIds.forEach(id => window.selectedBatchImeis.delete(id));
+                }
+
+                if (typeof closeStockBatchModal === 'function') {
+                    closeStockBatchModal();
+                }
+                updateStockModelFilterDropdowns();
+                filterInventoryTable();
+
+                showToast(`🗑️ ${modelDisplay} හි දුරකථන ${count} ම සාර්ථකව Inventory එකෙන් ඉවත් කරන ලදී!`, "warning");
+            } catch (err) {
+                console.error("Delete model stock error:", err);
+                showToast("Failed to delete model stock: " + err.message, "error");
             }
         };
 
@@ -10045,6 +10111,7 @@
             const mrpPrice = parseFloat(document.getElementById('invMrpPrice').value) || 0;
             const apiPrice = parseFloat(document.getElementById('invApiPrice')?.value) || 0;
             const customCommission = parseFloat(document.getElementById('invCustomCommission')?.value) || 0;
+            const promoBrand = (document.getElementById('invPromoBrand')?.value || '').trim();
 
             if (scannedImeiList.length === 0) return showToast("Please type or scan at least one IMEI number", "warning");
             if (!rawModel || !shop) return showToast("Please fill all required fields (Model, Storage, Target Location)", "warning");
@@ -10067,6 +10134,7 @@
                         mrp: mrpPrice,
                         apiPrice: apiPrice,
                         customCommission: customCommission,
+                        promoBrand: promoBrand,
                         status: 'Available',
                         timestamp: Date.now()
                     });
@@ -10091,6 +10159,8 @@
             if (invApiEl) invApiEl.value = '';
             const invCommEl = document.getElementById('invCustomCommission');
             if (invCommEl) invCommEl.value = '';
+            const invPromoEl = document.getElementById('invPromoBrand');
+            if (invPromoEl) invPromoEl.value = '';
     
             scannedImeiList = [];
             renderScannedImeiChips();
