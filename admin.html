@@ -3698,8 +3698,30 @@
                     spDisplayHtml = `<br><span style="font-size:0.75rem;"><del style="color:#ef4444; font-family:monospace;">${data.oldSpNumber}</del> <span style="color:#dc2626; font-weight:700;">(NIC Pending)</span></span>`;
                 }
 
+                const fileDateStr = data.originalDate || data.date || '-';
+                const entryDateStr = data.entryDate || (data.timestamp ? new Date(data.timestamp).toISOString().split('T')[0] : '');
+
+                let dateDisplayHtml = '';
+                if (entryDateStr && entryDateStr !== fileDateStr) {
+                    dateDisplayHtml = `
+                        <div style="line-height: 1.35;">
+                            <div style="font-weight: 800; color: #1e3a8a; font-size: 0.85rem;" title="Original File Submission Date">
+                                <span style="font-size: 0.68rem; background: rgba(37,99,235,0.12); color: #2563eb; padding: 1px 4px; border-radius: 4px; font-weight: 800;">FILE</span> ${fileDateStr}
+                            </div>
+                            <div style="font-size: 0.72rem; color: #047857; font-weight: 700; margin-top: 2px;" title="System Entry Date">
+                                <span style="font-size: 0.68rem; background: rgba(16,185,129,0.12); color: #059669; padding: 1px 4px; border-radius: 4px; font-weight: 800;">SYS</span> ${entryDateStr}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    dateDisplayHtml = `
+                        <div style="font-weight: 800; color: #1e293b; font-size: 0.85rem;">${fileDateStr}</div>
+                        ${entryDateStr ? `<div style="font-size: 0.70rem; color: var(--text-muted); font-weight: 600;">(Ent: ${entryDateStr})</div>` : ''}
+                    `;
+                }
+
                 tr.innerHTML = `
-                    <td>${data.date || '-'}</td>
+                    <td>${dateDisplayHtml}</td>
                     <td style="color: var(--accent-purple); font-weight: 600;">${shopName}</td>
                     <td><strong>${data.name || '-'}</strong><br><span style="color:var(--text-muted)">${data.model || '-'}</span>${spDisplayHtml}<br>${sourceHtml}</td>
                     <td>${amountsHtml}</td>
@@ -4772,8 +4794,14 @@
                 const pOwnP = profShopReg?.shopOwnPercent ?? 6;
                 let sourceHtml = data.stockSource === 'HO' ? `<span style="color:var(--success); font-size:0.8rem; font-weight:bold;">HO Stock (${pHoP}% Profit)</span>` : `<span style="color:var(--text-muted); font-size:0.8rem;">Shop Stock (${pOwnP}% Profit)</span>`;
                 
+                const profFileDate = data.originalDate || data.date || '-';
+                const profEntryDate = data.entryDate || (data.timestamp ? new Date(data.timestamp).toISOString().split('T')[0] : '');
+                let profDateHtml = (profEntryDate && profEntryDate !== profFileDate) 
+                    ? `<div style="font-weight:800; color:#1e3a8a; font-size:0.82rem;"><span style="font-size:0.65rem; background:rgba(37,99,235,0.12); color:#2563eb; padding:1px 3px; border-radius:3px;">FILE</span> ${profFileDate}</div><div style="font-size:0.72rem; color:#047857; font-weight:700;"><span style="font-size:0.65rem; background:rgba(16,185,129,0.12); color:#059669; padding:1px 3px; border-radius:3px;">SYS</span> ${profEntryDate}</div>`
+                    : `<div style="font-weight:800; font-size:0.85rem;">${profFileDate}</div>`;
+
                 tr.innerHTML = `
-                    <td>${data.date}</td>
+                    <td>${profDateHtml}</td>
                     <td><strong>${data.name}</strong><br><span style="color:var(--text-muted)">${data.model}</span></td>
                     <td>${sourceHtml}</td>
                     <td>Rs. ${parseFloat(data.loanAmount || 0).toLocaleString()}</td>
@@ -4863,7 +4891,8 @@
             content.innerHTML = `
                 ${nicClearBannerHtml}
                 ${customDetailsHtml}
-                <div class="detail-item"><strong>Date:</strong> <span class="val">${data.date || '-'}</span></div>
+                <div class="detail-item"><strong>Original File Date:</strong> <span class="val" style="color:#1d4ed8; font-weight:800;">${data.originalDate || data.date || '-'}</span></div>
+                <div class="detail-item"><strong>System Entry Date:</strong> <span class="val" style="color:#047857; font-weight:800;">${data.entryDate || (data.timestamp ? new Date(data.timestamp).toISOString().split('T')[0] : '-')}</span></div>
                 <div class="detail-item"><strong>Shop:</strong> <span class="val">${data.shopId || '-'}</span></div>
                 <div class="detail-item"><strong>Customer Name:</strong> <span class="val">${data.name || '-'}</span></div>
                 ${!isCash ? `<div class="detail-item"><strong>Customer NIC:</strong> <span class="val" style="color:#dc2626; font-weight:700;">${data.nic || '-'}</span></div>` : ''}
