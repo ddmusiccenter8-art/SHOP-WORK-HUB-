@@ -901,13 +901,115 @@
     </div>
 
     <!-- Toast Notifications Container -->
+    
+    <!-- Submission Correction & Re-check Modal (Admin PIN 1234 Protected) -->
+    <div id="submissionCorrectionModal" class="modal">
+        <div class="modal-content" style="max-width: 620px; width: 95vw; max-height: 92vh; overflow-y: auto; background: #ffffff; color: #0f172a; padding: 1.6rem; border-radius: 20px; border: 1.5px solid #cbd5e1; box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
+            <span class="modal-close" onclick="closeCorrectionModal()" style="color: #64748b; font-size: 1.6rem; top: 1.2rem; right: 1.4rem;">&times;</span>
+            
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 0.8rem;">
+                <span style="font-size: 1.4rem;">⚙️</span>
+                <div>
+                    <h2 style="font-size: 1.2rem; margin: 0; color: #0f172a; font-weight: 800;">Submission Management & Re-check</h2>
+                    <span style="font-size: 0.78rem; color: #64748b;">(දත්ත සංශෝධනය / පේමන්ට් නැවත පරීක්ෂාවට යැවීම)</span>
+                </div>
+            </div>
+
+            <!-- Sale Details Summary Card -->
+            <div id="correctionSaleSummary" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5;">
+            </div>
+
+            <!-- PIN Lock Section (Shows first if PIN not yet entered) -->
+            <div id="correctionPinSection" style="background: rgba(239, 68, 68, 0.05); border: 1.5px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 1.1rem; text-align: center; margin-bottom: 1rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 4px;">🔒</div>
+                <h4 style="margin: 0 0 6px 0; color: #991b1b; font-size: 0.95rem; font-weight: 800;">Admin Authorization Required</h4>
+                <p style="margin: 0 0 12px 0; font-size: 0.82rem; color: #475569;">
+                    මෙම දත්ත වෙනස් කිරීමට හෝ නැවත Re-check කිරීමට <strong>Admin PIN (1234)</strong> ඇතුලත් කරන්න.
+                </p>
+                <div style="display: flex; gap: 8px; justify-content: center; max-width: 320px; margin: 0 auto;">
+                    <input type="password" id="correctionAdminPinInput" placeholder="Enter PIN (1234)..." onkeydown="if(event.key==='Enter'){event.preventDefault();verifyCorrectionPin();}" style="flex: 1; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1.5px solid #dc2626; font-size: 0.95rem; font-weight: 800; text-align: center; letter-spacing: 2px;">
+                    <button type="button" onclick="verifyCorrectionPin()" style="background: #dc2626; color: white; border: none; padding: 0.65rem 1.1rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Unlock 🔓</button>
+                </div>
+            </div>
+
+            <!-- Management Actions Section (Visible after PIN verified) -->
+            <div id="correctionActionsSection" style="display: none;">
+                <!-- Action 1: Reset to Pending / Re-check -->
+                <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="font-weight: 800; color: #b45309; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span>🔄</span> Option 1: Reset Payment to Pending (නැවත පරීක්ෂාවට යැවීම)
+                    </div>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 0 0 10px 0;">
+                        වැරදීමකින් Confirmed / Completed වූ මෙම ගනුදෙනුව නැවත <strong>Pending</strong> තත්වයට පත් කරයි. ගනුදෙනු ශේෂය (Settlement Balance) ක්ෂණිකව නිවැරදි වේ.
+                    </p>
+                    <button type="button" onclick="executeSubmissionResetToPending()" style="width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 800; font-size: 0.86rem; cursor: pointer; box-shadow: 0 3px 10px rgba(245,158,11,0.25);">
+                        🔄 Reset Status to Pending (නැවත පරීක්ෂාවට යවන්න)
+                    </button>
+                </div>
+
+                <!-- Action 2: Edit Submission Details -->
+                <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.25); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="font-weight: 800; color: #1d4ed8; font-size: 0.92rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>✏️</span> Option 2: Edit Details (දත්ත සංශෝධනය කිරීම)
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.8rem;">
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">SP Number:</label>
+                            <input type="text" id="editCorrSp" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Customer Name:</label>
+                            <input type="text" id="editCorrCustName" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 600;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Loan Amount (රු.):</label>
+                            <input type="number" id="editCorrLoan" step="0.01" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 700; color: #047857;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Settlement (රු.):</label>
+                            <input type="number" id="editCorrSetl" step="0.01" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 700; color: #d97706;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Original File Date:</label>
+                            <input type="date" id="editCorrDate" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.74rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Customer NIC:</label>
+                            <input type="text" id="editCorrNic" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; font-weight: 600;">
+                        </div>
+                    </div>
+                    <button type="button" onclick="executeSaveEditedSubmission()" style="width: 100%; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; padding: 0.65rem; border-radius: 8px; font-weight: 800; font-size: 0.84rem; cursor: pointer;">
+                        💾 Save Corrected Details (දත්ත යාවත්කාලීන කරන්න)
+                    </button>
+                </div>
+
+                <!-- Action 3: Cancel Submission & Free IMEI -->
+                <div style="background: rgba(239, 68, 68, 0.05); border: 1.5px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 1rem;">
+                    <div style="font-weight: 800; color: #dc2626; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span>🗑️</span> Option 3: Delete & Free IMEI (අවලංගු කර IMEI නිදහස් කිරීම)
+                    </div>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 0 0 10px 0;">
+                        මෙම සටහන වැරදීමකින් දැමූ එකක් නම්, එය ඉවත් කර IMEI අංකය නැවත <strong>Available Stock</strong> බවට පත් කරයි (එවිට "Existing/Sold" දෝෂයකින් තොරව අලුතින් ඇතුළත් කළ හැක).
+                    </p>
+                    <button type="button" onclick="executeCancelAndFreeImei()" style="width: 100%; background: #ffffff; border: 1.5px solid #ef4444; color: #dc2626; padding: 0.65rem; border-radius: 8px; font-weight: 800; font-size: 0.84rem; cursor: pointer;">
+                        🗑️ Delete Submission & Free IMEI (අවලංගු කරන්න)
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem; text-align: right;">
+                <button type="button" onclick="closeCorrectionModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toastContainer"></div>
 
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, getDocs } 
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, getDocs, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1270,7 +1372,7 @@
                 loanAmountInput.value = Math.max(0, mrp - dp).toFixed(2);
             }
             calculateSettlement();
-            if (document.getElementById('shopSaleType').value === 'Cash') {
+            if (document.getElementById('shopSaleType')?.value === 'Cash') {
                 if (!document.getElementById('shopCashSellingPrice').value) {
                     document.getElementById('shopCashSellingPrice').value = mrp;
                 }
@@ -1340,7 +1442,7 @@
                         const dp = parseFloat(downPaymentInput.value) || 0;
                         loanAmountInput.value = Math.max(0, mrpVal - dp).toFixed(2);
                     }
-                    if (document.getElementById('shopSaleType').value === 'Cash') {
+                    if (document.getElementById('shopSaleType')?.value === 'Cash') {
                         document.getElementById('shopCashSellingPrice').value = mrpVal > 0 ? mrpVal : '';
                         if (mrpVal > 0) {
                             document.getElementById('shopCashCommission').value = Math.round(mrpVal * (myHoPercent / 100)) || 1500;
@@ -1627,7 +1729,7 @@
                     if (data.status === 'Cash Payment Pending') {
                         statusHtml = `<span class="badge" style="background:rgba(245,158,11,0.18); color:#d97706; border:1px solid rgba(245,158,11,0.4); font-weight:800;">⏳ Cash Payment Pending</span>`;
                     } else if (data.status === 'Completed' || data.paymentStatus === 'Paid') {
-                        statusHtml = `<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.25); color:#059669; font-weight:800;">✅ Completed / Payment Received</span>`;
+                        statusHtml = `<span class="badge badge-confirmed" onclick="openShopCorrectionModal('${id}')" style="background:rgba(16,185,129,0.25); color:#059669; font-weight:800; cursor: pointer;" title="Click to manage or reset (Admin PIN 1234)">✅ Completed / Payment Received ⚙️</span>`;
                     } else {
                         statusHtml = `<span class="badge badge-replied">${data.status}</span>`;
                     }
@@ -1647,9 +1749,9 @@
                     if (data.status === 'New') statusHtml = '<span class="badge badge-new">Submitted</span>';
                     else if (data.status === 'Admin Replied') statusHtml = `<span class="badge badge-replied" onclick="openModal('${id}', 'reply', '${encodeURIComponent(data.adminReply)}')">Message from Admin</span>`;
                     else if (data.status === 'Payment Sent') statusHtml = `<span class="badge badge-sent" onclick="openModal('${id}', 'payment', '${encodeURIComponent(data.fintrexPayment || '')}')">Payment Sent - Confirm</span>`;
-                    else if (data.status === 'Confirmed') statusHtml = '<span class="badge badge-confirmed">Confirmed by Shop</span>';
+                    else if (data.status === 'Confirmed') statusHtml = `<span class="badge badge-confirmed" onclick="openShopCorrectionModal('${id}')" style="cursor: pointer;" title="Click to manage or reset (Admin PIN 1234)">Confirmed by Shop ⚙️</span>`;
                     else if (data.status === 'NIC Clear Pending') statusHtml = `<span class="badge" style="background:rgba(239,68,68,0.18); color:#dc2626; border:1px solid rgba(239,68,68,0.45); font-weight:800; cursor:pointer;" onclick="openModal('${id}', 'reply', '${encodeURIComponent('⚠️ NIC CLEAR PENDING: ' + (data.nicClearReason || data.adminReply || 'NIC Clear වෙනතුරු රැඳී සිටින්න. Clear වූ පසු අලුත් SP Number එක ලබාදෙන්න.'))}')">🔄 NIC Clear Pending</span>`;
-                    else if (data.status === 'Completed') statusHtml = '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">✅ Completed</span>';
+                    else if (data.status === 'Completed') statusHtml = `<span class="badge badge-confirmed" onclick="openShopCorrectionModal('${id}')" style="background:rgba(16,185,129,0.3); cursor: pointer;" title="Click to manage or reset (Admin PIN 1234)">✅ Completed ⚙️</span>`;
 
                     let spDisplayHtml = `<strong>${data.spNumber || '-'}</strong>`;
                     if (data.oldSpNumber && data.newSpNumber) {
@@ -1696,7 +1798,14 @@
                     <td>${dateDisplayHtml}</td>
                     <td>${titleHtml}</td>
                     <td>${amountsHtml}</td>
-                    <td>${statusHtml}</td>
+                    <td>
+                        ${statusHtml}
+                        <div>
+                            <button type="button" onclick="openShopCorrectionModal('${id}')" style="background: rgba(239, 68, 68, 0.08); border: 1.5px solid rgba(239, 68, 68, 0.35); color: #dc2626; font-size: 0.72rem; padding: 2px 7px; border-radius: 6px; cursor: pointer; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;" title="Reset to Pending, Send for Re-check, or Edit (Admin PIN 1234)">
+                                🔄 Re-check / Reset
+                            </button>
+                        </div>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1970,6 +2079,197 @@
         }
 
         // Modal Logic
+        
+        // ====== SUBMISSION CORRECTION & RE-CHECK SYSTEM (ADMIN PIN: 1234) ======
+        let currentCorrectionSale = null;
+        let isCorrectionPinUnlocked = false;
+
+        window.openShopCorrectionModal = function(id) {
+            const sale = allShopSales.find(s => s.id === id);
+            if (!sale) return showToast("Sale record not found", "error");
+            currentCorrectionSale = sale;
+
+            const summaryEl = document.getElementById('correctionSaleSummary');
+            const isCash = (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
+            const isPaid = (sale.paymentStatus === 'Paid' || sale.status === 'Confirmed' || sale.status === 'Completed');
+
+            summaryEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                    <strong style="color: #1e3a8a; font-size: 0.95rem;">${sale.spNumber ? 'SP: ' + sale.spNumber : (isCash ? '💰 DIRECT CASH SALE' : 'Loan Application')}</strong>
+                    <span style="background: ${isPaid ? '#dcfce7' : '#fef3c7'}; color: ${isPaid ? '#15803d' : '#b45309'}; border: 1px solid ${isPaid ? '#86efac' : '#fde68a'}; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.74rem;">
+                        ${sale.status || 'Pending'} (${sale.paymentStatus || 'Pending'})
+                    </span>
+                </div>
+                <div style="color: #334155;"><strong>Model:</strong> ${sale.model || '-'} ${sale.storage ? '(' + sale.storage + ')' : ''}</div>
+                <div style="color: #334155;"><strong>Customer:</strong> ${sale.name || '-'} ${sale.nic ? '| NIC: ' + sale.nic : ''}</div>
+                <div style="color: #334155;"><strong>IMEI:</strong> <span style="font-family: monospace; font-weight: 800; color: #0284c7;">${sale.imei || '-'}</span></div>
+                <div style="color: #334155; margin-top: 4px;">
+                    <strong>Loan / Cash:</strong> Rs. ${parseFloat(sale.loanAmount || sale.cashSalePrice || 0).toLocaleString()} | 
+                    <strong style="color: #d97706;">Settlement / Due:</strong> Rs. ${parseFloat(sale.settlement || sale.headOfficeDue || 0).toLocaleString()}
+                </div>
+                <div style="color: #64748b; font-size: 0.76rem; margin-top: 4px;">
+                    File Date: <strong>${sale.originalDate || sale.date || '-'}</strong> | Entry Date: <strong>${sale.entryDate || '-'}</strong>
+                </div>
+            `;
+
+            // Populate Edit fields
+            document.getElementById('editCorrSp').value = sale.spNumber || '';
+            document.getElementById('editCorrCustName').value = sale.name || '';
+            document.getElementById('editCorrNic').value = sale.nic || '';
+            document.getElementById('editCorrLoan').value = sale.loanAmount || sale.cashSalePrice || 0;
+            document.getElementById('editCorrSetl').value = sale.settlement || sale.headOfficeDue || 0;
+            document.getElementById('editCorrDate').value = sale.originalDate || sale.date || '';
+
+            // If PIN is already verified during this session, show actions directly
+            if (isCorrectionPinUnlocked) {
+                document.getElementById('correctionPinSection').style.display = 'none';
+                document.getElementById('correctionActionsSection').style.display = 'block';
+            } else {
+                document.getElementById('correctionPinSection').style.display = 'block';
+                document.getElementById('correctionActionsSection').style.display = 'none';
+                document.getElementById('correctionAdminPinInput').value = '';
+            }
+
+            document.getElementById('submissionCorrectionModal').style.display = 'flex';
+        };
+
+        window.verifyCorrectionPin = function() {
+            const pin = document.getElementById('correctionAdminPinInput')?.value.trim();
+            if (pin === '1234') {
+                isCorrectionPinUnlocked = true;
+                document.getElementById('correctionPinSection').style.display = 'none';
+                document.getElementById('correctionActionsSection').style.display = 'block';
+                showToast("🔓 Admin Access Granted (අවසර ලබා දෙන ලදී)", "success");
+            } else {
+                showToast("❌ Invalid Admin PIN! (වැරදි Admin PIN අංකයකි)", "error");
+            }
+        };
+
+        window.closeCorrectionModal = function() {
+            document.getElementById('submissionCorrectionModal').style.display = 'none';
+            currentCorrectionSale = null;
+        };
+
+        // Action 1: Reset Status & Payment to Pending
+        window.executeSubmissionResetToPending = async function() {
+            if (!currentCorrectionSale) return;
+            const sale = currentCorrectionSale;
+            const isCash = (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
+
+            try {
+                const updateData = {
+                    status: isCash ? 'Cash Payment Pending' : 'New',
+                    paymentStatus: 'Pending',
+                    fintrexPayment: '',
+                    recheckRequested: true,
+                    recheckDate: new Date().toISOString(),
+                    adminReply: '⚠️ Re-opened for re-check & correction by Admin'
+                };
+
+                await updateDoc(doc(db, "sales", sale.id), updateData);
+                Object.assign(sale, updateData);
+
+                showToast("🔄 සාර්ථකයි! ගනුදෙනුව නැවත Pending තත්වයට පත් කරන ලදී. (Reset to Pending)", "success");
+                closeCorrectionModal();
+                renderShopSales();
+            } catch (e) {
+                console.error("Reset error:", e);
+                showToast("Failed to reset: " + e.message, "error");
+            }
+        };
+
+        // Action 2: Save Edited Details
+        window.executeSaveEditedSubmission = async function() {
+            if (!currentCorrectionSale) return;
+            const sale = currentCorrectionSale;
+
+            const newSp = document.getElementById('editCorrSp').value.trim();
+            const newName = document.getElementById('editCorrCustName').value.trim();
+            const newNic = document.getElementById('editCorrNic').value.trim();
+            const newLoan = parseFloat(document.getElementById('editCorrLoan').value) || 0;
+            const newSetl = parseFloat(document.getElementById('editCorrSetl').value) || 0;
+            const newDate = document.getElementById('editCorrDate').value;
+
+            try {
+                const updateData = {
+                    spNumber: newSp,
+                    name: newName,
+                    nic: newNic,
+                    loanAmount: newLoan,
+                    settlement: newSetl,
+                    date: newDate || sale.date,
+                    originalDate: newDate || sale.originalDate || sale.date,
+                    lastEditedAt: Date.now()
+                };
+
+                await updateDoc(doc(db, "sales", sale.id), updateData);
+                Object.assign(sale, updateData);
+
+                showToast("💾 සාර්ථකයි! ගනුදෙනුවේ තොරතුරු සංශෝධනය කරන ලදී. (Details Saved)", "success");
+                closeCorrectionModal();
+                renderShopSales();
+            } catch (e) {
+                console.error("Edit error:", e);
+                showToast("Failed to save edit: " + e.message, "error");
+            }
+        };
+
+        // Action 3: Delete Submission & Free IMEI to Available Stock
+        window.executeCancelAndFreeImei = async function() {
+            if (!currentCorrectionSale) return;
+            const sale = currentCorrectionSale;
+            const imei = sale.imei;
+
+            if (!confirm(`Are you sure you want to permanently delete submission for ${sale.model} (${imei}) and restore IMEI back to Available stock?\n\nමෙම ගනුදෙනුව සම්පූර්ණයෙන්ම ඉවත් කර IMEI අංකය නැවත Available Stock බවට පත් කිරීමට තහවුරු කරන්න.`)) {
+                return;
+            }
+
+            try {
+                // 1. Delete sales doc
+                await deleteDoc(doc(db, "sales", sale.id));
+
+                // 2. Restore phone in inventory if matching IMEI or doc ID exists
+                if (sale.inventoryDocId) {
+                    try {
+                        await updateDoc(doc(db, "inventory", sale.inventoryDocId), {
+                            status: 'Available',
+                            soldAt: null,
+                            soldBy: null,
+                            salesDocId: null
+                        });
+                    } catch (invE) {
+                        console.warn("Could not update inv by docId:", invE);
+                    }
+                }
+                if (imei) {
+                    try {
+                        const invQ = query(collection(db, "inventory"), where("imei", "==", imei));
+                        const invSnap = await getDocs(invQ);
+                        invSnap.forEach(async d => {
+                            await updateDoc(doc(db, "inventory", d.id), {
+                                status: 'Available',
+                                soldAt: null,
+                                soldBy: null,
+                                salesDocId: null
+                            });
+                        });
+                    } catch (invE2) {
+                        console.warn("Could not query inv by imei:", invE2);
+                    }
+                }
+
+                // Remove from in-memory list
+                allShopSales = allShopSales.filter(s => s.id !== sale.id);
+
+                showToast(`🗑️ සාර්ථකයි! ගනුදෙනුව ඉවත් කර IMEI (${imei}) නැවත Available Stock බවට පත් කරන ලදී!`, "warning");
+                closeCorrectionModal();
+                renderShopSales();
+            } catch (e) {
+                console.error("Delete error:", e);
+                showToast("Failed to cancel submission: " + e.message, "error");
+            }
+        };
+
         window.openModal = function(id, type, replyEncoded) {
             currentModalDocId = id;
             const modal = document.getElementById('actionModal');

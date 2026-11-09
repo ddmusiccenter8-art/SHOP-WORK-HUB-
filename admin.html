@@ -4818,6 +4818,73 @@
         };
 
         // Details Modal
+        
+        // Admin Reset Submission to Pending (Requires PIN 1234)
+        window.adminResetSubmissionToPending = async function(id) {
+            const pin = prompt("Enter Admin PIN (1234) to Reset this submission to Pending / Re-check:");
+            if (pin === null) return;
+            if (pin.trim() !== '1234') return showToast("❌ Invalid Admin PIN!", "error");
+
+            try {
+                const sale = (allSales || []).find(s => s.id === id);
+                const isCash = sale && (sale.saleType === 'Cash Sale' || sale.status === 'Cash Payment Pending');
+
+                const updateData = {
+                    status: isCash ? 'Cash Payment Pending' : 'New',
+                    paymentStatus: 'Pending',
+                    fintrexPayment: '',
+                    recheckRequested: true,
+                    recheckDate: new Date().toISOString(),
+                    adminReply: '⚠️ Re-opened for re-check & correction by Head Office Admin'
+                };
+
+                await updateDoc(doc(db, "sales", id), updateData);
+                if (sale) Object.assign(sale, updateData);
+
+                showToast("🔄 Submission reset to Pending! Sent back for re-check.", "success");
+                document.getElementById('detailsModal').style.display = 'none';
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Admin reset error:", e);
+                showToast("Failed to reset: " + e.message, "error");
+            }
+        };
+
+        // Admin Delete Submission & Free IMEI (Requires PIN 1234)
+        window.adminDeleteSubmissionAndFreeImei = async function(id, imei) {
+            const pin = prompt("Enter Admin PIN (1234) to permanently DELETE this submission and restore IMEI to Available Stock:");
+            if (pin === null) return;
+            if (pin.trim() !== '1234') return showToast("❌ Invalid Admin PIN!", "error");
+
+            if (!confirm("Are you sure you want to permanently delete this submission?")) return;
+
+            try {
+                await deleteDoc(doc(db, "sales", id));
+
+                if (imei) {
+                    const invQ = query(collection(db, "inventory"), where("imei", "==", imei));
+                    const invSnap = await getDocs(invQ);
+                    invSnap.forEach(async d => {
+                        await updateDoc(doc(db, "inventory", d.id), {
+                            status: 'Available',
+                            soldAt: null,
+                            soldBy: null,
+                            salesDocId: null
+                        });
+                    });
+                }
+
+                allSales = (allSales || []).filter(s => s.id !== id);
+
+                showToast(`🗑️ Submission deleted and IMEI ${imei} restored to Available stock!`, "warning");
+                document.getElementById('detailsModal').style.display = 'none';
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Admin delete error:", e);
+                showToast("Failed to delete: " + e.message, "error");
+            }
+        };
+    
         window.openDetailsModal = function(data) {
             currentModalDocId = data.id;
             const content = document.getElementById('modalContent');
@@ -4909,7 +4976,21 @@
                     <div class="detail-item"><strong>Settlement Amount:</strong> <span class="val" style="color:var(--warning); font-weight:bold;">Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></div>
                 ` : ''}
                 <div class="detail-item"><strong>Current Status:</strong> <span class="val">${getStatusBadge(data.status)}</span></div>
+                <!-- Admin Correction & Reset Toolbar -->
+                <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1rem;">
+                <div style="font-weight: 800; color: #b45309; font-size: 0.86rem; margin-bottom: 6px;">⚙️ Admin Correction & Reset (PIN 1234)</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" onclick="adminResetSubmissionToPending('${data.id}')" style="background: #f59e0b; color: white; border: none; padding: 0.45rem 0.9rem; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                🔄 Reset to Pending / Re-check
+                </button>
+                <button type="button" onclick="adminDeleteSubmissionAndFreeImei('${data.id}', '${data.imei || ''}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #dc2626; padding: 0.45rem 0.9rem; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
+                🗑️ Delete & Free IMEI
+                </button>
+                </div>
+                </div>
+                
             `;
+            
             
             document.getElementById('replyText').value = data.adminReply || '';
             document.getElementById('fintrexPaymentText').value = data.fintrexPayment || '';
