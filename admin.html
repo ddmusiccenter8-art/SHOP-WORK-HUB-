@@ -3059,7 +3059,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc, writeBatch, setDoc } 
+        import { getFirestore, collection, onSnapshot, getDocs, query, orderBy, doc, updateDoc, addDoc, deleteDoc, writeBatch, setDoc, where } 
         from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -4859,28 +4859,65 @@
             if (pin === null) return;
             if (pin.trim() !== '1234') return showToast("❌ Invalid Admin PIN!", "error");
 
-            if (!confirm("Are you sure you want to permanently delete this submission?")) return;
+            if (!confirm("Are you sure you want to permanently delete this submission and restore IMEI to stock?")) return;
 
             try {
+                const targetSale = (allSales || []).find(s => s.id === id);
+                const actualImei = imei || targetSale?.imei || '';
+                const invDocId = targetSale?.inventoryDocId || '';
+
+                // 1. Delete the sales document
                 await deleteDoc(doc(db, "sales", id));
 
-                if (imei) {
-                    const invQ = query(collection(db, "inventory"), where("imei", "==", imei));
-                    const invSnap = await getDocs(invQ);
-                    invSnap.forEach(async d => {
-                        await updateDoc(doc(db, "inventory", d.id), {
+                // 2. Restore linked phone in inventory to Available
+                if (invDocId) {
+                    try {
+                        await updateDoc(doc(db, "inventory", invDocId), {
                             status: 'Available',
                             soldAt: null,
                             soldBy: null,
                             salesDocId: null
                         });
+                    } catch(e) {
+                        console.warn("Could not update invDocId:", e);
+                    }
+                }
+
+                if (actualImei) {
+                    try {
+                        const invQ = query(collection(db, "inventory"), where("imei", "==", actualImei.trim()));
+                        const invSnap = await getDocs(invQ);
+                        for (const d of invSnap.docs) {
+                            await updateDoc(doc(db, "inventory", d.id), {
+                                status: 'Available',
+                                soldAt: null,
+                                soldBy: null,
+                                salesDocId: null
+                            });
+                        }
+                    } catch(e) {
+                        console.warn("Query by imei error:", e);
+                    }
+
+                    // Also update in-memory inventory items
+                    (allInventoryItems || []).forEach(item => {
+                        if ((item.imei || '').trim() === actualImei.trim() || item.id === invDocId) {
+                            item.status = 'Available';
+                            delete item.soldAt;
+                            delete item.soldBy;
+                            delete item.salesDocId;
+                        }
                     });
                 }
 
+                // Remove from in-memory sales
                 allSales = (allSales || []).filter(s => s.id !== id);
 
-                showToast(`🗑️ Submission deleted and IMEI ${imei} restored to Available stock!`, "warning");
+                showToast(`🗑️ Submission deleted and IMEI ${actualImei || ''} restored to Available stock!`, "warning");
                 document.getElementById('detailsModal').style.display = 'none';
+                
+                if (typeof updateStockModelFilterDropdowns === 'function') updateStockModelFilterDropdowns();
+                if (typeof filterInventoryTable === 'function') filterInventoryTable();
                 renderAllSubmissions();
             } catch(e) {
                 console.error("Admin delete error:", e);
