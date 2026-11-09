@@ -1003,6 +1003,87 @@
         </div>
     </div>
 
+    
+    <!-- Shop October Submissions Batch Cleanup Modal (Admin PIN 1234 Protected) -->
+    <div id="shopOctoberCleanupModal" class="modal" style="z-index: 2600;">
+        <div class="modal-content" style="max-width: 780px; width: 95vw; max-height: 92vh; overflow-y: auto; background: #ffffff; color: #0f172a; padding: 1.6rem; border-radius: 20px; border: 1.5px solid #cbd5e1; box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
+            <span class="modal-close" onclick="closeShopOctoberCleanupModal()" style="color: #64748b; font-size: 1.6rem; top: 1.2rem; right: 1.4rem;">&times;</span>
+            
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 0.8rem;">
+                <span style="font-size: 1.5rem;">🧹</span>
+                <div>
+                    <h2 style="font-size: 1.25rem; margin: 0; color: #dc2626; font-weight: 800;">Delete October Submissions (10 වන මාසය)</h2>
+                    <span style="font-size: 0.78rem; color: #64748b;">(10 වන මාසයේ වැරදීමකින් දැමූ ෆයිල්ස් ඉවත් කිරීම සහ IMEI නිදහස් කිරීම)</span>
+                </div>
+            </div>
+
+            <!-- PIN Lock Section -->
+            <div id="shopOctPinSection" style="background: rgba(239, 68, 68, 0.05); border: 1.5px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 1.1rem; text-align: center; margin-bottom: 1rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 4px;">🔒</div>
+                <h4 style="margin: 0 0 6px 0; color: #991b1b; font-size: 0.95rem; font-weight: 800;">Admin Authorization Required</h4>
+                <p style="margin: 0 0 12px 0; font-size: 0.82rem; color: #475569;">
+                    10 වැනි මාසයේ දත්ත ඉවත් කිරීමට කරුණාකර <strong>Admin PIN (1234)</strong> ඇතුලත් කරන්න.
+                </p>
+                <div style="display: flex; gap: 8px; justify-content: center; max-width: 320px; margin: 0 auto;">
+                    <input type="password" id="shopOctPinInput" placeholder="Enter PIN (1234)..." onkeydown="if(event.key==='Enter'){event.preventDefault();verifyShopOctPin();}" style="flex: 1; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1.5px solid #dc2626; font-size: 0.95rem; font-weight: 800; text-align: center; letter-spacing: 2px;">
+                    <button type="button" onclick="verifyShopOctPin()" style="background: #dc2626; color: white; border: none; padding: 0.65rem 1.1rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer;">Unlock 🔓</button>
+                </div>
+            </div>
+
+            <!-- Main Cleanup Content (Visible after unlock) -->
+            <div id="shopOctMainSection" style="display: none;">
+                <!-- Protected Stock Alert -->
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.4rem;">🛡️</span>
+                    <div style="font-size: 0.82rem; color: #065f46; line-height: 1.4;">
+                        <strong>ආරක්ෂිතයි:</strong> ඔබ ළඟ දැනට ඉතිරිව ඇති <strong>Available Stock (දුරකථන 4)</strong> කිසිසේත්ම Delete නොවේ. ඉවත් කරන්නේ 10 වන මාසයේ සබ්මිට් කළ ෆයිල්ස් පමණි.
+                    </div>
+                </div>
+
+                <!-- Submissions Table Selection -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 6px;">
+                    <label style="font-weight: 800; font-size: 0.88rem; color: #0f172a; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="checkbox" id="shopOctSelectAllCheckbox" onchange="toggleSelectAllShopOctSubmissions(this.checked)" checked style="width: 17px; height: 17px; accent-color: #dc2626;">
+                        Select All October Submissions (October 04 - October 20)
+                    </label>
+                    <span id="shopOctSelectedCountBadge" style="font-size: 0.78rem; font-weight: 800; background: rgba(239, 68, 68, 0.15); color: #dc2626; padding: 2px 8px; border-radius: 6px;">
+                        0 Selected
+                    </span>
+                </div>
+
+                <div style="max-height: 280px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 1rem;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+                        <thead style="background: #f1f5f9; position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1; width: 35px;"></th>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1;">Date</th>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1;">SP / Details</th>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1;">IMEI</th>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1;">Amount</th>
+                                <th style="padding: 6px 10px; border-bottom: 1px solid #cbd5e1;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shopOctTableBody">
+                            <tr><td colspan="6" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">Loading October files...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p style="font-size: 0.8rem; color: #1e3a8a; background: #eff6ff; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 1.2rem;">
+                    ℹ️ මෙම ෆයිල්ස් Delete කිරීමෙන් පසු, එම දුරකථනවල IMEI අංක නැවත <strong>Available Stock</strong> බවට පත් වන බැවින් "Existing/Sold" දෝෂයකින් තොරව අලුතින් නිවැරදිව සබ්මිට් කළ හැක.
+                </p>
+
+                <button type="button" id="shopOctExecuteBtn" onclick="executeBatchDeleteShopOctSubmissions()" style="width: 100%; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: white; border: none; padding: 0.85rem; border-radius: 10px; font-weight: 800; font-size: 0.92rem; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.35);">
+                    🗑️ Confirm & Delete Selected October Submissions (ස්ථිරවම ඉවත් කරන්න)
+                </button>
+            </div>
+
+            <div style="margin-top: 1rem; text-align: right;">
+                <button type="button" onclick="closeShopOctoberCleanupModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toastContainer"></div>
 
     <!-- Firebase SDKs -->
@@ -2267,6 +2348,165 @@
             } catch (e) {
                 console.error("Delete error:", e);
                 showToast("Failed to cancel submission: " + e.message, "error");
+            }
+        };
+
+        
+        // ====== SHOP OCTOBER CLEANUP SYSTEM (ADMIN PIN: 1234) ======
+        let shopOctList = [];
+        let isShopOctPinUnlocked = false;
+
+        window.openShopOctoberCleanupModal = function() {
+            const modal = document.getElementById('shopOctoberCleanupModal');
+            if (!modal) return;
+
+            if (!isShopOctPinUnlocked) {
+                document.getElementById('shopOctPinSection').style.display = 'block';
+                document.getElementById('shopOctMainSection').style.display = 'none';
+                document.getElementById('shopOctPinInput').value = '';
+            } else {
+                document.getElementById('shopOctPinSection').style.display = 'none';
+                document.getElementById('shopOctMainSection').style.display = 'block';
+                loadShopOctoberSubmissionsData();
+            }
+
+            modal.style.display = 'flex';
+        };
+
+        window.verifyShopOctPin = function() {
+            const pin = document.getElementById('shopOctPinInput')?.value.trim();
+            if (pin === '1234') {
+                isShopOctPinUnlocked = true;
+                document.getElementById('shopOctPinSection').style.display = 'none';
+                document.getElementById('shopOctMainSection').style.display = 'block';
+                showToast("🔓 Admin Access Granted", "success");
+                loadShopOctoberSubmissionsData();
+            } else {
+                showToast("❌ Invalid Admin PIN!", "error");
+            }
+        };
+
+        window.closeShopOctoberCleanupModal = function() {
+            document.getElementById('shopOctoberCleanupModal').style.display = 'none';
+        };
+
+        window.loadShopOctoberSubmissionsData = function() {
+            const tbody = document.getElementById('shopOctTableBody');
+            tbody.innerHTML = '';
+
+            shopOctList = (allShopSales || []).filter(sale => {
+                const sDate = (sale.originalDate || sale.date || '');
+                return sDate.includes('2026-10') || sDate.startsWith('2026-10');
+            });
+
+            if (shopOctList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">No October submissions found.</td></tr>';
+                document.getElementById('shopOctSelectedCountBadge').innerText = '0 Selected';
+                return;
+            }
+
+            shopOctList.forEach((sale, idx) => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #f1f5f9';
+                tr.style.background = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+                const sDate = sale.originalDate || sale.date || '-';
+                const amt = parseFloat(sale.loanAmount || sale.cashSalePrice || 0);
+
+                tr.innerHTML = `
+                    <td style="padding: 6px 10px; text-align: center;">
+                        <input type="checkbox" class="shop-oct-chk" value="${sale.id}" data-imei="${sale.imei || ''}" data-invid="${sale.inventoryDocId || ''}" checked onchange="updateShopOctSelectedCount()" style="width: 16px; height: 16px; accent-color: #dc2626; cursor: pointer;">
+                    </td>
+                    <td style="padding: 6px 10px; font-weight: 700; color: #1e3a8a;">${sDate}</td>
+                    <td style="padding: 6px 10px;">
+                        <strong>${sale.spNumber || '-'}</strong><br>
+                        <span style="color: #475569;">${sale.model || '-'} (${sale.name || '-'})</span>
+                    </td>
+                    <td style="padding: 6px 10px; font-family: monospace; font-weight: 700; color: #0284c7;">${sale.imei || '-'}</td>
+                    <td style="padding: 6px 10px; font-weight: 700;">Rs. ${amt.toLocaleString()}</td>
+                    <td style="padding: 6px 10px;"><span style="font-size: 0.74rem; background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${sale.status || 'Submitted'}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateShopOctSelectedCount();
+        };
+
+        window.updateShopOctSelectedCount = function() {
+            const chks = document.querySelectorAll('.shop-oct-chk:checked');
+            const badge = document.getElementById('shopOctSelectedCountBadge');
+            if (badge) badge.innerText = chks.length + ' Selected';
+        };
+
+        window.toggleSelectAllShopOctSubmissions = function(checked) {
+            document.querySelectorAll('.shop-oct-chk').forEach(c => c.checked = checked);
+            updateShopOctSelectedCount();
+        };
+
+        window.executeBatchDeleteShopOctSubmissions = async function() {
+            const checkedBoxes = Array.from(document.querySelectorAll('.shop-oct-chk:checked'));
+            if (checkedBoxes.length === 0) {
+                return showToast("කරුණාකර Delete කිරීමට අවම වශයෙන් එක් ගනුදෙනුවක් හෝ තෝරන්න!", "warning");
+            }
+
+            const count = checkedBoxes.length;
+            const pin = prompt(`⚠️ WARNING: Delete ${count} October submissions?\n\nEnter Admin PIN (1234) to confirm:\n(${count} ක් වූ දහවෙනි මාසයේ ෆයිල්ස් මකාදැමීමට Admin PIN 1234 ඇතුලත් කරන්න):`);
+            if (pin === null) return;
+            if (pin.trim() !== '1234') {
+                return showToast("❌ Invalid Admin PIN!", "error");
+            }
+
+            const btn = document.getElementById('shopOctExecuteBtn');
+            btn.disabled = true;
+            btn.innerText = `⏳ Deleting ${count} submissions...`;
+
+            try {
+                for (const chk of checkedBoxes) {
+                    const saleId = chk.value;
+                    const imei = chk.dataset.imei;
+                    const invId = chk.dataset.invid;
+
+                    // 1. Delete sales doc
+                    await deleteDoc(doc(db, "sales", saleId));
+
+                    // 2. Restore phone to Available stock in inventory
+                    if (invId) {
+                        try {
+                            await updateDoc(doc(db, "inventory", invId), {
+                                status: 'Available',
+                                soldAt: null,
+                                soldBy: null,
+                                salesDocId: null
+                            });
+                        } catch(e) {}
+                    }
+                    if (imei) {
+                        try {
+                            const qInv = query(collection(db, "inventory"), where("imei", "==", imei));
+                            const snap = await getDocs(qInv);
+                            snap.forEach(async d => {
+                                await updateDoc(doc(db, "inventory", d.id), {
+                                    status: 'Available',
+                                    soldAt: null,
+                                    soldBy: null,
+                                    salesDocId: null
+                                });
+                            });
+                        } catch(e) {}
+                    }
+                }
+
+                const deletedIds = new Set(checkedBoxes.map(c => c.value));
+                allShopSales = (allShopSales || []).filter(s => !deletedIds.has(s.id));
+
+                showToast(`🗑️ සාර්ථකයි! දහවෙනි මාසයේ සේල්ස් ${count} ක් ඉවත් කරන ලදී! IMEI නැවත Available Stock බවට පත් විය.`, "success");
+                closeShopOctoberCleanupModal();
+                renderShopSales();
+            } catch (err) {
+                console.error("Batch delete error:", err);
+                showToast("Failed to delete submissions: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🗑️ Confirm & Delete Selected October Submissions (ස්ථිරවම ඉවත් කරන්න)';
             }
         };
 
