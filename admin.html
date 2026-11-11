@@ -3196,6 +3196,7 @@
             }
         });
 
+        let currentUser = null;
         let allSales = [];
         let allMainShopSales = [];
         let registeredShopsList = [];
@@ -3279,6 +3280,7 @@
         // Strict Auth Guard & Data Loader
         onAuthStateChanged(auth, (user) => {
             if (!user) {
+                currentUser = null;
                 // Not authenticated -> immediately redirect to login page
                 window.location.replace('index.html');
                 return;
@@ -3299,6 +3301,7 @@
             }
 
             // User is verified as Admin: Show page and load data securely
+            currentUser = user;
             document.body.style.display = 'block';
             try {
                 loadAllData();
@@ -5310,6 +5313,10 @@
             }
 
             try {
+                const adminUserEmail = (typeof currentUser !== 'undefined' && currentUser?.email) || 
+                                       (typeof auth !== 'undefined' && auth?.currentUser?.email) || 
+                                       'admin';
+
                 const updateData = {
                     status: 'Correction Needed',
                     correctionRequired: true,
@@ -5317,7 +5324,7 @@
                     adminReply: '⚠️ Head Office Command: ' + cmd,
                     paymentStatus: 'Pending',
                     correctionRequestedAt: Date.now(),
-                    correctionRequestedBy: currentUser ? currentUser.email : 'admin'
+                    correctionRequestedBy: adminUserEmail
                 };
 
                 await updateDoc(doc(db, "sales", id), updateData);
@@ -5325,8 +5332,12 @@
                 if (sale) Object.assign(sale, updateData);
 
                 showToast("📤 සාර්ථකයි! ගනුදෙනුව සංශෝධනය කිරීම සඳහා ශාඛාව වෙත ආපසු යවන ලදී!", "success");
-                closeModal();
-                renderAllSubmissions();
+                if (typeof window.closeModal === 'function') window.closeModal();
+                else if (typeof closeModal === 'function') closeModal();
+                const modalEl = document.getElementById('detailModal');
+                if (modalEl) modalEl.style.display = 'none';
+
+                if (typeof renderAllSubmissions === 'function') renderAllSubmissions();
             } catch (e) {
                 console.error("Correction send error:", e);
                 showToast("Failed to send for correction: " + e.message, "error");
@@ -5374,8 +5385,9 @@
                 Object.assign(sale, updateData);
 
                 showToast("💾 සාර්ථකයි! ගනුදෙනුවේ තොරතුරු Admin විසින් සෘජුවම සංශෝධනය කරන ලදී!", "success");
-                openDetailsModal(sale);
-                renderAllSubmissions();
+                if (typeof window.openDetailsModal === 'function') window.openDetailsModal(sale);
+                else if (typeof openDetailsModal === 'function') openDetailsModal(sale);
+                if (typeof renderAllSubmissions === 'function') renderAllSubmissions();
             } catch(e) {
                 console.error("Direct save error:", e);
                 showToast("Failed to save correction: " + e.message, "error");
