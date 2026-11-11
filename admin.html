@@ -3751,6 +3751,8 @@
             if (status === 'Confirmed') return '<span class="badge badge-confirmed">Confirmed</span>';
             if (status === 'Cash Payment Pending') return '<span class="badge" style="background:rgba(245,158,11,0.18); color:#d97706; border:1px solid rgba(245,158,11,0.4); font-weight:800;">⏳ Cash Due</span>';
             if (status === 'NIC Clear Pending') return '<span class="badge" style="background:rgba(239,68,68,0.18); color:#dc2626; border:1px solid rgba(239,68,68,0.45); font-weight:800;">🔄 NIC Clear Pending</span>';
+            if (status === 'Correction Needed') return '<span class="badge" style="background:rgba(239,68,68,0.2); color:#dc2626; border:1.5px solid rgba(239,68,68,0.6); font-weight:800;">⚠️ Correction Needed</span>';
+            if (status === 'Resubmitted') return '<span class="badge" style="background:rgba(37,99,235,0.2); color:#2563eb; border:1.5px solid rgba(37,99,235,0.6); font-weight:800;">🔄 Resubmitted</span>';
             if (status === 'Completed') return '<span class="badge badge-confirmed" style="background:rgba(16,185,129,0.3)">Completed ✅</span>';
             return `<span class="badge">${status}</span>`;
         }
@@ -4855,7 +4857,7 @@
                 if (sale) Object.assign(sale, updateData);
 
                 showToast("🔄 Submission reset to Pending! Sent back for re-check.", "success");
-                document.getElementById('detailsModal').style.display = 'none';
+                document.getElementById('detailModal').style.display = 'none';
                 renderAllSubmissions();
             } catch(e) {
                 console.error("Admin reset error:", e);
@@ -4924,7 +4926,7 @@
                 allSales = (allSales || []).filter(s => s.id !== id);
 
                 showToast(`🗑️ Submission deleted and IMEI ${actualImei || ''} restored to Available stock!`, "warning");
-                document.getElementById('detailsModal').style.display = 'none';
+                document.getElementById('detailModal').style.display = 'none';
                 
                 if (typeof updateStockModelFilterDropdowns === 'function') updateStockModelFilterDropdowns();
                 if (typeof filterInventoryTable === 'function') filterInventoryTable();
@@ -5290,6 +5292,96 @@
         };
 
 
+        
+        // Admin Correction & Return-to-Branch System
+        window.setAdminCorrectionCmd = function(cmdText) {
+            const input = document.getElementById('adminCorrectionCommandInput');
+            if (input) {
+                input.value = cmdText;
+                input.focus();
+            }
+        };
+
+        window.sendSubmissionBackForCorrection = async function(id) {
+            const cmdInput = document.getElementById('adminCorrectionCommandInput');
+            const cmd = (cmdInput ? cmdInput.value : '').trim();
+            if (!cmd) {
+                return showToast("කරුණාකර ශාඛාවට යැවිය යුතු Command / උපදෙස ඇතුළත් කරන්න!", "warning");
+            }
+
+            try {
+                const updateData = {
+                    status: 'Correction Needed',
+                    correctionRequired: true,
+                    adminCommand: cmd,
+                    adminReply: '⚠️ Head Office Command: ' + cmd,
+                    paymentStatus: 'Pending',
+                    correctionRequestedAt: Date.now(),
+                    correctionRequestedBy: currentUser ? currentUser.email : 'admin'
+                };
+
+                await updateDoc(doc(db, "sales", id), updateData);
+                const sale = (allSales || []).find(s => s.id === id);
+                if (sale) Object.assign(sale, updateData);
+
+                showToast("📤 සාර්ථකයි! ගනුදෙනුව සංශෝධනය කිරීම සඳහා ශාඛාව වෙත ආපසු යවන ලදී!", "success");
+                closeModal();
+                renderAllSubmissions();
+            } catch (e) {
+                console.error("Correction send error:", e);
+                showToast("Failed to send for correction: " + e.message, "error");
+            }
+        };
+
+        window.toggleAdminDirectEditSection = function(id) {
+            const container = document.getElementById('adminDirectEditContainer');
+            if (!container) return;
+            const isHidden = container.style.display === 'none' || container.style.display === '';
+            container.style.display = isHidden ? 'block' : 'none';
+        };
+
+        window.executeSaveAdminDirectCorrection = async function(id) {
+            const sale = (allSales || []).find(s => s.id === id);
+            if (!sale) return showToast("Sale record not found", "error");
+
+            const fileDate = document.getElementById('adminEditFileDate')?.value;
+            const entryDate = document.getElementById('adminEditEntryDate')?.value;
+            const sp = document.getElementById('adminEditSp')?.value.trim();
+            const name = document.getElementById('adminEditCustName')?.value.trim();
+            const nic = document.getElementById('adminEditCustNic')?.value.trim();
+            const docFee = parseFloat(document.getElementById('adminEditDocFee')?.value) || 0;
+            const dp = parseFloat(document.getElementById('adminEditDownPayment')?.value) || 0;
+            const loan = parseFloat(document.getElementById('adminEditLoanAmount')?.value) || 0;
+            const setl = parseFloat(document.getElementById('adminEditSettlement')?.value) || 0;
+
+            try {
+                const updateData = {
+                    date: fileDate || sale.date,
+                    originalDate: fileDate || sale.originalDate || sale.date,
+                    entryDate: entryDate || sale.entryDate || '',
+                    spNumber: sp,
+                    name: name,
+                    nic: nic,
+                    document: docFee,
+                    downPayment: dp,
+                    loanAmount: loan,
+                    settlement: setl,
+                    lastEditedByAdmin: true,
+                    adminEditedAt: Date.now()
+                };
+
+                await updateDoc(doc(db, "sales", id), updateData);
+                Object.assign(sale, updateData);
+
+                showToast("💾 සාර්ථකයි! ගනුදෙනුවේ තොරතුරු Admin විසින් සෘජුවම සංශෝධනය කරන ලදී!", "success");
+                openDetailsModal(sale);
+                renderAllSubmissions();
+            } catch(e) {
+                console.error("Direct save error:", e);
+                showToast("Failed to save correction: " + e.message, "error");
+            }
+        };
+
         window.openDetailsModal = function(data) {
             currentModalDocId = data.id;
             const content = document.getElementById('modalContent');
@@ -5381,9 +5473,103 @@
                     <div class="detail-item"><strong>Settlement Amount:</strong> <span class="val" style="color:var(--warning); font-weight:bold;">Rs. ${parseFloat(data.settlement || 0).toLocaleString()}</span></div>
                 ` : ''}
                 <div class="detail-item"><strong>Current Status:</strong> <span class="val">${getStatusBadge(data.status)}</span></div>
+                <!-- Two-Way Correction Banners -->
+                ${data.status === 'Correction Needed' || data.correctionRequired ? `
+                    <div style="grid-column: 1 / -1; background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 0.75rem;">
+                        <div style="font-weight: 800; color: #b91c1c; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                            <span>⚠️</span> RETURNED TO BRANCH FOR CORRECTION (ශාඛාවට යවා ඇත)
+                        </div>
+                        <div style="font-size: 0.84rem; color: #334155;">Command sent to branch: <strong style="color: #991b1b;">"${data.adminCommand || data.adminReply || '-'}"</strong></div>
+                    </div>
+                ` : ''}
+
+                ${data.status === 'Resubmitted' ? `
+                    <div style="grid-column: 1 / -1; background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 0.75rem;">
+                        <div style="font-weight: 800; color: #1e40af; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                            <span>🔄</span> BRANCH HAS RESUBMITTED WITH CORRECTIONS (ශාඛාව විසින් සංශෝධනය කර ඇත)
+                        </div>
+                        <div style="font-size: 0.84rem; color: #334155;">Branch Note: <strong style="color: #047857;">"${data.branchReplyNote || data.adminReply || 'Details updated by shop'}"</strong></div>
+                    </div>
+                ` : ''}
+
+                <!-- TWO-WAY CORRECTION SECTION: SEND BACK TO BRANCH OR EDIT DIRECTLY -->
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(245, 158, 11, 0.06) 100%); border: 1.5px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 1rem 1.1rem; margin-top: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                        <span style="font-weight: 800; color: #991b1b; font-size: 0.92rem; display: flex; align-items: center; gap: 6px;">
+                            <span>↩️</span> Send Back to Branch for Correction (සංශෝධනය සඳහා ශාඛාවට ආපසු යැවීම)
+                        </span>
+                        <button type="button" onclick="toggleAdminDirectEditSection('${data.id}')" style="background: white; border: 1.5px solid #3b82f6; color: #2563eb; padding: 3px 9px; border-radius: 6px; font-weight: 800; font-size: 0.74rem; cursor: pointer;">
+                            ✏️ Direct Edit Here (මෙතැනදීම හදන්න)
+                        </button>
+                    </div>
+
+                    <!-- Quick Reason Suggestion Buttons -->
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px;">
+                        <button type="button" onclick="setAdminCorrectionCmd('කරුණාකර File Submit Date (දිනය) නිවැරදි කර නැවත එවන්න.')" style="background: white; border: 1px solid #cbd5e1; color: #1e3a8a; padding: 2px 7px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">📅 Fix Date</button>
+                        <button type="button" onclick="setAdminCorrectionCmd('Customer Name සහ NIC අංකය නිවැරදි කර නැවත එවන්න.')" style="background: white; border: 1px solid #cbd5e1; color: #1e3a8a; padding: 2px 7px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">👤 Fix Customer/NIC</button>
+                        <button type="button" onclick="setAdminCorrectionCmd('SP Number (බිල්පත් අංකය) නිවැරදි කර නැවත එවන්න.')" style="background: white; border: 1px solid #cbd5e1; color: #1e3a8a; padding: 2px 7px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">🔢 Fix SP No</button>
+                        <button type="button" onclick="setAdminCorrectionCmd('Down Payment / Document Charge මුදල් නිවැරදි කර නැවත එවන්න.')" style="background: white; border: 1px solid #cbd5e1; color: #1e3a8a; padding: 2px 7px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">💵 Fix Fees</button>
+                    </div>
+
+                    <textarea id="adminCorrectionCommandInput" placeholder="ශාඛාවට යැවිය යුතු Command / සටහන මෙහි ලියන්න (උදා: File Date එක නිවැරදි දිනයට සකසා නැවත එවන්න)..." style="width: 100%; min-height: 55px; padding: 0.6rem; border-radius: 8px; border: 1.5px solid #dc2626; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; background: white;"></textarea>
+
+                    <button type="button" onclick="sendSubmissionBackForCorrection('${data.id}')" style="width: 100%; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 0.65rem; border-radius: 8px; font-weight: 800; font-size: 0.86rem; cursor: pointer; box-shadow: 0 4px 12px rgba(220,38,38,0.25);">
+                        ↩️ Send Back to Branch for Correction (ශාඛාවට යවන්න)
+                    </button>
+                </div>
+
+                <!-- Admin In-Place Direct Edit Section (Hidden by default, shown on toggle) -->
+                <div id="adminDirectEditContainer" style="display: none; grid-column: 1 / -1; background: #f8fafc; border: 1.5px solid #3b82f6; border-radius: 14px; padding: 1rem; margin-top: 0.8rem;">
+                    <div style="font-weight: 800; color: #1e40af; font-size: 0.92rem; margin-bottom: 8px;">✏️ Direct Admin In-Place Correction (මෙතැනදීම සංශෝධනය කර සුරකින්න)</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem;">
+                        <div>
+                            <label style="font-weight: 700; color: #1e3a8a; display: block; margin-bottom: 2px;">Original File Date:</label>
+                            <input type="date" id="adminEditFileDate" value="${data.originalDate || data.date || ''}" style="width: 100%; padding: 0.45rem; border: 1.5px solid #3b82f6; border-radius: 6px; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #047857; display: block; margin-bottom: 2px;">System Entry Date:</label>
+                            <input type="date" id="adminEditEntryDate" value="${data.entryDate || ''}" style="width: 100%; padding: 0.45rem; border: 1.5px solid #10b981; border-radius: 6px; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">SP Number:</label>
+                            <input type="text" id="adminEditSp" value="${data.spNumber || ''}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Customer Name:</label>
+                            <input type="text" id="adminEditCustName" value="${data.name || ''}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Customer NIC:</label>
+                            <input type="text" id="adminEditCustNic" value="${data.nic || ''}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Document Charge (Rs.):</label>
+                            <input type="number" id="adminEditDocFee" value="${data.document || 0}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Down Payment (Rs.):</label>
+                            <input type="number" id="adminEditDownPayment" value="${data.downPayment || 0}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Loan Amount (Rs.):</label>
+                            <input type="number" id="adminEditLoanAmount" value="${data.loanAmount || 0}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #047857;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 700; color: #334155; display: block; margin-bottom: 2px;">Settlement (Rs.):</label>
+                            <input type="number" id="adminEditSettlement" value="${data.settlement || 0}" style="width: 100%; padding: 0.45rem; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #d97706;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button type="button" onclick="executeSaveAdminDirectCorrection('${data.id}')" style="flex: 1; background: #2563eb; color: white; border: none; padding: 0.6rem; border-radius: 8px; font-weight: 800; font-size: 0.84rem; cursor: pointer;">
+                            💾 Save Admin Corrections Now (වහාම සුරකින්න)
+                        </button>
+                        <button type="button" onclick="toggleAdminDirectEditSection()" style="background: #e2e8f0; color: #475569; border: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">Cancel</button>
+                    </div>
+                </div>
+
                 <!-- Admin Correction & Reset Toolbar -->
-                <div style="background: rgba(245, 158, 11, 0.08); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1rem;">
-                <div style="font-weight: 800; color: #b45309; font-size: 0.86rem; margin-bottom: 6px;">⚙️ Admin Correction & Reset (PIN 1234)</div>
+                <div style="grid-column: 1 / -1; background: rgba(245, 158, 11, 0.08); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 0.8rem;">
+                <div style="font-weight: 800; color: #b45309; font-size: 0.86rem; margin-bottom: 6px;">⚙️ Admin Reset & Delete (PIN 1234)</div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="button" onclick="adminResetSubmissionToPending('${data.id}')" style="background: #f59e0b; color: white; border: none; padding: 0.45rem 0.9rem; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer;">
                 🔄 Reset to Pending / Re-check
@@ -5402,7 +5588,7 @@
             document.getElementById('paymentStatusSelect').value = (data.paymentStatus === 'Paid' || data.status === 'Completed') ? 'Paid' : 'Pending';
             
             const completeBtn = document.getElementById('completeProcessBtn');
-            if (data.status === 'Confirmed' || data.status === 'Cash Payment Pending' || isCash) {
+            if (data.status === 'Confirmed' || data.status === 'Cash Payment Pending' || data.status === 'Resubmitted' || data.status === 'New' || isCash) {
                 completeBtn.style.display = 'block';
                 completeBtn.innerText = isCash ? '💵 Payment Received & Complete File ✅' : 'Complete Process ✅';
                 completeBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
