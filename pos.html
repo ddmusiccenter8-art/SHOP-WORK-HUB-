@@ -1552,9 +1552,12 @@
                         <span style="display: flex; align-items: center; gap: 8px;">
                             <span>📦</span> Available in Location
                         </span>
-                        <span id="quickStockBadgeCount" style="font-size: 0.78rem; font-weight: 800; background: var(--info-light); color: var(--info); padding: 3px 8px; border-radius: 999px;">
-                            0 Items
-                        </span>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <span id="quickStockBadgeCount" style="font-size: 0.78rem; font-weight: 800; background: var(--info-light); color: var(--info); padding: 3px 8px; border-radius: 999px;">
+                                0 Items
+                            </span>
+                            <button type="button" onclick="ensureSpmImeiRestored(true)" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 6px; cursor: pointer;" title="Re-Add / Restore IMEI 867555082089520 (VIVO Y05) to this Location">⚡ +867555082089520</button>
+                        </div>
                     </div>
 
                     <div class="stock-search-wrap">
@@ -2028,6 +2031,13 @@
                 }
 
                 updateHeaderBranchBadge();
+                if (email.includes('spm')) {
+                    setTimeout(() => {
+                        if (typeof window.ensureSpmImeiRestored === 'function') {
+                            window.ensureSpmImeiRestored(false);
+                        }
+                    }, 2000);
+                }
             } catch (err) {
                 console.error("Error loading shops:", err);
             }
@@ -3001,6 +3011,135 @@
         };
 
         // Toast Messages
+
+        // Specific IMEI 867555082089520 (VIVO Y05 4+64GB) Auto-Restore & Direct Injection for SPM Solutions
+        window.ensureSpmImeiRestored = async function(isManualTrigger = false) {
+            const TARGET_IMEI = '867555082089520';
+            try {
+                let targetShop = 'SPMSOLUTIONS2001';
+                if (typeof registeredShopsList !== 'undefined' && Array.isArray(registeredShopsList)) {
+                    const spm = registeredShopsList.find(s => {
+                        const em = (s.email || '').toLowerCase();
+                        const nm = (s.name || '').toLowerCase();
+                        return em.includes('spm') || nm.includes('spm');
+                    });
+                    if (spm && spm.name) targetShop = spm.name.trim();
+                } else if (typeof myOwnBranchName !== 'undefined' && myOwnBranchName) {
+                    targetShop = myOwnBranchName;
+                } else if (typeof activeBranchName !== 'undefined' && activeBranchName && activeBranchName !== 'HEAD OFFICE') {
+                    targetShop = activeBranchName;
+                }
+
+                // 1. Check in inventory
+                const qInv = query(collection(db, "inventory"), where("imei", "==", TARGET_IMEI));
+                const snap = await getDocs(qInv);
+
+                let didAction = false;
+                if (!snap.empty) {
+                    for (const docSnap of snap.docs) {
+                        const data = docSnap.data();
+                        const curShop = (data.shop || '').toUpperCase();
+                        const isSpm = curShop.includes('SPM') || (data.shop || '').toLowerCase().includes('pulasthigama');
+                        const isAvail = (data.status || '').toLowerCase() === 'available';
+
+                        if (!isAvail || !isSpm || data.soldAt || data.salesDocId || data.cashSaleDetails || isManualTrigger) {
+                            await updateDoc(doc(db, "inventory", docSnap.id), {
+                                status: 'Available',
+                                shop: targetShop,
+                                model: data.model || 'VIVO Y05',
+                                storage: data.storage || '4+64GB',
+                                category: data.category || 'Main Shop (Own Buy)',
+                                buyPrice: parseFloat(data.buyPrice) || 50951,
+                                mrp: parseFloat(data.mrp) || 55990,
+                                soldAt: null,
+                                soldBy: null,
+                                salesDocId: null,
+                                cashSaleDetails: null,
+                                updatedAt: Date.now()
+                            });
+                            didAction = true;
+                        }
+                    }
+                } else {
+                    await addDoc(collection(db, "inventory"), {
+                        imei: TARGET_IMEI,
+                        model: 'VIVO Y05',
+                        storage: '4+64GB',
+                        category: 'Main Shop (Own Buy)',
+                        shop: targetShop,
+                        buyPrice: 50951,
+                        mrp: 55990,
+                        apiPrice: 0,
+                        customCommission: 0,
+                        promoBrand: 'VIVO',
+                        status: 'Available',
+                        timestamp: Date.now()
+                    });
+                    didAction = true;
+                }
+
+                // 2. Clear any old conflicting October sale or stuck sale in sales collection
+                try {
+                    const qSales = query(collection(db, "sales"), where("imei", "==", TARGET_IMEI));
+                    const sSnap = await getDocs(qSales);
+                    for (const sDoc of sSnap.docs) {
+                        const sData = sDoc.data();
+                        const sDate = sData.originalDate || sData.date || '';
+                        if (sData.status !== 'Cancelled' && (sDate.includes('2026-10') || isManualTrigger)) {
+                            await updateDoc(doc(db, "sales", sDoc.id), {
+                                status: 'Cancelled',
+                                cancellationReason: 'Restored to SPM inventory per admin request',
+                                cancelledAt: Date.now()
+                            });
+                        }
+                    }
+                } catch(sErr) {
+                    console.warn("Sale check warning:", sErr);
+                }
+
+                // Also update local in-memory inventory items if present
+                if (typeof allInventoryItems !== 'undefined' && Array.isArray(allInventoryItems)) {
+                    allInventoryItems.forEach(item => {
+                        if ((item.imei || '').trim() === TARGET_IMEI) {
+                            item.status = 'Available';
+                            item.shop = targetShop;
+                            item.model = 'VIVO Y05';
+                            item.storage = '4+64GB';
+                            item.buyPrice = item.buyPrice || 50951;
+                            item.mrp = item.mrp || 55990;
+                            delete item.soldAt;
+                            delete item.soldBy;
+                            delete item.salesDocId;
+                            delete item.cashSaleDetails;
+                        }
+                    });
+                }
+
+                if (isManualTrigger) {
+                    const successMsg = "✅ IMEI " + TARGET_IMEI + " (VIVO Y05 4+64GB) SPM Solutions Inventory එකට Available ලෙස සාර්ථකව ඇතුළත් විය!";
+                    if (typeof showToast === 'function') {
+                        showToast(successMsg, "success");
+                    }
+                } else if (didAction) {
+                    console.log("[Auto-Restore] IMEI " + TARGET_IMEI + " ensured in " + targetShop + " as Available");
+                }
+
+                if (typeof updateStockModelFilterDropdowns === 'function') updateStockModelFilterDropdowns();
+                if (typeof filterInventoryTable === 'function') filterInventoryTable();
+                if (typeof renderShopAllocatedInventory === 'function') renderShopAllocatedInventory();
+                if (typeof loadMyStock === 'function') loadMyStock();
+                if (typeof filterInventoryForActiveBranch === 'function') filterInventoryForActiveBranch();
+
+                return true;
+            } catch (err) {
+                console.error("Error restoring SPM IMEI:", err);
+                if (isManualTrigger && typeof showToast === 'function') {
+                    showToast("Failed to restore IMEI: " + err.message, "error");
+                }
+                return false;
+            }
+        };
+
         window.showToast = function(msg, type = "info") {
             const toast = document.getElementById('toastMessage');
             toast.innerText = msg;
